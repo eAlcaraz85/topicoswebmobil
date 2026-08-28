@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-08-26 mié 21:03 -->
+<!-- 2026-08-28 vie 07:33 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tópicos Selectos de Tecnologías Web y Móvil — Introducción a los Patrones de Diseño de Software</title>
@@ -210,164 +210,167 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge6fc322">1. Actividad : tres acertijos para encontrar el patrón</a>
+<li><a href="#org9b4fdd3">1. Actividad : tres acertijos para encontrar el patrón</a>
 <ul>
-<li><a href="#orgcb68abf">1.1. Acertijo 1 — Un millón de interruptores</a></li>
-<li><a href="#orge6158da">1.2. Acertijo 2 — El estacionamiento</a></li>
-<li><a href="#orgb352687">1.3. Acertijo 3 — La mosca y los dos trenes</a></li>
-<li><a href="#orgcba1564">1.4. Soluciones y moraleja (después de intentar)</a>
+<li><a href="#org1f80108">1.1. Acertijo 1 — Un millón de interruptores</a></li>
+<li><a href="#orgf867cc3">1.2. Acertijo 2 — El estacionamiento</a></li>
+<li><a href="#orgcc455fe">1.3. Acertijo 3 — La mosca y los dos trenes</a></li>
+<li><a href="#orge54791f">1.4. Soluciones y moraleja</a>
 <ul>
-<li><a href="#orgc823c97">1.4.1. Revelación del acertijo 1</a></li>
-<li><a href="#orgf06926f">1.4.2. Revelación del acertijo 2</a></li>
-<li><a href="#orgdc2d1cb">1.4.3. Revelación del acertijo 3</a></li>
-<li><a href="#org58ee821">1.4.4. Qué tiene esto que ver con patrones de <b>diseño</b></a></li>
+<li><a href="#org8eb732c">1.4.1. Revelación del acertijo 1</a></li>
+<li><a href="#orgecd6f10">1.4.2. Revelación del acertijo 2</a></li>
+<li><a href="#orgfd9613e">1.4.3. Revelación del acertijo 3</a></li>
+<li><a href="#org4b62e80">1.4.4. Qué tiene esto que ver con patrones de <b>diseño</b></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org61a3199">2. Introducción</a>
+<li><a href="#org41a4085">2. Introducción</a>
 <ul>
-<li><a href="#orgce38e3b">2.1. Analogía general (si no sabes nada del tema)</a></li>
-<li><a href="#orga9b29de">2.2. El hilo conductor: el minijuego «FeriaPPT»</a></li>
-<li><a href="#orga852de3">2.3. Glosario desde cero</a>
+<li><a href="#orgabcba23">2.1. El caso de estudio: FeriaPPT</a></li>
+<li><a href="#orgb1093db">2.2. Glosario</a>
 <ul>
-<li><a href="#org5465780">2.3.1. Conceptos de diseño</a></li>
-<li><a href="#org0fa0704">2.3.2. Familias de patrones (catálogo clásico)</a></li>
-<li><a href="#org434a528">2.3.3. Vocabulario que verás en web y móvil</a></li>
+<li><a href="#org9e0dda5">2.2.1. Conceptos de diseño</a></li>
+<li><a href="#org03bad0c">2.2.2. Familias de patrones</a></li>
+<li><a href="#orgf8f0a77">2.2.3. Vocabulario de aplicaciones web y móviles</a></li>
 </ul>
 </li>
-<li><a href="#org67dacad">2.4. ¿Qué es un patrón de diseño? Definición operativa</a></li>
-<li><a href="#org1a15de1">2.5. Qué significa GoF (Gang of Four): el apodo, las cuatro personas y el libro</a>
+<li><a href="#orgf313d57">2.3. Definición de patrón de diseño</a></li>
+<li><a href="#orgd82d8bd">2.4. GoF: autores, libro y catálogo</a>
 <ul>
-<li><a href="#org9d9cc79">2.5.1. El malentendido más común</a></li>
-<li><a href="#orgabb07e9">2.5.2. De dónde sale el nombre «Gang of Four»</a></li>
-<li><a href="#orgea33923">2.5.3. Quiénes son las cuatro personas</a></li>
-<li><a href="#orgfdde595">2.5.4. Qué contiene el libro (y qué no)</a></li>
-<li><a href="#org850833d">2.5.5. Analogía para no volver a perderse</a></li>
-<li><a href="#org27217b9">2.5.6. Cómo se usa la palabra en clase, en libros y en código</a></li>
-<li><a href="#orgc9d46ea">2.5.7. Por qué el apodo sigue vivo treinta años después</a></li>
+<li><a href="#orgc6d47bb">2.4.1. Alcance del término</a></li>
+<li><a href="#org341ad04">2.4.2. Origen del nombre</a></li>
+<li><a href="#org16f7571">2.4.3. Los autores</a></li>
+<li><a href="#orgfe62921">2.4.4. Contenido y plantilla</a></li>
+<li><a href="#orga14030b">2.4.5. Relación con otros catálogos</a></li>
+<li><a href="#org9918aa8">2.4.6. Persistencia del catálogo</a></li>
 </ul>
 </li>
-<li><a href="#org0decd6d">2.6. De dónde salen los patrones (historia breve y por qué importa)</a></li>
-<li><a href="#orgea671a7">2.7. Anatomía de un patrón (plantilla de análisis)</a></li>
-<li><a href="#orgea7a079">2.8. Principios que sostienen a los patrones (SOLID y amigos)</a>
+<li><a href="#org43e3335">2.5. Anatomía de un patrón</a></li>
+<li><a href="#orge310cde">2.6. Principios de los que dependen los patrones</a>
 <ul>
-<li><a href="#orgb6fa515">2.8.1. SOLID (muy usados en web y móvil)</a></li>
-<li><a href="#org646d29e">2.8.2. Otros principios que aparecen todo el tiempo</a></li>
+<li><a href="#org1967c0d">2.6.1. SOLID</a></li>
+<li><a href="#org510d8f7">2.6.2. Otros principios</a></li>
 </ul>
 </li>
-<li><a href="#org64117af">2.9. Niveles: idioma, patrón, estilo arquitectónico</a></li>
-<li><a href="#orgd2c2923">2.10. Buena práctica: el patrón conveniente <b>también</b> depende del lenguaje</a></li>
-<li><a href="#org58ef1e8">2.11. Catálogo GoF: mapa de alto nivel de los 23</a>
+<li><a href="#org234152e">2.7. Niveles: idioma, patrón, estilo arquitectónico</a></li>
+<li><a href="#orgf22d13b">2.8. Relación entre patrón, idioma, lenguaje y marco de trabajo</a>
 <ul>
-<li><a href="#org74d51c3">2.11.1. Creacionales</a></li>
-<li><a href="#orgec1cac4">2.11.2. Estructurales</a></li>
-<li><a href="#org370f205">2.11.3. Comportamentales</a></li>
+<li><a href="#orgeae130d">2.8.1. Realización de Strategy en Java, JavaScript y React</a></li>
+<li><a href="#orgeeb18ee">2.8.2. El marco de trabajo como diseño congelado</a></li>
+<li><a href="#orgd79944a">2.8.3. Correspondencia de formas</a></li>
 </ul>
 </li>
-<li><a href="#orgee8eba7">2.12. Cómo se <b>analiza</b> un patrón (método de la materia)</a></li>
-<li><a href="#org0c3111e">2.13. Cómo se <b>diseña</b> con patrones (no al revés)</a></li>
-<li><a href="#org4b59980">2.14. Antipatrones que debes reconocer (para no copiarlos)</a></li>
-<li><a href="#orgce31f00">2.15. Mini-ejemplo con FeriaPPT: Strategy (el rival de la máquina)</a></li>
-<li><a href="#org8c9ddf8">2.16. Idea clave de la introducción</a></li>
+<li><a href="#orgdb7e8a3">2.9. Catálogo GoF: mapa de alto nivel de los 23</a>
+<ul>
+<li><a href="#orgc3f7626">2.9.1. Creacionales</a></li>
+<li><a href="#org1305821">2.9.2. Estructurales</a></li>
+<li><a href="#orgf85e665">2.9.3. Comportamentales</a></li>
+</ul>
+</li>
+<li><a href="#org81393de">2.10. Método de análisis</a></li>
+<li><a href="#org45b7c36">2.11. Orden de diseño</a></li>
+<li><a href="#orgfe5068e">2.12. Antipatrones</a></li>
+<li><a href="#org3036526">2.13. Mini-ejemplo con FeriaPPT: Strategy</a></li>
+<li><a href="#org68b43f6">2.14. Síntesis de la introducción</a></li>
 </ul>
 </li>
 <li><a href="#patrones-web">3. Patrones de software para aplicaciones web</a>
 <ul>
-<li><a href="#org496d545">3.1. Tablero de patrones web (lista visible)</a></li>
-<li><a href="#orge8639ee">3.2. FeriaPPT en el navegador: cómo se ve el juego</a></li>
-<li><a href="#org1cef616">3.3. Contexto: qué hace «web» al diseño (fuerzas específicas)</a></li>
-<li><a href="#orgb6db058">3.4. Mapa de capas donde viven los patrones web</a></li>
-<li><a href="#orga80b8ad">3.5. Patrones de presentación en el servidor (P of EAA)</a>
+<li><a href="#org75c0cac">3.1. Tablero de patrones web</a></li>
+<li><a href="#org8cc8669">3.2. FeriaPPT en el navegador: cómo se ve el juego</a></li>
+<li><a href="#org9cda52a">3.3. Contexto: restricciones de la web</a></li>
+<li><a href="#org97b4226">3.4. Mapa de capas donde viven los patrones web</a></li>
+<li><a href="#orgeae03ff">3.5. Patrones de presentación en el servidor</a>
 <ul>
-<li><a href="#orgbbb461d">3.5.1. Front Controller — la taquilla única</a></li>
-<li><a href="#org1558430">3.5.2. Page Controller — un puesto, una página</a></li>
-<li><a href="#org5698371">3.5.3. Template View vs. Transform View — la lona</a></li>
-<li><a href="#orgd6cd659">3.5.4. MVC en web — marcador, lona y clic</a></li>
-<li><a href="#org18fc81d">3.5.5. MVVM y unidireccionalidad en el cliente — un solo tablero de ronda</a></li>
+<li><a href="#org7a74358">3.5.1. Front Controller</a></li>
+<li><a href="#org5c06cc2">3.5.2. Page Controller</a></li>
+<li><a href="#org31fd43d">3.5.3. Template View y Transform View</a></li>
+<li><a href="#org6b81d76">3.5.4. MVC en web</a></li>
+<li><a href="#org8a30ff2">3.5.5. MVVM y flujo unidireccional en el cliente</a></li>
 </ul>
 </li>
-<li><a href="#org1994284">3.6. Middleware: Chain of Responsibility — el portero de la feria</a></li>
-<li><a href="#org783a597">3.7. Patrones de dominio y aplicación (el reglamento, no la lona)</a>
+<li><a href="#org890f717">3.6. Middleware y Chain of Responsibility</a></li>
+<li><a href="#org2522d33">3.7. Patrones de dominio y aplicación</a>
 <ul>
-<li><a href="#org2127238">3.7.1. Service Layer — el feriante que sabe el juego</a></li>
-<li><a href="#orgc0c0569">3.7.2. Repository y Unit of Work — el cajón y la doble anotación</a></li>
-<li><a href="#orgeb9f4a5">3.7.3. Adapter — la máquina arcade del abuelo</a></li>
-<li><a href="#orgb57839b">3.7.4. Facade — el letrero «tirar»</a></li>
-<li><a href="#orgde66739">3.7.5. Strategy y Factory — personalidades del rival</a></li>
-<li><a href="#orgca8e648">3.7.6. Observer — globo, marcador y ranking</a></li>
+<li><a href="#org50ca9af">3.7.1. Service Layer</a></li>
+<li><a href="#orgd3c288f">3.7.2. Repository y Unit of Work</a></li>
+<li><a href="#org47ff406">3.7.3. Adapter</a></li>
+<li><a href="#org108c9ca">3.7.4. Facade</a></li>
+<li><a href="#org0d70a79">3.7.5. Strategy y Factory</a></li>
+<li><a href="#orgcfeafb2">3.7.6. Observer</a></li>
 </ul>
 </li>
-<li><a href="#orge4bc673">3.8. Patrones de API e integración</a>
+<li><a href="#org125273c">3.8. Patrones de API e integración</a>
 <ul>
-<li><a href="#org78a4bd1">3.8.1. Recurso REST — la partida es una cosa con dirección</a></li>
-<li><a href="#orgbf146a6">3.8.2. API Gateway y BFF — puerta de la feria vs mostrador a la medida</a></li>
-<li><a href="#org4b0523c">3.8.3. Proxy, caché y CDN</a></li>
-<li><a href="#orgcc56dc0">3.8.4. Circuit Breaker, Retry, Bulkhead — el ranking nacional se cayó</a></li>
+<li><a href="#orga6d40fc">3.8.1. Recurso REST</a></li>
+<li><a href="#org0d07780">3.8.2. API Gateway y BFF</a></li>
+<li><a href="#org8c6ff3a">3.8.3. Proxy, caché y CDN</a></li>
+<li><a href="#org8e7ccde">3.8.4. Circuit Breaker, Retry y Bulkhead</a></li>
 </ul>
 </li>
-<li><a href="#org5be9b65">3.9. Patrones de arquitectura web que envuelven a los de diseño</a>
+<li><a href="#org03e2785">3.9. Patrones de arquitectura web que envuelven a los de diseño</a>
 <ul>
-<li><a href="#org25a928a">3.9.1. Capas</a></li>
-<li><a href="#orgedeaf14">3.9.2. Hexagonal / puertos y adaptadores</a></li>
-<li><a href="#org95d6139">3.9.3. CQRS (alto nivel)</a></li>
+<li><a href="#org693d18d">3.9.1. Capas</a></li>
+<li><a href="#org227d0b1">3.9.2. Hexagonal / puertos y adaptadores</a></li>
+<li><a href="#org4fe9ef6">3.9.3. CQRS</a></li>
 </ul>
 </li>
-<li><a href="#org7aa5745">3.10. Análisis de un caso web: FeriaPPT en línea</a></li>
-<li><a href="#orged5ee50">3.11. Tabla de decisión rápida (web)</a></li>
-<li><a href="#org6733c33">3.12. Idea clave de la parte web</a></li>
+<li><a href="#org7847632">3.10. Análisis de un caso web: FeriaPPT en línea</a></li>
+<li><a href="#org7aa2229">3.11. Tabla de decisión rápida: web</a></li>
+<li><a href="#org7f513a5">3.12. Idea clave de la parte web</a></li>
 </ul>
 </li>
 <li><a href="#patrones-movil">4. Patrones de software para aplicaciones móviles</a>
 <ul>
-<li><a href="#org55c8806">4.1. Tablero de patrones móviles (el mismo juego, otro mostrador)</a></li>
-<li><a href="#org0ae2dc8">4.2. Contexto: qué hace «móvil» al diseño (fuerzas específicas)</a></li>
-<li><a href="#org9505d80">4.3. Mapa de capas en una app moderna</a></li>
-<li><a href="#org53bf584">4.4. Patrones de presentación móviles (el menú que sí tienes que comparar)</a>
+<li><a href="#org1d4e05b">4.1. Tablero de patrones móviles</a></li>
+<li><a href="#orge4051bf">4.2. Contexto: qué hace «móvil» al diseño</a></li>
+<li><a href="#orgdb9d9f0">4.3. Mapa de capas en una app moderna</a></li>
+<li><a href="#orge01003d">4.4. Patrones de presentación móviles</a>
 <ul>
-<li><a href="#org1c4ed3f">4.4.1. MVC móvil (el legado)</a></li>
-<li><a href="#orgd370ab1">4.4.2. MVP (Model-View-Presenter)</a></li>
-<li><a href="#orgd436deb">4.4.3. MVVM (el más usado hoy en Android e iOS)</a></li>
-<li><a href="#org5cd460c">4.4.4. MVI / UDF (Model-View-Intent)</a></li>
-<li><a href="#org1fa3c28">4.4.5. BLoC / Redux-like (Flutter y RN)</a></li>
-<li><a href="#org2c3230e">4.4.6. Tabla comparativa (para el examen y para el diseño)</a></li>
+<li><a href="#orgff8dff1">4.4.1. MVC móvil</a></li>
+<li><a href="#org4d44266">4.4.2. MVP</a></li>
+<li><a href="#org3f7c5a2">4.4.3. MVVM</a></li>
+<li><a href="#org7657278">4.4.4. MVI y UDF</a></li>
+<li><a href="#orgdb30878">4.4.5. BLoC y Redux</a></li>
+<li><a href="#orgbe94f28">4.4.6. Tabla comparativa</a></li>
 </ul>
 </li>
-<li><a href="#orgda261de">4.5. Navegación: Coordinator / Router / Navigator</a></li>
-<li><a href="#org7b92f85">4.6. Datos, offline y sincronización (el camión sin señal)</a>
+<li><a href="#org0805eaf">4.5. Navegación: Coordinator / Router / Navigator</a></li>
+<li><a href="#orgd5e6793">4.6. Datos, offline y sincronización</a>
 <ul>
-<li><a href="#org142ccea">4.6.1. Repository con dos (o tres) orígenes</a></li>
-<li><a href="#orge67db17">4.6.2. Cola de comandos y sincronización</a></li>
-<li><a href="#org1371e57">4.6.3. Observer en datos</a></li>
+<li><a href="#org4fb53eb">4.6.1. Repository con varios orígenes</a></li>
+<li><a href="#org53f7081">4.6.2. Cola de comandos y sincronización</a></li>
+<li><a href="#org4b67359">4.6.3. Observer en datos</a></li>
 </ul>
 </li>
-<li><a href="#org4fc75f0">4.7. Ciclo de vida, concurrencia y recursos</a>
+<li><a href="#org72d139d">4.7. Ciclo de vida, concurrencia y recursos</a>
 <ul>
-<li><a href="#orgb9ad2b7">4.7.1. Template Method del sistema operativo</a></li>
-<li><a href="#orgd2141e1">4.7.2. Proxy virtual y lazy</a></li>
-<li><a href="#orga1e11f8">4.7.3. Command para trabajo en segundo plano</a></li>
+<li><a href="#orga02fc62">4.7.1. Template Method del sistema operativo</a></li>
+<li><a href="#org15d1900">4.7.2. Proxy virtual y lazy</a></li>
+<li><a href="#orgf8d6f1e">4.7.3. Command para trabajo en segundo plano</a></li>
 </ul>
 </li>
-<li><a href="#org4107646">4.8. Inyección de dependencias en móvil</a></li>
-<li><a href="#org57b3838">4.9. Patrones GoF que el móvil usa <b>con otro disfraz</b></a></li>
-<li><a href="#org2730453">4.10. Plataformas: el mismo análisis, distintos idiomas</a></li>
-<li><a href="#orgfd9dd5b">4.11. Análisis de un caso móvil: FeriaPPT en el camión</a></li>
-<li><a href="#orgbfa03cf">4.12. Comparativa de diseño: el mismo FeriaPPT, dos mundos</a></li>
-<li><a href="#org652859c">4.13. Tabla de decisión rápida (móvil)</a></li>
-<li><a href="#org80309e4">4.14. Idea clave de la parte móvil</a></li>
+<li><a href="#org6379561">4.8. Inyección de dependencias en móvil</a></li>
+<li><a href="#orgcd72caa">4.9. Patrones GoF que el móvil usa <b>con otro disfraz</b></a></li>
+<li><a href="#org563ebac">4.10. Plataformas: el mismo análisis, distintos idiomas</a></li>
+<li><a href="#orgafe0910">4.11. Análisis de un caso móvil: FeriaPPT sin red continua</a></li>
+<li><a href="#org48ddab6">4.12. Comparativa de diseño: el mismo FeriaPPT, dos mundos</a></li>
+<li><a href="#org0bd2bc6">4.13. Tabla de decisión rápida: móvil</a></li>
+<li><a href="#org1221036">4.14. Idea clave de la parte móvil</a></li>
 </ul>
 </li>
-<li><a href="#org85e4262">5. Mapa integrado de la unidad</a>
+<li><a href="#orgf195c66">5. Mapa integrado de la unidad</a>
 <ul>
-<li><a href="#orgac2723d">5.1. Las tres preguntas de cualquier ejercicio</a></li>
-<li><a href="#org4555b29">5.2. Chuleta de elección (alto nivel)</a></li>
-<li><a href="#org13e941c">5.3. Errores de examen (y de código) más frecuentes</a></li>
+<li><a href="#org0684743">5.1. Las tres preguntas de cualquier ejercicio</a></li>
+<li><a href="#orgfbab4f0">5.2. Chuleta de elección</a></li>
+<li><a href="#org99bb5e4">5.3. Errores de examen y de código más frecuentes</a></li>
 </ul>
 </li>
-<li><a href="#org5832e6b">6. Preguntas de autoevaluación</a></li>
-<li><a href="#orgb8f3725">7. Mini-glosario UML para leer diagramas de patrones</a></li>
-<li><a href="#orgea39ba1">8. Referencias recomendadas</a></li>
-<li><a href="#org01befb2">9. Cierre</a></li>
+<li><a href="#org0328de9">6. Preguntas de autoevaluación</a></li>
+<li><a href="#orge378af6">7. Mini-glosario UML para leer diagramas de patrones</a></li>
+<li><a href="#orgae8cf3a">8. Referencias recomendadas</a></li>
+<li><a href="#org0d1630a">9. Cierre</a></li>
 </ul>
 </div>
 </div>
@@ -378,15 +381,15 @@ Unidad: <b>Introducción a los Patrones de Diseño de Software</b>
 Subtemas: Introducción · Análisis y diseño de patrones para aplicaciones web · Análisis y diseño de patrones para aplicaciones móviles
 </p>
 </blockquote>
-<div id="outline-container-orge6fc322" class="outline-2">
-<h2 id="orge6fc322"><span class="section-number-2">1.</span> Actividad : tres acertijos para encontrar el patrón</h2>
+<div id="outline-container-org9b4fdd3" class="outline-2">
+<h2 id="org9b4fdd3"><span class="section-number-2">1.</span> Actividad : tres acertijos para encontrar el patrón</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Antes de hablar de  Observer o Strategy, <b>patrón</b> aquí es una <b>regularidad oculta</b>. La fuerza bruta funciona; <b>no escala</b>. Quien ve la estructura responde en un renglón.
 </p>
 </div>
-<div id="outline-container-orgcb68abf" class="outline-3">
-<h3 id="orgcb68abf"><span class="section-number-3">1.1.</span> Acertijo 1 — Un millón de interruptores</h3>
+<div id="outline-container-org1f80108" class="outline-3">
+<h3 id="org1f80108"><span class="section-number-3">1.1.</span> Acertijo 1 — Un millón de interruptores</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Hay <b>n</b> focos apagados e <b>n</b> pasadas. En la pasada <b>k</b> (k = 1 … n) se conmutan exactamente los múltiplos de <b>k</b>.
@@ -407,15 +410,15 @@ Dos ciclos anidados para n = 10⁶ no caben en el cuaderno: por eso existe el ac
 </p>
 </div>
 </div>
-<div id="outline-container-orge6158da" class="outline-3">
-<h3 id="orge6158da"><span class="section-number-3">1.2.</span> Acertijo 2 — El estacionamiento</h3>
+<div id="outline-container-orgf867cc3" class="outline-3">
+<h3 id="orgf867cc3"><span class="section-number-3">1.2.</span> Acertijo 2 — El estacionamiento</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Un coche tapa un cajón:
 </p>
 
-<pre class="example" id="org5c9e276">
-16   |   06   |   68   |   88   |   [COCHE]   |   98
+<pre class="example" id="org81355e8">
+   16   |   06   |   68   |   88   |   [COCHE]   |   98
 </pre>
 
 <p>
@@ -427,8 +430,8 @@ No es sucesión aritmética, ni geométrica, ni Fibonacci. Si salió 89, 96 o 10
 </p>
 </div>
 </div>
-<div id="outline-container-orgb352687" class="outline-3">
-<h3 id="orgb352687"><span class="section-number-3">1.3.</span> Acertijo 3 — La mosca y los dos trenes</h3>
+<div id="outline-container-orgcc455fe" class="outline-3">
+<h3 id="orgcc455fe"><span class="section-number-3">1.3.</span> Acertijo 3 — La mosca y los dos trenes</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Dos trenes salen al mismo tiempo uno hacia el otro. Distancia inicial: <b>240 km</b>. Cada uno va a <b>60 km/h</b>. Una mosca vuela a <b>90 km/h</b> desde el frente del primer tren: llega al segundo, se da la vuelta, llega al primero, se da la vuelta… hasta que los trenes chocan y la aplastan.
@@ -443,12 +446,12 @@ La fuerza bruta es sumar infinitos tramos cada vez más cortos. Hay forma de no 
 </p>
 </div>
 </div>
-<div id="outline-container-orgcba1564" class="outline-3">
-<h3 id="orgcba1564"><span class="section-number-3">1.4.</span> Soluciones y moraleja (después de intentar)</h3>
+<div id="outline-container-orge54791f" class="outline-3">
+<h3 id="orge54791f"><span class="section-number-3">1.4.</span> Soluciones y moraleja</h3>
 <div class="outline-text-3" id="text-1-4">
 </div>
-<div id="outline-container-orgc823c97" class="outline-4">
-<h4 id="orgc823c97"><span class="section-number-4">1.4.1.</span> Revelación del acertijo 1</h4>
+<div id="outline-container-org8eb732c" class="outline-4">
+<h4 id="org8eb732c"><span class="section-number-4">1.4.1.</span> Revelación del acertijo 1</h4>
 <div class="outline-text-4" id="text-1-4-1">
 <p>
 Cada foco <b>k</b> se toca una vez por cada divisor de <b>k</b>. Los divisores van en parejas, salvo en los <b>cuadrados perfectos</b> (un divisor se empareja consigo mismo) → toques <b>impares</b> → queda <b>encendido</b>.
@@ -493,8 +496,8 @@ Cada foco <b>k</b> se toca una vez por cada divisor de <b>k</b>. Los divisores v
 </table>
 </div>
 </div>
-<div id="outline-container-orgf06926f" class="outline-4">
-<h4 id="orgf06926f"><span class="section-number-4">1.4.2.</span> Revelación del acertijo 2</h4>
+<div id="outline-container-orgecd6f10" class="outline-4">
+<h4 id="orgecd6f10"><span class="section-number-4">1.4.2.</span> Revelación del acertijo 2</h4>
 <div class="outline-text-4" id="text-1-4-2">
 <p>
 Gira la hoja <b>180°</b>. Los dígitos 0, 1, 6, 8 y 9 siguen siendo dígitos al revés.
@@ -509,8 +512,8 @@ El patrón no era una fórmula: era <b>cambiar de marco</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc2d1cb" class="outline-4">
-<h4 id="orgdc2d1cb"><span class="section-number-4">1.4.3.</span> Revelación del acertijo 3</h4>
+<div id="outline-container-orgfd9613e" class="outline-4">
+<h4 id="orgfd9613e"><span class="section-number-4">1.4.3.</span> Revelación del acertijo 3</h4>
 <div class="outline-text-4" id="text-1-4-3">
 <p>
 Los trenes cierran 120 km/h sobre 240 km → chocan a las <b>2 horas</b>. La mosca vuela esas 2 h a 90 km/h → <b>180 km</b>.
@@ -521,8 +524,8 @@ La serie infinita de zig-zags <b>también</b> suma 180, pero pide razón geomét
 </p>
 </div>
 </div>
-<div id="outline-container-org58ee821" class="outline-4">
-<h4 id="org58ee821"><span class="section-number-4">1.4.4.</span> Qué tiene esto que ver con patrones de <b>diseño</b></h4>
+<div id="outline-container-org4b62e80" class="outline-4">
+<h4 id="org4b62e80"><span class="section-number-4">1.4.4.</span> Qué tiene esto que ver con patrones de <b>diseño</b></h4>
 <div class="outline-text-4" id="text-1-4-4">
 <p>
 Ninguno es Observer ni Factory. Los tres <b>sí</b> son patrones: instinto de simularlo todo → estructura oculta → receta ya nombrada.
@@ -575,75 +578,81 @@ El resto de estos apuntes pone <b>nombre</b> a esas perspectivas en web y móvil
 </div>
 </div>
 </div>
-<div id="outline-container-org61a3199" class="outline-2">
-<h2 id="org61a3199"><span class="section-number-2">2.</span> Introducción</h2>
+<div id="outline-container-org41a4085" class="outline-2">
+<h2 id="org41a4085"><span class="section-number-2">2.</span> Introducción</h2>
 <div class="outline-text-2" id="text-2">
+<p>
+La literatura de ingeniería de software distingue con claridad entre
+<b>inventar una solución</b> y <b>reconocer una forma ya estudiada</b>. Un patrón de
+diseño pertenece a lo segundo: nombra un problema que aparece con
+regularidad, describe el contexto en el que ese problema es
+pertinente, propone una estructura de elementos (clases, objetos,
+módulos, procesos) y hace explícitas las <b>consecuencias</b> —lo que se gana
+y lo que se paga— al adoptarla.
+</p>
+
+<p>
+Gamma, Helm, Johnson y Vlissides (1994) formulan la idea en estos
+términos: un patrón nombra, abstrae e identifica los aspectos clave de
+una estructura de diseño común, de modo que pueda reutilizarse. No es
+un fragmento de código que se copia; es una <b>forma</b> cuya realización
+concreta depende del lenguaje, de la plataforma y del marco de
+trabajo. Tampoco es, por sí sola, la arquitectura de un sistema: la
+arquitectura fija las decisiones estructurales de mayor alcance
+(capas, distribución, estilo de despliegue); los patrones operan, por
+lo general, en la escala de un conjunto de tipos y de sus
+colaboraciones.
+</p>
+
+<p>
+Usar un patrón donde no existe el problema correspondiente no es
+«aplicar ingeniería»: es añadir indirección, tipos y curva de
+aprendizaje sin contraprestación. En la teoría de Alexander —de la que
+el campo del software toma el esquema problema–contexto–solución— un
+patrón <b>no se aplica por catálogo</b>, se <b>reconoce</b> cuando las fuerzas del
+problema coinciden con las de la ficha.
+</p>
 </div>
-<div id="outline-container-orgce38e3b" class="outline-3">
-<h3 id="orgce38e3b"><span class="section-number-3">2.1.</span> Analogía general (si no sabes nada del tema)</h3>
+<div id="outline-container-orgabcba23" class="outline-3">
+<h3 id="orgabcba23"><span class="section-number-3">2.1.</span> El caso de estudio: FeriaPPT</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
-Imagina que no inventas recetas desde cero cada vez que cocinas. Sabes que <b>«sofrito → proteína → salsa → reposo»</b> resuelve muchos platillos distintos. No es un platillo concreto: es una <b>forma de organizar el trabajo</b> que ya fue probada, tiene nombre, y un cocinero experimentado puede explicarte <b>cuándo sirve y cuándo no</b>.
-</p>
-
-<p>
-Un <b>patrón de diseño de software</b> es exactamente eso: una <b>solución reutilizable a un problema recurrente de diseño</b>, descrita con un nombre compartido, un contexto, una estructura de clases/objetos/módulos, y un análisis de ventajas y costos.
-</p>
-
-<p>
-Tres precisiones importantes:
+A lo largo de la unidad se emplea una sola aplicación de dominio, <b>FeriaPPT</b>, a fin de no cambiar de ejemplo en cada patrón. El dominio es el juego de piedra, papel o tijera:
 </p>
 
 <ul class="org-ul">
-<li>Un patrón <b>no es un fragmento de código listo</b>. Es una <b>forma</b>. El código concreto cambia según el lenguaje (Java, TypeScript, Kotlin, Dart, Swift).</li>
-<li>Un patrón <b>no es arquitectura completa</b>. La arquitectura es el plano de la casa; los patrones son cómo resolviste las puertas, las tuberías y la distribución de la cocina.</li>
-<li>Un patrón <b>no es obligatorio</b>. Usarlo donde no hay el problema es como instalar un extractor industrial en un departamento de una recámara: añade complejidad sin beneficio.</li>
+<li>El jugador y el rival eligen, cada uno, una de tres tiradas.</li>
+<li>Las reglas de victoria son fijas: el papel cubre la piedra, la piedra rompe la tijera, la tijera corta el papel; si coinciden, hay empate.</li>
+<li>El sistema administra <b>fichas</b>, el <b>estado de la ronda</b>, un <b>ranking</b> y la <b>compra de vidas extra</b>.</li>
 </ul>
 
 <p>
-En una frase: <b>los patrones son vocabulario de diseño para no reinventar (ni disfrazar) soluciones que la industria ya entiende.</b>
+Ese dominio es independiente de la plataforma. La variante <b>web</b> se
+ejecuta en el navegador y se comunica con un servidor HTTP
+(persistencia, ranking, pagos). La variante <b>móvil</b> se ejecuta en un
+dispositivo con ciclo de vida propio y, con frecuencia, conectividad
+intermitente: las tiradas deben poder persistirse en local y
+sincronizarse después.
+</p>
+
+<p>
+Las reglas del duelo no cambian. Cambian las restricciones de la
+plataforma (HTTP sin estado, latencia, ciclo de vida del sistema
+operativo, batería). Los patrones de cada parte de la unidad se
+analizan sobre esas restricciones, no como ornamento del diagrama.
 </p>
 </div>
 </div>
-<div id="outline-container-orga9b29de" class="outline-3">
-<h3 id="orga9b29de"><span class="section-number-3">2.2.</span> El hilo conductor: el minijuego «FeriaPPT»</h3>
+<div id="outline-container-orgb1093db" class="outline-3">
+<h3 id="orgb1093db"><span class="section-number-3">2.2.</span> Glosario</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
-El resto de la unidad usa <b>un solo juego</b>, para no cambiar de analogía en cada patrón.
-</p>
-
-<p>
-<b>FeriaPPT</b> es un puesto de feria de <b>piedra, papel o tijera</b>:
-</p>
-
-<ul class="org-ul">
-<li>El jugador elige <b>piedra</b>, <b>papel</b> o <b>tijera</b>.</li>
-<li>El rival (una máquina o otra persona) también elige.</li>
-<li>Gana quien cubre o rompe al otro: papel envuelve piedra, piedra rompe tijera, tijera corta papel. Empate si coinciden.</li>
-<li>Hay <b>fichas</b>, un <b>marcador de la ronda</b>, un <b>ranking de la feria</b> y <b>vidas extra</b> que se pagan.</li>
-<li>En <b>web</b> se juega en el navegador: el puesto habla con un servidor (ranking, pagos, cuentas).</li>
-<li>En <b>móvil</b> se juega en el camión: a veces no hay señal y las tiradas se guardan para subirlas después.</li>
-</ul>
-
-<p>
-Las <b>reglas del duelo</b> no cambian entre web y móvil. Lo que cambia es el mostrador y el correo (HTTP, pantallas, red intermitente). Ahí es donde entran los patrones de cada plataforma.
-</p>
-
-<p>
-La sección de <b>patrones web</b> es el puesto montado como <b>sitio web</b> (ahí está el tablero). La de <b>patrones móviles</b> es el mismo puesto como <b>app en el teléfono</b>.
+Los términos siguientes se usan de manera estable en el resto del capítulo. Las definiciones coinciden, en lo esencial, con Gamma et al. (1994), Buschmann et al. (POSA) y Fowler (P of EAA).
 </p>
 </div>
-</div>
-<div id="outline-container-orga852de3" class="outline-3">
-<h3 id="orga852de3"><span class="section-number-3">2.3.</span> Glosario desde cero</h3>
-<div class="outline-text-3" id="text-2-3">
-<p>
-Esta sección define los términos que aparecerán una y otra vez. No hace falta memorizarlos de un jalón; sirve como mapa.
-</p>
-</div>
-<div id="outline-container-org5465780" class="outline-4">
-<h4 id="org5465780"><span class="section-number-4">2.3.1.</span> Conceptos de diseño</h4>
-<div class="outline-text-4" id="text-2-3-1">
+<div id="outline-container-org9e0dda5" class="outline-4">
+<h4 id="org9e0dda5"><span class="section-number-4">2.2.1.</span> Conceptos de diseño</h4>
+<div class="outline-text-4" id="text-2-2-1">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -651,89 +660,79 @@ Esta sección define los términos que aparecerán una y otra vez. No hace falta
 <col  class="org-left" />
 
 <col  class="org-left" />
-
-<col  class="org-left" />
 </colgroup>
 <thead>
 <tr>
 <th scope="col" class="org-left">Término</th>
-<th scope="col" class="org-left">Qué es en criollo</th>
-<th scope="col" class="org-left">Analogía</th>
+<th scope="col" class="org-left">Definición</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>GoF</b></td>
-<td class="org-left">Sigla de <b>Gang of Four</b>: apodo de <b>cuatro autores</b> y, por extensión, de su <b>libro de 23 patrones</b> (1994). No es un framework ni una banda musical.</td>
-<td class="org-left">Como decir «los Beatles» para no repetir cada vez los cuatro nombres, o «la RAE» para referirte al diccionario, no a un edificio.</td>
+<td class="org-left">Sigla de <b>Gang of Four</b>: los cuatro autores de <b>Design Patterns</b> (1994) y, por extensión, el catálogo de 23 patrones de ese libro. No es un producto de software ni un marco de trabajo.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Patrón de diseño</b></td>
-<td class="org-left">Receta nombrada para un problema de diseño que se repite.</td>
-<td class="org-left">«El método de la lasaña»: capas, orden, por qué no se deshace.</td>
+<td class="org-left">Solución nombrada a un problema de diseño recurrente, con contexto, estructura de participantes y consecuencias.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Arquitectura de software</b></td>
-<td class="org-left">Decisiones estructurales de todo el sistema (capas, módulos, despliegue).</td>
-<td class="org-left">El plano de la casa: cuántos pisos, dónde van las instalaciones.</td>
+<td class="org-left">Conjunto de decisiones estructurales de mayor alcance: descomposición en módulos, estilo (capas, cliente–servidor, hexagonal), despliegue.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Idioma (idiom)</b></td>
-<td class="org-left">Truco local de un lenguaje.</td>
-<td class="org-left">En español: «estar en las nubes». En Python: comprensión de listas.</td>
+<td class="org-left"><b>Idioma</b></td>
+<td class="org-left">Construcción local de un lenguaje o de una plataforma (comprensión de listas en Python, <code>async/await</code>, <b>hooks</b> de React). No sustituye al patrón: lo realiza.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Principio de diseño</b></td>
-<td class="org-left">Regla guía (p. ej. «depende de abstracciones»).</td>
-<td class="org-left">«No pongas el refrigerador junto a la estufa»: no es receta, es criterio.</td>
+<td class="org-left">Criterio normativo (p. ej. inversión de dependencias), no una estructura de clases. Los patrones son, con frecuencia, <b>realizaciones</b> de principios.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Abstracción</b></td>
-<td class="org-left">Ocultar detalle y mostrar solo lo esencial para el cliente.</td>
-<td class="org-left">El volante: no ves el motor, pero controlas el auto.</td>
+<td class="org-left">Selección de lo esencial para un cliente, ocultando el resto. Parnas (1972) la formula como <b>ocultamiento de información</b>: cada módulo esconde una decisión de diseño.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Acoplamiento</b></td>
-<td class="org-left">Cuánto un módulo <b>conoce y depende</b> de otro.</td>
-<td class="org-left">Dos compañeros que no pueden trabajar si el otro no está.</td>
+<td class="org-left">Grado en que un módulo conoce y depende de otro. Un acoplamiento alto dificulta el cambio independiente.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Cohesión</b></td>
-<td class="org-left">Cuánto las piezas de un módulo <b>pertenecen juntas</b>.</td>
-<td class="org-left">Un cajón de «solo cubiertos» vs uno con cables, calcetines y harina.</td>
+<td class="org-left">Grado en que las responsabilidades de un módulo pertenecen a un mismo propósito. Baja cohesión es síntoma de God Object.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Encapsulamiento</b></td>
-<td class="org-left">Esconder estado interno y exponer operaciones controladas.</td>
-<td class="org-left">Cajero automático: depositas/retiras; no entras a la bóveda.</td>
+<td class="org-left">Ocultación del estado interno tras una interfaz de operaciones.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Polimorfismo</b></td>
-<td class="org-left">Tratar objetos distintos con la misma interfaz.</td>
-<td class="org-left">Enchufe: lámpara, abanico o teléfono, mismo tipo de toma.</td>
+<td class="org-left">Tratamiento uniforme de objetos de tipos distintos a través de un contrato común. Es el mecanismo con el que Strategy, State y Observer intercambian comportamiento.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Contrato / interfaz</b></td>
-<td class="org-left">Promesa de <b>qué</b> se puede pedir, no <b>cómo</b> se implementa.</td>
-<td class="org-left">Menú de restaurante: pide «sopa», no «abre la olla y mueve».</td>
+<td class="org-left"><b>Contrato</b></td>
+<td class="org-left">Conjunto de obligaciones de un tipo (precondiciones, postcondiciones, invariantes). En OO se expresa, de modo incompleto, como interfaz o protocolo.</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="outline-container-org0fa0704" class="outline-4">
-<h4 id="org0fa0704"><span class="section-number-4">2.3.2.</span> Familias de patrones (catálogo clásico)</h4>
-<div class="outline-text-4" id="text-2-3-2">
+<div id="outline-container-org03bad0c" class="outline-4">
+<h4 id="org03bad0c"><span class="section-number-4">2.2.2.</span> Familias de patrones</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+La clasificación tripartita de Gamma et al. no es la única posible (POSA organiza por <b>granularidad</b> y por dominio); es, sin embargo, la más citada en diseño orientado a objetos:
+</p>
+
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -747,35 +746,35 @@ Esta sección define los términos que aparecerán una y otra vez. No hace falta
 <thead>
 <tr>
 <th scope="col" class="org-left">Familia</th>
-<th scope="col" class="org-left">Pregunta que responde</th>
-<th scope="col" class="org-left">Analogía</th>
+<th scope="col" class="org-left">Pregunta</th>
+<th scope="col" class="org-left">Escala típica</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>Creacionales</b></td>
-<td class="org-left">¿Quién crea los objetos y cómo se oculta esa creación?</td>
-<td class="org-left">Fábrica o constructor de casas prefabricadas.</td>
+<td class="org-left">¿Quién instancia los objetos y cómo se oculta esa decisión?</td>
+<td class="org-left">Fábricas, constructores, prototipos</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Estructurales</b></td>
-<td class="org-left">¿Cómo se componen objetos para formar estructuras mayores?</td>
-<td class="org-left">Adaptadores, fachadas, decoradores de un edificio.</td>
+<td class="org-left">¿Cómo se componen tipos para formar estructuras mayores sin explotar la jerarquía de herencia?</td>
+<td class="org-left">Adaptación, envoltorio, fachada, proxy</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Comportamentales</b></td>
-<td class="org-left">¿Cómo se reparte y se coordina el comportamiento?</td>
-<td class="org-left">Protocolos de una oficina: quién avisa a quién, quién decide.</td>
+<td class="org-left">¿Cómo se distribuyen responsabilidades y mensajes?</td>
+<td class="org-left">Algoritmos intercambiables, observación, cadena de handlers</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="outline-container-org434a528" class="outline-4">
-<h4 id="org434a528"><span class="section-number-4">2.3.3.</span> Vocabulario que verás en web y móvil</h4>
-<div class="outline-text-4" id="text-2-3-3">
+<div id="outline-container-orgf8f0a77" class="outline-4">
+<h4 id="orgf8f0a77"><span class="section-number-4">2.2.3.</span> Vocabulario de aplicaciones web y móviles</h4>
+<div class="outline-text-4" id="text-2-2-3">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -789,195 +788,122 @@ Esta sección define los términos que aparecerán una y otra vez. No hace falta
 <thead>
 <tr>
 <th scope="col" class="org-left">Término</th>
-<th scope="col" class="org-left">Qué es</th>
-<th scope="col" class="org-left">Dónde aparece</th>
+<th scope="col" class="org-left">Definición</th>
+<th scope="col" class="org-left">Ámbito</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>MVC / MVP / MVVM / MVI</b></td>
-<td class="org-left">Formas de separar <b>datos</b>, <b>reglas</b> y <b>pantalla</b>.</td>
-<td class="org-left">Web (servidor y SPA) y casi todo móvil moderno.</td>
+<td class="org-left">Patrones de <b>presentación</b>: separación entre estado de dominio, presentación y entrada. No figuran entre los 23 de GoF.</td>
+<td class="org-left">Web (servidor y SPA) y cliente móvil</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Repositorio</b></td>
-<td class="org-left">Puerta única hacia datos (API, BD, caché).</td>
-<td class="org-left">Ambos mundos.</td>
+<td class="org-left">Abstracción de una colección persistida; oculta el origen (API, base de datos, caché). Fowler, P of EAA.</td>
+<td class="org-left">Ambos</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Inyección de dependencias (DI)</b></td>
-<td class="org-left">No construyes tú las colaboraciones; te las entregan.</td>
-<td class="org-left">Frameworks web y móviles.</td>
+<td class="org-left"><b>Inyección de dependencias</b></td>
+<td class="org-left">Las colaboraciones se entregan al objeto (constructor, contenedor), en lugar de que él las construya. Realiza inversión de dependencias.</td>
+<td class="org-left">Marcos web y móviles</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Middleware</b></td>
-<td class="org-left">Cadena de pasos alrededor de una petición.</td>
-<td class="org-left">Express, Django, ASP.NET, Next.js.</td>
+<td class="org-left">Cadena de transformaciones sobre una petición. Realiza Chain of Responsibility o Decorator.</td>
+<td class="org-left">Express, Django, ASP.NET, Next.js</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Ciclo de vida</b></td>
-<td class="org-left">Nacimiento, pausa, muerte de una pantalla o un proceso.</td>
-<td class="org-left">Crítico en móvil; también en SPA y SSR.</td>
+<td class="org-left">Secuencia de estados que el <b>runtime</b> impone a una pantalla o a un proceso (creación, pausa, destrucción).</td>
+<td class="org-left">Crítico en móvil; también en SPA y SSR</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Estado (state)</b></td>
-<td class="org-left">Datos que, si cambian, cambian lo que se ve o se hace.</td>
-<td class="org-left">Redux, ViewModel, BLoC, Vuex, Riverpod.</td>
+<td class="org-left"><b>Estado</b></td>
+<td class="org-left">Datos cuya variación implica una variación observable de la interfaz o del flujo.</td>
+<td class="org-left">Redux, ViewModel, BLoC, Riverpod</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Offline-first</b></td>
-<td class="org-left">El dispositivo puede trabajar sin red y sincronizar después.</td>
-<td class="org-left">Móvil (y PWAs).</td>
+<td class="org-left">El dispositivo opera sin red y reconcilia después. Exige repositorio dual y cola de comandos.</td>
+<td class="org-left">Móvil y PWA</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>BFF (Backend for Frontend)</b></td>
-<td class="org-left">API hecha <b>a la medida</b> de un cliente (web o app).</td>
-<td class="org-left">Arquitectura de sistemas reales.</td>
+<td class="org-left"><b>BFF</b></td>
+<td class="org-left">API diseñada para <b>un</b> tipo de cliente. No es Factory: es un estilo de integración.</td>
+<td class="org-left">Sistemas con web y app</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Antipatrón</b></td>
-<td class="org-left">Receta que <b>parece</b> solución y suele empeorar el diseño.</td>
-<td class="org-left">God Object, Singleton global, Callback Hell.</td>
+<td class="org-left">Forma recurrente que parece solución y degrada atributos de calidad (mantenibilidad, prueba, rendimiento).</td>
+<td class="org-left">God Object, Singleton de sesión, Callback Hell</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
-<div id="outline-container-org67dacad" class="outline-3">
-<h3 id="org67dacad"><span class="section-number-3">2.4.</span> ¿Qué es un patrón de diseño? Definición operativa</h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-orgf313d57" class="outline-3">
+<h3 id="orgf313d57"><span class="section-number-3">2.3.</span> Definición de patrón de diseño</h3>
+<div class="outline-text-3" id="text-2-3">
 <p>
-Un patrón de diseño <b>nombra</b> una forma de organizar clases y objetos que ya se ha visto muchas veces, <b>abstrae</b> lo esencial de esa forma (no el código de un lenguaje concreto) e <b>identifica</b> las piezas que hay que conectar para reutilizarla.
-</p>
-
-<p>
-Definición operativa para analizar y diseñar:
+Un patrón de diseño, en el sentido de Gamma et al., satisface simultáneamente:
 </p>
 
 <ol class="org-ol">
-<li>Hay un <b>problema de diseño que se repite</b> (no un bug, no un requisito de negocio único).</li>
-<li>Hay un <b>contexto</b> (restricciones: lenguaje, plataforma, equipo, rendimiento, red).</li>
-<li>Hay una <b>solución estructural</b> (clases, módulos, flujos de mensajes) que se puede adaptar.</li>
-<li>Hay <b>consecuencias</b>: lo que ganas (flexibilidad, testeo, claridad) y lo que pagas (más tipos, más indirección, curva de aprendizaje).</li>
-<li>Hay un <b>nombre</b> que el equipo puede usar en una revisión de código: «esto es un Strategy», «esto pide un Adapter».</li>
+<li>Un <b>problema de diseño que se repite</b> —no un defecto de implementación ni un requisito de negocio irrepetible.</li>
+<li>Un <b>contexto</b> —restricciones de lenguaje, plataforma, equipo, rendimiento y entorno de ejecución.</li>
+<li>Una <b>solución estructural</b> —participantes, colaboraciones, invariantes— que admite adaptación, no copia literal.</li>
+<li><b>Consecuencias</b>: efectos sobre acoplamiento, cohesión, prueba, rendimiento y comprensibilidad. Si este punto se omite, no hay análisis: hay adhesión a una moda.</li>
+<li>Un <b>nombre</b> que el equipo puede emplear en revisión de código («esto es un Strategy»; «esto pide un Adapter»).</li>
 </ol>
 
 <p>
-Si falta el punto 4, no se está diseñando: se está copiando una moda.
+Alexander (1977) había fijado el esquema <b>contexto–problema–fuerzas–solución</b> para la arquitectura de edificios. Buschmann et al. (POSA) distinguen además <b>patrón de arquitectura</b> (sistema), <b>patrón de diseño</b> (subsistema o colaboración) e <b>idioma</b> (lenguaje). Confundir esos tres niveles es el error de análisis más frecuente: tratar MVVM como si fuera Observer, o <code>useEffect</code> como si fuera el patrón.
 </p>
 
 <p>
-La formulación clásica de esa idea (nombre + abstracción + estructura reutilizable) la popularizó un libro de 1994 escrito por <b>cuatro personas</b>. A esas cuatro personas —y al libro, y a su catálogo de 23 patrones— el medio les puso el apodo <b>GoF</b>. La sección siguiente desmonta esa sigla, porque no es un producto ni una metodología: es un <b>apodo de autores</b>.
+La formulación de 1994 no agota el campo. Fowler documenta patrones de <b>aplicación empresarial</b> (Front Controller, Repository, Unit of Work). Nygard documenta patrones de <b>estabilidad</b> en sistemas distribuidos (Circuit Breaker, Bulkhead). Las guías de Android, Apple y Flutter documentan patrones de <b>presentación</b> (MVVM, UDF, BLoC). Cuando un texto dice «esto no es GoF», no lo descalifica: sitúa el patrón en <b>otro catálogo y otra escala</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-org1a15de1" class="outline-3">
-<h3 id="org1a15de1"><span class="section-number-3">2.5.</span> Qué significa GoF (Gang of Four): el apodo, las cuatro personas y el libro</h3>
-<div class="outline-text-3" id="text-2-5">
+<div id="outline-container-orgd82d8bd" class="outline-3">
+<h3 id="orgd82d8bd"><span class="section-number-3">2.4.</span> GoF: autores, libro y catálogo</h3>
+<div class="outline-text-3" id="text-2-4">
 </div>
-<div id="outline-container-org9d9cc79" class="outline-4">
-<h4 id="org9d9cc79"><span class="section-number-4">2.5.1.</span> El malentendido más común</h4>
-<div class="outline-text-4" id="text-2-5-1">
+<div id="outline-container-orgc6d47bb" class="outline-4">
+<h4 id="orgc6d47bb"><span class="section-number-4">2.4.1.</span> Alcance del término</h4>
+<div class="outline-text-4" id="text-2-4-1">
 <p>
-<b>GoF no es un software, no es un framework, no es una certificación, no es una empresa y no es una banda de rock.</b> Tampoco es un «método GoF» que se instala. Es una <b>sigla informal</b> que la comunidad de programación usa desde los años 90, igual que se dice «los Beatles» o «el cuarteto de Liverpool» para no repetir cuatro nombres cada vez.
-</p>
-
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-left" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">Lo que parece</th>
-<th scope="col" class="org-left">Lo que realmente es</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">Un producto o librería («¿ya instalaste GoF?»)</td>
-<td class="org-left">Nada que instalar.</td>
-</tr>
-
-<tr>
-<td class="org-left">Una metodología tipo Scrum o XP</td>
-<td class="org-left">Un <b>libro</b> y un <b>vocabulario</b> de 23 recetas.</td>
-</tr>
-
-<tr>
-<td class="org-left">Un grupo oficial con logo y sede</td>
-<td class="org-left">Un <b>apodo</b> que les pusieron <b>otros</b>, no un nombre legal.</td>
-</tr>
-
-<tr>
-<td class="org-left">«La banda de los cuatro» como grupo criminal o político</td>
-<td class="org-left">Juego de palabras en inglés; ver más abajo.</td>
-</tr>
-
-<tr>
-<td class="org-left">Todos los patrones que existen</td>
-<td class="org-left">Solo <b>23</b> patrones de <b>diseño orientado a objetos</b>. Hay muchos más fuera de ese libro.</td>
-</tr>
-</tbody>
-</table>
-
-<p>
-Cuando un texto dice «este es un patrón GoF», se lee: <b>«este patrón está en el catálogo de ese libro de 1994»</b>. Cuando dice «esto no es GoF», se lee: <b>«esta receta es de otro catálogo o de otra época»</b> (por ejemplo MVC web, BFF, Circuit Breaker, MVVM).
+<b>GoF</b> no designa un producto, un marco de trabajo, una certificación ni una metodología de proceso. Es la sigla con que la comunidad se refiere a Gamma, Helm, Johnson y Vlissides y, por metonimia, a su libro de 1994 y a los 23 patrones que cataloga. Cuando un texto afirma «este es un patrón GoF», debe leerse: <b>figura en ese catálogo</b>. Cuando afirma «esto no es GoF», debe leerse: <b>pertenece a otro catálogo o a otra escala</b> (MVC de presentación, BFF, Circuit Breaker, MVVM).
 </p>
 </div>
 </div>
-<div id="outline-container-orgabb07e9" class="outline-4">
-<h4 id="orgabb07e9"><span class="section-number-4">2.5.2.</span> De dónde sale el nombre «Gang of Four»</h4>
-<div class="outline-text-4" id="text-2-5-2">
+<div id="outline-container-org341ad04" class="outline-4">
+<h4 id="org341ad04"><span class="section-number-4">2.4.2.</span> Origen del nombre</h4>
+<div class="outline-text-4" id="text-2-4-2">
 <p>
-En inglés, <b>gang of four</b> significa literalmente «pandilla de cuatro» o «banda de los cuatro». Suena raro en español porque <b>gang</b> evoca pandilla, y <b>banda</b> evoca música o delito. En la jerga de software es <b>cariñoso e informal</b>, como apodar a un equipo de laboratorio «los cuatro fantásticos».
+El título completo —*Design Patterns: Elements of Reusable Object-Oriented Software*— es largo para la cita oral. <b>Gang of Four</b> y <b>GoF</b> se impusieron como abreviatura. El inglés <b>gang of four</b> es informal; en la bibliografía técnica no implica una organización legal. El mote se inspiró, de manera irónica, en un uso político previo de la misma frase en China (años 1970). No existe relación histórica ni ideológica con aquel episodio: es un apodo académico-industrial que se estabilizó porque el cuarteto se cita siempre junto.
 </p>
 
 <p>
-El apodo se inspiró, de forma irónica, en un uso político previo: en China se llamó <b>Gang of Four</b> a un grupo de cuatro dirigentes de los años 70. Los programadores de Occidente tomaron la <b>forma</b> de la frase («cuatro personas muy citadas juntas») y se la pusieron a los autores del libro de patrones. <b>No hay relación histórica ni ideológica</b> con aquel episodio: es un mote que se pegó en foros, revistas y facultades porque el título del libro es larguísimo.
-</p>
-
-<p>
-El título real del libro es:
-</p>
-
-<p class="verse">
-Design Patterns: Elements of Reusable Object-Oriented Software<br />
-Erich Gamma · Richard Helm · Ralph Johnson · John Vlissides<br />
-Addison-Wesley, 1994<br />
-</p>
-
-<p>
-En español suele citarse como <b>Patrones de diseño: elementos de software orientado a objetos reutilizable</b>. Decir cada vez «el libro de Gamma, Helm, Johnson y Vlissides de Addison-Wesley 1994» cansa. Por eso nació la abreviatura:
-</p>
-
-<ul class="org-ul">
-<li><b>Gang of Four</b> → las cuatro personas.</li>
-<li><b>GoF</b> (se pronuncia en inglés «yi ou ef», o en clase a menudo «gof» de un jalón) → las personas <b>o</b> el libro <b>o</b> el catálogo de 23, según el contexto.</li>
-</ul>
-
-<p>
-Es el mismo fenómeno que «la RAE» (un diccionario y una institución) o «el DSM» en psicología (un manual y un modo de hablar). El contexto aclara si se habla de <b>autores</b>, de <b>libro</b> o de <b>lista de patrones</b>.
+En español el libro se cita habitualmente como <b>Patrones de diseño: elementos de software orientado a objetos reutilizable</b> (Addison-Wesley, 1994).
 </p>
 </div>
 </div>
-<div id="outline-container-orgea33923" class="outline-4">
-<h4 id="orgea33923"><span class="section-number-4">2.5.3.</span> Quiénes son las cuatro personas</h4>
-<div class="outline-text-4" id="text-2-5-3">
+<div id="outline-container-org16f7571" class="outline-4">
+<h4 id="org16f7571"><span class="section-number-4">2.4.3.</span> Los autores</h4>
+<div class="outline-text-4" id="text-2-4-3">
 <p>
-No hay que memorizar biografías. Sirve saber que eran <b>investigadores e ingenieros de orientación a objetos</b> (sobre todo Smalltalk, C++ y herramientas de diseño), no un comité de una universidad única ni los inventores de «la idea de patrón» (esa idea viene de la arquitectura de edificios; se cuenta en la historia más abajo).
+No es necesario memorizar biografías. Importa que eran investigadores e ingenieros de orientación a objetos (Smalltalk, C++, herramientas de diseño), y que <b>no</b> inventaron la idea de patrón —esa proviene de Alexander— ni los mecanismos (Observer existía en el MVC de Smalltalk). Su contribución fue <b>documentar</b> 23 formas con una plantilla común, de modo que la comunidad dispusiera de un vocabulario compartido.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -991,46 +917,38 @@ No hay que memorizar biografías. Sirve saber que eran <b>investigadores e ingen
 <thead>
 <tr>
 <th scope="col" class="org-left">Autor</th>
-<th scope="col" class="org-left">Qué aporta al retrato del cuarteto</th>
+<th scope="col" class="org-left">Notas</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>Erich Gamma</b></td>
-<td class="org-left">Suizo; trabajo en herramientas OO y más tarde en Eclipse y JUnit (con Kent Beck). Suele ser el nombre que más aparece en citas.</td>
+<td class="org-left">Herramientas OO; más tarde Eclipse y JUnit (con Kent Beck).</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Richard Helm</b></td>
-<td class="org-left">Trabajo en diseño OO y en consultoría; parte del grupo que reunió ejemplos industriales, no solo de laboratorio.</td>
+<td class="org-left">Diseño OO e industria; ejemplos no solo de laboratorio.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Ralph Johnson</b></td>
-<td class="org-left">Académico de la Universidad de Illinois; Smalltalk y frameworks. Ayuda a explicar por qué el libro habla de <b>reutilizar diseño</b>, no de copiar código.</td>
+<td class="org-left">Universidad de Illinois; Smalltalk y <b>frameworks</b>. El libro insiste en reutilizar <b>diseño</b>, no código.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>John Vlissides</b></td>
-<td class="org-left">Investigador en IBM; diagramas y ejemplos muy cuidados. Murió en 2005; a veces se le recuerda aparte al citar «los cuatro».</td>
+<td class="org-left">IBM; rigor en diagramas y ejemplos. Falleció en 2005.</td>
 </tr>
 </tbody>
 </table>
-
-<p>
-Analogía: no son «dueños» de Observer o de Factory. Observer existía en Smalltalk mucho antes. Lo que hicieron fue <b>ponerle ficha de catálogo</b> (nombre, problema, diagrama, consecuencias, código de muestra) para que el resto del mundo pudiera <b>hablar el mismo idioma</b>.
-</p>
 </div>
 </div>
-<div id="outline-container-orgfdde595" class="outline-4">
-<h4 id="orgfdde595"><span class="section-number-4">2.5.4.</span> Qué contiene el libro (y qué no)</h4>
-<div class="outline-text-4" id="text-2-5-4">
+<div id="outline-container-orgfe62921" class="outline-4">
+<h4 id="orgfe62921"><span class="section-number-4">2.4.4.</span> Contenido y plantilla</h4>
+<div class="outline-text-4" id="text-2-4-4">
 <p>
-El libro no es una novela ni un tutorial de un lenguaje. Es un <b>catálogo</b>: cada patrón es un capítulo con una plantilla fija (nombre, propósito, motivación, estructura UML, participantes, colaboraciones, consecuencias, implementación, código de ejemplo, usos conocidos, patrones relacionados). Esa plantilla es la abuela de la «anatomía de un patrón» que se usa en esta unidad.
-</p>
-
-<p>
-Clasificaron los 23 en <b>tres familias</b>, que es el mapa que aparece en el glosario:
+El libro es un <b>catálogo</b>. Cada patrón ocupa un capítulo con plantilla fija, que es el modelo de la «anatomía» de esta unidad:
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -1040,157 +958,137 @@ Clasificaron los 23 en <b>tres familias</b>, que es el mapa que aparece en el gl
 <col  class="org-left" />
 
 <col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Apartado en el original</th>
+<th scope="col" class="org-left">Función</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><b>Intent</b></td>
+<td class="org-left">Propósito en una o dos frases.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Motivation</b></td>
+<td class="org-left">Escenario que hace visible el problema.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Applicability</b></td>
+<td class="org-left">Cuándo aplicar y cuándo no.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Structure</b></td>
+<td class="org-left">Diagrama de tipos y relaciones.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Participants</b> y <b>Collaborations</b></td>
+<td class="org-left">Quién es cada rol y cómo se envían mensajes.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Consequences</b></td>
+<td class="org-left">Compromisos: flexibilidad frente a número de clases, indirección, etc.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Implementation</b> y <b>Sample Code</b></td>
+<td class="org-left">Notas de lenguaje (en el libro, C++ y Smalltalk) y código ilustrativo.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Known Uses</b> y <b>Related Patterns</b></td>
+<td class="org-left">Usos industriales y vecinos del catálogo.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Los 23 se agrupan en tres familias:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
 
 <col  class="org-left" />
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="org-left">Familia que ellos usaron</th>
-<th scope="col" class="org-left">Pregunta</th>
-<th scope="col" class="org-left">Ejemplos del propio libro</th>
+<th scope="col" class="org-left">Familia</th>
+<th scope="col" class="org-right">Cardinalidad</th>
+<th scope="col" class="org-left">Ejemplos</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="org-left"><b>Creacionales</b> (5)</td>
-<td class="org-left">¿Quién crea los objetos y cómo se esconde esa creación?</td>
+<td class="org-left"><b>Creacionales</b></td>
+<td class="org-right">5</td>
 <td class="org-left">Factory Method, Abstract Factory, Builder, Prototype, Singleton</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Estructurales</b> (7)</td>
-<td class="org-left">¿Cómo se pegan objetos para armar estructuras más grandes?</td>
+<td class="org-left"><b>Estructurales</b></td>
+<td class="org-right">7</td>
 <td class="org-left">Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Comportamentales</b> (11)</td>
-<td class="org-left">¿Cómo se reparte el trabajo y los mensajes entre objetos?</td>
+<td class="org-left"><b>Comportamentales</b></td>
+<td class="org-right">11</td>
 <td class="org-left">Observer, Strategy, Command, State, Template Method, Iterator, Mediator, Chain of Responsibility, Visitor, Memento, Interpreter</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-Esos 23 <b>no son todos los patrones del universo</b>. El libro se limita a <b>diseño orientado a objetos</b> a escala de clases y objetos (cómo se relacionan un puñado de tipos). No cubre:
+El catálogo se limita al <b>diseño orientado a objetos</b> a escala de tipos. No pretende cubrir partición en microservicios, operación <b>offline</b>, organización de pantallas móviles, versionado de API REST ni MVC como uno de los 23 (MVC es anterior y pertenece a la arquitectura de presentación).
 </p>
 
+<p>
+Por ello, en web y en móvil se trabaja con <b>GoF más otros catálogos</b>: no porque 1994 esté «caduco», sino porque el libro nunca fue el plano de una aplicación HTTP ni de un sistema operativo móvil.
+</p>
+</div>
+</div>
+<div id="outline-container-orga14030b" class="outline-4">
+<h4 id="orga14030b"><span class="section-number-4">2.4.5.</span> Relación con otros catálogos</h4>
+<div class="outline-text-4" id="text-2-4-5">
 <ul class="org-ul">
-<li>cómo partir un sistema en microservicios,</li>
-<li>cómo hacer una app <b>offline</b>,</li>
-<li>cómo organizar pantallas Android (MVVM),</li>
-<li>cómo versionar una API REST,</li>
-<li>ni MVC como los 23 (MVC es más antiguo y vive en otro estante: presentación / arquitectura de UI).</li>
+<li><b>Alexander</b> (1977), <b>A Pattern Language</b>: origen extra-informático del esquema problema–contexto–solución.</li>
+<li><b>Beck y Cunningham</b> (finales de los 80): introducción de patrones en Smalltalk, <b>antes</b> de 1994.</li>
+<li><b>POSA</b> (Buschmann et al.): patrones de <b>arquitectura</b> de sistema (capas, pizarra, broker, microkernel).</li>
+<li><b>P of EAA</b> (Fowler) y <b>Core J2EE Patterns</b>: aplicación empresarial (Front Controller, Data Mapper, Unit of Work). Puente hacia la web.</li>
+<li>Comunidad móvil (2010–2020): MVP, MVVM, MVI, BLoC, Coordinator. No están en los 23; adaptan Observer, State, Adapter y Facade al ciclo de vida y a la red intermitente.</li>
 </ul>
 
 <p>
-Por eso en web y móvil se dice «patrones GoF <b>más</b> otros catálogos»: no porque GoF esté caduco, sino porque el libro <b>nunca pretendió</b> ser el plano de una aplicación HTTP ni de un teléfono.
+El análisis consiste en elegir el <b>nivel</b> correcto: ficha de clases (GoF) frente a plano de la aplicación (POSA, Fowler, guías de plataforma).
 </p>
 </div>
 </div>
-<div id="outline-container-org850833d" class="outline-4">
-<h4 id="org850833d"><span class="section-number-4">2.5.5.</span> Analogía para no volver a perderse</h4>
-<div class="outline-text-4" id="text-2-5-5">
+<div id="outline-container-org9918aa8" class="outline-4">
+<h4 id="org9918aa8"><span class="section-number-4">2.4.6.</span> Persistencia del catálogo</h4>
+<div class="outline-text-4" id="text-2-4-6">
 <p>
-Imagina la cocina de un restaurante:
-</p>
-
-<ul class="org-ul">
-<li><b>Christopher Alexander</b> (arquitecto de edificios, 1977) inventó la idea de «lenguaje de patrones»: recetas con nombre para problemas que se repiten al <b>construir</b>.</li>
-<li><b>GoF</b> es el primer <b>recetario famoso de la cocina orientada a objetos</b>: 23 fichas con foto, ingredientes y «si lo haces, ganas X y pagas Y».</li>
-<li><b>P of EAA</b> (Fowler) y los patrones J2EE son recetarios de <b>cocina industrial / restaurante grande</b> (sesiones HTTP, controladores, mapeo a base de datos).</li>
-<li><b>MVVM, BFF, Circuit Breaker</b> son recetas de <b>cocina de app web y de teléfono</b> que salieron después, cuando el comedor ya no era un solo programa en una sola memoria.</li>
-</ul>
-
-<p>
-GoF es el recetario que <b>todo el gremio reconoce</b>. El resto de esta materia usa esas fichas (Adapter, Observer, Strategy…) <b>dentro</b> de recetas más grandes (un servidor HTTP, una app con ciclo de vida).
+Tres razones explican que el vocabulario de 1994 siga vigente. Primera: «esto pide un Adapter» se entiende en Java, TypeScript y Kotlin; sin el libro, cada equipo nombraba la misma forma de otro modo. Segunda: los 23 reaparecen <b>realizados</b> por la plataforma (un interceptor de Express es Decorator o Chain of Responsibility; <code>RecyclerView.Adapter</code> es Adapter; <code>LiveData</code> es Observer). Tercera: delimitar qué <b>es</b> GoF evita atribuirle MVC, REST o Clean Architecture.
 </p>
 </div>
 </div>
-<div id="outline-container-org27217b9" class="outline-4">
-<h4 id="org27217b9"><span class="section-number-4">2.5.6.</span> Cómo se usa la palabra en clase, en libros y en código</h4>
-<div class="outline-text-4" id="text-2-5-6">
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-left" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">Frase que oirás</th>
-<th scope="col" class="org-left">Traducción al criollo</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">«Es un patrón GoF»</td>
-<td class="org-left">Está en la lista de los 23 del libro de 1994.</td>
-</tr>
-
-<tr>
-<td class="org-left">«El catálogo GoF»</td>
-<td class="org-left">Esa lista de 23, agrupada en creacionales / estructurales / comportamentales.</td>
-</tr>
-
-<tr>
-<td class="org-left">«Los autores GoF»</td>
-<td class="org-left">Gamma, Helm, Johnson y Vlissides.</td>
-</tr>
-
-<tr>
-<td class="org-left">«La plantilla GoF»</td>
-<td class="org-left">La forma en que ellos documentaban cada patrón (problema, estructura, consecuencias…).</td>
-</tr>
-
-<tr>
-<td class="org-left">«Esto no sale en el GoF»</td>
-<td class="org-left">Es un patrón de otro libro o de la práctica web/móvil. <b>Puede ser igual de importante.</b></td>
-</tr>
-
-<tr>
-<td class="org-left">«No sobreuses GoF»</td>
-<td class="org-left">No metas Factory + Singleton + Visitor en un CRUD de tres campos. El libro describe recetas, no un checklist de honores.</td>
-</tr>
-</tbody>
-</table>
 </div>
-</div>
-<div id="outline-container-orgc9d46ea" class="outline-4">
-<h4 id="orgc9d46ea"><span class="section-number-4">2.5.7.</span> Por qué el apodo sigue vivo treinta años después</h4>
-<div class="outline-text-4" id="text-2-5-7">
-<ol class="org-ol">
-<li><b>Vocabulario compartido.</b> «Esto pide un Adapter» se entiende en Java, en TypeScript y en Kotlin. Sin el libro, cada equipo inventaba nombres distintos para la misma forma.</li>
-<li><b>Los 23 siguen apareciendo disfrazados.</b> Un interceptor de Express es un Decorator / Chain of Responsibility; un <code>RecyclerView.Adapter</code> es un Adapter; <code>LiveData</code> es Observer. El disfraz es de plataforma; la ficha es GoF.</li>
-<li><b>Límite claro.</b> Saber qué <b>es</b> GoF evita el error de examen de llamar GoF a MVC, a REST o a Clean Architecture.</li>
-</ol>
-</div>
-</div>
-</div>
-<div id="outline-container-org0decd6d" class="outline-3">
-<h3 id="org0decd6d"><span class="section-number-3">2.6.</span> De dónde salen los patrones (historia breve y por qué importa)</h3>
-<div class="outline-text-3" id="text-2-6">
-<ul class="org-ul">
-<li><b>Christopher Alexander</b> (arquitectura de <b>edificios</b>, 1977): <b>A Pattern Language</b>. La idea de «problema + contexto + solución nombrada» nace <b>fuera</b> del software. GoF cita esa herencia: ellos no inventaron «pensar en patrones», inventaron el <b>catálogo OO</b> que se volvió estándar.</li>
-<li><b>Kent Beck y Ward Cunningham</b> (finales de los 80): llevan patrones a Smalltalk y a la comunidad de objetos, <b>antes</b> del libro de 1994.</li>
-<li><b>GoF</b> (Gamma, Helm, Johnson, Vlissides, 1994): el recetario de 23 patrones descrito arriba. Sigue siendo el vocabulario común en facultades, entrevistas y código legado.</li>
-<li><b>POSA</b> (<b>Pattern-Oriented Software Architecture</b>, Buschmann et al.): patrones de <b>arquitectura</b> de sistema (capas, pizarra, broker, microkernel). Otro libro, otro nivel: el edificio completo, no la bisagra.</li>
-<li><b>Core J2EE Patterns</b> y <b>P of EAA</b> (Martin Fowler, <b>Patterns of Enterprise Application Architecture</b>): patrones de <b>aplicaciones empresariales</b> (Active Record, Data Mapper, Front Controller, Unit of Work). Puente hacia <b>web</b>.</li>
-<li>Comunidad móvil (2010s–2020s): MVP, MVVM, Clean Architecture, MVI, BLoC, Coordinator. <b>No están en los 23 de GoF</b>; adaptan las mismas ideas (Observer, State, Adapter, Facade) a ciclo de vida, pantallas y red intermitente.</li>
-</ul>
-
+<div id="outline-container-org43e3335" class="outline-3">
+<h3 id="org43e3335"><span class="section-number-3">2.5.</span> Anatomía de un patrón</h3>
+<div class="outline-text-3" id="text-2-5">
 <p>
-En web y móvil no se usa «solo GoF». Se usa el catálogo GoF <b>más</b> patrones de enterprise <b>más</b> patrones de UI <b>más</b> patrones de sistemas distribuidos. El análisis consiste en <b>elegir el nivel correcto</b>: ficha de clases (GoF) frente a plano de la aplicación (POSA, Fowler, guías de Android/iOS).
-</p>
-</div>
-</div>
-<div id="outline-container-orgea671a7" class="outline-3">
-<h3 id="orgea671a7"><span class="section-number-3">2.7.</span> Anatomía de un patrón (plantilla de análisis)</h3>
-<div class="outline-text-3" id="text-2-7">
-<p>
-Cuando analices o diseñes, escribe (aunque sea mentalmente) estas seis cajas. Es el método de la unidad.
+El método de análisis de la unidad reproduce, de forma compacta, la plantilla de Gamma et al. Al examinar o proponer un patrón se documentan, al menos, estas cajas:
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -1205,65 +1103,69 @@ Cuando analices o diseñes, escribe (aunque sea mentalmente) estas seis cajas. E
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="org-left">Caja</th>
+<th scope="col" class="org-left">Elemento</th>
 <th scope="col" class="org-left">Pregunta</th>
-<th scope="col" class="org-left">Ejemplo (Strategy de pagos)</th>
+<th scope="col" class="org-left">Ejemplo: Strategy de pasarelas de pago</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>Nombre</b></td>
-<td class="org-left">¿Cómo lo llamamos en el equipo?</td>
+<td class="org-left">¿Cómo se nombra en el equipo?</td>
 <td class="org-left">Strategy</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Problema</b></td>
-<td class="org-left">¿Qué duele si no lo resolvemos bien?</td>
-<td class="org-left">Cada pasarela de pago mete <code>if</code> distintos en el checkout.</td>
+<td class="org-left">¿Qué atributo de calidad se degrada si no se resuelve?</td>
+<td class="org-left">Cada pasarela introduce condicionales en el flujo de cobro.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Contexto</b></td>
-<td class="org-left">¿Dónde y con qué restricciones?</td>
-<td class="org-left">Tienda web; tres pasarelas; hay que agregar una cuarta el próximo mes.</td>
+<td class="org-left">¿Plataforma, volumen de variación, restricciones?</td>
+<td class="org-left">Aplicación web; tres pasarelas; se prevé una cuarta.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Fuerzas</b></td>
-<td class="org-left">¿Qué se tira en direcciones opuestas?</td>
-<td class="org-left">Rapidez de entrega vs. abierto a extensión; simplicidad vs. pruebas.</td>
+<td class="org-left">¿Qué requisitos tiran en direcciones opuestas?</td>
+<td class="org-left">Tiempo de entrega frente a abierto a extensión; simplicidad frente a prueba.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Solución</b></td>
-<td class="org-left">¿Qué estructura propones?</td>
-<td class="org-left">Interfaz <code>PaymentGateway</code>; una clase por pasarela; el checkout elige.</td>
+<td class="org-left">¿Qué estructura de tipos y colaboraciones?</td>
+<td class="org-left">Interfaz <code>PaymentGateway</code>; una realización por pasarela; el caso de uso elige.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Consecuencias</b></td>
-<td class="org-left">¿Qué ganas y qué pagas?</td>
-<td class="org-left">Ganas: nuevas pasarelas sin tocar el checkout. Pagas: más archivos, hay que registrar estrategias.</td>
+<td class="org-left">¿Qué se gana y qué se paga?</td>
+<td class="org-left">Extensión sin modificar el cobro; más tipos y registro de estrategias.</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-Si no puedes llenar <b>fuerzas</b> y <b>consecuencias</b>, todavía no entendiste el patrón: solo viste un diagrama UML.
+Las <b>fuerzas</b> (Alexander) son el núcleo teórico: un patrón no es «bueno» en abstracto; <b>resuelve un conflicto</b> entre fuerzas. Si no pueden enunciarse fuerzas ni consecuencias, solo se ha memorizado un diagrama.
 </p>
 </div>
 </div>
-<div id="outline-container-orgea7a079" class="outline-3">
-<h3 id="orgea7a079"><span class="section-number-3">2.8.</span> Principios que sostienen a los patrones (SOLID y amigos)</h3>
-<div class="outline-text-3" id="text-2-8">
+<div id="outline-container-orge310cde" class="outline-3">
+<h3 id="orge310cde"><span class="section-number-3">2.6.</span> Principios de los que dependen los patrones</h3>
+<div class="outline-text-3" id="text-2-6">
 <p>
-Los patrones no flotan en el vacío. Casi todos existen para <b>obedecer principios</b>. Si memorizas patrones sin principios, los aplicarás al revés.
+Los patrones no son un conjunto axiomático independiente. Casi todos existen para realizar principios de diseño. Aplicarlos sin esos principios produce el uso inverso: más tipos y el mismo acoplamiento.
 </p>
 </div>
-<div id="outline-container-orgb6fa515" class="outline-4">
-<h4 id="orgb6fa515"><span class="section-number-4">2.8.1.</span> SOLID (muy usados en web y móvil)</h4>
-<div class="outline-text-4" id="text-2-8-1">
+<div id="outline-container-org1967c0d" class="outline-4">
+<h4 id="org1967c0d"><span class="section-number-4">2.6.1.</span> SOLID</h4>
+<div class="outline-text-4" id="text-2-6-1">
+<p>
+Martin resume cinco principios de diseño OO que aparecen, de manera reiterada, como <b>justificación</b> de Adapter, Strategy, DIP y las interfaces segregadas:
+</p>
+
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1273,83 +1175,79 @@ Los patrones no flotan en el vacío. Casi todos existen para <b>obedecer princip
 <col  class="org-left" />
 
 <col  class="org-left" />
-
-<col  class="org-left" />
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="org-left">Letra</th>
 <th scope="col" class="org-left">Principio</th>
-<th scope="col" class="org-left">En criollo</th>
-<th scope="col" class="org-left">Señal de que lo estás violando</th>
+<th scope="col" class="org-left">Enunciado</th>
+<th scope="col" class="org-left">Violación típica</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="org-left"><b>S</b></td>
-<td class="org-left">Single Responsibility</td>
-<td class="org-left">Una razón para cambiar.</td>
-<td class="org-left">Una clase «hace pantallas, llama APIs, guarda SQLite y formatea fechas».</td>
+<td class="org-left"><b>S</b> Single Responsibility</td>
+<td class="org-left">Un módulo tiene una sola razón de cambio.</td>
+<td class="org-left">Una clase concentra presentación, red, persistencia y formato.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>O</b></td>
-<td class="org-left">Open/Closed</td>
+<td class="org-left"><b>O</b> Open/Closed</td>
 <td class="org-left">Abierto a extensión, cerrado a modificación.</td>
-<td class="org-left">Cada feature nueva obliga a editar un <code>switch</code> gigante.</td>
+<td class="org-left">Cada variante nueva obliga a editar un <code>switch</code> central.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>L</b></td>
-<td class="org-left">Liskov Substitution</td>
-<td class="org-left">Un subtipo no rompe lo que el padre prometió.</td>
-<td class="org-left"><code>Square</code> hereda de <code>Rectangle</code> y el área deja de cuadrar.</td>
+<td class="org-left"><b>L</b> Liskov Substitution</td>
+<td class="org-left">El subtipo preserva el contrato del supertipo.</td>
+<td class="org-left">Una subclase rompe invariantes del tipo base.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>I</b></td>
-<td class="org-left">Interface Segregation</td>
-<td class="org-left">Interfaces chicas, no «diosas».</td>
-<td class="org-left">Un cliente web está forzado a implementar <code>pushNotification()</code>.</td>
+<td class="org-left"><b>I</b> Interface Segregation</td>
+<td class="org-left">Contratos pequeños, no omnicomprensivos.</td>
+<td class="org-left">Un cliente web forzado a métodos de notificaciones <b>push</b>.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>D</b></td>
-<td class="org-left">Dependency Inversion</td>
-<td class="org-left">Módulos de alto nivel no dependen de detalles.</td>
-<td class="org-left">El <code>ViewModel</code> importa <code>Retrofit</code> concreto o <code>fetch</code> crudo.</td>
+<td class="org-left"><b>D</b> Dependency Inversion</td>
+<td class="org-left">Los módulos de alto nivel dependen de abstracciones.</td>
+<td class="org-left">El ViewModel importa el cliente HTTP concreto.</td>
 </tr>
 </tbody>
 </table>
+
+<p>
+Parnas (1972) anticipa S y D: cada módulo oculta una decisión. Strategy y Repository son formas de ese ocultamiento.
+</p>
 </div>
 </div>
-<div id="outline-container-org646d29e" class="outline-4">
-<h4 id="org646d29e"><span class="section-number-4">2.8.2.</span> Otros principios que aparecen todo el tiempo</h4>
-<div class="outline-text-4" id="text-2-8-2">
+<div id="outline-container-org510d8f7" class="outline-4">
+<h4 id="org510d8f7"><span class="section-number-4">2.6.2.</span> Otros principios</h4>
+<div class="outline-text-4" id="text-2-6-2">
 <ul class="org-ul">
-<li><b>DRY</b> (Don't Repeat Yourself): no duplicar <b>conocimiento</b>, no solo líneas. Duplicar un <code>if</code> de autenticación en 12 controladores es el síntoma; el patrón (middleware, decorator, guard) es la cura.</li>
-<li><b>KISS</b> y <b>YAGNI</b>: el antipatrón más común de alumnos es <b>sobrepatrones</b>. Si el problema ocurre <b>una vez</b> y no va a variar, un procedimiento claro gana a un Strategy de tres interfaces.</li>
-<li><b>Ley de Demeter</b>: «no hables con extraños». <code>pedido.cliente.direccion.ciudad.codigoPostal</code> es un tren de acoplamiento. En web se ve en plantillas; en móvil, en vistas que conocen el modelo entero.</li>
-<li><b>Separación de preocupaciones</b>: UI, reglas de negocio, persistencia, red, navegación. MVC y Clean Architecture son <b>aplicaciones</b> de este principio, no magia.</li>
+<li><b>DRY</b>: no duplicar <b>conocimiento</b>. La repetición de autenticación en doce controladores es el síntoma; middleware o Decorator es la estructura que lo localiza.</li>
+<li><b>KISS</b> y <b>YAGNI</b>: si la variación ocurre una sola vez y no se prevé repetición, un procedimiento claro es preferible a un Strategy de tres tipos. El antipatrón escolar es el <b>sobreuso</b> de catálogo.</li>
+<li><b>Ley de Demeter</b>: un objeto no debe navegar cadenas largas de colaboradores. En plantillas web y en vistas móviles aparece como <code>pedido.cliente.direccion.ciudad</code>.</li>
+<li><b>Separación de preocupaciones</b>: presentación, dominio, persistencia, red, navegación. MVC y la arquitectura hexagonal son <b>aplicaciones</b> de este principio, no un estilo mágico.</li>
 </ul>
 </div>
 </div>
 </div>
-<div id="outline-container-org64117af" class="outline-3">
-<h3 id="org64117af"><span class="section-number-3">2.9.</span> Niveles: idioma, patrón, estilo arquitectónico</h3>
-<div class="outline-text-3" id="text-2-9">
+<div id="outline-container-org234152e" class="outline-3">
+<h3 id="org234152e"><span class="section-number-3">2.7.</span> Niveles: idioma, patrón, estilo arquitectónico</h3>
+<div class="outline-text-3" id="text-2-7">
 <p>
 Confundir niveles es el error de diseño número uno.
 </p>
 
-<pre class="example" id="org7f753d2">
-[Estilo arquitectónico]     p. ej. capas, hexagonal, microservicios, offline-first
-         ↑ se implementa con
-[Patrones de diseño]        p. ej. Observer, Strategy, Repository, Adapter
-         ↑ se escribe con
-[Idiomas del lenguaje]      p. ej. async/await, data classes, hooks de React
-         ↑ corre sobre
-[Plataforma]                navegador, Node, Android, iOS, Flutter
+<pre class="example" id="orgff2e49d">
+  [Estilo arquitectónico]     p. ej. capas, hexagonal, microservicios, offline-first
+           ↑ se implementa con
+  [Patrones de diseño]        p. ej. Observer, Strategy, Repository, Adapter
+           ↑ se escribe con
+  [Idiomas del lenguaje]      p. ej. async/await, data classes, hooks de React
+           ↑ corre sobre
+  [Plataforma]                navegador, Node, Android, iOS, Flutter
 </pre>
 
 <p>
@@ -1357,25 +1255,102 @@ Ejemplo: <b>MVVM</b> es un <b>patrón de presentación</b> (a veces se le llama 
 </p>
 </div>
 </div>
-<div id="outline-container-orgd2c2923" class="outline-3">
-<h3 id="orgd2c2923"><span class="section-number-3">2.10.</span> Buena práctica: el patrón conveniente <b>también</b> depende del lenguaje</h3>
-<div class="outline-text-3" id="text-2-10">
+<div id="outline-container-orgf22d13b" class="outline-3">
+<h3 id="orgf22d13b"><span class="section-number-3">2.8.</span> Relación entre patrón, idioma, lenguaje y marco de trabajo</h3>
+<div class="outline-text-3" id="text-2-8">
 <p>
-El problema manda (qué duele, qué va a variar). El <b>lenguaje no es neutro</b>: lo que en un idioma pide tres clases, en otro ya viene en la gramática. Copiar el mismo diagrama GoF a todos los lenguajes <b>no</b> es buena práctica.
+Gamma et al. separan, en cada ficha, <b>Structure</b> de <b>Implementation</b>. La estructura es estable; la implementación es función del lenguaje. Coplien llama <b>idioma</b> a la realización canónica de una idea en un lenguaje dado. Buschmann et al. sitúan el <b>framework</b> un nivel por encima: un marco de trabajo <b>congela</b> un diseño (Hollywood principle: «no nos llames, nosotros te llamamos») y deja <b>puntos de extensión</b> (hot spots). El programador no reimplementa Observer si el marco ya publica un bus de eventos: <b>reutiliza el diseño congelado</b>.
 </p>
 
 <p>
-Tres reglas:
+De ahí tres niveles de decisión, en este orden:
 </p>
 
 <ol class="org-ol">
-<li><b>Primero el problema, después el catálogo.</b> Strategy no se elige «porque el proyecto es Java». Se elige porque el algoritmo va a cambiar (rival, pasarela, ordenamiento).</li>
-<li><b>Luego se pregunta qué ofrece el lenguaje.</b> Si ya hay funciones de primera clase, un Strategy de jerarquía de clases suele ser ruido. Si no hay herencia, Adapter se escribe con interfaces o con composición, no con el UML de 1994.</li>
-<li><b>No se traduce clase por clase.</b> Un libro de patrones en Java no se pega en Python, JavaScript o Go. Se traduce la <b>intención</b> al idioma local. Lo contrario (montar 8 tipos para un callback) es ceremonia. Lo otro extremo (nunca nombrar el patrón porque «en JS todo es un objeto») deja el diseño sin vocabulario.</li>
+<li><b>El problema de diseño</b> (qué varía: algoritmo del rival, pasarela, origen de datos).</li>
+<li><b>El lenguaje</b>: si ofrece funciones de primera clase, clausuras, coincidencia de patrones o módulos como unidad de carga, varios de los 23 se realizan sin jerarquía de clases.</li>
+<li><b>El marco de trabajo</b>: Spring, React, Android y Flutter <b>instancian</b> Singleton, Observer, Front Controller y el patrón de presentación. Duplicarlos al margen del mecanismo nativo degrada el diseño (dos contenedores de instancias, dos buses de eventos).</li>
 </ol>
 
 <p>
-El mismo dolor, distinta forma conveniente:
+El catálogo de 1994 se escribió sobre Smalltalk y C++. En un lenguaje con clausuras, Strategy se reduce a menudo a un argumento función. En Go, sin herencia de implementación, Adapter y Strategy se expresan con interfaces y composición. El patrón no desaparece: deja de coincidir con el diagrama UML del ejemplo en C++.
+</p>
+</div>
+<div id="outline-container-orgeae130d" class="outline-4">
+<h4 id="orgeae130d"><span class="section-number-4">2.8.1.</span> Realización de Strategy en Java, JavaScript y React</h4>
+<div class="outline-text-4" id="text-2-8-1">
+<p>
+Problema: el rival de FeriaPPT elige la tirada según políticas distintas, y se prevé añadir políticas.
+</p>
+
+<p>
+En Java, la estructura de libro es natural: un contrato y una clase por política.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #c099ff;">interface</span> <span style="color: #ffc777;">Rival</span> <span style="color: #c099ff;">{</span>
+  <span style="color: #ffc777;">String</span> <span style="color: #82aaff;">elegir</span><span style="color: #ff995e;">(</span><span style="color: #ffc777;">List</span><span style="color: #ff98a4;">&lt;</span><span style="color: #ffc777;">String</span><span style="color: #ff98a4;">&gt;</span> <span style="color: #ff98a4;">historial</span><span style="color: #ff995e;">)</span>;
+<span style="color: #c099ff;">}</span>
+
+<span style="color: #c099ff;">class</span> <span style="color: #ffc777;">RivalAleatorio</span> <span style="color: #c099ff;">implements</span> <span style="color: #ffc777;">Rival</span> <span style="color: #c099ff;">{</span>
+  <span style="color: #c099ff;">public</span> <span style="color: #ffc777;">String</span> <span style="color: #82aaff;">elegir</span><span style="color: #ff995e;">(</span><span style="color: #ffc777;">List</span><span style="color: #ff98a4;">&lt;</span><span style="color: #ffc777;">String</span><span style="color: #ff98a4;">&gt;</span> <span style="color: #ff98a4;">h</span><span style="color: #ff995e;">)</span> <span style="color: #ff995e;">{</span>
+    <span style="color: #ffc777;">String</span><span style="color: #ff98a4;">[]</span> <span style="color: #ff98a4;">ops</span> = <span style="color: #ff98a4;">{</span><span style="color: #c3e88d;">"piedra"</span>, <span style="color: #c3e88d;">"papel"</span>, <span style="color: #c3e88d;">"tijera"</span><span style="color: #ff98a4;">}</span>;
+    <span style="color: #c099ff;">return</span> ops<span style="color: #ff98a4;">[</span><span style="color: #c099ff;">new</span> <span style="color: #ffc777;">Random</span><span style="color: #b4f9f8;">()</span>.nextInt<span style="color: #b4f9f8;">(</span>3<span style="color: #b4f9f8;">)</span><span style="color: #ff98a4;">]</span>;
+  <span style="color: #ff995e;">}</span>
+<span style="color: #c099ff;">}</span>
+
+<span style="color: #c099ff;">class</span> <span style="color: #ffc777;">Duelo</span> <span style="color: #c099ff;">{</span>
+  <span style="color: #c099ff;">private</span> <span style="color: #c099ff;">final</span> <span style="color: #ffc777;">Rival</span> <span style="color: #ff98a4;">rival</span>;
+  <span style="color: #82aaff;">Duelo</span><span style="color: #ff995e;">(</span><span style="color: #ffc777;">Rival</span> <span style="color: #ff98a4;">rival</span><span style="color: #ff995e;">)</span> <span style="color: #ff995e;">{</span> <span style="color: #c099ff;">this</span>.rival = rival; <span style="color: #ff995e;">}</span>
+<span style="color: #c099ff;">}</span>
+</pre>
+</div>
+
+<p>
+En JavaScript, las clases ilustran la <b>forma</b>. El idioma del lenguaje es pasar la función:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #c099ff;">const</span> <span style="color: #ff98a4;">aleatorio</span> = <span style="color: #c099ff;">()</span> =&gt; <span style="color: #c099ff;">[</span><span style="color: #c3e88d;">"piedra"</span>, <span style="color: #c3e88d;">"papel"</span>, <span style="color: #c3e88d;">"tijera"</span><span style="color: #c099ff;">][</span>Math.floor<span style="color: #ff995e;">(</span>Math.random<span style="color: #ff98a4;">()</span> * 3<span style="color: #ff995e;">)</span><span style="color: #c099ff;">]</span>;
+<span style="color: #c099ff;">const</span> <span style="color: #ff98a4;">copion</span> = <span style="color: #c099ff;">(</span>historial<span style="color: #c099ff;">)</span> =&gt; historial.at<span style="color: #c099ff;">(</span>-1<span style="color: #c099ff;">)</span> || <span style="color: #c3e88d;">"piedra"</span>;
+
+<span style="color: #c099ff;">function</span> <span style="color: #82aaff;">duelo</span><span style="color: #c099ff;">(</span><span style="color: #ff98a4;">elegirRival</span>, <span style="color: #ff98a4;">tirada</span>, <span style="color: #ff98a4;">historial</span><span style="color: #c099ff;">)</span> <span style="color: #c099ff;">{</span>
+  <span style="color: #c099ff;">return</span> <span style="color: #ff995e;">{</span> jugador: tirada, rival: elegirRival<span style="color: #ff98a4;">(</span>historial<span style="color: #ff98a4;">)</span> <span style="color: #ff995e;">}</span>;
+<span style="color: #c099ff;">}</span>
+
+duelo<span style="color: #c099ff;">(</span>aleatorio, <span style="color: #c3e88d;">"piedra"</span>, <span style="color: #ff995e;">[]</span><span style="color: #c099ff;">)</span>;
+duelo<span style="color: #c099ff;">(</span>copion, <span style="color: #c3e88d;">"papel"</span>, <span style="color: #ff995e;">[</span><span style="color: #c3e88d;">"piedra"</span><span style="color: #ff995e;">]</span><span style="color: #c099ff;">)</span>;
+</pre>
+</div>
+
+<p>
+La jerarquía <code>class Rival</code> / <code>extends</code> en un módulo breve es correcta, pero redundante: el lenguaje ya resuelve el intercambio de algoritmo.
+</p>
+
+<p>
+En React, el algoritmo intercambiable suele ser una <b>propiedad</b> o un <b>hook</b>. No se transcribe <code>Duelo</code> de Java: se inyecta la política.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #c099ff;">function</span> <span style="color: #82aaff;">Duelo</span><span style="color: #c099ff;">(</span><span style="color: #ff995e;">{</span> elegirRival, tirada, historial <span style="color: #ff995e;">}</span><span style="color: #c099ff;">)</span> <span style="color: #c099ff;">{</span>
+  <span style="color: #c099ff;">const</span> <span style="color: #ff98a4;">rival</span> = elegirRival<span style="color: #ff995e;">(</span>historial<span style="color: #ff995e;">)</span>;
+  <span style="color: #c099ff;">return</span> &lt;p&gt;Jugador: <span style="color: #ff995e;">{</span>tirada<span style="color: #ff995e;">}</span> &#183; Rival: <span style="color: #ff995e;">{</span>rival<span style="color: #ff995e;">}</span>&lt;/p&gt;;
+<span style="color: #c099ff;">}</span>
+
+&lt;Duelo elegirRival=<span style="color: #c099ff;">{</span>aleatorio<span style="color: #c099ff;">}</span> tirada=<span style="color: #c3e88d;">"piedra"</span> historial=<span style="color: #c099ff;">{</span><span style="color: #ff995e;">[]</span><span style="color: #c099ff;">}</span> /&gt;
+</pre>
+</div>
+
+<p>
+El nombre Strategy sigue siendo el de la intención; el diagrama de clases de 1994 no es la forma idiomática.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeeb18ee" class="outline-4">
+<h4 id="orgeeb18ee"><span class="section-number-4">2.8.2.</span> El marco de trabajo como diseño congelado</h4>
+<div class="outline-text-4" id="text-2-8-2">
+<p>
+Johnson (uno de los GoF) insiste en que un <b>framework</b> reutiliza diseño. Ignorar los puntos de extensión nativos equivale a diseñar dos veces.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -1392,95 +1367,157 @@ El mismo dolor, distinta forma conveniente:
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="org-left">Intención (el problema)</th>
-<th scope="col" class="org-left">Suele convenir en Java / C# / Kotlin «clásico»</th>
-<th scope="col" class="org-left">Suele convenir en JS / Python / Kotlin moderno</th>
-<th scope="col" class="org-left">A veces <b>no</b> conviene en…</th>
+<th scope="col" class="org-left">Intención</th>
+<th scope="col" class="org-left">Estructura «a mano»</th>
+<th scope="col" class="org-left">Mecanismo habitual del marco</th>
+<th scope="col" class="org-left">Efecto de reimplementarlo</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="org-left">Variar un algoritmo (Strategy)</td>
-<td class="org-left">Interfaz + una clase por receta</td>
-<td class="org-left">Una función pasada como argumento</td>
-<td class="org-left">Un Strategy de 4 clases para <b>una</b> receta que no va a cambiar</td>
+<td class="org-left">Una instancia o cableado</td>
+<td class="org-left">Singleton</td>
+<td class="org-left">Spring <code>@Component</code>, Angular <code>providedIn: 'root'</code>, Hilt</td>
+<td class="org-left">Doble estado global; pruebas frágiles</td>
 </tr>
 
 <tr>
-<td class="org-left">Avisar cambios (Observer)</td>
-<td class="org-left">Interfaz <code>Observer</code> + <code>notify</code></td>
-<td class="org-left">Eventos, callbacks, <code>Flow</code>, signals</td>
-<td class="org-left">Reimplementar pub/sub a mano si el runtime ya lo trae</td>
+<td class="org-left">Notificación de cambios</td>
+<td class="org-left">Observer</td>
+<td class="org-left">Estado de React/Vue, LiveData, StateFlow, Combine</td>
+<td class="org-left">Un <code>addListener</code> paralelo al sistema nativo</td>
 </tr>
 
 <tr>
-<td class="org-left">Recorrer una colección (Iterator)</td>
-<td class="org-left">Casi nunca: ya está en <code>for</code> / streams</td>
-<td class="org-left">Casi nunca: <code>for...of</code>, generadores</td>
-<td class="org-left">Un Iterator GoF de libro en un <code>list</code> de Python</td>
+<td class="org-left">Recorrido</td>
+<td class="org-left">Iterator</td>
+<td class="org-left">Iteradores del lenguaje</td>
+<td class="org-left">Tipo adicional sobre un arreglo</td>
 </tr>
 
 <tr>
-<td class="org-left">Una sola instancia (Singleton)</td>
-<td class="org-left"><code>object</code> / enum / DI del contenedor</td>
-<td class="org-left">Un módulo (el archivo <b>ya</b> es único)</td>
-<td class="org-left">Singleton global de «el usuario» en <b>cualquier</b> lenguaje</td>
+<td class="org-left">Cadena de políticas</td>
+<td class="org-left">Decorator / Chain of Responsibility</td>
+<td class="org-left">Middleware de Express, Django, Next.js</td>
+<td class="org-left">Condicionales acumulados en el controlador</td>
 </tr>
 
 <tr>
-<td class="org-left">Envolver comportamiento (Decorator)</td>
-<td class="org-left">Clases que envuelven</td>
-<td class="org-left">Middleware, closures, decoradores de Python</td>
-<td class="org-left">Herencia profunda «por si acaso»</td>
+<td class="org-left">Traducción HTTP → tipo de dominio</td>
+<td class="org-left">Adapter</td>
+<td class="org-left">Retrofit, interceptores, función de mapeo</td>
+<td class="org-left">Jerarquía innecesaria sobre un JSON reducido</td>
 </tr>
 
 <tr>
-<td class="org-left">Traducir una API ajena (Adapter)</td>
-<td class="org-left">Clase adaptadora</td>
-<td class="org-left">Función o objeto que mapea JSON → tu tipo</td>
-<td class="org-left">El mismo Adapter si el lenguaje y la API ya hablan igual</td>
+<td class="org-left">Punto único de entrada HTTP</td>
+<td class="org-left">Front Controller</td>
+<td class="org-left"><code>DispatcherServlet</code>, kernel de Laravel, enrutador de Next.js</td>
+<td class="org-left">Segundo <b>front</b> paralelo</td>
 </tr>
 
 <tr>
-<td class="org-left">Visitor sobre un árbol</td>
-<td class="org-left">Útil si el lenguaje no tiene <b>pattern matching</b></td>
-<td class="org-left">A menudo un <code>match</code> / multimétodo basta</td>
-<td class="org-left">Visitor en un script de 40 líneas</td>
+<td class="org-left">Presentación</td>
+<td class="org-left">MVC / MVVM / MVI</td>
+<td class="org-left">ViewModel, SwiftUI, BLoC, Riverpod, Vue</td>
+<td class="org-left">Portar MVP de Android a Flutter por isomorfismo superficial</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-El catálogo GoF nació en <b>orientación a objetos</b> (Smalltalk, C++). En un lenguaje funcional o en JS con closures, varios de los 23 se <b>colapsan</b> a una función. En Go, sin herencia de clases, se usa composición e interfaces. El patrón no «deja de existir»: <b>deja de ser la receta UML que salió en el examen de Java</b>.
-</p>
-
-<p>
-Buenas prácticas al elegir:
-</p>
-
-<ul class="org-ul">
-<li>Si el lenguaje ya resolvió el patrón como <b>idioma</b>, úsalo (no reinventes Iterator).</li>
-<li>Si el lenguaje <b>no</b> tiene el idioma, entonces sí vale la estructura clásica (p. ej. Strategy con tipos en Java 8 sin lambdas en código legado).</li>
-<li>Un patrón que en Java es higiene (inyección por constructor) en un script PHP de una página puede ser teatro.</li>
-<li>Un patrón que en React es natural (composición de componentes ≈ Decorator/Composite) copiado a un servlet 2.5 se siente forzado.</li>
-<li>La pregunta de revisión de código no es «¿usamos el patrón X como en el libro?». Es «¿este lenguaje ya lo trae? ¿el problema lo necesita? ¿el equipo lo va a mantener?».</li>
-</ul>
-
-<p>
-Los esqueletos en JavaScript de estos apuntes son <b>un</b> disfraz para leer la forma. En Kotlin, PHP o Dart la intención se escribe distinto; la decisión de <b>si</b> aplica Strategy o no sigue siendo del problema, no del logo del lenguaje.
+En Spring, un servicio de duelo es un <b>bean</b>: el contenedor realiza el Singleton <b>y</b> la inyección, de modo que en prueba se sustituye el rival. En Express, la autenticación, CORS y el registro se componen como middleware (Chain of Responsibility). En Android, el marcador observable es Observer vía <code>StateFlow</code>, no una lista propia de oyentes. En Flutter, BLoC o Riverpod <b>son</b> el patrón de presentación; transcribir MVVM de Android con <code>LiveData</code> entra en conflicto con el marco.
 </p>
 </div>
 </div>
-<div id="outline-container-org58ef1e8" class="outline-3">
-<h3 id="org58ef1e8"><span class="section-number-3">2.11.</span> Catálogo GoF: mapa de alto nivel de los 23</h3>
-<div class="outline-text-3" id="text-2-11">
+<div id="outline-container-orgd79944a" class="outline-4">
+<h4 id="orgd79944a"><span class="section-number-4">2.8.3.</span> Correspondencia de formas</h4>
+<div class="outline-text-4" id="text-2-8-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Intención</th>
+<th scope="col" class="org-left">Java / C# / Kotlin clásico</th>
+<th scope="col" class="org-left">JS / Python / Kotlin contemporáneo</th>
+<th scope="col" class="org-left">Marco típico de la materia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Variar un algoritmo</td>
+<td class="org-left">Interfaz y una clase por política</td>
+<td class="org-left">Función</td>
+<td class="org-left">Propiedad, <b>hook</b>, bean</td>
+</tr>
+
+<tr>
+<td class="org-left">Notificar cambios</td>
+<td class="org-left">Interfaz Observer</td>
+<td class="org-left">Retrollamadas, <code>Flow</code></td>
+<td class="org-left">Sistema de estado del <b>toolkit</b></td>
+</tr>
+
+<tr>
+<td class="org-left">Recorrer</td>
+<td class="org-left">Iterador del lenguaje</td>
+<td class="org-left">Iterador del lenguaje</td>
+<td class="org-left">El del lenguaje</td>
+</tr>
+
+<tr>
+<td class="org-left">Una instancia</td>
+<td class="org-left"><code>object</code>, enum, DI</td>
+<td class="org-left">Módulo ES</td>
+<td class="org-left">Contenedor de DI</td>
+</tr>
+
+<tr>
+<td class="org-left">Envolver comportamiento</td>
+<td class="org-left">Clases envolventes</td>
+<td class="org-left">Clausuras, decoradores</td>
+<td class="org-left">Middleware, interceptores</td>
+</tr>
+
+<tr>
+<td class="org-left">Traducir una API ajena</td>
+<td class="org-left">Clase adaptadora</td>
+<td class="org-left">Función de mapeo</td>
+<td class="org-left">Cliente HTTP + mapper</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Criterio: si el idioma o el marco ya realizan el patrón, se usa esa realización. La estructura de 1994 se justifica cuando el lenguaje o el <b>runtime</b> no la ofrecen (código legado, servidor mínimo, lienzo sin un <b>toolkit</b> de estado).
+</p>
+
+<p>
+Los ejemplos en JavaScript de estos apuntes son un vehículo de lectura. En Kotlin, PHP o Dart la intención se escribe de otro modo; <b>si</b> Strategy es pertinente lo determina el problema, no el logotipo del lenguaje ni el del marco.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdb7e8a3" class="outline-3">
+<h3 id="orgdb7e8a3"><span class="section-number-3">2.9.</span> Catálogo GoF: mapa de alto nivel de los 23</h3>
+<div class="outline-text-3" id="text-2-9">
 <p>
 Los 23 del libro de Gamma, Helm, Johnson y Vlissides. Reconocer la <b>familia</b> importa más que memorizar cada diagrama; varios reaparecen en web y en móvil con otro nombre de framework.
 </p>
 </div>
-<div id="outline-container-org74d51c3" class="outline-4">
-<h4 id="org74d51c3"><span class="section-number-4">2.11.1.</span> Creacionales</h4>
-<div class="outline-text-4" id="text-2-11-1">
+<div id="outline-container-orgc3f7626" class="outline-4">
+<h4 id="orgc3f7626"><span class="section-number-4">2.9.1.</span> Creacionales</h4>
+<div class="outline-text-4" id="text-2-9-1">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1532,9 +1569,9 @@ Los 23 del libro de Gamma, Helm, Johnson y Vlissides. Reconocer la <b>familia</b
 </table>
 </div>
 </div>
-<div id="outline-container-orgec1cac4" class="outline-4">
-<h4 id="orgec1cac4"><span class="section-number-4">2.11.2.</span> Estructurales</h4>
-<div class="outline-text-4" id="text-2-11-2">
+<div id="outline-container-org1305821" class="outline-4">
+<h4 id="org1305821"><span class="section-number-4">2.9.2.</span> Estructurales</h4>
+<div class="outline-text-4" id="text-2-9-2">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1598,9 +1635,9 @@ Los 23 del libro de Gamma, Helm, Johnson y Vlissides. Reconocer la <b>familia</b
 </table>
 </div>
 </div>
-<div id="outline-container-org370f205" class="outline-4">
-<h4 id="org370f205"><span class="section-number-4">2.11.3.</span> Comportamentales</h4>
-<div class="outline-text-4" id="text-2-11-3">
+<div id="outline-container-orgf85e665" class="outline-4">
+<h4 id="orgf85e665"><span class="section-number-4">2.9.3.</span> Comportamentales</h4>
+<div class="outline-text-4" id="text-2-9-3">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1689,58 +1726,48 @@ Los 23 del libro de Gamma, Helm, Johnson y Vlissides. Reconocer la <b>familia</b
 </div>
 </div>
 </div>
-<div id="outline-container-orgee8eba7" class="outline-3">
-<h3 id="orgee8eba7"><span class="section-number-3">2.12.</span> Cómo se <b>analiza</b> un patrón (método de la materia)</h3>
-<div class="outline-text-3" id="text-2-12">
+<div id="outline-container-org81393de" class="outline-3">
+<h3 id="org81393de"><span class="section-number-3">2.10.</span> Método de análisis</h3>
+<div class="outline-text-3" id="text-2-10">
 <p>
-Cuando el profesor pide «analiza el patrón X para web/móvil», no recites Wikipedia. Sigue este protocolo:
+Un análisis de patrón en esta unidad no consiste en reproducir la ficha de un manual. El protocolo siguiente obliga a situar el patrón en <b>un</b> problema, <b>unas</b> fuerzas y <b>una</b> plataforma:
 </p>
 
 <ol class="org-ol">
-<li><b>Nombra el problema en lenguaje de producto</b>, no de UML. («El checkout se rompe cada vez que entra un banco nuevo.»)</li>
-<li><b>Lista las fuerzas:</b> tiempo de mercado, testabilidad, rendimiento, tamaño del APK, ida y vuelta de red, equipo junior vs. senior, <b>y qué idiomas ya trae el lenguaje</b> (lambdas, eventos, módulos).</li>
-<li><b>Dibuja el diseño actual</b> (aunque sea cajas). Marca el acoplamiento doloroso.</li>
-<li><b>Propón el patrón</b> y <b>justifica por qué ese y no otro</b>, y por qué esa <b>forma</b> en este lenguaje (clases vs. función vs. idioma nativo). Adapter vs. Facade se confunden mucho; Strategy vs. State también.</li>
-<li><b>Diseña las interfaces</b> (los contratos), no las 40 clases de implementación.</li>
-<li><b>Enumera consecuencias negativas</b> a propósito. Si no hay costos, estás vendiendo, no diseñando.</li>
-<li><b>Define señales de salida:</b> ¿cómo sabré que el patrón se volvió un antipatrón aquí?</li>
+<li>Enunciar el problema en términos de producto o de atributo de calidad, no de UML.</li>
+<li>Enumerar fuerzas: tiempo de entrega, prueba, rendimiento, tamaño de binario, latencia, madurez del equipo, e idiomas que el lenguaje ya ofrece.</li>
+<li>Representar el diseño actual y marcar el acoplamiento que impide el cambio.</li>
+<li>Proponer el patrón, justificar por qué ese y no un vecino (Adapter frente a Facade; Strategy frente a State), y qué <b>forma</b> admite el lenguaje.</li>
+<li>Diseñar contratos (interfaces, funciones, módulos), no el conjunto exhaustivo de clases.</li>
+<li>Enumerar consecuencias adversas. Si no hay costos, no hay análisis.</li>
+<li>Definir señales de que el patrón se ha convertido en antipatrón en ese contexto.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org0c3111e" class="outline-3">
-<h3 id="org0c3111e"><span class="section-number-3">2.13.</span> Cómo se <b>diseña</b> con patrones (no al revés)</h3>
-<div class="outline-text-3" id="text-2-13">
+<div id="outline-container-org45b7c36" class="outline-3">
+<h3 id="org45b7c36"><span class="section-number-3">2.11.</span> Orden de diseño</h3>
+<div class="outline-text-3" id="text-2-11">
 <p>
-El orden correcto:
+El orden coherente con la teoría (problema → principios → estructura) es:
 </p>
 
-<pre class="example" id="orga91884d">
-Requisitos y restricciones (incluido el lenguaje)
-      → problemas de diseño recurrentes
-            → principios (SOLID, separación)
-                  → patrón(es) candidatos *y* forma idiomática en este lenguaje
-                        → contratos (interfaces, funciones, módulos)
-                              → implementación y pruebas
+<pre class="example" id="org30fa1e1">
+  Requisitos y restricciones (lenguaje y marco incluidos)
+        → problemas de diseño recurrentes
+              → principios (SOLID, separación de preocupaciones)
+                    → patrones candidatos y forma idiomática
+                          → contratos
+                                → implementación y prueba
 </pre>
 
 <p>
-El orden incorrecto (muy común):
-</p>
-
-<pre class="example" id="orgff8e2d8">
-«Hay que usar Factory, Singleton y MVVM porque salen en el temario»
-      → se inventan clases para que el diagrama se vea completo
-            → el problema real sigue igual de acoplado
-</pre>
-
-<p>
-Regla de oro: <b>el patrón es la consecuencia del análisis, no el punto de partida.</b>
+El orden inverso —partir del catálogo «porque figura en el temario»— produce tipos sin problema y deja intacto el acoplamiento. El patrón es <b>consecuencia</b> del análisis.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b59980" class="outline-3">
-<h3 id="org4b59980"><span class="section-number-3">2.14.</span> Antipatrones que debes reconocer (para no copiarlos)</h3>
-<div class="outline-text-3" id="text-2-14">
+<div id="outline-container-orgfe5068e" class="outline-3">
+<h3 id="orgfe5068e"><span class="section-number-3">2.12.</span> Antipatrones</h3>
+<div class="outline-text-3" id="text-2-12">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1804,59 +1831,52 @@ Regla de oro: <b>el patrón es la consecuencia del análisis, no el punto de par
 </table>
 </div>
 </div>
-<div id="outline-container-orgce31f00" class="outline-3">
-<h3 id="orgce31f00"><span class="section-number-3">2.15.</span> Mini-ejemplo con FeriaPPT: Strategy (el rival de la máquina)</h3>
-<div class="outline-text-3" id="text-2-15">
+<div id="outline-container-org3036526" class="outline-3">
+<h3 id="org3036526"><span class="section-number-3">2.13.</span> Mini-ejemplo con FeriaPPT: Strategy</h3>
+<div class="outline-text-3" id="text-2-13">
 <p>
 El esqueleto muestra <b>Strategy</b>: el duelo depende de un contrato «cómo elige el rival», no de un <code>if</code> por cada personalidad. Está en JavaScript solo para leerlo; en este lenguaje a menudo basta <b>pasar una función</b> (<code>elegir: () =&gt; "piedra"</code>) y no hace falta la jerarquía de clases. En Java «clásico» las clases sí suelen convenir. El mismo <b>problema</b> (cambiar de rival) se escribe distinto; no se copia el UML a todos los idiomas.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">// Contrato: "cómo elige el rival", no "qué botones pinta la página".
-class Rival {
-  elegir(historial) { throw new Error("implementar"); }
-}
+<pre class="src src-javascript">  <span style="color: #7a88cf;">// </span><span style="color: #7a88cf;">Contrato: "c&#243;mo elige el rival", no "qu&#233; botones pinta la p&#225;gina".
+</span>  <span style="color: #c099ff;">class</span> Rival <span style="color: #c099ff;">{</span>
+    elegir<span style="color: #ff995e;">(</span>historial<span style="color: #ff995e;">)</span> <span style="color: #ff995e;">{</span> <span style="color: #c099ff;">throw</span> <span style="color: #c099ff;">new</span> <span style="color: #ffc777;">Error</span><span style="color: #ff98a4;">(</span><span style="color: #c3e88d;">"implementar"</span><span style="color: #ff98a4;">)</span>; <span style="color: #ff995e;">}</span>
+  <span style="color: #c099ff;">}</span>
 
-class RivalAleatorio extends Rival {
-  elegir() {
-    const opciones = ["piedra", "papel", "tijera"];
-    return opciones[Math.floor(Math.random() * 3)];
-  }
-}
+  <span style="color: #c099ff;">class</span> RivalAleatorio <span style="color: #c099ff;">extends</span> Rival <span style="color: #c099ff;">{</span>
+    elegir<span style="color: #ff995e;">()</span> <span style="color: #ff995e;">{</span>
+      <span style="color: #c099ff;">const</span> <span style="color: #ff98a4;">opciones</span> = <span style="color: #ff98a4;">[</span><span style="color: #c3e88d;">"piedra"</span>, <span style="color: #c3e88d;">"papel"</span>, <span style="color: #c3e88d;">"tijera"</span><span style="color: #ff98a4;">]</span>;
+      <span style="color: #c099ff;">return</span> opciones<span style="color: #ff98a4;">[</span>Math.floor<span style="color: #b4f9f8;">(</span>Math.random<span style="color: #f989d3;">()</span> * 3<span style="color: #b4f9f8;">)</span><span style="color: #ff98a4;">]</span>;
+    <span style="color: #ff995e;">}</span>
+  <span style="color: #c099ff;">}</span>
 
-class RivalCopion extends Rival {
-  elegir(historial) {
-    return historial.at(-1) || "piedra"; // copia tu última tirada
-  }
-}
+  <span style="color: #c099ff;">class</span> RivalCopion <span style="color: #c099ff;">extends</span> Rival <span style="color: #c099ff;">{</span>
+    elegir<span style="color: #ff995e;">(</span>historial<span style="color: #ff995e;">)</span> <span style="color: #ff995e;">{</span>
+      <span style="color: #c099ff;">return</span> historial.at<span style="color: #ff98a4;">(</span>-1<span style="color: #ff98a4;">)</span> || <span style="color: #c3e88d;">"piedra"</span>; <span style="color: #7a88cf;">// </span><span style="color: #7a88cf;">copia tu &#250;ltima tirada
+</span>    <span style="color: #ff995e;">}</span>
+  <span style="color: #c099ff;">}</span>
 
-class Duelo {
-  constructor(rival) { this.rival = rival; }
-  jugar(tiradaJugador, historial) {
-    return { jugador: tiradaJugador, rival: this.rival.elegir(historial) };
-  }
-}
+  <span style="color: #c099ff;">class</span> Duelo <span style="color: #c099ff;">{</span>
+    constructor<span style="color: #ff995e;">(</span>rival<span style="color: #ff995e;">)</span> <span style="color: #ff995e;">{</span> <span style="color: #ff995e;">this</span>.rival = rival; <span style="color: #ff995e;">}</span>
+    jugar<span style="color: #ff995e;">(</span>tiradaJugador, historial<span style="color: #ff995e;">)</span> <span style="color: #ff995e;">{</span>
+      <span style="color: #c099ff;">return</span> <span style="color: #ff98a4;">{</span> jugador: tiradaJugador, rival: <span style="color: #ff995e;">this</span>.rival.elegir<span style="color: #b4f9f8;">(</span>historial<span style="color: #b4f9f8;">)</span> <span style="color: #ff98a4;">}</span>;
+    <span style="color: #ff995e;">}</span>
+  <span style="color: #c099ff;">}</span>
 </pre>
 </div>
 
 <p>
-El patrón solo resolvió <b>la variación del algoritmo del rival</b>. No es «todo el sistema de la feria»: faltan fichas, ranking y red. Eso entra en las secciones web y móvil.
+El patrón resuelve únicamente la <b>variación del algoritmo del rival</b>. El resto del sistema (fichas, ranking, red) se trata en las secciones de web y de móvil.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c9ddf8" class="outline-3">
-<h3 id="org8c9ddf8"><span class="section-number-3">2.16.</span> Idea clave de la introducción</h3>
-<div class="outline-text-3" id="text-2-16">
+<div id="outline-container-org68b43f6" class="outline-3">
+<h3 id="org68b43f6"><span class="section-number-3">2.14.</span> Síntesis de la introducción</h3>
+<div class="outline-text-3" id="text-2-14">
 <p>
-Un patrón es <b>vocabulario + estructura + consecuencias</b>. En esta materia aprenderás a:
+Un patrón es, a la vez, vocabulario, estructura y consecuencias. El trabajo de la unidad es: situar el problema en la capa correcta (presentación, dominio, datos, integración); elegir estructuras compatibles con las restricciones de web (HTTP, estado distribuido, latencia) y de móvil (ciclo de vida, red intermitente, energía); diseñar contratos <b>antes</b> de fijar el marco de trabajo; y rechazar el patrón cuando el costo de la indirección supera el beneficio.
 </p>
-
-<ul class="org-ul">
-<li><b>Nombrar</b> el problema al nivel correcto (UI, dominio, datos, integración).</li>
-<li><b>Elegir</b> patrones que respeten las restricciones de <b>web</b> (HTTP, estado en servidor/cliente, latencia) y de <b>móvil</b> (ciclo de vida, red intermitente, batería, stores).</li>
-<li><b>Diseñar</b> contratos (interfaces) antes que frameworks.</li>
-<li><b>Rechazar</b> el patrón cuando el costo de indirección supera el beneficio.</li>
-</ul>
 </div>
 </div>
 </div>
@@ -1864,11 +1884,11 @@ Un patrón es <b>vocabulario + estructura + consecuencias</b>. En esta materia a
 <h2 id="patrones-web"><span class="section-number-2">3.</span> Patrones de software para aplicaciones web</h2>
 <div class="outline-text-2" id="text-patrones-web">
 <p>
-Esta sección es el puesto <b>FeriaPPT montado como sitio web</b>: navegador + servidor HTTP + ranking + pago de vidas extra.
+Esta parte examina FeriaPPT como <b>aplicación web</b>: cliente en el navegador, servidor HTTP, persistencia del ranking y del cobro de vidas extra. El dominio (reglas del duelo) permanece; las fuerzas nuevas son las de HTTP y de la separación cliente–servidor. Fowler (P of EAA) y los patrones J2EE documentan la mayoría de las estructuras de esta sección; GoF aporta Strategy, Observer, Adapter, Decorator y Chain of Responsibility <b>dentro</b> de esas capas.
 </p>
 </div>
-<div id="outline-container-org496d545" class="outline-3">
-<h3 id="org496d545"><span class="section-number-3">3.1.</span> Tablero de patrones web (lista visible)</h3>
+<div id="outline-container-org75c0cac" class="outline-3">
+<h3 id="org75c0cac"><span class="section-number-3">3.1.</span> Tablero de patrones web</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Aquí están <b>todos</b> los patrones de esta parte. Cada uno es una pieza del mismo minijuego. El detalle técnico va debajo del tablero.
@@ -1890,8 +1910,8 @@ Aquí están <b>todos</b> los patrones de esta parte. Cada uno es una pieza del 
 <tr>
 <th scope="col" class="org-right">#</th>
 <th scope="col" class="org-left">Patrón</th>
-<th scope="col" class="org-left">En FeriaPPT (el juego)</th>
-<th scope="col" class="org-left">Qué problema de diseño resuelve</th>
+<th scope="col" class="org-left">En FeriaPPT</th>
+<th scope="col" class="org-left">Problema de diseño</th>
 </tr>
 </thead>
 <tbody>
@@ -2045,36 +2065,36 @@ Aquí están <b>todos</b> los patrones de esta parte. Cada uno es una pieza del 
 </table>
 </div>
 </div>
-<div id="outline-container-orge8639ee" class="outline-3">
-<h3 id="orge8639ee"><span class="section-number-3">3.2.</span> FeriaPPT en el navegador: cómo se ve el juego</h3>
+<div id="outline-container-org8cc8669" class="outline-3">
+<h3 id="org8cc8669"><span class="section-number-3">3.2.</span> FeriaPPT en el navegador: cómo se ve el juego</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Imagina la página:
 </p>
 
-<pre class="example" id="orgf8af08e">
-┌─────────────────────────────────────────────┐
-│  FERIA PPT          fichas: 7   ronda: 2/3  │
-│                                             │
-│     tú:  ?          vs         CPU:  ?      │
-│                                             │
-│   [ piedra ]    [ papel ]    [ tijera ]     │
-│                                             │
-│   resultado: —     ranking de la feria →    │
-└─────────────────────────────────────────────┘
-         clic  ──HTTP POST /partidas──►  servidor
+<pre class="example" id="orgb4fadaf">
+  ┌─────────────────────────────────────────────┐
+  │  FERIA PPT          fichas: 7   ronda: 2/3  │
+  │                                             │
+  │     tú:  ?          vs         CPU:  ?      │
+  │                                             │
+  │   [ piedra ]    [ papel ]    [ tijera ]     │
+  │                                             │
+  │   resultado: —     ranking de la feria →    │
+  └─────────────────────────────────────────────┘
+           clic  ──HTTP POST /partidas──►  servidor
 </pre>
 
 <p>
-Eso <b>ya</b> pide varios patrones a la vez. No porque «hay que usar patrones», sino porque hay <b>varios problemas distintos</b> (pintar, validar pulsera, decidir ganador, guardar, avisar al ranking). Mezclarlos en un solo archivo <code>jugar.php</code> de 400 líneas es el antipatrón del puesto: el feriante, el portero, la caja y el pintor de la lona son la misma persona agitada.
+Esa interfaz implica <b>varios</b> problemas de diseño simultáneos (presentación, autenticación, decisión del ganador, persistencia, notificación). Concentrarlos en un solo script de controlador es el antipatrón habitual: una sola unidad con baja cohesión y alto acoplamiento.
 </p>
 </div>
 </div>
-<div id="outline-container-org1cef616" class="outline-3">
-<h3 id="org1cef616"><span class="section-number-3">3.3.</span> Contexto: qué hace «web» al diseño (fuerzas específicas)</h3>
+<div id="outline-container-org9cda52a" class="outline-3">
+<h3 id="org9cda52a"><span class="section-number-3">3.3.</span> Contexto: restricciones de la web</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
-Una aplicación web no es un programa de escritorio con HTML. En FeriaPPT eso se nota así:
+Una aplicación web no es un programa de escritorio con una capa HTML. En FeriaPPT:
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -2087,63 +2107,63 @@ Una aplicación web no es un programa de escritorio con HTML. En FeriaPPT eso se
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="org-left">Fuerza web</th>
-<th scope="col" class="org-left">En el minijuego</th>
+<th scope="col" class="org-left">Fuerza</th>
+<th scope="col" class="org-left">Manifestación</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="org-left"><b>HTTP es sin estado</b></td>
-<td class="org-left">Cada clic es un sobre nuevo. El servidor <b>no recuerda</b> la ronda a menos que guardemos sesión, token o el id de partida.</td>
+<td class="org-left"><b>HTTP sin estado</b></td>
+<td class="org-left">Cada petición es independiente. La ronda no existe en memoria de servidor salvo sesión, token o identificador de partida.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Cliente ≠ servidor</b></td>
-<td class="org-left">Los botones viven en el navegador; el reglamento y el ranking viven atrás. No hay un objeto compartido en memoria.</td>
+<td class="org-left"><b>Cliente distinto del servidor</b></td>
+<td class="org-left">La entrada vive en el navegador; las reglas y el ranking, en el servidor. No hay un objeto compartido en un único espacio de direcciones.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Muchos jugadores, varios nodos</b></td>
-<td class="org-left">Un <code>Singleton</code> «la partida actual» en un proceso Node <b>no</b> es la partida de toda la feria.</td>
+<td class="org-left"><b>Múltiples nodos</b></td>
+<td class="org-left">Un Singleton de proceso no es «la partida del sistema».</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Latencia y fallos</b></td>
-<td class="org-left">El ranking nacional puede tardar o caerse. El puesto no puede quedarse congelado.</td>
+<td class="org-left"><b>Latencia y fallo parcial</b></td>
+<td class="org-left">Un ranking remoto puede no responder; la partida local no debe bloquearse.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Seguridad en el perímetro</b></td>
-<td class="org-left">Ocultar el botón «vidas extra» en HTML no basta: el servidor cobra y valida.</td>
+<td class="org-left">Ocultar un control en el cliente no sustituye la validación en servidor.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Despliegue continuo</b></td>
-<td class="org-left">Mañana cambia el rival; <code>/partidas</code> tiene que seguir entendiendo las de ayer.</td>
+<td class="org-left"><b>Evolución de la API</b></td>
+<td class="org-left">Las partidas antiguas deben seguir siendo interpretables.</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-Analogía: el sitio web es <b>taquilla + correo</b> (peticiones/respuestas) más <b>lona pintada</b> (HTML/SPA), no un único escritorio donde todos los papeles están a la mano.
+El modelo es petición–respuesta más una vista (HTML o SPA), no un único espacio de memoria compartida.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb6db058" class="outline-3">
-<h3 id="orgb6db058"><span class="section-number-3">3.4.</span> Mapa de capas donde viven los patrones web</h3>
+<div id="outline-container-org97b4226" class="outline-3">
+<h3 id="org97b4226"><span class="section-number-3">3.4.</span> Mapa de capas donde viven los patrones web</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
-No mezclar el patrón de la lona con el patrón del pago de vidas.
+No mezclar el patrón de la vista con el del cobro.
 </p>
 
-<pre class="example" id="orgfcfa976">
-[Navegador]  Botones piedra/papel/tijera, marcador, routing, PWA
-     ↕  HTTPS / JSON / HTML
-[Borde]      CDN, API Gateway, WAF, BFF, reverse proxy   ← puerta de la feria
-     ↕
-[Aplicación] Controladores, caso de uso «jugar ronda», reglamento, auth
-     ↕
-[Datos]      Repositorio de partidas, UoW, caché de ranking, BD
+<pre class="example" id="orgc0c6e65">
+  [Navegador]  Entrada, estado de UI, enrutamiento, PWA
+       ↕  HTTPS / JSON / HTML
+  [Borde]      CDN, API Gateway, WAF, BFF, proxy inverso
+       ↕
+  [Aplicación] Controladores, casos de uso, dominio, autenticación
+       ↕
+  [Datos]      Repositorio, Unit of Work, caché, base de datos
 </pre>
 
 <p>
@@ -2151,50 +2171,50 @@ Un mismo nombre (p. ej. Observer) aparece en varias capas con consecuencias dist
 </p>
 </div>
 </div>
-<div id="outline-container-orga80b8ad" class="outline-3">
-<h3 id="orga80b8ad"><span class="section-number-3">3.5.</span> Patrones de presentación en el servidor (P of EAA)</h3>
+<div id="outline-container-orgeae03ff" class="outline-3">
+<h3 id="orgeae03ff"><span class="section-number-3">3.5.</span> Patrones de presentación en el servidor</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
-Quién recibe el sobre HTTP y quién arma la respuesta.
+Quién recibe la petición HTTP y quién construye la respuesta.
 </p>
 </div>
-<div id="outline-container-orgbbb461d" class="outline-4">
-<h4 id="orgbbb461d"><span class="section-number-4">3.5.1.</span> Front Controller — la taquilla única</h4>
+<div id="outline-container-org7a74358" class="outline-4">
+<h4 id="org7a74358"><span class="section-number-4">3.5.1.</span> Front Controller</h4>
 <div class="outline-text-4" id="text-3-5-1">
 <ul class="org-ul">
-<li><b>En el juego:</b> nadie entra por la puerta de atrás. Da igual si vienes a <b>jugar</b>, a <b>ver el ranking</b> o a <b>pagar una vida</b>: pasas por <b>una</b> taquilla (<code>index.php</code>, Express, servlet, Rails).</li>
-<li><b>Problema:</b> si cada URL es un script suelto (<code>jugar.php</code>, <code>ranking.php</code>, <code>admin.php</code>), cada uno copia «¿trajiste pulsera?», logs e idioma.</li>
-<li><b>Diseño:</b> un punto de entrada parsea la petición, aplica filtros, delega a un handler según la ruta y serializa la respuesta.</li>
-<li><b>Consecuencias:</b> un solo lugar para seguridad. Costo: la taquilla se vuelve un embudo mágico si le metes el reglamento del duelo.</li>
-<li><b>En la práctica:</b> Django, Rails, Spring MVC, Express, ASP.NET, Next.js (el runtime).</li>
+<li>En FeriaPPT: jugar, consultar el ranking o comprar una vida entran por el mismo punto (<code>index.php</code>, Express, servlet, Rails).</li>
+<li><b>Problema:</b> si cada URL es un script independiente, cada uno duplica autenticación, registro e internacionalización.</li>
+<li><b>Diseño:</b> un punto de entrada interpreta la petición, aplica filtros, delega según la ruta y serializa la respuesta.</li>
+<li><b>Consecuencias:</b> un solo lugar para políticas transversales. Costo: el controlador frontal se degrada si absorbe reglas de dominio.</li>
+<li><b>En la práctica:</b> Django, Rails, Spring MVC, Express, ASP.NET, Next.js.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org1558430" class="outline-4">
-<h4 id="org1558430"><span class="section-number-4">3.5.2.</span> Page Controller — un puesto, una página</h4>
+<div id="outline-container-org5c06cc2" class="outline-4">
+<h4 id="org5c06cc2"><span class="section-number-4">3.5.2.</span> Page Controller</h4>
 <div class="outline-text-4" id="text-3-5-2">
 <ul class="org-ul">
-<li><b>En el juego:</b> la feria tiene también «tiro al blanco» y «pesca de patitos», cada uno con su página casi independiente.</li>
-<li><b>Diseño:</b> una clase/función por página o recurso.</li>
-<li><b>Cuándo:</b> sitios chicos, HTML por plantilla. <b>Cuándo no:</b> API grande o SPA, donde «página» ya no es la unidad.</li>
+<li>En FeriaPPT: recursos o páginas relativamente independientes (p. ej. un minijuego adicional) pueden tener su propio controlador.</li>
+<li><b>Diseño:</b> una clase o función por página o recurso.</li>
+<li><b>Cuándo:</b> sitios pequeños con plantillas. <b>Cuándo no:</b> API amplia o SPA, donde la unidad ya no es la «página».</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org5698371" class="outline-4">
-<h4 id="org5698371"><span class="section-number-4">3.5.3.</span> Template View vs. Transform View — la lona</h4>
+<div id="outline-container-org31fd43d" class="outline-4">
+<h4 id="org31fd43d"><span class="section-number-4">3.5.3.</span> Template View y Transform View</h4>
 <div class="outline-text-4" id="text-3-5-3">
 <ul class="org-ul">
-<li><b>Template View:</b> HTML con huecos (<code>Jinja</code>, <code>EJS</code>, <code>Blade</code>): <code>Hola {{jugador}}, vas {{fichas}} fichas</code>.</li>
-<li><b>Transform View:</b> un programa (p. ej. React en SSR) <b>construye</b> el HTML a partir del modelo.</li>
-<li><b>Regla del puesto:</b> la lona <b>no consulta</b> la caja registradora. Nada de SQL dentro de la plantilla.</li>
+<li><b>Template View:</b> documento con huecos (<code>Jinja</code>, <code>EJS</code>, <code>Blade</code>).</li>
+<li><b>Transform View:</b> un programa construye la representación a partir del modelo (p. ej. React en SSR).</li>
+<li>La vista no consulta persistencia. No hay SQL en la plantilla.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd6cd659" class="outline-4">
-<h4 id="orgd6cd659"><span class="section-number-4">3.5.4.</span> MVC en web — marcador, lona y clic</h4>
+<div id="outline-container-org6b81d76" class="outline-4">
+<h4 id="org6b81d76"><span class="section-number-4">3.5.4.</span> MVC en web</h4>
 <div class="outline-text-4" id="text-3-5-4">
 <p>
-MVC original (Smalltalk) no es el MVC de Rails ni el de Angular.
+El MVC de Smalltalk no coincide con el de Rails ni con el de Angular.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -2210,27 +2230,27 @@ MVC original (Smalltalk) no es el MVC de Rails ni el de Angular.
 <thead>
 <tr>
 <th scope="col" class="org-left">Rol</th>
+<th scope="col" class="org-left">Responsabilidad</th>
 <th scope="col" class="org-left">En FeriaPPT</th>
-<th scope="col" class="org-left">Analogía de feria</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>Model</b></td>
-<td class="org-left">Fichas, ronda, reglamento (quién gana). No sabe de CSS ni de HTTP.</td>
-<td class="org-left">El cuaderno del feriante.</td>
+<td class="org-left">Estado y reglas de dominio. Independiente de HTTP y de CSS.</td>
+<td class="org-left">Fichas, ronda, reglamento.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>View</b></td>
-<td class="org-left">Los tres botones y el texto «ganaste». No decide el ganador.</td>
-<td class="org-left">La lona pintada.</td>
+<td class="org-left">Presentación. No decide el ganador.</td>
+<td class="org-left">Controles de tirada y texto de resultado.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Controller</b></td>
-<td class="org-left">Traduce el clic «papel» a «registrar tirada». No es un cajón de reglas.</td>
-<td class="org-left">El feriante que oye y anota.</td>
+<td class="org-left">Traduce la entrada en operaciones sobre el modelo.</td>
+<td class="org-left">El clic «papel» se convierte en registrar tirada.</td>
 </tr>
 </tbody>
 </table>
@@ -2244,8 +2264,8 @@ Señales de mal MVC en el puesto: el controlador hace SQL y arma HTML; la planti
 </p>
 </div>
 </div>
-<div id="outline-container-org18fc81d" class="outline-4">
-<h4 id="org18fc81d"><span class="section-number-4">3.5.5.</span> MVVM y unidireccionalidad en el cliente — un solo tablero de ronda</h4>
+<div id="outline-container-org8a30ff2" class="outline-4">
+<h4 id="org8a30ff2"><span class="section-number-4">3.5.5.</span> MVVM y flujo unidireccional en el cliente</h4>
 <div class="outline-text-4" id="text-3-5-5">
 <p>
 En SPA (React, Vue, Angular, Svelte):
@@ -2263,46 +2283,46 @@ Redux brilla si el marcador, el ranking lateral y el globo de «¡ganaste!» com
 </div>
 </div>
 </div>
-<div id="outline-container-org1994284" class="outline-3">
-<h3 id="org1994284"><span class="section-number-3">3.6.</span> Middleware: Chain of Responsibility — el portero de la feria</h3>
+<div id="outline-container-org890f717" class="outline-3">
+<h3 id="org890f717"><span class="section-number-3">3.6.</span> Middleware y Chain of Responsibility</h3>
 <div class="outline-text-3" id="text-3-6">
 <ul class="org-ul">
-<li><b>En el juego:</b> antes de <code>POST /partidas</code> pasa una fila de porteros: «¿pulsera?», «¿te quedan fichas?», «¿no vas a 200 clics por segundo?». Cada uno deja pasar o te saca.</li>
+<li>En FeriaPPT: antes de <code>POST /partidas</code> pasa una fila de porteros: «¿pulsera?», «¿te quedan fichas?», «¿no vas a 200 clics por segundo?». Cada uno deja pasar o te saca.</li>
 <li><b>Diseño:</b> <code>(req, res, next)</code>. El <b>orden es el diseño</b>: el portero de pulsera <b>después</b> del duelo no sirve.</li>
 <li><b>Patrón GoF:</b> Chain of Responsibility. <b>Decorator</b> si envuelves el handler (ficha dorada = puntaje doble).</li>
 <li><b>Costo:</b> depurar «quién mutó =req.jugador=» se pone opaco. El portero no aplica el reglamento del duelo; solo políticas transversales.</li>
 </ul>
 
 <div class="org-src-container">
-<pre class="src src-javascript">function pulsera(req, res, next) {
-  if (!req.headers.authorization) return res.status(401).end();
-  next();
-}
-function quedanFichas(req, res, next) {
-  if (req.jugador.fichas &lt; 1) return res.status(402).end();
-  next();
-}
-// app.post("/partidas", pulsera, quedanFichas, jugarRonda)
+<pre class="src src-javascript">  <span style="color: #c099ff;">function</span> <span style="color: #82aaff;">pulsera</span><span style="color: #c099ff;">(</span><span style="color: #ff98a4;">req</span>, <span style="color: #ff98a4;">res</span>, <span style="color: #ff98a4;">next</span><span style="color: #c099ff;">)</span> <span style="color: #c099ff;">{</span>
+    <span style="color: #c099ff;">if</span> <span style="color: #ff995e;">(</span>!req.headers.authorization<span style="color: #ff995e;">)</span> <span style="color: #c099ff;">return</span> res.status<span style="color: #ff995e;">(</span>401<span style="color: #ff995e;">)</span>.end<span style="color: #ff995e;">()</span>;
+    next<span style="color: #ff995e;">()</span>;
+  <span style="color: #c099ff;">}</span>
+  <span style="color: #c099ff;">function</span> <span style="color: #82aaff;">quedanFichas</span><span style="color: #c099ff;">(</span><span style="color: #ff98a4;">req</span>, <span style="color: #ff98a4;">res</span>, <span style="color: #ff98a4;">next</span><span style="color: #c099ff;">)</span> <span style="color: #c099ff;">{</span>
+    <span style="color: #c099ff;">if</span> <span style="color: #ff995e;">(</span>req.jugador.fichas &lt; 1<span style="color: #ff995e;">)</span> <span style="color: #c099ff;">return</span> res.status<span style="color: #ff995e;">(</span>402<span style="color: #ff995e;">)</span>.end<span style="color: #ff995e;">()</span>;
+    next<span style="color: #ff995e;">()</span>;
+  <span style="color: #c099ff;">}</span>
+  <span style="color: #7a88cf;">// </span><span style="color: #7a88cf;">app.post("/partidas", pulsera, quedanFichas, jugarRonda)</span>
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org783a597" class="outline-3">
-<h3 id="org783a597"><span class="section-number-3">3.7.</span> Patrones de dominio y aplicación (el reglamento, no la lona)</h3>
+<div id="outline-container-org2522d33" class="outline-3">
+<h3 id="org2522d33"><span class="section-number-3">3.7.</span> Patrones de dominio y aplicación</h3>
 <div class="outline-text-3" id="text-3-7">
 </div>
-<div id="outline-container-org2127238" class="outline-4">
-<h4 id="org2127238"><span class="section-number-4">3.7.1.</span> Service Layer — el feriante que sabe el juego</h4>
+<div id="outline-container-org50ca9af" class="outline-4">
+<h4 id="org50ca9af"><span class="section-number-4">3.7.1.</span> Service Layer</h4>
 <div class="outline-text-4" id="text-3-7-1">
 <ul class="org-ul">
-<li><b>En el juego:</b> <code>jugarRonda(jugadorId, "papel")</code> descuenta ficha, elige rival, decide ganador, anota. El controlador HTTP solo traduce status codes.</li>
+<li>En FeriaPPT: <code>jugarRonda(jugadorId, "papel")</code> descuenta ficha, elige rival, decide ganador, anota. El controlador HTTP solo traduce status codes.</li>
 <li><b>Problema:</b> si eso vive en la ruta Express, no puedes reutilizarlo desde un job nocturno («cerrar la feria y recuenta») ni desde GraphQL.</li>
 <li><b>Consecuencia:</b> el caso de uso es invocable desde web, CLI o cola.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc0c0569" class="outline-4">
-<h4 id="orgc0c0569"><span class="section-number-4">3.7.2.</span> Repository y Unit of Work — el cajón y la doble anotación</h4>
+<div id="outline-container-orgd3c288f" class="outline-4">
+<h4 id="orgd3c288f"><span class="section-number-4">3.7.2.</span> Repository y Unit of Work</h4>
 <div class="outline-text-4" id="text-3-7-2">
 <ul class="org-ul">
 <li><b>Repository:</b> <code>partidas.guardar</code>, <code>ranking.top10</code>. Parece una colección en memoria; por detrás hay SQL o un archivo.</li>
@@ -2311,18 +2331,18 @@ function quedanFichas(req, res, next) {
 </ul>
 </div>
 </div>
-<div id="outline-container-orgeb9f4a5" class="outline-4">
-<h4 id="orgeb9f4a5"><span class="section-number-4">3.7.3.</span> Adapter — la máquina arcade del abuelo</h4>
+<div id="outline-container-org47ff406" class="outline-4">
+<h4 id="org47ff406"><span class="section-number-4">3.7.3.</span> Adapter</h4>
 <div class="outline-text-4" id="text-3-7-3">
 <ul class="org-ul">
-<li><b>En el juego:</b> llega una máquina de los 90 que manda <code>R</code> / <code>P</code> / <code>S</code> en bytes. Nuestro dominio habla <code>piedra</code> / <code>papel</code> / <code>tijera</code>.</li>
+<li>En FeriaPPT: llega una máquina de los 90 que manda <code>R</code> / <code>P</code> / <code>S</code> en bytes. Nuestro dominio habla <code>piedra</code> / <code>papel</code> / <code>tijera</code>.</li>
 <li><b>Adapter:</b> traduce <b>su</b> interfaz a <b>la nuestra</b>.</li>
 <li><b>Anti-Corruption Layer:</b> además traduce <b>lenguaje</b>. Ellos dicen «crédito»; nosotros «ficha». El reglamento no se llena de nombres ajenos.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgb57839b" class="outline-4">
-<h4 id="orgb57839b"><span class="section-number-4">3.7.4.</span> Facade — el letrero «tirar»</h4>
+<div id="outline-container-org108c9ca" class="outline-4">
+<h4 id="org108c9ca"><span class="section-number-4">3.7.4.</span> Facade</h4>
 <div class="outline-text-4" id="text-3-7-4">
 <ul class="org-ul">
 <li><code>puesto.tirar("papel")</code> por detrás: RNG, reglamento, puntaje, evento.</li>
@@ -2330,8 +2350,8 @@ function quedanFichas(req, res, next) {
 </ul>
 </div>
 </div>
-<div id="outline-container-orgde66739" class="outline-4">
-<h4 id="orgde66739"><span class="section-number-4">3.7.5.</span> Strategy y Factory — personalidades del rival</h4>
+<div id="outline-container-org0d70a79" class="outline-4">
+<h4 id="org0d70a79"><span class="section-number-4">3.7.5.</span> Strategy y Factory</h4>
 <div class="outline-text-4" id="text-3-7-5">
 <p>
 Ya vistos en la introducción con código. En el servidor web:
@@ -2382,11 +2402,11 @@ Ya vistos en la introducción con código. En el servidor web:
 </table>
 </div>
 </div>
-<div id="outline-container-orgca8e648" class="outline-4">
-<h4 id="orgca8e648"><span class="section-number-4">3.7.6.</span> Observer — globo, marcador y ranking</h4>
+<div id="outline-container-orgcfeafb2" class="outline-4">
+<h4 id="orgcfeafb2"><span class="section-number-4">3.7.6.</span> Observer</h4>
 <div class="outline-text-4" id="text-3-7-6">
 <ul class="org-ul">
-<li><b>En el juego:</b> «ganaste la ronda» no debe conocer a <b>todos</b> los que se alegran. El dominio emite <code>RondaGanada</code>. El globo, el marcador y el ranking <b>escuchan</b>.</li>
+<li>En FeriaPPT: «ganaste la ronda» no debe conocer a <b>todos</b> los que se alegran. El dominio emite <code>RondaGanada</code>. El globo, el marcador y el ranking <b>escuchan</b>.</li>
 <li><b>In-process:</b> <code>EventEmitter</code> en el mismo Node.</li>
 <li><b>Out-of-process:</b> cola hacia el ranking nacional. Ahí es Pub/Sub: puede llegar dos veces → las partidas necesitan id de idempotencia.</li>
 </ul>
@@ -2397,12 +2417,12 @@ Si el cobro de la ficha <b>debe</b> ser atómico con la partida, un <code>emit</
 </div>
 </div>
 </div>
-<div id="outline-container-orge4bc673" class="outline-3">
-<h3 id="orge4bc673"><span class="section-number-3">3.8.</span> Patrones de API e integración</h3>
+<div id="outline-container-org125273c" class="outline-3">
+<h3 id="org125273c"><span class="section-number-3">3.8.</span> Patrones de API e integración</h3>
 <div class="outline-text-3" id="text-3-8">
 </div>
-<div id="outline-container-org78a4bd1" class="outline-4">
-<h4 id="org78a4bd1"><span class="section-number-4">3.8.1.</span> Recurso REST — la partida es una cosa con dirección</h4>
+<div id="outline-container-orga6d40fc" class="outline-4">
+<h4 id="orga6d40fc"><span class="section-number-4">3.8.1.</span> Recurso REST</h4>
 <div class="outline-text-4" id="text-3-8-1">
 <p>
 REST no es «devolver JSON». En FeriaPPT:
@@ -2416,8 +2436,8 @@ REST no es «devolver JSON». En FeriaPPT:
 </ul>
 </div>
 </div>
-<div id="outline-container-orgbf146a6" class="outline-4">
-<h4 id="orgbf146a6"><span class="section-number-4">3.8.2.</span> API Gateway y BFF — puerta de la feria vs mostrador a la medida</h4>
+<div id="outline-container-org0d07780" class="outline-4">
+<h4 id="org0d07780"><span class="section-number-4">3.8.2.</span> API Gateway y BFF</h4>
 <div class="outline-text-4" id="text-3-8-2">
 <ul class="org-ul">
 <li><b>API Gateway:</b> recepción del recinto (auth, rate limit, ruteo a PPT, a tiro al blanco, a caja).</li>
@@ -2429,8 +2449,8 @@ Si el SPA hace 12 <code>fetch</code> para pintar el marcador, falta agregación 
 </p>
 </div>
 </div>
-<div id="outline-container-org4b0523c" class="outline-4">
-<h4 id="org4b0523c"><span class="section-number-4">3.8.3.</span> Proxy, caché y CDN</h4>
+<div id="outline-container-org8c6ff3a" class="outline-4">
+<h4 id="org8c6ff3a"><span class="section-number-4">3.8.3.</span> Proxy, caché y CDN</h4>
 <div class="outline-text-4" id="text-3-8-3">
 <ul class="org-ul">
 <li>Ranking de la feria: un Proxy cachea el top 10 treinta segundos (el papelito en la ventanilla).</li>
@@ -2438,8 +2458,8 @@ Si el SPA hace 12 <code>fetch</code> para pintar el marcador, falta agregación 
 </ul>
 </div>
 </div>
-<div id="outline-container-orgcc56dc0" class="outline-4">
-<h4 id="orgcc56dc0"><span class="section-number-4">3.8.4.</span> Circuit Breaker, Retry, Bulkhead — el ranking nacional se cayó</h4>
+<div id="outline-container-org8e7ccde" class="outline-4">
+<h4 id="org8e7ccde"><span class="section-number-4">3.8.4.</span> Circuit Breaker, Retry y Bulkhead</h4>
 <div class="outline-text-4" id="text-3-8-4">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -2484,28 +2504,28 @@ Estos no están en GoF y son de los más importantes en web de producción.
 </div>
 </div>
 </div>
-<div id="outline-container-org5be9b65" class="outline-3">
-<h3 id="org5be9b65"><span class="section-number-3">3.9.</span> Patrones de arquitectura web que envuelven a los de diseño</h3>
+<div id="outline-container-org03e2785" class="outline-3">
+<h3 id="org03e2785"><span class="section-number-3">3.9.</span> Patrones de arquitectura web que envuelven a los de diseño</h3>
 <div class="outline-text-3" id="text-3-9">
 </div>
-<div id="outline-container-org25a928a" class="outline-4">
-<h4 id="org25a928a"><span class="section-number-4">3.9.1.</span> Capas</h4>
+<div id="outline-container-org693d18d" class="outline-4">
+<h4 id="org693d18d"><span class="section-number-4">3.9.1.</span> Capas</h4>
 <div class="outline-text-4" id="text-3-9-1">
 <p>
 Lona → caso de uso → reglamento → SQL. Fácil de explicar; peligro de capas fantasma que solo delegan, o de que el reglamento importe el ORM.
 </p>
 </div>
 </div>
-<div id="outline-container-orgedeaf14" class="outline-4">
-<h4 id="orgedeaf14"><span class="section-number-4">3.9.2.</span> Hexagonal / puertos y adaptadores</h4>
+<div id="outline-container-org227d0b1" class="outline-4">
+<h4 id="org227d0b1"><span class="section-number-4">3.9.2.</span> Hexagonal / puertos y adaptadores</h4>
 <div class="outline-text-4" id="text-3-9-2">
 <p>
 El <b>reglamento PPT</b> está en el centro. Puertos: <code>PartidaRepository</code>, <code>Reloj</code>, <code>PasarelaVidas</code>. Adaptadores: HTTP, Postgres, Stripe. El patrón Adapter deja de ser un juguete y se vuelve la frontera del programa.
 </p>
 </div>
 </div>
-<div id="outline-container-org95d6139" class="outline-4">
-<h4 id="org95d6139"><span class="section-number-4">3.9.3.</span> CQRS (alto nivel)</h4>
+<div id="outline-container-org4fe9ef6" class="outline-4">
+<h4 id="org4fe9ef6"><span class="section-number-4">3.9.3.</span> CQRS</h4>
 <div class="outline-text-4" id="text-3-9-3">
 <p>
 Escribir partidas (transaccional) vs leer el ranking (agregado, desnormalizado). Útil si el tablero del campeonato no se parece en nada al agregado de una ronda. Costo: dos modelos. No hace falta en un PPT de laboratorio.
@@ -2513,8 +2533,8 @@ Escribir partidas (transaccional) vs leer el ranking (agregado, desnormalizado).
 </div>
 </div>
 </div>
-<div id="outline-container-org7aa5745" class="outline-3">
-<h3 id="org7aa5745"><span class="section-number-3">3.10.</span> Análisis de un caso web: FeriaPPT en línea</h3>
+<div id="outline-container-org7847632" class="outline-3">
+<h3 id="org7847632"><span class="section-number-3">3.10.</span> Análisis de un caso web: FeriaPPT en línea</h3>
 <div class="outline-text-3" id="text-3-10">
 <ol class="org-ol">
 <li><b>Problemas:</b> variar rivales; pulsera en muchas rutas; el SPA quiere el tablero en <b>una</b> llamada; el correo de «ganaste el día» no debe bloquear el clic.</li>
@@ -2526,8 +2546,8 @@ Escribir partidas (transaccional) vs leer el ranking (agregado, desnormalizado).
 </ol>
 </div>
 </div>
-<div id="outline-container-orged5ee50" class="outline-3">
-<h3 id="orged5ee50"><span class="section-number-3">3.11.</span> Tabla de decisión rápida (web)</h3>
+<div id="outline-container-org7aa2229" class="outline-3">
+<h3 id="org7aa2229"><span class="section-number-3">3.11.</span> Tabla de decisión rápida: web</h3>
 <div class="outline-text-3" id="text-3-11">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -2586,11 +2606,11 @@ Escribir partidas (transaccional) vs leer el ranking (agregado, desnormalizado).
 </table>
 </div>
 </div>
-<div id="outline-container-org6733c33" class="outline-3">
-<h3 id="org6733c33"><span class="section-number-3">3.12.</span> Idea clave de la parte web</h3>
+<div id="outline-container-org7f513a5" class="outline-3">
+<h3 id="org7f513a5"><span class="section-number-3">3.12.</span> Idea clave de la parte web</h3>
 <div class="outline-text-3" id="text-3-12">
 <p>
-En la web de FeriaPPT los patrones GoF siguen vigentes (Strategy del rival, Observer del globo, Adapter de la arcade), pero el diseño se juega en <b>las fronteras</b>: HTTP, JSON, sesión y el hecho de que <b>el navegador no es el servidor</b>. Primero taquilla, portero, cajón y cables (Front Controller, middleware, BFF, puertos); Factory y Observer salen solos.
+En la web, los patrones GoF siguen siendo pertinentes (Strategy del rival, Observer de dominio, Adapter de un protocolo ajeno), pero el diseño se decide en las <b>fronteras</b>: HTTP, representación, sesión y el hecho de que el cliente y el servidor no comparten memoria. Front Controller, middleware, BFF y puertos hexagonales son, en este contexto, anteriores a Factory o a un Observer de interfaz.
 </p>
 </div>
 </div>
@@ -2599,11 +2619,11 @@ En la web de FeriaPPT los patrones GoF siguen vigentes (Strategy del rival, Obse
 <h2 id="patrones-movil"><span class="section-number-2">4.</span> Patrones de software para aplicaciones móviles</h2>
 <div class="outline-text-2" id="text-patrones-movil">
 <p>
-Esta sección es <b>el mismo FeriaPPT</b>, ahora como app en el teléfono: giras la pantalla, se va la señal en el camión, el sistema operativo puede matar el puesto y las tiradas tienen que sobrevivir.
+Esta parte examina el mismo dominio FeriaPPT como <b>aplicación móvil</b>. Las reglas del duelo no cambian. Cambian el ciclo de vida que impone el sistema operativo, la rotación de pantalla, la conectividad intermitente y el trabajo que debe continuar cuando la interfaz ya no está visible.
 </p>
 </div>
-<div id="outline-container-org55c8806" class="outline-3">
-<h3 id="org55c8806"><span class="section-number-3">4.1.</span> Tablero de patrones móviles (el mismo juego, otro mostrador)</h3>
+<div id="outline-container-org1d4e05b" class="outline-3">
+<h3 id="org1d4e05b"><span class="section-number-3">4.1.</span> Tablero de patrones móviles</h3>
 <div class="outline-text-3" id="text-4-1">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -2748,11 +2768,11 @@ Esta sección es <b>el mismo FeriaPPT</b>, ahora como app en el teléfono: giras
 </table>
 </div>
 </div>
-<div id="outline-container-org0ae2dc8" class="outline-3">
-<h3 id="org0ae2dc8"><span class="section-number-3">4.2.</span> Contexto: qué hace «móvil» al diseño (fuerzas específicas)</h3>
+<div id="outline-container-orge4051bf" class="outline-3">
+<h3 id="orge4051bf"><span class="section-number-3">4.2.</span> Contexto: qué hace «móvil» al diseño</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
-Una app móvil <b>no</b> es el sitio web de FeriaPPT metido en un APK. El mismo duelo (piedra/papel/tijera) ahora vive en un tren: giras el teléfono, se va la señal, el SO puede recoger el puesto.
+Una aplicación móvil no es la aplicación web empaquetada. El mismo dominio opera bajo otras fuerzas:
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -2766,70 +2786,70 @@ Una app móvil <b>no</b> es el sitio web de FeriaPPT metido en un APK. El mismo 
 <thead>
 <tr>
 <th scope="col" class="org-left">Fuerza</th>
-<th scope="col" class="org-left">En FeriaPPT móvil</th>
+<th scope="col" class="org-left">Manifestación en FeriaPPT</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left"><b>Ciclo de vida agresivo</b></td>
-<td class="org-left">Rotas la pantalla a mitad de la ronda: el marcador <b>no puede vivir solo en los botones</b>.</td>
+<td class="org-left">La rotación recrea la vista; el estado de la ronda no puede residir solo en controles.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Red intermitente</b></td>
-<td class="org-left">Juegas en el camión. Las tiradas van a disco y se suben después (Repository dual + Command).</td>
+<td class="org-left">Las tiradas se persisten en local y se sincronizan (repositorio dual y Command).</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Recursos finitos</b></td>
-<td class="org-left">Avatares del ranking y animaciones a 60 fps: lazy load, Adapter de lista, no parsear JSON en el hilo UI.</td>
+<td class="org-left">Listas y medios: carga diferida, Adapter de lista, ningún análisis JSON en el hilo de UI.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Navegación como grafo</b></td>
-<td class="org-left">Menú → duelo → ranking; deep link <code>feriappt://partida/17</code>. Coordinator, no <code>startActivity</code> desde el repo.</td>
+<td class="org-left">Flujos y <b>deep links</b>; Coordinator, no arranque de actividades desde el repositorio.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Dos ecosistemas</b></td>
-<td class="org-left">Android, iOS o Flutter: el <b>reglamento</b> es el mismo; cambian los adapters.</td>
+<td class="org-left"><b>Varios ecosistemas</b></td>
+<td class="org-left">El dominio es portable; los adaptadores son de plataforma.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>Stores</b></td>
-<td class="org-left">Un hotfix de HTML en 30 s ya no existe: feature flags, API versionada.</td>
+<td class="org-left"><b>Distribución por almacén</b></td>
+<td class="org-left">La corrección no es un despliegue HTML inmediato: conviene versionar la API y, si aplica, <b>feature flags</b>.</td>
 </tr>
 
 <tr>
 <td class="org-left"><b>Sensores</b></td>
-<td class="org-left">«Tirar al azar» con shake: Facade/puerto de sensor; en tests no hay acelerómetro.</td>
+<td class="org-left">Una fachada de plataforma; en prueba no hay acelerómetro.</td>
 </tr>
 
 <tr>
-<td class="org-left"><b>UI a 60/120 Hz</b></td>
-<td class="org-left">El rival Strategy se calcula <b>fuera</b> del hilo que pinta los tres botones.</td>
+<td class="org-left"><b>Frecuencia de pintado</b></td>
+<td class="org-left">El cálculo de Strategy no corre en el hilo que pinta.</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-Analogía: diseñar móvil es diseñar un <b>puesto de trabajo en un tren</b>: la luz se va, el asiento se mueve, a veces no hay señal, y el sistema operativo puede recoger tu mesa sin preguntar. El patrón de presentación tiene que <b>sobrevivir a eso</b>, no solo pintar bonito.
+El patrón de presentación debe <b>conservar el estado</b> ante la destrucción de la vista, no solo separar responsabilidades en el diagrama.
 </p>
 </div>
 </div>
-<div id="outline-container-org9505d80" class="outline-3">
-<h3 id="org9505d80"><span class="section-number-3">4.3.</span> Mapa de capas en una app moderna</h3>
+<div id="outline-container-orgdb9d9f0" class="outline-3">
+<h3 id="orgdb9d9f0"><span class="section-number-3">4.3.</span> Mapa de capas en una app moderna</h3>
 <div class="outline-text-3" id="text-4-3">
-<pre class="example" id="org8d87456">
-[UI]           Tres botones, globo «ganaste», animación
-     ↕  estado observable (UDF)
-[Presentación] ViewModel / Presenter / BLoC del duelo
-     ↕  TiréPapel / ComprarVida
-[Dominio]      JugarRonda, reglamento PPT, fichas
-     ↕  puertos
-[Datos]        Partidas en disco + API + caché de ranking
-     ↕
-[Plataforma]   Shake, push «te retaron», filesystem
+<pre class="example" id="org6ae4e15">
+  [UI]           Tres botones, globo «ganaste», animación
+       ↕  estado observable (UDF)
+  [Presentación] ViewModel / Presenter / BLoC del duelo
+       ↕  TiréPapel / ComprarVida
+  [Dominio]      JugarRonda, reglamento PPT, fichas
+       ↕  puertos
+  [Datos]        Partidas en disco + API + caché de ranking
+       ↕
+  [Plataforma]   Shake, push «te retaron», filesystem
 </pre>
 
 <p>
@@ -2837,64 +2857,64 @@ Clean Architecture en móvil <b>es</b> hexagonal con nombres de Google/Uber/comm
 </p>
 </div>
 </div>
-<div id="outline-container-org53bf584" class="outline-3">
-<h3 id="org53bf584"><span class="section-number-3">4.4.</span> Patrones de presentación móviles (el menú que sí tienes que comparar)</h3>
+<div id="outline-container-orge01003d" class="outline-3">
+<h3 id="orge01003d"><span class="section-number-3">4.4.</span> Patrones de presentación móviles</h3>
 <div class="outline-text-3" id="text-4-4">
 <p>
 Todos intentan lo mismo: <b>que la View sea tonta y sobreviva al ciclo de vida.</b> Difieren en <b>quién tiene el estado</b> y <b>quién habla primero</b>.
 </p>
 </div>
-<div id="outline-container-org1c4ed3f" class="outline-4">
-<h4 id="org1c4ed3f"><span class="section-number-4">4.4.1.</span> MVC móvil (el legado)</h4>
+<div id="outline-container-orgff8dff1" class="outline-4">
+<h4 id="orgff8dff1"><span class="section-number-4">4.4.1.</span> MVC móvil</h4>
 <div class="outline-text-4" id="text-4-4-1">
 <ul class="org-ul">
-<li><b>En el juego:</b> la Activity oye «papel», llama al reglamento y escribe «ganaste» en un <code>TextView</code>.</li>
+<li>En FeriaPPT: la Activity oye «papel», llama al reglamento y escribe «ganaste» en un <code>TextView</code>.</li>
 <li><b>Problema:</b> en cuanto hay ranking, red y rotación, esa Activity se vuelve el feriante, el portero y la lona a la vez (God Object). El SO <b>le entrega</b> el ciclo de vida, por eso engorda.</li>
 <li><b>Cuándo sobrevive:</b> prototipo de una sola pantalla de PPT.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd370ab1" class="outline-4">
-<h4 id="orgd370ab1"><span class="section-number-4">4.4.2.</span> MVP (Model-View-Presenter)</h4>
+<div id="outline-container-org4d44266" class="outline-4">
+<h4 id="org4d44266"><span class="section-number-4">4.4.2.</span> MVP</h4>
 <div class="outline-text-4" id="text-4-4-2">
 <ul class="org-ul">
-<li><b>En el juego:</b> la vista solo sabe <code>mostrarTiradaRival("piedra")</code>, <code>mostrarGanaste()</code>. El Presenter decide; no importa <code>Button</code>.</li>
+<li>En FeriaPPT: la vista solo sabe <code>mostrarTiradaRival("piedra")</code>, <code>mostrarGanaste()</code>. El Presenter decide; no importa <code>Button</code>.</li>
 <li><b>Fuerzas:</b> testear el duelo en JVM vs. muchos métodos <code>showX</code>.</li>
 <li><b>Riesgo:</b> el Presenter sujeta la vista y se olvida de soltarla al <code>onDestroy</code> → fuga. En FeriaPPT: rotas el teléfono y el Presenter viejo sigue hablando con una pantalla muerta.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd436deb" class="outline-4">
-<h4 id="orgd436deb"><span class="section-number-4">4.4.3.</span> MVVM (el más usado hoy en Android e iOS)</h4>
+<div id="outline-container-org3f7c5a2" class="outline-4">
+<h4 id="org3f7c5a2"><span class="section-number-4">4.4.3.</span> MVVM</h4>
 <div class="outline-text-4" id="text-4-4-3">
 <ul class="org-ul">
-<li><b>En el juego:</b> el ViewModel guarda <code>{fichas, tuTirada, rival, resultado}</code>. Giras el teléfono: los botones se recrean; el marcador <b>sigue ahí</b>.</li>
+<li>En FeriaPPT: el ViewModel guarda <code>{fichas, tuTirada, rival, resultado}</code>. Giras el teléfono: los botones se recrean; el marcador <b>sigue ahí</b>.</li>
 <li><b>Observer:</b> <code>StateFlow</code> / <code>LiveData</code> / <code>Combine</code> — la lona se suscribe.</li>
 <li><b>Riesgo:</b> un ViewModel que también sube el ranking y cobra vidas (debería ser UseCase).</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org5cd460c" class="outline-4">
-<h4 id="org5cd460c"><span class="section-number-4">4.4.4.</span> MVI / UDF (Model-View-Intent)</h4>
+<div id="outline-container-org7657278" class="outline-4">
+<h4 id="org7657278"><span class="section-number-4">4.4.4.</span> MVI y UDF</h4>
 <div class="outline-text-4" id="text-4-4-4">
 <ul class="org-ul">
-<li><b>En el juego:</b> la UI solo manda intenciones: <code>TiréPapel</code>, <code>PedirSync</code>. Un reductor produce un <code>UiState</code> nuevo: <code>idle | jugando | sincronizando | error</code>.</li>
+<li>En FeriaPPT: la UI solo manda intenciones: <code>TiréPapel</code>, <code>PedirSync</code>. Un reductor produce un <code>UiState</code> nuevo: <code>idle | jugando | sincronizando | error</code>.</li>
 <li><b>Análisis:</b> State + Command + Observer. Encaja cuando a la vez hay debounce de «tirar», cola offline y push de «te retaron».</li>
 <li><b>Costo:</b> ceremonia. Tres botones sin red no necesitan una novela de reducers.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org1fa3c28" class="outline-4">
-<h4 id="org1fa3c28"><span class="section-number-4">4.4.5.</span> BLoC / Redux-like (Flutter y RN)</h4>
+<div id="outline-container-orgdb30878" class="outline-4">
+<h4 id="orgdb30878"><span class="section-number-4">4.4.5.</span> BLoC y Redux</h4>
 <div class="outline-text-4" id="text-4-4-5">
 <ul class="org-ul">
-<li><b>En el juego:</b> <code>evento TiréPapel</code> entra; <code>estado del duelo</code> sale. Misma idea que MVI.</li>
+<li>En FeriaPPT: <code>evento TiréPapel</code> entra; <code>estado del duelo</code> sale. Misma idea que MVI.</li>
 <li>Justificado si sesión, fichas y ranking se comparten entre pantallas; no si el tooltip de «tijera corta papel» vive en Redux.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org2c3230e" class="outline-4">
-<h4 id="org2c3230e"><span class="section-number-4">4.4.6.</span> Tabla comparativa (para el examen y para el diseño)</h4>
+<div id="outline-container-orgbe94f28" class="outline-4">
+<h4 id="orgbe94f28"><span class="section-number-4">4.4.6.</span> Tabla comparativa</h4>
 <div class="outline-text-4" id="text-4-4-6">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -2976,21 +2996,21 @@ Diseño honesto: <b>MVVM + casos de uso</b> cubre el 80 % de apps de negocio. MV
 </div>
 </div>
 </div>
-<div id="outline-container-orgda261de" class="outline-3">
-<h3 id="orgda261de"><span class="section-number-3">4.5.</span> Navegación: Coordinator / Router / Navigator</h3>
+<div id="outline-container-org0805eaf" class="outline-3">
+<h3 id="org0805eaf"><span class="section-number-3">4.5.</span> Navegación: Coordinator / Router / Navigator</h3>
 <div class="outline-text-3" id="text-4-5">
 <ul class="org-ul">
-<li><b>En el juego:</b> el ViewModel dice «mostrar ranking», no «abre <code>RankingActivity=». Un Coordinator/Navigator arma el grafo: menú → duelo → ranking, y el deep link =feriappt://partida/17</code>.</li>
+<li>En FeriaPPT: el ViewModel dice «mostrar ranking», no «abre <code>RankingActivity=». Un Coordinator/Navigator arma el grafo: menú → duelo → ranking, y el deep link =feriappt://partida/17</code>.</li>
 <li><b>Es un Mediator</b> de flujos. En tres pantallas, el Navigation component basta sin bautizar Coordinator.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org7b92f85" class="outline-3">
-<h3 id="org7b92f85"><span class="section-number-3">4.6.</span> Datos, offline y sincronización (el camión sin señal)</h3>
+<div id="outline-container-orgd5e6793" class="outline-3">
+<h3 id="orgd5e6793"><span class="section-number-3">4.6.</span> Datos, offline y sincronización</h3>
 <div class="outline-text-3" id="text-4-6">
 </div>
-<div id="outline-container-org142ccea" class="outline-4">
-<h4 id="org142ccea"><span class="section-number-4">4.6.1.</span> Repository con dos (o tres) orígenes</h4>
+<div id="outline-container-org4fb53eb" class="outline-4">
+<h4 id="org4fb53eb"><span class="section-number-4">4.6.1.</span> Repository con varios orígenes</h4>
 <div class="outline-text-4" id="text-4-6-1">
 <p>
 En FeriaPPT móvil el cajón <b>no</b> es solo SQL.
@@ -3039,8 +3059,8 @@ Adapter: JSON del server ↔ ronda en disco ↔ lo que pinta el botón. Tres rit
 </p>
 </div>
 </div>
-<div id="outline-container-orge67db17" class="outline-4">
-<h4 id="orge67db17"><span class="section-number-4">4.6.2.</span> Cola de comandos y sincronización</h4>
+<div id="outline-container-org53f7081" class="outline-4">
+<h4 id="org53f7081"><span class="section-number-4">4.6.2.</span> Cola de comandos y sincronización</h4>
 <div class="outline-text-4" id="text-4-6-2">
 <ul class="org-ul">
 <li><b>Command:</b> cada <code>TiréPapel</code> offline se guarda con un UUID y se envía al volver la señal.</li>
@@ -3049,8 +3069,8 @@ Adapter: JSON del server ↔ ronda en disco ↔ lo que pinta el botón. Tres rit
 </ul>
 </div>
 </div>
-<div id="outline-container-org1371e57" class="outline-4">
-<h4 id="org1371e57"><span class="section-number-4">4.6.3.</span> Observer en datos</h4>
+<div id="outline-container-org4b67359" class="outline-4">
+<h4 id="org4b67359"><span class="section-number-4">4.6.3.</span> Observer en datos</h4>
 <div class="outline-text-4" id="text-4-6-3">
 <p>
 El marcador se suscribe al <b>stream de partidas de dominio</b>, no a filas crudas de Room. Si la UI observa la tabla SQL, acoplaste la lona al cajón.
@@ -3058,28 +3078,28 @@ El marcador se suscribe al <b>stream de partidas de dominio</b>, no a filas crud
 </div>
 </div>
 </div>
-<div id="outline-container-org4fc75f0" class="outline-3">
-<h3 id="org4fc75f0"><span class="section-number-3">4.7.</span> Ciclo de vida, concurrencia y recursos</h3>
+<div id="outline-container-org72d139d" class="outline-3">
+<h3 id="org72d139d"><span class="section-number-3">4.7.</span> Ciclo de vida, concurrencia y recursos</h3>
 <div class="outline-text-3" id="text-4-7">
 </div>
-<div id="outline-container-orgb9ad2b7" class="outline-4">
-<h4 id="orgb9ad2b7"><span class="section-number-4">4.7.1.</span> Template Method del sistema operativo</h4>
+<div id="outline-container-orga02fc62" class="outline-4">
+<h4 id="orga02fc62"><span class="section-number-4">4.7.1.</span> Template Method del sistema operativo</h4>
 <div class="outline-text-4" id="text-4-7-1">
 <p>
 El SO llama <code>onCreate</code> / <code>onResume</code>: plantilla fija. En FeriaPPT se engancha «restaurar el ViewModel»; el cálculo del rival no va en <code>onDraw</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd2141e1" class="outline-4">
-<h4 id="orgd2141e1"><span class="section-number-4">4.7.2.</span> Proxy virtual y lazy</h4>
+<div id="outline-container-org15d1900" class="outline-4">
+<h4 id="org15d1900"><span class="section-number-4">4.7.2.</span> Proxy virtual y lazy</h4>
 <div class="outline-text-4" id="text-4-7-2">
 <p>
 Avatares del ranking: no se cargan hasta que la fila es visible. El <code>RecyclerView.Adapter</code> es Adapter GoF + Flyweight (celdas reutilizadas).
 </p>
 </div>
 </div>
-<div id="outline-container-orga1e11f8" class="outline-4">
-<h4 id="orga1e11f8"><span class="section-number-4">4.7.3.</span> Command para trabajo en segundo plano</h4>
+<div id="outline-container-orgf8d6f1e" class="outline-4">
+<h4 id="orgf8d6f1e"><span class="section-number-4">4.7.3.</span> Command para trabajo en segundo plano</h4>
 <div class="outline-text-4" id="text-4-7-3">
 <p>
 Cerrar la app en el camión: WorkManager sube las tiradas pendientes. El duelo en pantalla ya no existe; el Command sí.
@@ -3087,17 +3107,17 @@ Cerrar la app en el camión: WorkManager sube las tiradas pendientes. El duelo e
 </div>
 </div>
 </div>
-<div id="outline-container-org4107646" class="outline-3">
-<h3 id="org4107646"><span class="section-number-3">4.8.</span> Inyección de dependencias en móvil</h3>
+<div id="outline-container-org6379561" class="outline-3">
+<h3 id="org6379561"><span class="section-number-3">4.8.</span> Inyección de dependencias en móvil</h3>
 <div class="outline-text-3" id="text-4-8">
 <ul class="org-ul">
-<li><b>En el juego:</b> el ViewModel recibe <code>Rival</code> (Strategy) y <code>PartidaRepository</code>. En tests, un <code>RivalSiemprePiedra</code> falso. Nada de <code>new Retrofit</code> dentro del Fragment de los botones.</li>
+<li>En FeriaPPT: el ViewModel recibe <code>Rival</code> (Strategy) y <code>PartidaRepository</code>. En tests, un <code>RivalSiemprePiedra</code> falso. Nada de <code>new Retrofit</code> dentro del Fragment de los botones.</li>
 <li>Singleton del repositorio: bien. Singleton de «ronda que estoy pintando»: fugas y tests sucios.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org57b3838" class="outline-3">
-<h3 id="org57b3838"><span class="section-number-3">4.9.</span> Patrones GoF que el móvil usa <b>con otro disfraz</b></h3>
+<div id="outline-container-orgcd72caa" class="outline-3">
+<h3 id="orgcd72caa"><span class="section-number-3">4.9.</span> Patrones GoF que el móvil usa <b>con otro disfraz</b></h3>
 <div class="outline-text-3" id="text-4-9">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -3174,8 +3194,8 @@ Cerrar la app en el camión: WorkManager sube las tiradas pendientes. El duelo e
 </table>
 </div>
 </div>
-<div id="outline-container-org2730453" class="outline-3">
-<h3 id="org2730453"><span class="section-number-3">4.10.</span> Plataformas: el mismo análisis, distintos idiomas</h3>
+<div id="outline-container-org563ebac" class="outline-3">
+<h3 id="org563ebac"><span class="section-number-3">4.10.</span> Plataformas: el mismo análisis, distintos idiomas</h3>
 <div class="outline-text-3" id="text-4-10">
 <p>
 El curso pide <b>análisis y diseño</b>, no fanatismo de toolkit. Una tabla para no perder el nivel:
@@ -3252,8 +3272,8 @@ El curso pide <b>análisis y diseño</b>, no fanatismo de toolkit. Una tabla par
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd9dd5b" class="outline-3">
-<h3 id="orgfd9dd5b"><span class="section-number-3">4.11.</span> Análisis de un caso móvil: FeriaPPT en el camión</h3>
+<div id="outline-container-orgafe0910" class="outline-3">
+<h3 id="orgafe0910"><span class="section-number-3">4.11.</span> Análisis de un caso móvil: FeriaPPT sin red continua</h3>
 <div class="outline-text-3" id="text-4-11">
 <ol class="org-ol">
 <li><b>Fuerzas:</b> rotación a mitad de ronda, 40 % de red, el SO mata el proceso, push de «te retaron».</li>
@@ -3265,8 +3285,8 @@ El curso pide <b>análisis y diseño</b>, no fanatismo de toolkit. Una tabla par
 </ol>
 </div>
 </div>
-<div id="outline-container-orgbfa03cf" class="outline-3">
-<h3 id="orgbfa03cf"><span class="section-number-3">4.12.</span> Comparativa de diseño: el mismo FeriaPPT, dos mundos</h3>
+<div id="outline-container-org48ddab6" class="outline-3">
+<h3 id="org48ddab6"><span class="section-number-3">4.12.</span> Comparativa de diseño: el mismo FeriaPPT, dos mundos</h3>
 <div class="outline-text-3" id="text-4-12">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -3341,8 +3361,8 @@ El curso pide <b>análisis y diseño</b>, no fanatismo de toolkit. Una tabla par
 </table>
 </div>
 </div>
-<div id="outline-container-org652859c" class="outline-3">
-<h3 id="org652859c"><span class="section-number-3">4.13.</span> Tabla de decisión rápida (móvil)</h3>
+<div id="outline-container-org0bd2bc6" class="outline-3">
+<h3 id="org0bd2bc6"><span class="section-number-3">4.13.</span> Tabla de decisión rápida: móvil</h3>
 <div class="outline-text-3" id="text-4-13">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -3407,21 +3427,21 @@ El curso pide <b>análisis y diseño</b>, no fanatismo de toolkit. Una tabla par
 </table>
 </div>
 </div>
-<div id="outline-container-org80309e4" class="outline-3">
-<h3 id="org80309e4"><span class="section-number-3">4.14.</span> Idea clave de la parte móvil</h3>
+<div id="outline-container-org1221036" class="outline-3">
+<h3 id="org1221036"><span class="section-number-3">4.14.</span> Idea clave de la parte móvil</h3>
 <div class="outline-text-3" id="text-4-14">
 <p>
-En FeriaPPT móvil el patrón de presentación (MVP/MVVM/MVI) es <b>necesario pero insuficiente</b>. El análisis se juega en <b>ciclo de vida</b> (no perder la ronda), <b>dos cajones de datos</b> (camión sin señal) y <b>trabajo que continúa cuando los botones ya no existen</b> (subir tiradas). El ViewModel es el asiento; el tren es el sistema operativo.
+En el cliente móvil el patrón de presentación (MVP, MVVM, MVI) es necesario y no basta. El análisis se concentra en el <b>ciclo de vida</b> (conservar la ronda), en <b>dos orígenes de datos</b> (local y remoto) y en el <b>trabajo que continúa</b> cuando la vista ha sido destruida. El ViewModel conserva estado de presentación; el proceso lo administra el sistema operativo.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org85e4262" class="outline-2">
-<h2 id="org85e4262"><span class="section-number-2">5.</span> Mapa integrado de la unidad</h2>
+<div id="outline-container-orgf195c66" class="outline-2">
+<h2 id="orgf195c66"><span class="section-number-2">5.</span> Mapa integrado de la unidad</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgac2723d" class="outline-3">
-<h3 id="orgac2723d"><span class="section-number-3">5.1.</span> Las tres preguntas de cualquier ejercicio</h3>
+<div id="outline-container-org0684743" class="outline-3">
+<h3 id="org0684743"><span class="section-number-3">5.1.</span> Las tres preguntas de cualquier ejercicio</h3>
 <div class="outline-text-3" id="text-5-1">
 <ol class="org-ol">
 <li><b>¿Qué problema de diseño se repite y en qué capa vive?</b></li>
@@ -3430,31 +3450,31 @@ En FeriaPPT móvil el patrón de presentación (MVP/MVVM/MVI) es <b>necesario pe
 </ol>
 </div>
 </div>
-<div id="outline-container-org4555b29" class="outline-3">
-<h3 id="org4555b29"><span class="section-number-3">5.2.</span> Chuleta de elección (alto nivel)</h3>
+<div id="outline-container-orgfbab4f0" class="outline-3">
+<h3 id="orgfbab4f0"><span class="section-number-3">5.2.</span> Chuleta de elección</h3>
 <div class="outline-text-3" id="text-5-2">
-<pre class="example" id="org3301207">
-¿Varía un ALGORITMO?                 → Strategy (a veces Factory para crearlos)
-¿Varía una FAMILIA de productos?     → Abstract Factory
-¿La interfaz AJENA no te sirve?      → Adapter (+ Anti-Corruption si hay lenguaje de negocio)
-¿Subsistema FEOSO y quieres 3 métodos? → Facade
-¿Añadir comportamiento en capas?     → Decorator / Middleware / Interceptor
-¿Avisar a muchos sin acoplarlos?     → Observer / Pub-Sub (define in-process vs cola)
-¿Pasos de un algoritmo fijos?        → Template Method (¡cuidado con bases gordas!)
-¿Objeto que se comporta distinto según fase? → State (ideal para UiState)
-¿Acción que quieres encolar, deshacer o loguear? → Command
-¿Acceso controlado, remoto o cacheado? → Proxy
-¿Crear sin new por todos lados?      → Factory + DI
-¿HTTP con políticas transversales?   → Front Controller + Chain of Responsibility
-¿UI vs reglas vs datos?              → MVC/MVP/MVVM/MVI + Repository
-¿Dominio independiente de frameworks? → Hexagonal (puertos y adaptadores)
-¿Cliente web y app quieren payloads distintos? → BFF
-¿El tren (móvil) se queda sin señal? → Repository dual + cola de Commands
+<pre class="example" id="orgce28fc3">
+  ¿Varía un ALGORITMO?                 → Strategy (a veces Factory para crearlos)
+  ¿Varía una FAMILIA de productos?     → Abstract Factory
+  ¿La interfaz AJENA no te sirve?      → Adapter (+ Anti-Corruption si hay lenguaje de negocio)
+  ¿Subsistema FEOSO y quieres 3 métodos? → Facade
+  ¿Añadir comportamiento en capas?     → Decorator / Middleware / Interceptor
+  ¿Avisar a muchos sin acoplarlos?     → Observer / Pub-Sub (define in-process vs cola)
+  ¿Pasos de un algoritmo fijos?        → Template Method (¡cuidado con bases gordas!)
+  ¿Objeto que se comporta distinto según fase? → State (ideal para UiState)
+  ¿Acción que quieres encolar, deshacer o loguear? → Command
+  ¿Acceso controlado, remoto o cacheado? → Proxy
+  ¿Crear sin new por todos lados?      → Factory + DI
+  ¿HTTP con políticas transversales?   → Front Controller + Chain of Responsibility
+  ¿UI vs reglas vs datos?              → MVC/MVP/MVVM/MVI + Repository
+  ¿Dominio independiente de frameworks? → Hexagonal (puertos y adaptadores)
+  ¿Cliente web y app quieren payloads distintos? → BFF
+  ¿El tren (móvil) se queda sin señal? → Repository dual + cola de Commands
 </pre>
 </div>
 </div>
-<div id="outline-container-org13e941c" class="outline-3">
-<h3 id="org13e941c"><span class="section-number-3">5.3.</span> Errores de examen (y de código) más frecuentes</h3>
+<div id="outline-container-org99bb5e4" class="outline-3">
+<h3 id="org99bb5e4"><span class="section-number-3">5.3.</span> Errores de examen y de código más frecuentes</h3>
 <div class="outline-text-3" id="text-5-3">
 <ol class="org-ol">
 <li>Decir que MVC <b>es</b> un patrón GoF. (Es patrón de <b>arquitectura/presentación</b>; GoF no lo incluye como los 23.)</li>
@@ -3469,25 +3489,25 @@ En FeriaPPT móvil el patrón de presentación (MVP/MVVM/MVI) es <b>necesario pe
 </div>
 </div>
 </div>
-<div id="outline-container-org5832e6b" class="outline-2">
-<h2 id="org5832e6b"><span class="section-number-2">6.</span> Preguntas de autoevaluación</h2>
+<div id="outline-container-org0328de9" class="outline-2">
+<h2 id="org0328de9"><span class="section-number-2">6.</span> Preguntas de autoevaluación</h2>
 <div class="outline-text-2" id="text-6">
 <ol class="org-ol">
-<li>Explica con analogía qué es un patrón de diseño y en qué se diferencia de un estilo arquitectónico. También: qué es GoF y qué <b>no</b> es.</li>
+<li>Defina patrón de diseño y diferéncielo de un estilo arquitectónico. Indique qué es GoF y qué queda fuera de ese catálogo.</li>
 <li>Llena la plantilla de anatomía (nombre, problema, contexto, fuerzas, solución, consecuencias) para <b>Decorator</b> aplicado a middleware HTTP.</li>
 <li>¿Por qué Singleton en un proceso de Node <b>no</b> garantiza una sola instancia «del sistema»?</li>
 <li>En FeriaPPT un compañero mete un <code>switch</code> de 15 rivales en el controlador HTTP. ¿Qué analizas y qué diseñarías?</li>
-<li>Diferencia Adapter, Facade y Proxy con el puesto: arcade vieja, letrero <code>tirar()</code>, papelito del ranking.</li>
-<li>¿En qué capa va la pulsera (autorización) y por qué no basta con ocultar el botón «vidas extra»?</li>
-<li>Compara MVP, MVVM y MVI para la pantalla del duelo con sync y push de «te retaron».</li>
-<li>Diseña (cajas e interfaces) FeriaPPT offline en el camión. ¿Dónde entra Command, Repository y Adapter?</li>
-<li>¿Cuándo un BFF es justificado entre la lona web y la app, y cuándo es un servicio de más?</li>
+<li>Diferencie Adapter, Facade y Proxy sobre FeriaPPT: protocolo ajeno, fachada de duelo, acceso cacheado al ranking.</li>
+<li>¿En qué capa se aplica la autenticación y por qué no basta con ocultar el control de «vidas extra» en el cliente?</li>
+<li>Compare MVP, MVVM y MVI para la pantalla del duelo con sincronización y notificaciones.</li>
+<li>Diseñe (tipos e interfaces) FeriaPPT con operación en ausencia de red. Sitúe Command, Repository y Adapter.</li>
+<li>¿Cuándo se justifica un BFF entre el cliente web y la aplicación móvil, y cuándo es una capa superflua?</li>
 <li>Da un ejemplo donde <b>no</b> usarías un patrón famoso (YAGNI) y qué harías en su lugar.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-orgb8f3725" class="outline-2">
-<h2 id="orgb8f3725"><span class="section-number-2">7.</span> Mini-glosario UML para leer diagramas de patrones</h2>
+<div id="outline-container-orge378af6" class="outline-2">
+<h2 id="orge378af6"><span class="section-number-2">7.</span> Mini-glosario UML para leer diagramas de patrones</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 Cuando veas un diagrama GoF:
@@ -3545,30 +3565,32 @@ No memorices UML: úsalo para <b>ver el acoplamiento</b>. Si todas las flechas a
 </p>
 </div>
 </div>
-<div id="outline-container-orgea39ba1" class="outline-2">
-<h2 id="orgea39ba1"><span class="section-number-2">8.</span> Referencias recomendadas</h2>
+<div id="outline-container-orgae8cf3a" class="outline-2">
+<h2 id="orgae8cf3a"><span class="section-number-2">8.</span> Referencias recomendadas</h2>
 <div class="outline-text-2" id="text-8">
 <ul class="org-ul">
-<li>Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides. <b>Design Patterns: Elements of Reusable Object-Oriented Software</b> (GoF).</li>
-<li>Martin Fowler. <b>Patterns of Enterprise Application Architecture</b> (P of EAA). Front Controller, Repository, Unit of Work, Template View.</li>
-<li>Frank Buschmann et al. <b>Pattern-Oriented Software Architecture</b> (POSA).</li>
-<li>Robert C. Martin. <b>Clean Architecture</b>. Útil en móvil y en backends; no es un dogma de carpetas.</li>
-<li>Erich Gamma / Kent Beck (artículos y charlas sobre patrones como <b>vocabulario</b>).</li>
-<li>Roy Fielding. Disertación REST (estilo arquitectónico; para no reducir REST a JSON).</li>
-<li>Documentación de arquitecturas oficiales: <b>Android App architecture</b>, <b>Apple Human Interface + SwiftUI data flow</b>, <b>Flutter architecture</b>.</li>
-<li>Michael Nygard. <b>Release It!</b> (Circuit Breaker, Bulkhead, estabilidad en sistemas distribuidos).</li>
+<li>Christopher Alexander. <b>A Pattern Language</b>. Origen del esquema contexto–problema–solución.</li>
+<li>David Parnas. «On the Criteria to Be Used in Decomposing Systems into Modules» (1972). Ocultamiento de información.</li>
+<li>Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides. <b>Design Patterns: Elements of Reusable Object-Oriented Software</b>.</li>
+<li>James O. Coplien. <b>Advanced C++ Programming Styles and Idioms</b>; trabajos sobre idiomas frente a patrones.</li>
+<li>Martin Fowler. <b>Patterns of Enterprise Application Architecture</b>. Front Controller, Repository, Unit of Work, Template View.</li>
+<li>Frank Buschmann et al. <b>Pattern-Oriented Software Architecture</b>.</li>
+<li>Robert C. Martin. <b>Clean Architecture</b>.</li>
+<li>Roy Fielding. Disertación sobre REST.</li>
+<li>Guías de plataforma: <b>Android App architecture</b>, flujo de datos en SwiftUI, arquitectura Flutter.</li>
+<li>Michael Nygard. <b>Release It!</b> Circuit Breaker, Bulkhead.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org01befb2" class="outline-2">
-<h2 id="org01befb2"><span class="section-number-2">9.</span> Cierre</h2>
+<div id="outline-container-org0d1630a" class="outline-2">
+<h2 id="org0d1630a"><span class="section-number-2">9.</span> Cierre</h2>
 <div class="outline-text-2" id="text-9">
 <p>
-Los patrones no son colección de cromos: son <b>decisiones con nombre</b>. En <b>Tópicos Selectos de Tecnologías Web y Móvil</b> el nivel alto no es recitar los 23 del GoF; es <b>analizar las fuerzas de cada plataforma</b> y <b>diseñar contratos</b> para que la UI, el dominio y los datos puedan cambiar a ritmos distintos.
+Los patrones no constituyen un inventario ornamental. Son decisiones de diseño con nombre, contexto y costo. En esta unidad el criterio no es recitar los 23 del catálogo de 1994; es analizar las fuerzas de cada plataforma y diseñar contratos que permitan evolucionar, a ritmos distintos, la presentación, el dominio y los datos.
 </p>
 
 <p>
-Si puedes explicar <b>por qué este patrón, en esta capa, con este costo</b>, ya no estás memorizando: estás diseñando.
+Si puede justificarse <b>por qué este patrón, en esta capa, con estas consecuencias</b>, el trabajo ya no es de memorización: es de diseño.
 </p>
 </div>
 </div>
@@ -3576,7 +3598,7 @@ Si puedes explicar <b>por qué este patrón, en esta capa, con este costo</b>, y
 <div id="postamble" class="status">
 <p class="date">Fecha: 2026-08-25</p>
 <p class="author">Autor: Eduardo Alcaraz</p>
-<p class="date">Created: 2026-08-26 mié 21:03</p>
+<p class="date">Created: 2026-08-28 vie 07:33</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
