@@ -1,13 +1,15 @@
-#+TITLE: Tópicos Selectos de Tecnologías Web y Móvil — Introducción a los Patrones de Diseño de Software
+#+TITLE: Tópicos Selectos de Tecnologías Web y Móvil  Introducción a los Patrones de Diseño de Software
 #+AUTHOR: Eduardo Alcaraz 
 #+LANGUAGE: es
-#+DATE: 2026-08-25
-#+OPTIONS: toc:3 num:t h:4
-#+STARTUP: overview indent
-#+SETUPFILE: theme-readtheorg-local.setup
-#+EXPORT_FILE_NAME: index
-#+HTML_HEAD: <style> #content{max-width:none;}</style>
-#+PROPERTY: header-args :exports both :eval never
+#+LaTeX_HEADER: \usepackage[spanish]{inputenc}
+#+SETUPFILE: /home/likcos/Materias/Graficacion/theme-readtheorg-local.setup
+#+EXPORT_FILE_NAME: index.html
+#+OPTIONS: num:nil
+#+OPTIONS: tex:mathjax
+#+HTML_HEAD: <style> #content{max-width:1800px;}</style>
+#+PROPERTY: header-args :eval yes
+#+BIND: org-confirm-babel-evaluate nil
+
 
 #+begin_quote
 Materia: *Tópicos Selectos de Tecnologías Web y Móvil*
@@ -99,11 +101,31 @@ El resto de estos apuntes pone *nombre* a esas perspectivas en web y móvil.
 
 * Introducción
 
-La literatura de ingeniería de software distingue con claridad entre *inventar una solución* y *reconocer una forma ya estudiada*. Un patrón de diseño pertenece a lo segundo: nombra un problema que aparece con regularidad, describe el contexto en el que ese problema es pertinente, propone una estructura de elementos (clases, objetos, módulos, procesos) y hace explícitas las *consecuencias* —lo que se gana y lo que se paga— al adoptarla.
+La literatura de ingeniería de software distingue con claridad entre
+*inventar una solución* y *reconocer una forma ya estudiada*. Un patrón de
+diseño pertenece a lo segundo: nombra un problema que aparece con
+regularidad, describe el contexto en el que ese problema es
+pertinente, propone una estructura de elementos (clases, objetos,
+módulos, procesos) y hace explícitas las *consecuencias* —lo que se gana
+y lo que se paga— al adoptarla.
 
-Gamma, Helm, Johnson y Vlissides (1994) formulan la idea en estos términos: un patrón nombra, abstrae e identifica los aspectos clave de una estructura de diseño común, de modo que pueda reutilizarse. No es un fragmento de código que se copia; es una *forma* cuya realización concreta depende del lenguaje, de la plataforma y del marco de trabajo. Tampoco es, por sí sola, la arquitectura de un sistema: la arquitectura fija las decisiones estructurales de mayor alcance (capas, distribución, estilo de despliegue); los patrones operan, por lo general, en la escala de un conjunto de tipos y de sus colaboraciones.
+Gamma, Helm, Johnson y Vlissides (1994) formulan la idea en estos
+términos: un patrón nombra, abstrae e identifica los aspectos clave de
+una estructura de diseño común, de modo que pueda reutilizarse. No es
+un fragmento de código que se copia; es una *forma* cuya realización
+concreta depende del lenguaje, de la plataforma y del marco de
+trabajo. Tampoco es, por sí sola, la arquitectura de un sistema: la
+arquitectura fija las decisiones estructurales de mayor alcance
+(capas, distribución, estilo de despliegue); los patrones operan, por
+lo general, en la escala de un conjunto de tipos y de sus
+colaboraciones.
 
-Usar un patrón donde no existe el problema correspondiente no es «aplicar ingeniería»: es añadir indirección, tipos y curva de aprendizaje sin contraprestación. En la teoría de Alexander —de la que el campo del software toma el esquema problema–contexto–solución— un patrón *no se aplica por catálogo*, se *reconoce* cuando las fuerzas del problema coinciden con las de la ficha.
+Usar un patrón donde no existe el problema correspondiente no es
+«aplicar ingeniería»: es añadir indirección, tipos y curva de
+aprendizaje sin contraprestación. En la teoría de Alexander —de la que
+el campo del software toma el esquema problema–contexto–solución— un
+patrón *no se aplica por catálogo*, se *reconoce* cuando las fuerzas del
+problema coinciden con las de la ficha.
 
 ** El caso de estudio: FeriaPPT
 
@@ -113,9 +135,17 @@ A lo largo de la unidad se emplea una sola aplicación de dominio, *FeriaPPT*, a
 - Las reglas de victoria son fijas: el papel cubre la piedra, la piedra rompe la tijera, la tijera corta el papel; si coinciden, hay empate.
 - El sistema administra *fichas*, el *estado de la ronda*, un *ranking* y la *compra de vidas extra*.
 
-Ese dominio es independiente de la plataforma. La variante *web* se ejecuta en el navegador y se comunica con un servidor HTTP (persistencia, ranking, pagos). La variante *móvil* se ejecuta en un dispositivo con ciclo de vida propio y, con frecuencia, conectividad intermitente: las tiradas deben poder persistirse en local y sincronizarse después.
+Ese dominio es independiente de la plataforma. La variante *web* se
+ejecuta en el navegador y se comunica con un servidor HTTP
+(persistencia, ranking, pagos). La variante *móvil* se ejecuta en un
+dispositivo con ciclo de vida propio y, con frecuencia, conectividad
+intermitente: las tiradas deben poder persistirse en local y
+sincronizarse después.
 
-Las reglas del duelo no cambian. Cambian las restricciones de la plataforma (HTTP sin estado, latencia, ciclo de vida del sistema operativo, batería). Los patrones de cada parte de la unidad se analizan sobre esas restricciones, no como ornamento del diagrama.
+Las reglas del duelo no cambian. Cambian las restricciones de la
+plataforma (HTTP sin estado, latencia, ciclo de vida del sistema
+operativo, batería). Los patrones de cada parte de la unidad se
+analizan sobre esas restricciones, no como ornamento del diagrama.
 
 ** Glosario
 
@@ -123,43 +153,43 @@ Los términos siguientes se usan de manera estable en el resto del capítulo. La
 
 *** Conceptos de diseño
 
-| Término | Definición |
-|----------+------------|
-| *GoF* | Sigla de *Gang of Four*: los cuatro autores de *Design Patterns* (1994) y, por extensión, el catálogo de 23 patrones de ese libro. No es un producto de software ni un marco de trabajo. |
-| *Patrón de diseño* | Solución nombrada a un problema de diseño recurrente, con contexto, estructura de participantes y consecuencias. |
-| *Arquitectura de software* | Conjunto de decisiones estructurales de mayor alcance: descomposición en módulos, estilo (capas, cliente–servidor, hexagonal), despliegue. |
-| *Idioma* | Construcción local de un lenguaje o de una plataforma (comprensión de listas en Python, =async/await=, *hooks* de React). No sustituye al patrón: lo realiza. |
-| *Principio de diseño* | Criterio normativo (p. ej. inversión de dependencias), no una estructura de clases. Los patrones son, con frecuencia, *realizaciones* de principios. |
-| *Abstracción* | Selección de lo esencial para un cliente, ocultando el resto. Parnas (1972) la formula como *ocultamiento de información*: cada módulo esconde una decisión de diseño. |
-| *Acoplamiento* | Grado en que un módulo conoce y depende de otro. Un acoplamiento alto dificulta el cambio independiente. |
-| *Cohesión* | Grado en que las responsabilidades de un módulo pertenecen a un mismo propósito. Baja cohesión es síntoma de God Object. |
-| *Encapsulamiento* | Ocultación del estado interno tras una interfaz de operaciones. |
-| *Polimorfismo* | Tratamiento uniforme de objetos de tipos distintos a través de un contrato común. Es el mecanismo con el que Strategy, State y Observer intercambian comportamiento. |
-| *Contrato* | Conjunto de obligaciones de un tipo (precondiciones, postcondiciones, invariantes). En OO se expresa, de modo incompleto, como interfaz o protocolo. |
+| Término                  | Definición                                                                                                                                                                           |
+|--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| *GoF*                      | Sigla de *Gang of Four*: los cuatro autores de *Design Patterns* (1994) y, por extensión, el catálogo de 23 patrones de ese libro. No es un producto de software ni un marco de trabajo. |
+| *Patrón de diseño*         | Solución nombrada a un problema de diseño recurrente, con contexto, estructura de participantes y consecuencias.                                                                     |
+| *Arquitectura de software* | Conjunto de decisiones estructurales de mayor alcance: descomposición en módulos, estilo (capas, cliente–servidor, hexagonal), despliegue.                                           |
+| *Idioma*                   | Construcción local de un lenguaje o de una plataforma (comprensión de listas en Python, =async/await=, *hooks* de React). No sustituye al patrón: lo realiza.                            |
+| *Principio de diseño*      | Criterio normativo (p. ej. inversión de dependencias), no una estructura de clases. Los patrones son, con frecuencia, *realizaciones* de principios.                                   |
+| *Abstracción*              | Selección de lo esencial para un cliente, ocultando el resto. Parnas (1972) la formula como *ocultamiento de información*: cada módulo esconde una decisión de diseño.                 |
+| *Acoplamiento*             | Grado en que un módulo conoce y depende de otro. Un acoplamiento alto dificulta el cambio independiente.                                                                             |
+| *Cohesión*                 | Grado en que las responsabilidades de un módulo pertenecen a un mismo propósito. Baja cohesión es síntoma de God Object.                                                             |
+| *Encapsulamiento*          | Ocultación del estado interno tras una interfaz de operaciones.                                                                                                                      |
+| *Polimorfismo*             | Tratamiento uniforme de objetos de tipos distintos a través de un contrato común. Es el mecanismo con el que Strategy, State y Observer intercambian comportamiento.                 |
+| *Contrato*                 | Conjunto de obligaciones de un tipo (precondiciones, postcondiciones, invariantes). En OO se expresa, de modo incompleto, como interfaz o protocolo.                                 |
 
 *** Familias de patrones
 
 La clasificación tripartita de Gamma et al. no es la única posible (POSA organiza por *granularidad* y por dominio); es, sin embargo, la más citada en diseño orientado a objetos:
 
-| Familia | Pregunta | Escala típica |
-|----------+----------+----------------|
-| *Creacionales* | ¿Quién instancia los objetos y cómo se oculta esa decisión? | Fábricas, constructores, prototipos |
-| *Estructurales* | ¿Cómo se componen tipos para formar estructuras mayores sin explotar la jerarquía de herencia? | Adaptación, envoltorio, fachada, proxy |
-| *Comportamentales* | ¿Cómo se distribuyen responsabilidades y mensajes? | Algoritmos intercambiables, observación, cadena de handlers |
+| Familia          | Pregunta                                                                                       | Escala típica                                               |
+|------------------+------------------------------------------------------------------------------------------------+-------------------------------------------------------------|
+| *Creacionales*     | ¿Quién instancia los objetos y cómo se oculta esa decisión?                                    | Fábricas, constructores, prototipos                         |
+| *Estructurales*    | ¿Cómo se componen tipos para formar estructuras mayores sin explotar la jerarquía de herencia? | Adaptación, envoltorio, fachada, proxy                      |
+| *Comportamentales* | ¿Cómo se distribuyen responsabilidades y mensajes?                                             | Algoritmos intercambiables, observación, cadena de handlers |
 
 *** Vocabulario de aplicaciones web y móviles
 
-| Término | Definición | Ámbito |
-|----------+------------+--------|
-| *MVC / MVP / MVVM / MVI* | Patrones de *presentación*: separación entre estado de dominio, presentación y entrada. No figuran entre los 23 de GoF. | Web (servidor y SPA) y cliente móvil |
-| *Repositorio* | Abstracción de una colección persistida; oculta el origen (API, base de datos, caché). Fowler, P of EAA. | Ambos |
-| *Inyección de dependencias* | Las colaboraciones se entregan al objeto (constructor, contenedor), en lugar de que él las construya. Realiza inversión de dependencias. | Marcos web y móviles |
-| *Middleware* | Cadena de transformaciones sobre una petición. Realiza Chain of Responsibility o Decorator. | Express, Django, ASP.NET, Next.js |
-| *Ciclo de vida* | Secuencia de estados que el *runtime* impone a una pantalla o a un proceso (creación, pausa, destrucción). | Crítico en móvil; también en SPA y SSR |
-| *Estado* | Datos cuya variación implica una variación observable de la interfaz o del flujo. | Redux, ViewModel, BLoC, Riverpod |
-| *Offline-first* | El dispositivo opera sin red y reconcilia después. Exige repositorio dual y cola de comandos. | Móvil y PWA |
-| *BFF* | API diseñada para *un* tipo de cliente. No es Factory: es un estilo de integración. | Sistemas con web y app |
-| *Antipatrón* | Forma recurrente que parece solución y degrada atributos de calidad (mantenibilidad, prueba, rendimiento). | God Object, Singleton de sesión, Callback Hell |
+| Término                   | Definición                                                                                                                               | Ámbito                                         |
+|---------------------------+------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------|
+| *MVC / MVP / MVVM / MVI*    | Patrones de *presentación*: separación entre estado de dominio, presentación y entrada. No figuran entre los 23 de GoF.                    | Web (servidor y SPA) y cliente móvil           |
+| *Repositorio*               | Abstracción de una colección persistida; oculta el origen (API, base de datos, caché). Fowler, P of EAA.                                 | Ambos                                          |
+| *Inyección de dependencias* | Las colaboraciones se entregan al objeto (constructor, contenedor), en lugar de que él las construya. Realiza inversión de dependencias. | Marcos web y móviles                           |
+| *Middleware*                | Cadena de transformaciones sobre una petición. Realiza Chain of Responsibility o Decorator.                                              | Express, Django, ASP.NET, Next.js              |
+| *Ciclo de vida*             | Secuencia de estados que el *runtime* impone a una pantalla o a un proceso (creación, pausa, destrucción).                                 | Crítico en móvil; también en SPA y SSR         |
+| *Estado*                    | Datos cuya variación implica una variación observable de la interfaz o del flujo.                                                        | Redux, ViewModel, BLoC, Riverpod               |
+| *Offline-first*             | El dispositivo opera sin red y reconcilia después. Exige repositorio dual y cola de comandos.                                            | Móvil y PWA                                    |
+| *BFF*                       | API diseñada para *un* tipo de cliente. No es Factory: es un estilo de integración.                                                        | Sistemas con web y app                         |
+| *Antipatrón*                | Forma recurrente que parece solución y degrada atributos de calidad (mantenibilidad, prueba, rendimiento).                               | God Object, Singleton de sesión, Callback Hell |
 
 ** Definición de patrón de diseño
 
