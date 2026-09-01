@@ -243,13 +243,15 @@ El libro es un *catálogo*. Cada patrón ocupa un capítulo con plantilla fija, 
 | *Implementation* y *Sample Code* | Notas de lenguaje (en el libro, C++ y Smalltalk) y código ilustrativo. |
 | *Known Uses* y *Related Patterns* | Usos industriales y vecinos del catálogo. |
 
-Los 23 se agrupan en tres familias:
+Los 23 se agrupan en tres familias. Las familias *no son alternativas excluyentes* de un proyecto: clasifican el *tipo de problema* (cómo se crea un objeto, cómo se relacionan las estructuras, cómo varía el comportamiento). Un mismo sistema emplea, de forma rutinaria, miembros de las tres.
 
 | Familia | Cardinalidad | Ejemplos |
 |----------+--------------+----------|
 | *Creacionales* | 5 | Factory Method, Abstract Factory, Builder, Prototype, Singleton |
 | *Estructurales* | 7 | Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy |
 | *Comportamentales* | 11 | Observer, Strategy, Command, State, Template Method, Iterator, Mediator, Chain of Responsibility, Visitor, Memento, Interpreter |
+
+Así, en un solo caso de uso pueden coincidir Factory (crear el objeto adecuado), Adapter (hablar con un servicio ajeno) y Strategy (elegir el algoritmo). Eso no es «mezclar mal el catálogo»: es asignar cada ficha a una fuerza. El abuso consiste en introducir la ficha *sin* esa fuerza. La sección de patrones web desarrolla esta composición con un ejemplo de comercio electrónico y con el recorte a lo largo de una petición HTTP.
 
 El catálogo se limita al *diseño orientado a objetos* a escala de tipos. No pretende cubrir partición en microservicios, operación *offline*, organización de pantallas móviles, versionado de API REST ni MVC como uno de los 23 (MVC es anterior y pertenece a la arquitectura de presentación).
 
@@ -265,9 +267,30 @@ Por ello, en web y en móvil se trabaja con *GoF más otros catálogos*: no porq
 
 El análisis consiste en elegir el *nivel* correcto: ficha de clases (GoF) frente a plano de la aplicación (POSA, Fowler, guías de plataforma).
 
-*** Persistencia del catálogo
+*** Por qué se sigue estudiando el catálogo de 1994
 
-Tres razones explican que el vocabulario de 1994 siga vigente. Primera: «esto pide un Adapter» se entiende en Java, TypeScript y Kotlin; sin el libro, cada equipo nombraba la misma forma de otro modo. Segunda: los 23 reaparecen *realizados* por la plataforma (un interceptor de Express es Decorator o Chain of Responsibility; =RecyclerView.Adapter= es Adapter; =LiveData= es Observer). Tercera: delimitar qué *es* GoF evita atribuirle MVC, REST o Clean Architecture.
+El libro no es un manual de Spring, de Android ni de HTTP. Aun así se enseña. Las razones son tres, y no se reducen a «es un clásico».
+
+**** Vocabulario compartido
+
+Antes de 1994, la misma estructura de diseño recibía *nombres distintos* en cada equipo. Unos decían «envoltorio», otros «traductor», otros «puente», y hablaban de cosas parecidas o distintas sin saberlo. El catálogo fija un nombre por estructura. «Esto pide un Adapter» se entiende hoy en Java, en TypeScript y en Kotlin: hay una interfaz que el dominio espera y otra, ajena, que hay que traducir. El valor no es el UML del apéndice; es que el equipo *nombra el mismo problema*.
+
+**** Las plataformas ya los implementan
+
+Los 23 no hay que reescribirlos siempre a mano. Los marcos de trabajo *incrustan* varios de ellos y los presentan con otro nombre:
+
+| Lo que ofrece la plataforma | Patrón GoF que está realizando |
+|-----------------------------+--------------------------------|
+| Interceptor o middleware (Express, OkHttp) | Decorator o Chain of Responsibility: envuelve la petición y puede seguir o cortar. |
+| =RecyclerView.Adapter= (Android) | Adapter: traduce el modelo de datos a lo que la lista sabe pintar. |
+| =LiveData=, =StateFlow=, estado de React | Observer: el sujeto cambia y los suscriptores se actualizan. |
+| Contenedor de Spring (=@Component=) | Singleton (de infraestructura) más inyección de dependencias. |
+
+Quien no conoce el catálogo ve solo «una API de Android» o «un middleware de Node». Quien lo conoce reconoce la *intención* y no duplica el mecanismo (por ejemplo, no arma una lista propia de oyentes al lado de =LiveData=).
+
+**** Saber qué *no* es GoF
+
+El libro cataloga 23 patrones de *clases y objetos*. No cataloga la organización de una aplicación web, ni REST, ni «Clean Architecture». MVC es anterior a 1994 y pertenece a la presentación; REST es un estilo de Fielding; las capas hexagonales son arquitectura de sistema. Si todo se llama «patrón GoF», el análisis pierde el nivel: se discute un diagrama de clases cuando el problema está en HTTP, en el ciclo de vida o en la API. Delimitar el catálogo no es despreciarlo; es no pedirle lo que nunca pretendió cubrir.
 
 ** Anatomía de un patrón
 
@@ -421,59 +444,70 @@ Criterio: si el idioma o el marco ya realizan el patrón, se usa esa realizació
 
 Los ejemplos en JavaScript de estos apuntes son un vehículo de lectura. En Kotlin, PHP o Dart la intención se escribe de otro modo; *si* Strategy es pertinente lo determina el problema, no el logotipo del lenguaje ni el del marco.
 
+Esta relación —misma estructura, distinta realización— no se agota aquí. La parte de *aplicaciones web* la particulariza a HTTP y a marcos como Spring, Express o Django. La parte de *aplicaciones móviles* la particulariza a Kotlin, Swift y Dart, y a Android, iOS, Flutter y React Native. Copiar el diagrama de un ecosistema a otro, ignorando el idioma y el marco, es el error que esas secciones tratan de prevenir.
+
 ** Catálogo GoF: mapa de alto nivel de los 23
 
-Los 23 del libro de Gamma, Helm, Johnson y Vlissides. Reconocer la *familia* importa más que memorizar cada diagrama; varios reaparecen en web y en móvil con otro nombre de framework.
+Los 23 del libro de Gamma, Helm, Johnson y Vlissides. Reconocer la *familia* importa más que memorizar cada diagrama. Cada ficha se lee con tres preguntas, en este orden:
+
+1. *¿Cuándo?* Qué problema ya existe (o se prevé con fundamento).
+2. *¿Por qué este y no el vecino?* Qué fuerza resuelve (variar un algoritmo no es lo mismo que traducir una interfaz).
+3. *¿El lenguaje o el marco ya lo traen?* Si sí, se usa esa realización; no se reescribe el diagrama de 1994 al lado.
+
+Varios de los 23 reaparecen en web y en móvil con *otro nombre* de API. Esa columna no es un adorno: es la diferencia entre reconocer el patrón y duplicarlo.
 
 *** Creacionales
 
-| Patrón | Idea en una línea | Uso típico web / móvil |
-|--------+-------------------+------------------------|
-| *Factory Method* | Una subclase decide *qué* objeto crear. | Crear notificaciones distintas; widgets según plataforma. |
-| *Abstract Factory* | Familias de objetos que combinan entre sí. | Temas claro/oscuro; SDKs de pago con «cliente + recibo + webhook». |
-| *Builder* | Construir un objeto complejo paso a paso. | Query SQL/ORM; =NotificationCompat.Builder=; URLs de API. |
-| *Prototype* | Clonar en vez de construir desde cero. | Plantillas de documentos; configuraciones de entorno. |
-| *Singleton* | Una sola instancia global. | *Peligroso.* A veces un logger; casi nunca «el usuario actual». |
+| Patrón | Cuándo usarlo y por qué | No usarlo | Ya lo trae el lenguaje o el marco |
+|--------+-------------------------+-----------+-----------------------------------|
+| *Factory Method* | Hay que *crear* un objeto y el tipo concreto varía (notificación, widget de plataforma, lector de archivo). Por qué: el cliente no se llena de =new= ni de un =switch= por cada variante (abierto/cerrado). | Solo existe una clase concreta y no se prevé otra. | Java =Calendar.getInstance=; Android =NotificationCompat=; factories de Spring; en JS a menudo basta una función. |
+| *Abstract Factory* | Hay que crear *familias* que combinan entre sí (tema claro/oscuro: botón + campo + diálogo). Por qué: no mezclar un botón claro con un diálogo oscuro. | Se crea un solo objeto aislado: basta Factory Method o un constructor. | Temas de Flutter y de CSS; *appearance* de UIKit; kits de componentes de un design system. |
+| *Builder* | El objeto tiene muchos pasos u opciones (consulta SQL, notificación, URL, cliente HTTP). Por qué: evita constructores de diez parámetros y estados a medias. | El objeto tiene dos o tres campos obligatorios. | =StringBuilder= / =StringBuffer=; =NotificationCompat.Builder=; =Uri.Builder=; query builders de ORM; el builder de Elasticsearch. |
+| *Prototype* | Clonar es más barato o más fiel que construir (plantilla de documento, prototipo de configuración). Por qué: se parte de un ejemplar ya válido. | Un Factory o un literal es más claro. | =clone= / =copy= en Java y Python; =structuredClone= en JS; poco frecuente como jerarquía propia. |
+| *Singleton* | Debe existir *un punto de acceso* a un recurso de infraestructura (configuración, *pool* de conexiones vía el contenedor). Por qué: no hay N copias incoherentes de ese recurso. | Sesión de usuario, carrito, «la petición actual», «la ronda que se pinta». En web concurrente no es «una sola conexión TCP». | Contenedor de Spring (=@Component=); módulo ES (un solo objeto al importar); =object= de Kotlin; =Application= de Android. El contenedor de DI *ya* es el Singleton: no se escribe otro. |
 
 *** Estructurales
 
-| Patrón | Idea en una línea | Uso típico web / móvil |
-|--------+-------------------+------------------------|
-| *Adapter* | Traduce una interfaz ajena a la tuya. | Envolver API REST vieja; =RecyclerView.Adapter=; SDKs de mapas. |
-| *Bridge* | Separa abstracción de implementación para variar ambas. | Motor de render (Canvas vs. WebGL); almacenamiento local vs. nube. |
-| *Composite* | Árbol de objetos que se tratan igual (hoja o grupo). | Árbol DOM; menús; widgets anidados; archivos y carpetas. |
-| *Decorator* | Añade responsabilidad sin heredar explosivamente. | Middleware HTTP; HOC en React; =InputStream= envuelto. |
-| *Facade* | Puerta simple a un subsistema feo. | =CheckoutService= que orquesta inventario, pago y correo. |
-| *Flyweight* | Comparte estado intrínseco para ahorrar memoria. | Iconos repetidos; estilos; tiles de mapa. |
-| *Proxy* | Sustituto que controla acceso (caché, remoto, seguridad). | API Gateway; lazy load de imágenes; stub en tests. |
+| Patrón | Cuándo usarlo y por qué | No usarlo | Ya lo trae el lenguaje o el marco |
+|--------+-------------------------+-----------+-----------------------------------|
+| *Adapter* | Una API *ajena* no coincide con la que el dominio espera (JSON legado, SDK, lista de Android). Por qué: no se reescribe el código extranjero; se traduce. | Se controlan *ambos* lados y se puede cambiar la interfaz de origen. | =RecyclerView.Adapter=; convertidores de Retrofit/Jackson; funciones de mapeo DTO → dominio; =collections.abc= en Python. |
+| *Bridge* | Hay que variar *a la vez* la abstracción y la implementación (motor de dibujo Canvas frente a WebGL; almacenamiento local frente a nube). Por qué: no explotar una jerarquía de herencia. | Solo varía un lado: Adapter o Strategy bastan. Raro en un CRUD. | Drivers de BD detrás de JDBC/PDO; backends de render en motores gráficos. |
+| *Composite* | Una estructura en *árbol* debe tratarse igual si es hoja o grupo (menú, widgets, archivos y carpetas). Por qué: el cliente recorre sin preguntar el tipo. | La colección es una lista plana. | El DOM; el árbol de componentes de React; el árbol de *widgets* de Flutter. |
+| *Decorator* | Hay que *añadir* comportamiento (registro, credencial, compresión) sin copiar la clase núcleo ni inflar la herencia. Por qué: abierto/cerrado por envoltorio. | Un parámetro extra o un =if= único resuelve el caso. | Flujos de Java (=InputStream= envuelto); decoradores de Python; middleware HTTP; HOC o composición en React; interceptores de OkHttp. |
+| *Facade* | Un subsistema *propio* es ruidoso y el cliente solo necesita tres operaciones. Por qué: reduce el acoplamiento a muchas clases. *No es Adapter:* Adapter traduce una interfaz ajena. | La clase solo delega a un método: es ruido. | SDKs que ocultan varios servicios; =CheckoutService=; en Laravel el nombre *Facade* es otro mecanismo (acceso estático al contenedor): no confundir. |
+| *Flyweight* | Hay miles de objetos con *estado compartible* (iconos, teselas de mapa, glifos). Por qué: memoria. | Hay pocas instancias. | Caché de fuentes e imágenes; reutilización de celdas de lista (junto con Adapter). |
+| *Proxy* | Hay que *controlar* el acceso: pereza, caché, seguridad o remoto. Por qué: el cliente habla con el mismo contrato; el sustituto aplica la política. | No hay política: el salto extra no aporta nada. | Caché HTTP y CDN; =Proxy= de ES6; Glide/Coil/SDWebImage; *virtual proxy* de ORM (carga perezosa); API Gateway en el borde. |
 
 *** Comportamentales
 
-| Patrón | Idea en una línea | Uso típico web / móvil |
-|--------+-------------------+------------------------|
-| *Chain of Responsibility* | Una petición recorre handlers hasta que uno la atiende. | Middleware; filtros servlet; interceptores. |
-| *Command* | Encapsula una acción como objeto (deshacer, colas). | Undo en editores; jobs en segundo plano; deep links. |
-| *Interpreter* | Mini-lenguaje y su gramática. | Filtros de búsqueda; reglas de cupones. Raro y caro. |
-| *Iterator* | Recorrer una colección sin exponer su interior. | Listas, cursores de BD, =for...of=. |
-| *Mediator* | Un objeto centraliza la comunicación entre colegas. | Chat rooms; form wizard; a veces un ViewModel «demasiado grande». |
-| *Memento* | Foto del estado para deshacer. | Borradores; navegación back. |
-| *Observer* | Publicación/suscripción de cambios. | Eventos DOM; Rx; LiveData; WebSockets. |
-| *State* | El objeto cambia de clase-comportamiento según estado. | Máquinas de UI: idle / loading / success / error. |
-| *Strategy* | Intercambia algoritmos con la misma interfaz. | Ordenamiento; autenticación; cálculo de envío. |
-| *Template Method* | Esqueleto de algoritmo; los pasos varían en subclases. | Ciclo de vida de Activity/Fragment; pipelines ETL. |
-| *Visitor* | Nueva operación sobre una estructura sin tocarla. | Recorrer AST; reportes sobre un modelo estable. Poco frecuente en apps. |
+| Patrón | Cuándo usarlo y por qué | No usarlo | Ya lo trae el lenguaje o el marco |
+|--------+-------------------------+-----------+-----------------------------------|
+| *Chain of Responsibility* | Una petición debe pasar por *varios* manejadores que pueden atenderla o seguir (autenticación, cupo, registro). Por qué: el orden es la política; el núcleo no se llena de condicionales transversales. | Un solo manejador atiende siempre: se llama directamente. | Middleware de Express, Django, ASP.NET y Next.js; filtros de servlet; interceptores de OkHttp. |
+| *Command* | Una acción debe *reificarse*: deshacer, encolar, auditar o ejecutar en fondo. Por qué: la operación es un objeto con identidad, no un procedimiento suelto. | Un botón que llama a un método y nada más. | Acciones de Redux; WorkManager / =BGTaskScheduler=; cola de jobs (Sidekiq, Celery, Bull); pila de *undo* de editores. |
+| *Interpreter* | Hay un *mini-lenguaje* con gramática (reglas de cupones, filtros de búsqueda complejos). Por qué: las reglas cambian más que el código. | Tres reglas fijas: un =if= es más honesto. Raro y caro. | Expresiones regulares; motores de reglas; no inventar un lenguaje para un formulario. |
+| *Iterator* | Recorrer una colección *sin* exponer su representación interna. Por qué: el cliente no depende de arreglo frente a árbol. | Nunca se escribe uno propio sobre un arreglo del lenguaje. | =for...of= / =Iterable= de Java; =__iter__= de Python; cursores de BD; =Iterator= de la biblioteca estándar. |
+| *Mediator* | Varios objetos se conocen *todos entre todos* (formularios de varios pasos, colegas de un chat). Por qué: un objeto centraliza el diálogo. | El «mediador» absorbe toda la aplicación: es un God Object. | Coordinator de navegación iOS; a veces el ViewModel si se desborda; buses de UI con cuidado. |
+| *Memento* | Hace falta una *foto* del estado para deshacer o volver atrás. Por qué: el origen no expone su interior. | Basta guardar el valor anterior en una variable. | Historial del navegador; borradores; *undo* de texto; *snapshots* de estado. |
+| *Observer* | Varios interesados deben enterarse de un cambio *sin* que el sujeto los importe. Por qué: uno-a-muchos desacoplado. | Un solo llamador: una llamada directa. No armar una lista de oyentes *junto* a la del marco. | Eventos del DOM; =EventEmitter=; RxJava/RxJS; =LiveData= / =StateFlow=; Combine; reactividad de Vue/React; WebSocket en el borde. |
+| *State* | El comportamiento cambia según una *fase explícita* (idle / cargando / éxito / error). Por qué: se elimina el nudo de booleanos. | Un par de condicionales estables. | Tipos sellados de Kotlin/Swift; máquinas de estado de UI; =UiState= en MVI. |
+| *Strategy* | Una *familia de algoritmos* debe ser intercambiable (pago, ordenación, rival, autenticación). Por qué: el cliente depende del contrato, no de cada política. | Solo hay un algoritmo y no se prevé otro. | =Comparator= de Java; funciones de primera clase en JS/Python; *beans* inyectados en Spring; *hooks* o propiedades en React. |
+| *Template Method* | El *esqueleto* del algoritmo es fijo y varían los pasos (ciclo de vida, prueba unitaria, *pipeline*). Por qué: el marco llama, el código engancha. | Una clase base de miles de líneas. | =setUp= / =tearDown= de JUnit; ciclo =onCreate= / =onResume= de Android; *class-based views* de Django. |
+| *Visitor* | Hay que añadir *operaciones* sobre una estructura de tipos *estable* (AST, modelo que no se toca). Por qué: no modificar cada clase por cada reporte nuevo. | El modelo cambia a menudo: cada visita rompe. Poco frecuente en aplicaciones de negocio. | Recorrido de AST en compiladores y linters; serializadores sobre un modelo cerrado. |
+
+La regla de la tercera columna: *si el idioma o el marco ya realizan el patrón, esa es la implementación*. La jerarquía de 1994 se justifica cuando el lenguaje o el *runtime* no la ofrecen (código legado, servidor mínimo, lienzo sin *toolkit* de estado).
 
 ** Método de análisis
 
 Un análisis de patrón en esta unidad no consiste en reproducir la ficha de un manual. El protocolo siguiente obliga a situar el patrón en *un* problema, *unas* fuerzas y *una* plataforma:
 
 1. Enunciar el problema en términos de producto o de atributo de calidad, no de UML.
-2. Enumerar fuerzas: tiempo de entrega, prueba, rendimiento, tamaño de binario, latencia, madurez del equipo, e idiomas que el lenguaje ya ofrece.
-3. Representar el diseño actual y marcar el acoplamiento que impide el cambio.
-4. Proponer el patrón, justificar por qué ese y no un vecino (Adapter frente a Facade; Strategy frente a State), y qué *forma* admite el lenguaje.
-5. Diseñar contratos (interfaces, funciones, módulos), no el conjunto exhaustivo de clases.
-6. Enumerar consecuencias adversas. Si no hay costos, no hay análisis.
-7. Definir señales de que el patrón se ha convertido en antipatrón en ese contexto.
+2. Decir *cuándo* aplica: qué hecho del código o del producto dispara la necesidad (varias políticas de cobro, autenticación copiada en doce rutas, la vista se destruye al rotar).
+3. Decir *por qué esa estructura* y no la vecina (Adapter frente a Facade; Strategy frente a State).
+4. Preguntar si el *lenguaje* o el *marco ya la implementan*. Si sí, se usa el mecanismo nativo; si no, se diseña el contrato.
+5. Representar el diseño actual y marcar el acoplamiento que impide el cambio.
+6. Diseñar contratos (interfaces, funciones, módulos), no el conjunto exhaustivo de clases.
+7. Enumerar consecuencias adversas. Si no hay costos, no hay análisis.
+8. Definir señales de que el patrón se ha convertido en antipatrón en ese contexto.
 
 ** Orden de diseño
 
@@ -533,7 +567,7 @@ El esqueleto muestra *Strategy*: el duelo depende de un contrato «cómo elige e
   }
 #+end_src
 
-El patrón resuelve únicamente la *variación del algoritmo del rival*. El resto del sistema (fichas, ranking, red) se trata en las secciones de web y de móvil.
+El patrón resuelve únicamente la *variación del algoritmo del rival*. El resto del sistema (fichas, ranking, red) se trata en las secciones de web y de móvil. *Cuándo:* hay más de una política de elección y se prevé otra. *Por qué:* el duelo depende de un contrato, no de un =if=. *Ya lo trae el lenguaje:* en JavaScript basta pasar la función; en Java, la interfaz. No se reescribe Strategy si Spring ya inyecta la implementación.
 
 ** Síntesis de la introducción
 
@@ -544,40 +578,550 @@ Un patrón es, a la vez, vocabulario, estructura y consecuencias. El trabajo de 
 :CUSTOM_ID: patrones-web
 :END:
 
-Esta parte examina FeriaPPT como *aplicación web*: cliente en el navegador, servidor HTTP, persistencia del ranking y del cobro de vidas extra. El dominio (reglas del duelo) permanece; las fuerzas nuevas son las de HTTP y de la separación cliente–servidor. Fowler (P of EAA) y los patrones J2EE documentan la mayoría de las estructuras de esta sección; GoF aporta Strategy, Observer, Adapter, Decorator y Chain of Responsibility *dentro* de esas capas.
+Esta sección trata el *análisis y el diseño de patrones para aplicaciones web* como un problema de arquitectura distribuida, no como un listado de analogías sobre un minijuego. El caso FeriaPPT se introduce *después* de cada definición, únicamente como instanciación: sirve para observar cómo se combinan las estructuras, no para descubrir qué es el patrón.
 
-** Tablero de patrones web
+La bibliografía de esta parte es, principalmente, Fowler, /Patterns of Enterprise Application Architecture/ (P of EAA); Alur, Crupi y Malks, /Core J2EE Patterns/; Buschmann et al., POSA; y Gamma et al. (GoF) para las estructuras que operan *dentro* de una capa (Strategy, Observer, Adapter, Decorator, Chain of Responsibility, Facade, Proxy, Factory). Fielding aporta el estilo arquitectónico REST; Newman y Nygard, los patrones de integración y de resiliencia que la web de producción exige y que GoF no cubre.
 
-Aquí están *todos* los patrones de esta parte. Cada uno es una pieza del mismo minijuego. El detalle técnico va debajo del tablero.
+** Qué es un patrón de software en el contexto web
 
-|  # | Patrón | En FeriaPPT | Problema de diseño |
-|----+--------+-------------|-------------------|
-|----+--------------------------------------+----------------------------------------------------+---------------------------------------------------------|
-|  1 | *MVC*                                  | Marcador / tres botones / el clic                  | Separar reglas del duelo, pantalla y entrada            |
-|  2 | *Front Controller*                     | Una sola taquilla para todo el puesto              | Un solo lugar recibe /jugar, /ranking, /pagar           |
-|  3 | *Page Controller*                      | Un puesto por juego de la feria                    | Páginas sueltas cuando no hay un solo «portal»          |
-|  4 | *Template View*                        | Lona HTML con huecos (marcador, nombre)            | Pintar HTML sin meter SQL en la lona                    |
-|  5 | *MVVM / flujo unidireccional*          | El tablero de la ronda es *un* estado                | La vista se pinta; no se pelea a golpes con el marcador |
-|  6 | *Middleware (Chain of Responsibility)* | Portero: pulsera, cupo, admin                      | Políticas transversales *antes* de jugar                  |
-|  7 | *Decorator*                            | Ficha dorada: la ronda cuenta doble                | Añadir comportamiento envolviendo, no copiando          |
-|  8 | *Service Layer*                        | El feriante que aplica el reglamento               | El botón HTTP no decide quién gana                      |
-|  9 | *Repository*                           | Cajón de partidas y ranking                        | La UI no habla SQL ni JSON crudo                        |
-| 10 | *Unit of Work*                         | Ficha + partida se guardan juntas                  | O queda todo, o no queda nada                           |
-| 11 | *Strategy*                             | Rival aleatorio, copión o «siempre piedra»         | Cambiar de CPU sin reescribir el duelo                  |
-| 12 | *Factory*                              | Según el nivel, nace un rival distinto             | Crear el objeto adecuado sin =new= por toda la página     |
-| 13 | *Facade*                               | Un letrero: «tirar()»                              | Esconder RNG, reglas y puntaje detrás de 1 método       |
-| 14 | *Adapter*                              | Traductor de la máquina arcade vieja               | Su protocolo raro entra como una =Jugada= nuestra         |
-| 15 | *Observer*                             | Al ganar: globo, marcador y ranking se enteran     | Avisar a varios sin acoplarlos entre sí                 |
-| 16 | *Proxy + caché*                        | Ranking en un papelito mientras llega la red       | Controlar acceso, cachear, no bloquear el puesto        |
-| 17 | *REST (recurso)*                       | =/partidas/17= es *esa* partida                        | Identificar cosas, no «scripts que hacen cosas»         |
-| 18 | *API Gateway*                          | Puerta de toda la feria                            | Auth, cupo de fichas, ruteo a varios puestos            |
-| 19 | *BFF*                                  | JSON chico para el celular, HTML rico para la lona | Cada cliente recibe *su* vista de datos                   |
-| 20 | *Circuit Breaker*                      | Si el ranking nacional está caído, se juega igual  | No fundir el puesto insistiendo a un tercero muerto     |
-| 21 | *Hexagonal (puertos)*                  | El reglamento en el centro; HTTP y SQL son cables  | El duelo no depende de Express ni de Postgres           |
+Un patrón de diseño, en el sentido de Alexander adoptado por GoF, es una terna: un *problema* que se repite, un *contexto* de fuerzas, y una *estructura* de colaboración entre elementos que resuelve el conflicto con consecuencias conocidas. En la web ese contexto no es el de un proceso único con memoria compartida. Es el de un sistema *distribuido de petición y respuesta*:
 
-** FeriaPPT en el navegador: cómo se ve el juego
+- el cliente (navegador o consumidor de API) y el servidor no comparten espacio de direcciones;
+- el protocolo HTTP es, en su modelo de base, *sin estado* (cada petición se interpreta por sí misma, salvo que el diseño añada sesión, token o identificador de recurso);
+- la representación (HTML, JSON, etc.) viaja por la red y puede *fallar de forma parcial*: un nodo responde y otro no;
+- hay *varios clientes* (página renderizada en servidor, aplicación de una sola página, aplicación móvil, trabajo por lotes) sobre el mismo dominio.
 
-Imagina la página:
+Por tanto, un «patrón web» no es una clase especial de GoF. Es un patrón —de presentación, de dominio, de datos o de integración— *cuyas fuerzas están determinadas por HTTP, por la separación cliente–servidor y por la evolución de la interfaz pública*. Front Controller, Template View, Service Layer y Repository proceden de P of EAA y de J2EE; MVC y MVVM son organizaciones de la presentación; Circuit Breaker y API Gateway son patrones de integración. Todos pueden coexistir en un mismo sistema.
+
+** Un proyecto no tiene un patrón: tiene una composición
+
+La convivencia de varios patrones en un mismo sistema no es un caso excepcional ni un adorno avanzado: es el estado *normal* del software que supera un ejercicio de laboratorio. Casi ningún proyecto real se describe con un único nombre de catálogo. Distintas partes del código enfrentan *problemas distintos*; cada problema, si se reitera y tiene fuerzas identificables, admite *su* estructura. Preguntar «¿cuál es el patrón de esta aplicación?» confunde el sistema con una de sus colaboraciones.
+
+Los patrones no se eligen como estilo de la aplicación entera. Se eligen como herramientas acotadas: un módulo puede necesitar un algoritmo intercambiable (Strategy), otro una notificación a varios interesados (Observer), otro una traducción de interfaz (Adapter). El diseño consiste en *asignar* cada estructura al conflicto que resuelve, no en etiquetar el repositorio con un solo término.
+
+*** Ejemplo de convivencia: backend de un comercio electrónico
+
+Considérese el servidor de una tienda en línea. En *una misma* base de código, y a menudo en el transcurso de *una misma* operación de compra, pueden aparecer simultáneamente:
+
+| Patrón | Familia | Problema que resuelve en la tienda | Qué no resuelve |
+|--------+---------+------------------------------------|-----------------|
+| *Singleton* (con matices) | Creacional | Un único *punto de acceso* a un recurso compartido de infraestructura (p. ej. la configuración de la fuente de datos o el *pool* de conexiones). | El reglamento de precios, el cobro ni el modelo de usuarios. En un servidor concurrente *no* significa «una sola conexión TCP a la base»: significa un único administrador del *pool*. Un Singleton de «la compra actual» es, en web, un error. |
+| *Factory* | Creacional | Crear el perfil adecuado (administrador, vendedor, cliente) según el tipo de cuenta, sin dispersar condicionales de instanciación por los controladores. | Autenticar la petición ni persistir el pedido. |
+| *Observer* | Comportamental | Tras confirmarse una compra, notificar a inventario (descontar existencias) y a expedición (emitir guía) *sin* que el módulo de ventas importe esas clases concretas. | Garantizar atomicidad del cobro con el descuento de stock: si eso debe ser transaccional, hace falta Unit of Work, no solo un evento. |
+| *Strategy* | Comportamental | Intercambiar el algoritmo de cobro (tarjeta, transferencia, pasarela externa) bajo un mismo contrato, sin un =switch= creciente en el caso de uso. | Elegir *quién* crea la estrategia (eso puede ser Factory) ni traducir el protocolo del banco (eso puede ser Adapter). |
+
+Cuatro patrones, cuatro problemas, un solo caso de uso («confirmar pedido»). El caso de uso *no es* Singleton, ni Factory, ni Observer, ni Strategy: *los emplea*. Esa es la composición que debe leerse en un diseño web.
+
+El mismo razonamiento se aplica, más adelante, a FeriaPPT. Antes conviene fijar la idea en abstracto: *el proyecto es el contexto; el patrón es la respuesta local a una fuerza*.
+
+*** Composición a lo largo de una petición HTTP
+
+En una aplicación web la composición no es solo un conjunto de fichas GoF en el dominio. La petición HTTP típica atraviesa una *cadena de estructuras* de distintos catálogos, no un único diagrama:
+
+#+begin_example
+  Cliente (MVC / MVVM / flujo unidireccional)
+       │  representación HTTP
+       ▼
+  Borde (API Gateway, BFF, Proxy, caché)
+       │
+       ▼
+  Front Controller
+       │  Chain of Responsibility (autenticación, cupo, registro)
+       ▼
+  Controlador de aplicación (Page Controller o recurso)
+       │
+       ▼
+  Service Layer  (caso de uso)
+       │          Strategy, Factory, Facade, Observer de dominio
+       ▼
+  Repository + Unit of Work
+       │          Adapter hacia el motor de persistencia o un sistema ajeno
+       ▼
+  Almacén / servicio externo
+#+end_example
+
+Esas piezas no se eligen «todas a la vez» por catálogo. Se eligen porque hay *fuerzas distintas*:
+
+| Capa | Pregunta de diseño | Familia de patrones |
+|------+--------------------+---------------------|
+| Presentación cliente | ¿Quién posee el estado de la interfaz y cómo se actualiza? | MVC, MVVM, flujo unidireccional, Observer de DOM |
+| Presentación servidor | ¿Quién recibe la petición y quién construye la representación? | Front Controller, Page Controller, Template View, Transform View |
+| Políticas transversales | ¿Dónde viven autenticación, cupo, registro, CORS? | Chain of Responsibility, Decorator |
+| Aplicación / dominio | ¿Dónde está el caso de uso, independiente del canal HTTP? | Service Layer, Facade, Strategy, Factory, Observer de dominio |
+| Datos | ¿Cómo se persiste de forma coherente? | Repository, Unit of Work |
+| Integración | ¿Cómo se habla con otros sistemas y cómo se tolera el fallo? | Adapter, Proxy, API Gateway, BFF, Circuit Breaker, REST |
+
+Un mismo nombre (Observer, Adapter, Strategy) puede aparecer en *más de una capa* con consecuencias distintas. El Observer del DOM no es el Observer de dominio; el Adapter de un protocolo legado no es el Adapter hexagonal hacia la base de datos. El diseñador nombra *la capa* además del patrón.
+
+*** Cuándo no componer: sobreingeniería de catálogo
+
+Que varios patrones *puedan* convivir no implica que *deban* introducirse todos. Un error frecuente —sobre todo al aprender el catálogo— es insertar diez estructuras en un programa que no las necesita, con el único fin de demostrar que se conocen. El resultado es código ilegible, más tipos de los que el problema exige y un costo de mantenimiento superior al del diseño directo. En la literatura de antipatrones esto se relaciona con el *Golden Hammer* («si el único instrumento es el catálogo, todo parece un patrón») y con la violación de YAGNI.
+
+La regla es simple y debe enunciarse antes de cualquier ejemplo de juego o de tienda:
+
+1. Un patrón es una *solución a un problema que ya existe* (o que se prevé con fundamento).
+2. Si el problema no está presente, no se implementa la solución.
+3. La pregunta útil no es «¿cuántos patrones tiene el proyecto?», sino «¿qué fuerzas quedan sin estructura y cuáles ya están cubiertas?».
+
+Acumular MVC, arquitectura hexagonal, CQRS, Event Sourcing y BFF sobre un CRUD de tres pantallas no es madurez arquitectónica. Es ceremonia. La composición se justifica *problema a problema*, no por densidad de nombres GoF.
+
+** Fuerzas que el medio web impone al diseño
+
+Antes de nombrar catálogos conviene fijar las restricciones. Son independientes del ejemplo de la feria; cualquier aplicación web las hereda.
+
+| Fuerza | Implicación para el diseño |
+|--------+----------------------------|
+| HTTP sin estado | El «objeto de sesión de negocio» no existe en memoria de servidor salvo que se *reifique* (sesión, token, identificador de agregado). Un Singleton de proceso no es el estado del usuario. |
+| Cliente ≠ servidor | La validación en el navegador no sustituye la del servidor. Las reglas de dominio no deben vivir solo en JavaScript de página. |
+| Representación separable | El mismo recurso admite HTML, JSON u otro formato (Fowler: *Two-Step View*; Fielding: representación). |
+| Fallo parcial y latencia | Un ranking remoto o una pasarela de pago pueden no responder. El diseño incluye *tiempo de espera*, reintento selectivo y degradación, no una espera ilimitada. |
+| Evolución de la interfaz pública | Los clientes antiguos siguen existiendo. Versionado, idempotencia y contratos estables son patrones de integración, no adornos. |
+| Múltiples nodos | Escalar horizontalmente prohíbe estado mutable global de proceso como fuente de verdad. |
+
+El modelo de ejecución es *petición–respuesta* más una vista (documento o aplicación de una sola página), no un único espacio de memoria.
+
+** Capas y catálogos de referencia
+
+POSA describe la arquitectura en capas como patrón de *sistema*. P of EAA descompone la aplicación empresarial en presentación, lógica de dominio y fuente de datos. /Core J2EE Patterns/ especializa la presentación web (Front Controller, Intercepting Filter, View Helper). GoF no habla de HTTP; sus patrones se *instancian* dentro de esas capas.
+
+#+begin_example
+  [Cliente]     Entrada, estado de interfaz, enrutamiento en el navegador
+       ↕  HTTPS / HTML / JSON
+  [Borde]       CDN, cortafuegos de aplicación, API Gateway, BFF, proxy inverso
+       ↕
+  [Aplicación]  Controladores, casos de uso, dominio, autenticación
+       ↕
+  [Datos]       Repositorio, unidad de trabajo, caché, almacén
+#+end_example
+
+No se mezcla el patrón de la vista con el del cobro: esa mezcla es el origen del controlador-dios y de la plantilla que ejecuta SQL.
+
+** Lenguaje y marco de trabajo en la web
+
+La tesis de la introducción se aplica *antes* de elegir un patrón de esta sección. Front Controller, middleware o Strategy son *intenciones* estables; el código no lo es. Un Front Controller en PHP no se transcribe a un =DispatcherServlet= de Java cambiando la sintaxis. Un Strategy en Java (interfaz y una clase por política) no se transcribe a JavaScript como jerarquía de clases si el idioma del lenguaje es la función de primera clase.
+
+Duplicar el mecanismo que el marco ya ofrece no es «aplicar más patrones». Es un diseño en conflicto consigo mismo: dos contenedores de instancias, dos buses de eventos, dos cadenas de filtros.
+
+*** El lenguaje cambia la forma, no la intención
+
+| Intención | Forma habitual en Java / C# | Forma habitual en JavaScript / Python | Transcripción infundada |
+|-----------+-----------------------------+----------------------------------------|-------------------------|
+| Strategy | Interfaz y una clase por política | Función de primera clase | UML de Java en un módulo breve |
+| Observer | Interfaz y registro de oyentes | =EventEmitter=, suscripción del *toolkit* de UI | Lista propia de *listeners* junto al estado de React o Vue |
+| Decorator / cadena | Clases envolventes | Clausuras, =app.use= | Condicionales acumulados en el controlador |
+| Adapter | Clase que implementa un puerto | Función de mapeo DTO → dominio | Jerarquía para un JSON de tres campos |
+| Singleton de infraestructura | Contenedor de DI | Módulo ES o el propio contenedor | =object= global de «la petición actual» |
+
+*** El marco congela el diseño
+
+Johnson: un *framework* reutiliza diseño y deja puntos de extensión. En la web, esos puntos *son* el patrón. Ignorarlos equivale a diseñar dos veces.
+
+| Marco | Qué instancia (usar, no reescribir) |
+|-------+--------------------------------------|
+| Spring MVC | Front Controller (=DispatcherServlet=); Singleton e inyección (=@Component=); filtros |
+| Express / Fastify | Enrutador como frontal; middleware como Chain of Responsibility |
+| Django / Rails / Laravel | Frontal, Template View, ORM (Data Mapper o Active Record) |
+| Next.js / Nuxt | Enrutado como frontal; renderizado en servidor como Transform View |
+| React / Vue / Svelte | Estado de interfaz como Observer; no un bus paralelo al del *toolkit* |
+
+**** Instanciación: FeriaPPT
+
+Si el puesto se sirve con Express, autenticación y saldo son *middleware*. Si se sirve con Spring, son filtros o interceptores. No se añade una cadena GoF casera *junto* a la del marco. El rival intercambiable sigue siendo Strategy: en Java, tipos; en el cliente JavaScript, a menudo una función.
+
+** Catálogo de la sección
+
+La tabla es la guía de *decisión*. FeriaPPT no aparece aquí: primero se sabe cuándo y por qué, y si el marco ya lo trae.
+
+| Patrón | Cuándo usarlo y por qué | No usarlo | Ya lo trae |
+|--------+-------------------------+-----------+------------|
+| MVC | Hay que separar reglas, pantalla y entrada. Por qué: un cambio de HTML no debe romper el reglamento. | El «modelo» es el diccionario que viaja de la BD al DOM. | Rails, Django, ASP.NET MVC, Spring MVC (cada uno con *su* MVC). |
+| Front Controller | Varias URLs duplicarían autenticación, registro o errores. Por qué: un solo punto de entrada. | Meter el reglamento en el enrutador. | =DispatcherServlet=; =urls.py=; =app= de Express; kernel de Laravel; enrutador de Next.js. |
+| Page Controller | El sitio es de *páginas* (CMS, plantillas). Por qué: una clase por documento. | API amplia o SPA: la unidad ya no es la página. | Controladores de Rails/Laravel por recurso; vistas basadas en clases de Django. |
+| Template / Transform View | Hay que pintar HTML (o JSON) *con datos ya listos*. Por qué: la vista no habla SQL. | Consultas en la plantilla. | Jinja, EJS, Blade, JSP; React/Vue en SSR como Transform View. |
+| MVVM / flujo unidireccional | Varias zonas de la UI comparten estado. Por qué: un estado explícito; la vista se deriva. | Tres campos y un diálogo: Redux es ceremonia. | React (estado + *hooks*), Vue, Redux, Zustand. |
+| Chain of Responsibility | Políticas *transversales* antes del caso de uso. Por qué: el orden es el diseño. | Un solo chequeo: se llama directo. | Middleware de Express, Django, ASP.NET, Next.js; filtros servlet. |
+| Decorator | Añadir registro, métrica o «ficha dorada» sin copiar el núcleo. Por qué: envoltorio, no herencia explosiva. | Un =if= único basta. | Interceptores; *decorators* de Python; composición de funciones. |
+| Service Layer | El caso de uso debe invocarse desde HTTP, cola o CLI. Por qué: el controlador no es el negocio. | Una sola ruta que nunca se reutilizará y no se prueba. | Servicios de Spring; *jobs* de Rails; casos de uso a mano si el marco no los impone. |
+| Repository | La UI o el servicio no deben hablar SQL. Por qué: el dominio ve una colección. | Un envoltorio CRUD de cuarenta métodos vacíos. | Repositorios de Spring Data; *active record* de Rails (ojo: es otro patrón); Unit of Work del ORM. |
+| Unit of Work | Varios cambios deben confirmarse *juntos*. Por qué: no dejar cargo sin partida. | Una sola escritura. | Transacción del ORM (=session.commit=, =@Transactional=). |
+| Strategy | Varias políticas de algoritmo (pago, rival). Por qué: contrato común, sin =switch= creciente. | Una sola política estable. | Funciones en JS; interfaces + DI en Java; *beans* de Spring. |
+| Factory | El controlador no debe hacer =new= de cada subclase. Por qué: localiza la creación. | Un solo tipo concreto. | Factories de Spring; funciones fábrica en JS. |
+| Facade | El cliente no debe orquestar cinco servicios. Por qué: una operación de aplicación. | Delegar a un solo método. | Un servicio de aplicación; no confundir con *Facades* de Laravel. |
+| Adapter | Un protocolo o DTO ajeno no es el del dominio. Por qué: traducir, no contaminar. | Se controlan ambos lados. | Mapeadores Jackson/Gson; funciones de mapeo; clientes HTTP generados. |
+| Observer | Varios oyentes de un hecho de dominio. Por qué: el emisor no los importa. | Un solo llamador; o atomicidad (ahí va Unit of Work). | =EventEmitter=; eventos de dominio de Spring; colas (Rabbit, SQS) entre procesos. |
+| Proxy / caché | Controlar acceso o frescura (ranking público sí; saldo no). Por qué: el contrato se mantiene. | Caché de datos vivos sin invalidación. | Cabeceras HTTP; Redis; CDN; proxy inverso (Nginx). |
+| REST | Identificar *recursos* y representaciones. Por qué: no «scripts que hacen cosas». | =/ganar= como verbo suelto sin reconocerlo. | Enrutado REST de Rails/Django REST/Spring; no es «devolver JSON». |
+| API Gateway | Varios servicios detrás de un borde (auth, cupo, TLS). Por qué: no es el Service Layer. | Un monolito de tres rutas. | Kong, AWS API Gateway, Nginx, Spring Cloud Gateway. |
+| BFF | Dos clientes quieren *agregaciones distintas*. Por qué: el móvil no orquesta doce =fetch=. | Un solo cliente con un recurso ya adecuado. | Un servicio por canal; GraphQL a veces cubre el mismo dolor. |
+| Circuit Breaker | Un colaborador falla de forma reiterada. Por qué: degradar, no insistir. | Reintentar un 400 de validación. | Resilience4j, Hystrix (legado), *timeouts* de *fetch*, *policies* de Polly (.NET). |
+| Hexagonal | El dominio no debe importar Express ni el ORM. Por qué: pruebas y cambio de infraestructura. | Un CRUD de tres pantallas con ocho carpetas vacías. | Se diseña a mano; el marco no lo «activa». Los adaptadores HTTP y SQL *son* el patrón. |
+
+** Patrones de presentación en el servidor
+
+La pregunta de esta familia es: *quién recibe la petición HTTP y quién construye la respuesta*. No es la pregunta de quién gana una ronda.
+
+*** Front Controller
+
+**** Definición y problema
+
+Front Controller (Fowler; J2EE: el servlet frontal o el =DispatcherServlet=) concentra en *un objeto* la recepción de todas o casi todas las peticiones de un sitio o de una API. El problema que resuelve es la *duplicación de políticas transversales*: si cada URL es un script independiente, autenticación, registro, internacionalización y tratamiento de errores se copian —y divergen— en cada archivo.
+
+La estructura típica es: (1) un punto de entrada único; (2) interpretación de la petición (ruta, método, encabezados); (3) una cadena de filtros; (4) despacho a un manejador de aplicación; (5) serialización de la respuesta. El controlador frontal *no* es el lugar de las reglas de dominio; si las absorbe, se convierte en un God Object de infraestructura.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* hay (o habrá) muchas rutas y las políticas transversales se copiarían.
+- *Por qué:* un solo punto de entrada localiza autenticación, registro y el mapa de URLs.
+- *No:* el frontal no decide reglas de dominio.
+- *Ya lo traen:* Spring =DispatcherServlet=; Django (WSGI + =urls.py=); Express (=app=); Laravel (kernel HTTP); Next.js (enrutador). No se escribe un segundo frontal.
+
+**** Instanciación: FeriaPPT
+
+En el puesto en línea, =POST /partidas=, =GET /ranking= y =POST /pagos= entran por el mismo proceso de aplicación (=index.php=, =app.js=, servlet). No hay un script distinto por botón. El Front Controller despacha; no decide si papel cubre a piedra.
+
+*** Page Controller
+
+**** Definición
+
+Page Controller asigna *una clase o función por página o por recurso de granularidad gruesa*. Es adecuado cuando la unidad de diseño sigue siendo el documento (sitio de plantillas, CMS ligero). Deja de serlo cuando la unidad es el recurso de una API amplia o el estado de una SPA: entonces el Front Controller más manejadores de aplicación describe mejor el sistema.
+
+Coexiste con Front Controller: el frontal despacha; el Page Controller ejecuta *una* página. No son excluyentes.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* el sitio se diseña por documentos (CMS, plantillas, CRUD clásico).
+- *Por qué:* cada página tiene un responsable claro.
+- *No:* API de muchos recursos o SPA, donde la unidad ya no es la página.
+- *Ya lo traen:* controladores de Rails, Laravel y ASP.NET por recurso; *class-based views* de Django.
+
+**** Instanciación: FeriaPPT
+
+Un minijuego adicional de la feria (tiro al blanco) puede tener su propio controlador de página, mientras el recinto comparte el frontal y los filtros de autenticación.
+
+*** Template View y Transform View
+
+**** Definición
+
+- *Template View:* un documento con huecos que se rellenan con datos ya preparados (=Jinja=, =EJS=, =Blade=, JSP). La plantilla no consulta el almacén.
+- *Transform View:* un programa *construye* la representación a partir del modelo (p. ej. un componente React en renderizado en servidor, o una transformación XSLT).
+
+En ambos casos la vista *no* es el dominio. SQL o llamadas HTTP embebidas en la plantilla violan la separación y hacen inmanejable la prueba.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* hay que producir HTML (o una representación) a partir de datos *ya* obtenidos.
+- *Por qué:* la vista no conoce persistencia; se puede cambiar el motor de plantillas sin tocar el dominio.
+- *No:* =SELECT= dentro de Jinja/Blade/EJS.
+- *Ya lo traen:* Jinja, EJS, Blade, JSP, Twig (Template View); React/Vue/Svelte en renderizado de servidor (Transform View).
+
+**** Instanciación: FeriaPPT
+
+El HTML del marcador recibe =fichas= y =resultado= como datos. No ejecuta una consulta del ranking dentro de la plantilla.
+
+*** MVC en aplicaciones web
+
+**** Definición
+
+MVC, originado en Smalltalk-80 (Reenskaug; popularizado por GoF como organización de interfaz), separa *tres* roles:
+
+| Rol | Responsabilidad |
+|-----+-----------------|
+| *Model* | Estado y reglas de dominio. Independiente del protocolo de entrega y de la hoja de estilo. |
+| *View* | Presentación. No decide reglas de negocio. |
+| *Controller* | Traduce la entrada del usuario en operaciones sobre el modelo y selecciona la vista. |
+
+El MVC de Smalltalk *no coincide* con el de Rails ni con el de Angular. En Rails el «modelo» suele ser el registro activo; en una SPA el «modelo» del cliente es a menudo un DTO más estado de interfaz. Conviene decir *qué MVC* se está usando.
+
+En una aplicación de una sola página hay, con frecuencia, *dos MVC anidados*: el del servidor (API + dominio + persistencia) y el del cliente (controles + estado de UI). No son el mismo objeto en memoria. Tratarlos como uno solo produce el antipatrón de enviar el agregado persistente completo al navegador y mutarlo allí como si fuera la fuente de verdad.
+
+Señales de MVC degradado: el controlador ejecuta SQL y concatena HTML; la plantilla llama a la base de datos; el «Model» es un diccionario único que atraviesa todas las capas.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* coexisten reglas de negocio, una representación y entrada del usuario.
+- *Por qué:* un cambio de presentación no debe reescribir el reglamento, ni al revés.
+- *No:* llamar «MVC» al hecho de tener carpetas =models/= =views/= =controllers/= con SQL en las tres.
+- *Ya lo traen:* Rails, Django, Spring MVC, ASP.NET MVC, Angular. Cada uno redefine los roles: hay que decir *qué* MVC. En React no hay controlador clásico: el estado y los *hooks* cubren parte del rol.
+
+**** Instanciación: FeriaPPT
+
+| Rol | En el puesto web |
+|-----+------------------|
+| Model | Fichas, ronda, reglamento del duelo |
+| View | Controles de tirada y texto de resultado |
+| Controller | El clic «papel» se traduce en *registrar tirada*, no en pintar el DOM a mano desde la regla |
+
+*** MVVM y flujo unidireccional en el cliente
+
+**** Definición
+
+MVVM (Model–View–ViewModel) introduce un objeto de presentación que *expone estado observable* a la vista. El flujo unidireccional (Flux, Redux y variantes) restringe aún más la actualización: la entrada se reifica como acción o comando; una función de reducción produce un *nuevo* estado; la vista se suscribe (Observer) y se vuelve a derivar.
+
+Es una composición: *Command* (la intención del usuario) + *Observer* (la suscripción) +, a menudo, un *Facade* sobre el estado. No sustituye al Service Layer del servidor. Redux está justificado cuando varias regiones de la interfaz comparten un estado no trivial. Es ceremonia inútil cuando el estado es un marcador de tres campos y un diálogo.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* marcador, panel lateral y avisos deben leer *el mismo* estado de cliente.
+- *Por qué:* un único flujo de actualización evita que cada componente mute el DOM del vecino.
+- *No:* tres botones y un diálogo; no sustituye al servicio del servidor.
+- *Ya lo traen:* estado y *hooks* de React; reactividad de Vue; Redux, Zustand, Pinia. No un =EventEmitter= paralelo al del *toolkit*.
+
+**** Instanciación: FeriaPPT
+
+El tablero de la ronda es un único valor ={ fichas, tuTirada, rivalTirada, resultado }=. Marcador, aviso de victoria y panel de ranking *leen* ese valor; no escriben en el DOM del vecino. Tres botones y un diálogo modal no requieren un almacén global.
+
+** Middleware: Chain of Responsibility y Decorator
+
+**** Definición
+
+Chain of Responsibility (GoF) articula una sucesión de manejadores que pueden tratar la petición o delegar al siguiente. En marcos HTTP esa cadena se llama *middleware* o *Intercepting Filter* (J2EE): la firma habitual es =(petición, respuesta, siguiente)=. El *orden es parte del diseño*: autenticar *después* de ejecutar el caso de uso no autentica.
+
+Decorator (GoF) envuelve un manejador para añadir comportamiento (registro, métrica, transformación de la respuesta) sin modificar el núcleo. En la práctica, middleware y Decorator se superponen; la distinción útil es: la cadena *decide si continuar*; el decorador *añade* y siempre delega, salvo error.
+
+Consecuencia negativa: el estado mutado en =req= a lo largo de doce filtros es difícil de depurar. Los filtros no implementan el reglamento de dominio; implementan políticas transversales.
+
+#+begin_src javascript
+  function autenticar(req, res, next) {
+    if (!req.headers.authorization) return res.status(401).end();
+    next();
+  }
+  function exigirSaldo(req, res, next) {
+    if (req.jugador.fichas < 1) return res.status(402).end();
+    next();
+  }
+  // app.post("/partidas", autenticar, exigirSaldo, jugarRonda)
+#+end_src
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* autenticación, cupo, CORS o registro deben ejecutarse en *muchas* rutas.
+- *Por qué:* el caso de uso no se llena de políticas transversales; el *orden* de la cadena es el diseño.
+- *No:* un único chequeo en una única ruta; el middleware no aplica el reglamento.
+- *Ya lo traen:* =app.use= de Express; middleware de Django, ASP.NET y Next.js; filtros de servlet; interceptores de Axios/OkHttp. No una cadena GoF casera *junto* a esa.
+
+**** Instanciación: FeriaPPT
+
+Antes de =POST /partidas= la cadena verifica credencial, saldo de fichas y, en su caso, límite de frecuencia. El Decorador de «ficha dorada» puede envolver el cálculo de puntaje para duplicarlo *sin* copiar =jugarRonda=.
+
+** Patrones de dominio y de aplicación
+
+*** Service Layer
+
+**** Definición
+
+Service Layer (Fowler) agrupa *casos de uso* de la aplicación detrás de una API de operaciones (=jugarRonda=, =comprarVida=). El controlador HTTP se limita a autenticar el canal, deserializar, invocar el servicio y traducir el resultado a códigos de estado. Así el mismo caso de uso es invocable desde la web, desde un trabajo programado o desde una cola.
+
+Si la operación vive en la función de ruta del marco, no hay reutilización ni prueba sin HTTP.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* el mismo caso de uso debe poder llamarse desde HTTP, una cola o un comando de consola.
+- *Por qué:* el controlador solo traduce el canal; el negocio se prueba sin servidor.
+- *No:* una ruta única que nunca se reutilizará y cuyo «servicio» es un alias vacío.
+- *Ya lo traen:* =@Service= de Spring; *jobs* y *service objects* en Rails; en Express/Django *no* viene impuesto: hay que extraerlo a un módulo. El marco HTTP no es el Service Layer.
+
+**** Instanciación: FeriaPPT
+
+=jugarRonda(jugadorId, "papel")= descuenta la ficha, elige rival, aplica el reglamento y registra. Express o Django no contienen la decisión de quién gana.
+
+*** Repository y Unit of Work
+
+**** Definición
+
+Repository (Evans; Fowler) presenta los agregados como una *colección* con criterios de búsqueda. Oculta el modelo relacional o documental. No es un envoltorio de «cuarenta métodos CRUD»: expone lo que el dominio necesita.
+
+Unit of Work registra los objetos modificados en una operación de negocio y los *confirma de forma atómica* (o los revierte). Impide el estado a medias: un cargo aplicado y un agregado no persistido.
+
+Riesgo habitual: ORM + vista = consultas N+1.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Repository — cuándo:* la aplicación no debe hablar SQL (ni el esquema documental) desde la UI o el controlador. *Por qué:* el dominio ve una colección de agregados. *No:* cuarenta métodos CRUD que nadie llama.
+- *Unit of Work — cuándo:* dos o más escrituras deben confirmarse juntas. *Por qué:* no dejar un cargo sin la partida. *No:* una sola sentencia.
+- *Ya lo traen:* Spring Data; =@Transactional=; la sesión del ORM (Hibernate, SQLAlchemy, Entity Framework) *es* la unidad de trabajo. Rails *Active Record* es otro patrón (el objeto de dominio *es* la fila): no llamarlo Repository si no lo es.
+
+**** Instanciación: FeriaPPT
+
+=partidas.guardar=, =ranking.top10=. La unidad de trabajo confirma *juntos* el descuento de ficha y el alta de la ronda.
+
+*** Adapter
+
+**** Definición
+
+Adapter (GoF) convierte la interfaz de una clase en la que el cliente espera. En sistemas web aparece en dos escalas: (1) un protocolo o DTO externo hacia el modelo de dominio; (2) un *adaptador hexagonal* que implementa un puerto. Anti-Corruption Layer (Evans) es Adapter *más* traducción de lenguaje ubicuo: no solo de tipos.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* un JSON, un SDK o un protocolo legado no coinciden con los tipos del dominio.
+- *Por qué:* se traduce en el borde; el reglamento no se llena de nombres ajenos.
+- *No:* se controlan ambos lados y se puede cambiar el origen.
+- *Ya lo traen:* convertidores Jackson/Gson; mapeo de Retrofit; funciones de mapeo en JS/Python. Una clase Adapter solo si hay contrato y tests; si no, una función basta.
+
+**** Instanciación: FeriaPPT
+
+Una máquina que envía =R= / =P= / =S= se adapta a =piedra= / =papel= / =tijera=. El término ajeno «crédito» se traduce a «ficha» *antes* de entrar al reglamento.
+
+*** Facade
+
+**** Definición
+
+Facade ofrece una interfaz reducida sobre un conjunto de clases. *No es Adapter:* Adapter traduce una interfaz existente; Facade *simplifica un subsistema propio*. Pueden componerse: una Facade de aplicación que, por dentro, usa Adapter y Strategy.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* el controlador tendría que orquestar cinco servicios para *una* operación de negocio.
+- *Por qué:* un método de aplicación oculta el ruido.
+- *No:* una clase que solo llama a un método (capa fantasma). No confundir con las *Facades* de Laravel (acceso estático al contenedor).
+- *Ya lo traen:* no suele venir «de fábrica»; se escribe como servicio de aplicación. Los SDK de pago a menudo *son* una Facade sobre varias APIs.
+
+**** Instanciación: FeriaPPT
+
+=puesto.tirar("papel")= oculta generación aleatoria, reglamento, puntaje y emisión de evento. El controlador llama a un método, no a cinco servicios.
+
+*** Strategy y Factory
+
+**** Definición
+
+Strategy encapsula algoritmos intercambiables. Factory encapsula *qué clase instanciar*. En el servidor web, Strategy suele modelar variaciones de política (cálculo, proveedor, canal de notificación); Factory evita que el controlador de presentación conozca las clases concretas.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Strategy — cuándo:* hay (o se prevé) más de un algoritmo para el mismo contrato (pasarela, rival, ordenación). *Por qué:* abierto/cerrado sin un =switch= en el controlador HTTP. *No:* una sola política estable.
+- *Factory — cuándo:* la creación depende de un dato (nivel, tipo de cuenta) y no debe vivir en la ruta. *Por qué:* localiza los =new=.
+- *Ya lo traen:* en Java/C#/Kotlin, interfaz + inyección de Spring/Hilt. En JavaScript y Python, una función es Strategy; una función que devuelve otra es Factory. No copiar el UML de Java a un módulo de diez líneas.
+
+**** Instanciación: FeriaPPT
+
+| Variación | Patrón | Motivo |
+|-----------+--------+--------|
+| Rival aleatorio, copión o constante | Strategy | Mismo contrato =elegir= |
+| Alta del rival según un parámetro de nivel | Factory | La ruta no instancia cada subclase a mano |
+| Pasarela de pago (simulada, Stripe, vale) | Strategy + Adapter | El dominio cobra; el adaptador habla con el proveedor |
+| Un canal de aviso frente a varios oyentes | Strategy u Observer | Uno u otro según haya *un* destino o *varios* |
+
+*** Observer
+
+**** Definición
+
+Observer define una dependencia uno-a-muchos: al cambiar el sujeto, los observadores se actualizan. En proceso, un bus de eventos o =EventEmitter= basta. Entre procesos, el patrón deriva hacia publicación–suscripción: aparecen *entrega al menos una vez* e *idempotencia*. Si la operación debe ser atómica con la persistencia, un evento asíncrono ingenuo no sustituye a una unidad de trabajo o a una bandeja de salida transaccional (*transactional outbox*).
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* varios módulos deben reaccionar a un hecho (compra confirmada, ronda ganada) *sin* que el emisor los importe.
+- *Por qué:* uno-a-muchos desacoplado.
+- *No:* un solo llamador; o cuando cobro e inventario deben ser atómicos (Unit of Work, no un evento ingenuo).
+- *Ya lo traen:* =EventEmitter=; eventos de dominio de Spring; DOM y estado de React/Vue *en el cliente*; colas (RabbitMQ, SQS) *entre* procesos. No una lista de oyentes junto al mecanismo nativo.
+
+**** Instanciación: FeriaPPT
+
+El dominio emite =RondaGanada=. Interfaz, marcador y ranking *escuchan*. El dominio no importa el componente visual del aviso. El correo de diploma no debe bloquear la respuesta HTTP de la tirada.
+
+** Patrones de API e integración
+
+*** Recurso REST
+
+**** Definición
+
+REST (Fielding) es un *estilo arquitectónico*, no un sinónimo de «JSON sobre HTTP». Los elementos pertinentes para el diseño de la interfaz son: identificación de recursos, representaciones, operaciones uniformes, hipermedios (en el modelo completo) e independencia de sesión de servidor. Un verbo de negocio colgado de una URL (=/ganar=) suele ser una *acción* disfrazada de recurso; a veces es aceptable, pero debe reconocerse como desviación.
+
+La idempotencia de operaciones financieras o de creación bajo reintento de red es un patrón de integración (clave de idempotencia), no un patrón GoF.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* se publica una API HTTP que otros clientes consumirán y evolucionará.
+- *Por qué:* recursos identificables, verbos uniformes e idempotencia bajo reintento. REST no es «devolver JSON».
+- *No:* un RPC (=/ganar=) disfrazado de recurso *sin* reconocerlo; o JSON sobre HTTP sin contrato de recurso.
+- *Ya lo traen:* enrutado REST de Rails, Django REST Framework, Spring =@RestController=. El marco *ayuda* a declarar rutas; el diseño del recurso lo hace el equipo.
+
+**** Instanciación: FeriaPPT
+
+=/partidas/17= y =/jugadores/ana/fichas= identifican recursos. =POST /partidas= crea una ronda. El cobro de vidas extra lleva clave de idempotencia para que un doble envío por latencia no cobre dos veces.
+
+*** API Gateway y BFF
+
+**** Definición
+
+API Gateway concentra en el *borde* autenticación, limitación de frecuencia, terminación TLS y ruteo hacia servicios internos. No es el Service Layer: no contiene el reglamento.
+
+BFF (*Backend for Frontend*) es una Facade de API *por clase de cliente*: cada interfaz recibe la agregación y el grano de datos que necesita. Evita que el cliente orqueste una docena de recursos para pintar una pantalla.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Gateway — cuándo:* hay varios servicios internos y hace falta un borde común (TLS, autenticación, cupo, ruteo). *Por qué:* esas políticas no son el reglamento. *No:* un monolito de tres rutas.
+- *BFF — cuándo:* web y móvil (o lona y celular) necesitan *distinta* agregación. *Por qué:* cada cliente no orquesta doce peticiones. *No:* un solo cliente cuyo recurso ya es adecuado.
+- *Ya lo traen:* Kong, AWS API Gateway, Nginx, Spring Cloud Gateway (Gateway). El BFF se escribe como servicio (a veces GraphQL cubre el mismo dolor). Ninguno sustituye al Service Layer.
+
+**** Instanciación: FeriaPPT
+
+El recinto (PPT, otros puestos, caja) entra por la pasarela. El cliente móvil pide un JSON mínimo del tablero; la pantalla de sala pide tabla de ranking e imágenes. No es un defecto de Factory: son *dos consumidores* con contratos distintos. Si la SPA realiza doce peticiones para el marcador, falta agregación en servidor.
+
+*** Proxy, caché y red de distribución
+
+**** Definición
+
+Proxy (GoF) controla el acceso a un sujeto: virtual (pereza), de protección, remoto o de caché. En la web, caché HTTP y CDN son Proxys de representación. El criterio es la *frescura del dato*: un agregado de solo lectura tolera caché; un saldo no.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* hay que diferir, cachear o proteger un recurso *sin* cambiar el contrato que ve el cliente.
+- *Por qué:* el sustituto aplica la política (frescura, seguridad, pereza).
+- *No:* cachear un saldo o un token sin invalidación.
+- *Ya lo traen:* cabeceras =Cache-Control=; Redis; CDN (CloudFront, Cloudflare); Nginx como proxy inverso; =Proxy= de ES6 en el lenguaje.
+
+**** Instanciación: FeriaPPT
+
+El top 10 público puede cachearse decenas de segundos. El saldo de fichas, no. Los avatares estáticos van a la CDN.
+
+*** Circuit Breaker, reintento y mamparo
+
+**** Definición
+
+Estos patrones proceden de la literatura de sistemas distribuidos (Nygard, /Release It!/; patrones de microservicios), no de GoF. Timeout acota la espera. Retry con retroceso reintenta fallos *transitorios* (no un 400 de validación). Circuit Breaker deja de invocar a un colaborador que ha fallado de forma reiterada y ofrece una respuesta degradada. Bulkhead (mamparo) aísla pools de recursos para que el agotamiento de un colaborador no detenga otro caso de uso.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* se llama a un servicio *ajeno* que puede fallar o tardar (pasarela, ranking federado).
+- *Por qué:* el proceso propio no debe bloquearse ni insistir contra un nodo muerto.
+- *No:* reintentar un 400; un =await= sin tiempo de espera.
+- *Ya lo traen:* Resilience4j; Polly (.NET); *timeouts* de =fetch= y de clientes HTTP; políticas de Envoy/Istio. GoF no los cubre: hay que buscarlos en bibliotecas de resiliencia, no en una jerarquía de clases de 1994.
+
+**** Instanciación: FeriaPPT
+
+| Patrón | Comportamiento |
+|--------+----------------|
+| Timeout | Si el ranking federado excede el umbral, la ronda local concluye |
+| Retry | Reintentar un 503; no reintentar un 400 |
+| Circuit Breaker | Tras fallos seguidos, servir ranking local y cesar llamadas un intervalo |
+| Bulkhead | El pool del duelo no se agota porque el de pagos está bloqueado |
+
+** Patrones de arquitectura que enmarcan a los de diseño
+
+*** Capas
+
+La arquitectura en capas (POSA) ordena dependencias: presentación → aplicación → dominio → infraestructura. El riesgo es la capa fantasma (objetos que solo delegan) y la inversión indebida (el dominio importa el ORM).
+
+*** Hexagonal: puertos y adaptadores
+
+Cockburn: el dominio ocupa el centro; los *puertos* son interfaces que él define; los *adaptadores* implementan esos puertos hacia HTTP, SQL o un proveedor. Adapter deja de ser un ejemplo de aula y pasa a ser la *frontera* del programa. El reglamento no depende de Express ni de un motor concreto.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* el dominio debe probarse y evolucionar *sin* arrastrar el marco HTTP ni el ORM; o se prevé cambiar de infraestructura.
+- *Por qué:* las dependencias apuntan hacia adentro.
+- *No:* un CRUD de tres pantallas con ocho carpetas vacías llamadas =domain/=.
+- *Ya lo traen:* ningún marco lo «activa». Se diseña: puertos (interfaces) y adaptadores (Spring MVC, Express, Room, Postgres). El valor es la frontera, no el número de directorios.
+
+**** Instanciación: FeriaPPT
+
+Puertos: repositorio de partidas, reloj, pasarela de vidas. Adaptadores: HTTP, Postgres, Stripe. Las pruebas del duelo no levantan un servidor web.
+
+*** CQRS
+
+Separar el modelo de *escritura* del de *lectura* (Young; Fowler). Útil cuando la proyección de consulta no se parece al agregado transaccional. El costo es la duplicación de modelos y la consistencia eventual. No es requisito de un laboratorio de tres recursos.
+
+** El caso FeriaPPT como composición, no como origen del patrón
+
+Hasta aquí el catálogo. El minijuego *instancia varios patrones a la vez*. La interfaz siguiente no «es» MVC: MVC es *una* de las estructuras que la organizan.
 
 #+begin_example
   ┌─────────────────────────────────────────────┐
@@ -592,446 +1136,426 @@ Imagina la página:
            clic  ──HTTP POST /partidas──►  servidor
 #+end_example
 
-Esa interfaz implica *varios* problemas de diseño simultáneos (presentación, autenticación, decisión del ganador, persistencia, notificación). Concentrarlos en un solo script de controlador es el antipatrón habitual: una sola unidad con baja cohesión y alto acoplamiento.
-
-** Contexto: restricciones de la web
-
-Una aplicación web no es un programa de escritorio con una capa HTML. En FeriaPPT:
-
-| Fuerza | Manifestación |
-|----------+----------------|
-| *HTTP sin estado* | Cada petición es independiente. La ronda no existe en memoria de servidor salvo sesión, token o identificador de partida. |
-| *Cliente distinto del servidor* | La entrada vive en el navegador; las reglas y el ranking, en el servidor. No hay un objeto compartido en un único espacio de direcciones. |
-| *Múltiples nodos* | Un Singleton de proceso no es «la partida del sistema». |
-| *Latencia y fallo parcial* | Un ranking remoto puede no responder; la partida local no debe bloquearse. |
-| *Seguridad en el perímetro* | Ocultar un control en el cliente no sustituye la validación en servidor. |
-| *Evolución de la API* | Las partidas antiguas deben seguir siendo interpretables. |
-
-El modelo es petición–respuesta más una vista (HTML o SPA), no un único espacio de memoria compartida.
-
-** Mapa de capas donde viven los patrones web
-
-No mezclar el patrón de la vista con el del cobro.
-
-#+begin_example
-  [Navegador]  Entrada, estado de UI, enrutamiento, PWA
-       ↕  HTTPS / JSON / HTML
-  [Borde]      CDN, API Gateway, WAF, BFF, proxy inverso
-       ↕
-  [Aplicación] Controladores, casos de uso, dominio, autenticación
-       ↕
-  [Datos]      Repositorio, Unit of Work, caché, base de datos
-#+end_example
-
-Un mismo nombre (p. ej. Observer) aparece en varias capas con consecuencias distintas. El clic en el botón es Observer del DOM; «partida ganada → actualizar ranking» es Observer de dominio.
-
-** Patrones de presentación en el servidor
-
-Quién recibe la petición HTTP y quién construye la respuesta.
-
-*** Front Controller
-
-- En FeriaPPT: jugar, consultar el ranking o comprar una vida entran por el mismo punto (=index.php=, Express, servlet, Rails).
-- *Problema:* si cada URL es un script independiente, cada uno duplica autenticación, registro e internacionalización.
-- *Diseño:* un punto de entrada interpreta la petición, aplica filtros, delega según la ruta y serializa la respuesta.
-- *Consecuencias:* un solo lugar para políticas transversales. Costo: el controlador frontal se degrada si absorbe reglas de dominio.
-- *En la práctica:* Django, Rails, Spring MVC, Express, ASP.NET, Next.js.
-
-*** Page Controller
-
-- En FeriaPPT: recursos o páginas relativamente independientes (p. ej. un minijuego adicional) pueden tener su propio controlador.
-- *Diseño:* una clase o función por página o recurso.
-- *Cuándo:* sitios pequeños con plantillas. *Cuándo no:* API amplia o SPA, donde la unidad ya no es la «página».
-
-*** Template View y Transform View
-
-- *Template View:* documento con huecos (=Jinja=, =EJS=, =Blade=).
-- *Transform View:* un programa construye la representación a partir del modelo (p. ej. React en SSR).
-- La vista no consulta persistencia. No hay SQL en la plantilla.
-
-*** MVC en web
-
-El MVC de Smalltalk no coincide con el de Rails ni con el de Angular.
-
-| Rol | Responsabilidad | En FeriaPPT |
-|-----+-----------------+-------------|
-| *Model* | Estado y reglas de dominio. Independiente de HTTP y de CSS. | Fichas, ronda, reglamento. |
-| *View* | Presentación. No decide el ganador. | Controles de tirada y texto de resultado. |
-| *Controller* | Traduce la entrada en operaciones sobre el modelo. | El clic «papel» se convierte en registrar tirada. |
-
-En una SPA hay *dos MVC anidados*: uno en el servidor (API de partidas) y otro en el cliente (botones). El Model del navegador es DTO + estado de UI; el del servidor es dominio + persistencia. No son el mismo objeto en memoria.
-
-Señales de mal MVC en el puesto: el controlador hace SQL y arma HTML; la plantilla llama a la base; el «Model» es un =dict= gigante que viaja de punta a punta.
-
-*** MVVM y flujo unidireccional en el cliente
-
-En SPA (React, Vue, Angular, Svelte):
-
-- *View:* los botones.
-- *ViewModel / store:* ={ fichas, tuTirada, rivalTirada, resultado }=.
-- Flujo unidireccional (Flux/Redux): el clic *entra por un solo camino*, el estado se reduce, la vista se suscribe (*Observer + Command*).
-
-Redux brilla si el marcador, el ranking lateral y el globo de «¡ganaste!» comparten estado. Estorba si solo hay tres botones y un =alert=.
-
-** Middleware y Chain of Responsibility
-
-- En FeriaPPT: antes de =POST /partidas= pasa una fila de porteros: «¿pulsera?», «¿te quedan fichas?», «¿no vas a 200 clics por segundo?». Cada uno deja pasar o te saca.
-- *Diseño:* =(req, res, next)=. El *orden es el diseño*: el portero de pulsera *después* del duelo no sirve.
-- *Patrón GoF:* Chain of Responsibility. *Decorator* si envuelves el handler (ficha dorada = puntaje doble).
-- *Costo:* depurar «quién mutó =req.jugador=» se pone opaco. El portero no aplica el reglamento del duelo; solo políticas transversales.
-
-#+begin_src javascript
-  function pulsera(req, res, next) {
-    if (!req.headers.authorization) return res.status(401).end();
-    next();
-  }
-  function quedanFichas(req, res, next) {
-    if (req.jugador.fichas < 1) return res.status(402).end();
-    next();
-  }
-  // app.post("/partidas", pulsera, quedanFichas, jugarRonda)
-#+end_src
-
-** Patrones de dominio y aplicación
-
-*** Service Layer
-
-- En FeriaPPT: =jugarRonda(jugadorId, "papel")= descuenta ficha, elige rival, decide ganador, anota. El controlador HTTP solo traduce status codes.
-- *Problema:* si eso vive en la ruta Express, no puedes reutilizarlo desde un job nocturno («cerrar la feria y recuenta») ni desde GraphQL.
-- *Consecuencia:* el caso de uso es invocable desde web, CLI o cola.
-
-*** Repository y Unit of Work
-
-- *Repository:* =partidas.guardar=, =ranking.top10=. Parece una colección en memoria; por detrás hay SQL o un archivo.
-- *Unit of Work:* descontar la ficha *y* guardar la partida *juntos*. Si el ranking falla a medias, no quieres «ficha cobrada, partida evaporada».
-- *Diseño:* el repositorio expone lo que el duelo necesita, no un CRUD de 40 métodos por capricho. Cuidado con ORM + plantilla = consultas N+1 (ir a la BD una vez por cada fila del ranking).
-
-*** Adapter
-
-- En FeriaPPT: llega una máquina de los 90 que manda =R= / =P= / =S= en bytes. Nuestro dominio habla =piedra= / =papel= / =tijera=.
-- *Adapter:* traduce *su* interfaz a *la nuestra*.
-- *Anti-Corruption Layer:* además traduce *lenguaje*. Ellos dicen «crédito»; nosotros «ficha». El reglamento no se llena de nombres ajenos.
-
-*** Facade
-
-- =puesto.tirar("papel")= por detrás: RNG, reglamento, puntaje, evento.
-- *No es Adapter:* Adapter traduce una interfaz. Facade *simplifica un subsistema*. En el puesto caben ambos: Facade de duelo que por dentro usa Adapter de la arcade y Strategy del rival.
-
-*** Strategy y Factory
-
-Ya vistos en la introducción con código. En el servidor web:
-
-| Variación en FeriaPPT | Patrón | Por qué |
-|-----------------------+--------+---------|
-| Rival fácil / copión / feriante | Strategy | Mismo contrato =elegir=, distinta cabeza |
-| Crear el rival según =?nivel= | Factory | La ruta no hace =new RivalCopion= a mano |
-| Pago de vidas: efectivo simulado, Stripe, vale | Strategy + Adapter | Igual que pasarelas de una tienda |
-| Avisar por mail o por globo en pantalla | Strategy o Observer | Strategy si eliges *un* canal; Observer si *varios* escuchan |
-
-*** Observer
-
-- En FeriaPPT: «ganaste la ronda» no debe conocer a *todos* los que se alegran. El dominio emite =RondaGanada=. El globo, el marcador y el ranking *escuchan*.
-- *In-process:* =EventEmitter= en el mismo Node.
-- *Out-of-process:* cola hacia el ranking nacional. Ahí es Pub/Sub: puede llegar dos veces → las partidas necesitan id de idempotencia.
-
-Si el cobro de la ficha *debe* ser atómico con la partida, un =emit= asíncrono puede mentir. A veces el diseño es *outbox transaccional*, no un evento ingenuo.
-
-** Patrones de API e integración
-
-*** Recurso REST
-
-REST no es «devolver JSON». En FeriaPPT:
-
-- Recurso: =/partidas/17=, =/jugadores/ana/fichas=.
-- Representación: JSON o HTML de *esa* cosa ahora.
-- =POST /partidas= crea una ronda; =GET /ranking= lee. Un =/ganar= suelto es una acción disfrazada; a veces =/partidas/17/resultado= es más honesto.
-- Idempotencia: pagar vidas extra necesita una *clave de idempotencia* (si el clic se manda dos veces por el lag, no cobres dos fichas). Eso no es GoF; es patrón de integración.
-
-*** API Gateway y BFF
-
-- *API Gateway:* recepción del recinto (auth, rate limit, ruteo a PPT, a tiro al blanco, a caja).
-- *BFF:* el *celular* quiere un JSON mínimo ={ronda, rival, fichas}=. La *lona gigante* de la feria quiere tabla HTML del ranking + avatares. No es que «falte un Factory»: son *dos clientes* con hambre distinta.
-
-Si el SPA hace 12 =fetch= para pintar el marcador, falta agregación en servidor (BFF o un =GET /me/tablero=).
-
-*** Proxy, caché y CDN
-
-- Ranking de la feria: un Proxy cachea el top 10 treinta segundos (el papelito en la ventanilla).
-- Las fotos de avatar van al CDN. Las fichas de la cuenta *no* se cachean igual (dato vivo).
-
-*** Circuit Breaker, Retry y Bulkhead
-
-| Patrón | En FeriaPPT |
-|--------+-------------|
-| *Timeout* | Si el ranking tarda 8 s, el duelo local sigue; no esperas la noche. |
-| *Retry con backoff* | Reintentar un 503; no reintentar un «ficha inválida» (400). |
-| *Circuit Breaker* | Tres fallos seguidos al ranking nacional → dejar de llamarlo un rato y mostrar ranking local. |
-| *Bulkhead* | El hilo del duelo no se agota porque el de pagos está atascado. |
-
-Estos no están en GoF y son de los más importantes en web de producción.
-
-** Patrones de arquitectura web que envuelven a los de diseño
-
-*** Capas
-
-Lona → caso de uso → reglamento → SQL. Fácil de explicar; peligro de capas fantasma que solo delegan, o de que el reglamento importe el ORM.
-
-*** Hexagonal / puertos y adaptadores
-
-El *reglamento PPT* está en el centro. Puertos: =PartidaRepository=, =Reloj=, =PasarelaVidas=. Adaptadores: HTTP, Postgres, Stripe. El patrón Adapter deja de ser un juguete y se vuelve la frontera del programa.
-
-*** CQRS
-
-Escribir partidas (transaccional) vs leer el ranking (agregado, desnormalizado). Útil si el tablero del campeonato no se parece en nada al agregado de una ronda. Costo: dos modelos. No hace falta en un PPT de laboratorio.
-
-** Análisis de un caso web: FeriaPPT en línea
-
-1. *Problemas:* variar rivales; pulsera en muchas rutas; el SPA quiere el tablero en *una* llamada; el correo de «ganaste el día» no debe bloquear el clic.
-2. *Presentación:* Front Controller + middleware (pulsera, fichas); BFF o =GET /me/tablero=; en el cliente, estado unidireccional del marcador.
-3. *Dominio:* Service =JugarRonda=, =ComprarVida=; Strategy de rivales; evento =RondaGanada=.
-4. *Datos:* Repository de partidas; Unit of Work ficha + ronda.
-5. *Integración:* Adapter de la arcade o de Stripe; cola para el diploma por mail; Circuit Breaker al ranking nacional.
-6. *Fuera de lugar:* Singleton =PartidaActual= global; God Service =FeriaManager=; Redux para el tooltip de «tijera corta papel».
-
-** Tabla de decisión rápida: web
-
-| Si el dolor en FeriaPPT es… | Empieza por… | Evita… |
-|-----------------------------+--------------+--------|
-| Pulsera copiada en cada ruta | Middleware / Front Controller | Copiar-pegar filtros |
-| Un =if= por cada rival o pago | Strategy + Adapter | Switch de 200 líneas en el controlador |
-| La lona habla SQL | Repository + Service Layer | Consultas en la plantilla |
-| 12 =fetch= para un marcador | BFF o =/me/tablero= | Más spinners |
-| Ranking nacional inestable | Timeout + Circuit Breaker | Reintentar para siempre |
-| Botones y marcador peleados | Flujo unidireccional | Mutar el marcador desde 12 componentes |
-
-** Idea clave de la parte web
-
-En la web, los patrones GoF siguen siendo pertinentes (Strategy del rival, Observer de dominio, Adapter de un protocolo ajeno), pero el diseño se decide en las *fronteras*: HTTP, representación, sesión y el hecho de que el cliente y el servidor no comparten memoria. Front Controller, middleware, BFF y puertos hexagonales son, en este contexto, anteriores a Factory o a un Observer de interfaz.
+Lectura de la misma petición como *composición*:
+
+1. El cliente aplica MVVM o flujo unidireccional al tablero (presentación).
+2. El borde puede autenticar y limitar frecuencia (Gateway, Chain of Responsibility).
+3. El Front Controller despacha =POST /partidas=.
+4. El Service Layer ejecuta =jugarRonda= (Strategy del rival, Factory al crearlo).
+5. Repository y Unit of Work persisten ficha y ronda juntas.
+6. Observer notifica a ranking e interfaz; un Circuit Breaker protege el ranking externo.
+7. La representación de vuelta es JSON o HTML (Template o Transform View).
+
+Ninguna de esas piezas sobra *si la fuerza existe*; ninguna debe introducirse si no existe.
+
+| Si el conflicto es… | Estructura inicial | Lo que no lo resuelve |
+|---------------------+--------------------+------------------------|
+| Políticas copiadas en cada ruta | Front Controller + middleware | Más controladores de página |
+| Variación de algoritmo (rival, pago) | Strategy (+ Factory / Adapter) | Un condicional en el controlador HTTP |
+| La vista consulta el almacén | Repository + Service Layer | Más lógica en la plantilla |
+| El cliente orquesta muchos recursos | BFF o recurso agregado | Más peticiones y estados de carga |
+| Colaborador inestable | Timeout + Circuit Breaker | Reintento ilimitado |
+| Interfaz y estado de cliente en conflicto | Flujo unidireccional | Mutación directa del DOM desde varios componentes |
+| Dominio atado al marco HTTP | Puertos y adaptadores | Un Singleton de petición |
+
+** Síntesis
+
+En la web, los patrones GoF siguen siendo pertinentes *dentro de una capa*. Las decisiones que distinguen un sistema web de un programa de escritorio se toman en las *fronteras*: protocolo, representación, sesión, fallo parcial y multiplicidad de clientes. Un proyecto real *compone* Front Controller, cadena de filtros, Service Layer, repositorio y, en el cliente, una organización MVC o MVVM. FeriaPPT ilustra esa composición; no sustituye la definición de cada patrón.
 
 * Patrones de software para aplicaciones móviles
 :PROPERTIES:
 :CUSTOM_ID: patrones-movil
 :END:
 
-Esta parte examina el mismo dominio FeriaPPT como *aplicación móvil*. Las reglas del duelo no cambian. Cambian el ciclo de vida que impone el sistema operativo, la rotación de pantalla, la conectividad intermitente y el trabajo que debe continuar cuando la interfaz ya no está visible.
+Esta sección trata el *análisis y el diseño de patrones para aplicaciones móviles* como un problema de cliente nativo (o híbrido) bajo el ciclo de vida del sistema operativo, no como la aplicación web empaquetada en un visor. El dominio puede coincidir con el de la parte web; las fuerzas no. El caso FeriaPPT se introduce *después* de cada definición, como instanciación, no como origen del patrón.
 
-** Tablero de patrones móviles
+La tesis de la introducción —el patrón es la estructura; el lenguaje y el marco son la realización— es aquí *más visible* que en el servidor: Android, iOS, Flutter y React Native congelan presentaciones distintas (ViewModel, SwiftUI, BLoC, Redux). Transcribir MVVM de Android con =LiveData= a Flutter no es «el mismo patrón»: es ignorar el diseño que el marco ya instancia.
 
-| # | Patrón | En FeriaPPT móvil | Qué problema resuelve |
-|---+--------+-------------------+------------------------|
-| 1 | *MVC (legado)* | Activity/ViewController que oye toques y pinta | Sirve en un prototipo; se infla en cuanto hay ranking y red |
-| 2 | *MVP* | Presenter dice =mostrarGanaste()=; la vista es tonta | Testear el duelo *sin* emulador |
-| 3 | *MVVM* | ViewModel guarda la ronda si rotas el teléfono | El estado no vive en los botones |
-| 4 | *MVI / UDF* | Intención =TiréPapel= → un =UiState= nuevo | Muchos eventos async (sync, debounce) sin booleanos locos |
-| 5 | *BLoC / Redux-like* | Eventos entra, estado del duelo sale | Flutter / RN: misma idea que MVI |
-| 6 | *Coordinator / Navigator* | Menú → duelo → ranking sin que el VM abra pantallas | Navegación testeable; deep link «abrir partida 17» |
-| 7 | *Repository dual* | Disco *y* red: jugaste en el camión | Offline-first; la UI no sabe si vino de SQLite o de HTTP |
-| 8 | *Command (cola)* | Cada tirada offline es un objeto guardado | Subir después, con id para no duplicar |
-| 9 | *State* | =idle / jugando / sincronizando / error= | Mejor que =isLoading && !error && data= |
-| 10 | *Observer / Flow* | El marcador *se suscribe* al repositorio | Listas vivas; cancelar al destruir la pantalla |
-| 11 | *Adapter* | JSON del server ↔ ronda en disco ↔ lo que pinta la UI | Tres ritmos distintos, tres formas |
-| 12 | *Facade* | =CamaraAvatar=, =SensorShake= para «tirar al azar» | La UI no importa 6 SDKs |
-| 13 | *Decorator* | Interceptor OkHttp: pone el token de pulsera | Igual que el portero web, otro proceso |
-| 14 | *DI* | El rival y el repo *se entregan* al ViewModel | Tests con rival falso; nada de =new Retrofit= en el Fragment |
-| 15 | *Template Method (SO)* | =onCreate= / =onResume= los llama el sistema | Enganchar trabajo ligero; el duelo pesado va al VM |
-| 16 | *Proxy / Flyweight* | Avatares lazy; celdas del ranking reutilizadas | Batería, memoria, 60 fps |
-| 17 | *WorkManager / Command de fondo* | Subir partidas con la app cerrada | El tren sigue; la pantalla ya no está |
+** Qué es un patrón de software en el contexto móvil
 
-** Contexto: qué hace «móvil» al diseño
+Un patrón móvil no es un GoF con otro nombre. Es un patrón —de presentación, de dominio, de datos o de plataforma— *cuyas fuerzas las impone el sistema operativo y el dispositivo*:
 
-Una aplicación móvil no es la aplicación web empaquetada. El mismo dominio opera bajo otras fuerzas:
+- la vista se destruye y se recrea (rotación, cambio de idioma, falta de memoria);
+- el proceso puede morir en segundo plano; el trabajo pendiente no puede vivir solo en memoria de interfaz;
+- la red es intermitente; el almacén local y el remoto son *dos* orígenes, no uno con un indicador de carga;
+- CPU, memoria, batería y frecuencia de pintado son recursos finitos;
+- la distribución pasa por un almacén: la corrección no es un despliegue HTML inmediato;
+- hay *varios ecosistemas* (Android, iOS, multiplataforma) sobre el mismo dominio.
 
-| Fuerza | Manifestación en FeriaPPT |
-|----------+----------------------------|
-| *Ciclo de vida agresivo* | La rotación recrea la vista; el estado de la ronda no puede residir solo en controles. |
-| *Red intermitente* | Las tiradas se persisten en local y se sincronizan (repositorio dual y Command). |
-| *Recursos finitos* | Listas y medios: carga diferida, Adapter de lista, ningún análisis JSON en el hilo de UI. |
-| *Navegación como grafo* | Flujos y *deep links*; Coordinator, no arranque de actividades desde el repositorio. |
-| *Varios ecosistemas* | El dominio es portable; los adaptadores son de plataforma. |
-| *Distribución por almacén* | La corrección no es un despliegue HTML inmediato: conviene versionar la API y, si aplica, *feature flags*. |
-| *Sensores* | Una fachada de plataforma; en prueba no hay acelerómetro. |
-| *Frecuencia de pintado* | El cálculo de Strategy no corre en el hilo que pinta. |
+MVC, MVP, MVVM y MVI organizan la presentación. Repository, Command y Adapter organizan datos y sincronización. WorkManager, *background tasks* e interceptores HTTP son idiomas de plataforma que *realizan* Command, Decorator y Proxy. GoF sigue presente (Observer, Strategy, Facade); el error es analizar solo el diagrama de clases y omitir el ciclo de vida.
 
-El patrón de presentación debe *conservar el estado* ante la destrucción de la vista, no solo separar responsabilidades en el diagrama.
+** Un proyecto móvil tampoco tiene un único patrón
 
-** Mapa de capas en una app moderna
+Como en la web, una aplicación no «es» MVVM. MVVM (o BLoC) organiza *una* capa. En el transcurso de una tirada coinciden, con frecuencia:
+
+| Capa | Pregunta | Familia |
+|------+----------+---------|
+| Presentación | ¿Quién posee el estado cuando la vista muere? | MVVM, MVI, BLoC; Observer del *toolkit* |
+| Navegación | ¿Quién arma el grafo de pantallas? | Coordinator / Navigator (Mediator) |
+| Dominio | ¿Dónde está el caso de uso, independiente de Activity y de Widget? | Service Layer / casos de uso; Strategy; Facade |
+| Datos | ¿Cómo se combina disco y red? | Repository dual; Adapter; Command en cola |
+| Plataforma | ¿Cómo se trabaja con la app no visible? | Command de fondo; Proxy; Decorator HTTP; DI |
+
+Acumular MVI, hexagonal, Event Sourcing y un Coordinator de doce tipos sobre tres pantallas sin red es la misma sobreingeniería descrita en la parte web. Cada ficha exige una fuerza.
+
+** Lenguaje, plataforma y marco de trabajo
+
+Gamma et al. separan *Structure* de *Implementation*. En móvil la implementación está *doblemente* determinada: por el *lenguaje* (Kotlin, Swift, Dart, JavaScript) y por el *marco o kit de UI* (Jetpack Compose, UIKit/SwiftUI, Flutter, React Native). El dominio (reglamento, repositorio abstracto) puede ser portable; los adaptadores *son* la plataforma.
+
+Tres decisiones, en este orden:
+
+1. El *problema* (conservar estado, sincronizar sin red, variar el rival).
+2. El *lenguaje*: clausuras, tipos sellados, corrutinas o *streams* cambian la forma de Observer, State y Strategy.
+3. El *marco*: si ya publica ViewModel, BLoC o un grafo de navegación, reimplementarlos al margen degrada el diseño.
+
+*** El lenguaje cambia la forma de Observer y de Strategy
+
+Problema de Observer: el marcador debe actualizarse cuando cambia el estado de la ronda, y la suscripción debe *cancelarse* al destruirse la vista.
+
+En Kotlin el idioma contemporáneo es un flujo, no una lista de oyentes GoF:
+
+#+begin_src kotlin
+class DueloViewModel : ViewModel() {
+  private val _ui = MutableStateFlow(UiState())
+  val ui: StateFlow<UiState> = _ui.asStateFlow()
+
+  fun tirar(jugada: String) {
+    _ui.update { it.copy(resultado = reglamento.jugar(jugada)) }
+  }
+}
+#+end_src
+
+En Dart / Flutter la misma intención suele congelarse como BLoC (evento entra, estado sale):
+
+#+begin_src dart
+class DueloBloc extends Bloc<DueloEvento, DueloEstado> {
+  DueloBloc(this.reglamento) : super(DueloEstado.inicial()) {
+    on<Tiro>((e, emit) => emit(state.copyWith(resultado: reglamento.jugar(e.jugada))));
+  }
+  final Reglamento reglamento;
+}
+#+end_src
+
+En Swift, Combine o la observación de SwiftUI realizan el mismo contrato:
+
+#+begin_src swift
+final class DueloModelo: ObservableObject {
+  @Published var resultado: String = ""
+  func tirar(_ jugada: String) { resultado = reglamento.jugar(jugada) }
+}
+#+end_src
+
+Los tres fragmentos son *Observer de presentación*. Ninguno obliga a una jerarquía =Subject= / =ConcreteObserver= de 1994. Strategy del rival, en Kotlin o Swift, puede ser un tipo que cumple un protocolo; en Dart o en JavaScript, a menudo una función. Copiar las clases Java del servidor al ViewModel «para que se vea el patrón» viola el idioma.
+
+*** El marco congela el patrón de presentación
+
+| Intención | Realización Android | Realización iOS | Realización Flutter | Realización React Native |
+|-----------+---------------------+-----------------+---------------------+--------------------------|
+| Presentación actual | MVVM + UDF (Compose), =ViewModel= | MVVM + SwiftUI; Coordinator | BLoC, Riverpod | Redux, Zustand, *hooks* |
+| Observer de UI | =StateFlow=, Compose | =@Published=, Combine | =Stream= / cubit | estado de React |
+| Navegación | Navigation / Compose Nav | =NavigationStack=, Coordinator | GoRouter, Navigator 2 | React Navigation |
+| Inyección | Hilt | Fábricas, Swinject | Riverpod, =get_it= | contexto y librerías |
+| Local + red | Room + Retrofit/Ktor | Core Data / SwiftData + URLSession | Hive/Isar + Dio | SQLite + =fetch= |
+| Trabajo en fondo | WorkManager | =BGTaskScheduler= | *plugins* + *isolates* | JS sin interfaz (limitado) |
+| Lista eficiente | =RecyclerView.Adapter= / *lazy lists* | =UITableView= / =LazyVStack= | =ListView.builder= | =FlatList= |
+
+Portar MVP de Android a Flutter «porque ya lo sabemos» ignora que BLoC o Riverpod *son* el punto de extensión del marco. Dos contenedores de estado (el de Compose y un bus propio) producen el mismo defecto que dos Front Controller en la web.
+
+**** Instanciación: FeriaPPT
+
+El marcador observable de la ronda se expresa con el mecanismo nativo (=StateFlow=, BLoC, =ObservableObject=), no con una lista de oyentes al margen. El rival intercambiable sigue siendo Strategy; su *forma* depende de Kotlin, Dart o Swift.
+
+** Fuerzas que el medio móvil impone al diseño
+
+Independientes del minijuego; cualquier cliente de dispositivo las hereda.
+
+| Fuerza | Implicación |
+|--------+-------------|
+| Ciclo de vida agresivo | El estado de pantalla no puede residir solo en controles. El patrón de presentación debe *sobrevivir* a la destrucción de la vista. |
+| Muerte del proceso | Colas y trabajo en fondo se reifican (Command persistido), no se dejan en un objeto de UI. |
+| Red intermitente | Repositorio con origen local y remoto; políticas cache-first, network-first u offline + cola. |
+| Recursos finitos | Listas virtualizadas (Adapter, Flyweight); ningún análisis costoso en el hilo que pinta. |
+| Navegación como grafo | Flujos y *deep links*; la capa de dominio no arranca pantallas. |
+| Varios ecosistemas | Puertos en el dominio; adaptadores de plataforma. |
+| Distribución por almacén | Versionado de API; *feature flags* si el cliente no se actualiza al ritmo del servidor. |
+| Sensores y permisos | Facade de plataforma; en prueba no hay acelerómetro. |
+
+** Capas
 
 #+begin_example
-  [UI]           Tres botones, globo «ganaste», animación
-       ↕  estado observable (UDF)
-  [Presentación] ViewModel / Presenter / BLoC del duelo
-       ↕  TiréPapel / ComprarVida
-  [Dominio]      JugarRonda, reglamento PPT, fichas
-       ↕  puertos
-  [Datos]        Partidas en disco + API + caché de ranking
+  [UI]           Controles, animación, *toolkit* nativo
+       ↕  estado observable
+  [Presentación] ViewModel / Presenter / BLoC
+       ↕  intenciones / casos de uso
+  [Dominio]      Reglamento, entidades, puertos
        ↕
-  [Plataforma]   Shake, push «te retaron», filesystem
+  [Datos]        Disco + API + caché
+       ↕
+  [Plataforma]   Sensores, notificaciones, sistema de archivos
 #+end_example
 
-Clean Architecture en móvil *es* hexagonal con nombres de Google/Uber/community: =UseCase=, =Repository=, =DataSource=. El valor no es el folder =domain/=: es que *la UI no sepa de Retrofit ni de Room*.
+La llamada *Clean Architecture* en móvil es, en lo esencial, hexagonal con nombres de plataforma (=UseCase=, =Repository=, =DataSource=). El valor no es el directorio =domain/=: es que la interfaz no conozca Retrofit, Room ni el SDK de cámara.
 
-** Patrones de presentación móviles
+** Catálogo de la sección
 
-Todos intentan lo mismo: *que la View sea tonta y sobreviva al ciclo de vida.* Difieren en *quién tiene el estado* y *quién habla primero*.
+Guía de decisión. FeriaPPT va en cada ficha, no aquí.
 
-*** MVC móvil
+| Patrón | Cuándo usarlo y por qué | No usarlo | Ya lo trae |
+|--------+-------------------------+-----------+------------|
+| MVC (legado) | Prototipo de *una* pantalla. Por qué: poco ceremonia. | En cuanto hay red, rotación y ranking: la Activity engorda. | Activity / ViewController *son* el controlador. El SO entrega el ciclo de vida. |
+| MVP | Hay lógica de UI densa que debe probarse *sin* emulador. Por qué: vista pasiva. | Olvidar =detach= al destruir la vista (fuga). | Se escribe; no viene de fábrica. En Android moderno se prefiere ViewModel. |
+| MVVM | Aplicación de negocio actual: el estado debe *sobrevivir* a la rotación. Por qué: la vista se suscribe; el VM no conoce el *toolkit*. | El VM sube red, cobro y navegación (God ViewModel). | =ViewModel= + Compose (Android); SwiftUI + =ObservableObject= (iOS). |
+| MVI / UDF | Varios eventos asíncronos a la vez (cola, toques, *push*). Por qué: un estado inmutable y un reductor. | Tres campos estables: ceremonia. | Compose UDF; MVIKotlin; en iOS, reductores a mano o TCA. |
+| BLoC | Proyecto Flutter (o RN con Redux/Zustand) y estado compartido entre rutas. Por qué: es el idioma del marco. | Portar BLoC a Android «porque Flutter lo usa». | =flutter_bloc=, Riverpod; Redux/Zustand en RN. |
+| Coordinator / Navigator | Hay grafo de pantallas o *deep links*. Por qué: el VM no instancia Activities. | Tres pantallas lineales: basta el Navigation del marco. | Jetpack Navigation; =NavigationStack=; GoRouter; React Navigation. |
+| Repository dual | Hay disco *y* red. Por qué: la UI no sabe el origen; se puede operar sin señal. | Un solo origen y nunca habrá *offline*. | Room + Retrofit; Core Data + URLSession; Hive + Dio. El patrón se *diseña*; las libs son los adaptadores. |
+| Command (cola) | La operación debe sobrevivir a cerrar la app o a perder la red. Por qué: la acción es un objeto con id. | Un toque que llama a un método y nada más. | WorkManager; =BGTaskScheduler=; acciones de Redux. |
+| State | La UI tiene fases (idle / jugando / sync / error). Por qué: no un nudo de booleanos. | Dos condicionales estables. | =sealed class= / =enum=; =UiState= de MVI. |
+| Observer / Flow | La vista debe actualizarse al cambiar el dominio y *cancelar* al destruirse. Por qué: uno-a-muchos. | Lista propia de oyentes junto a =StateFlow=. | =StateFlow=, =LiveData=, Combine, BLoC, estado de React. |
+| Adapter | JSON ≠ disco ≠ modelo de UI, o lista virtualizada. Por qué: tres ritmos, tres formas. | Un único DTO que viaja hasta el *widget*. | =RecyclerView.Adapter=; mapeo de Retrofit; =ListView.builder=. |
+| Facade | Cámara, sensores o *push* no deben entrar al VM de negocio. Por qué: puerto de plataforma. | Importar el SDK en la pantalla del duelo. | Se escribe; el SDK *es* lo que se oculta. |
+| Decorator HTTP | Credencial o registro en *todas* las llamadas. Por qué: no copiar el encabezado en cada =fetch=. | Una sola petición. | Interceptor de OkHttp, Dio, Alamofire. |
+| DI | El VM no debe construir Retrofit ni el rival. Por qué: pruebas y sustituir Strategy. | =new= en el Fragment/Widget. | Hilt, Koin, Riverpod, =get_it=, Swinject. |
+| Template Method (SO) | Enganchar trabajo al ciclo =onCreate= / =onResume=. Por qué: el SO llama. | Clase base de miles de líneas; cálculo pesado en =onDraw=. | El propio Android/iOS. |
+| Proxy / Flyweight | Listas largas e imágenes. Por qué: memoria y 60 fps. | Pocos elementos. | *Lazy lists*; Coil, Glide, SDWebImage; reutilización de celdas. |
+| Trabajo en fondo | La vista puede no existir y el envío debe ocurrir. Por qué: Command persistido. | Un hilo suelto que muere con el proceso. | WorkManager; =BGTaskScheduler=; *isolates* + plugins en Flutter. |
 
-- En FeriaPPT: la Activity oye «papel», llama al reglamento y escribe «ganaste» en un =TextView=.
-- *Problema:* en cuanto hay ranking, red y rotación, esa Activity se vuelve el feriante, el portero y la lona a la vez (God Object). El SO *le entrega* el ciclo de vida, por eso engorda.
-- *Cuándo sobrevive:* prototipo de una sola pantalla de PPT.
+** Patrones de presentación
+
+Todos persiguen una vista *pasiva* y un estado que sobreviva al ciclo de vida. Difieren en quién posee el estado y quién inicia el diálogo.
+
+*** MVC en el cliente móvil
+
+**** Definición
+
+El objeto de pantalla (Activity, ViewController) recibe la entrada, consulta el modelo y escribe en los controles. El sistema operativo *entrega* el ciclo de vida a ese objeto; por eso el MVC móvil tiende al God Object en cuanto aparecen red, persistencia y rotación. Subsiste en prototipos de una pantalla.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* demostración de una pantalla, sin red ni rotación crítica.
+- *Por qué:* mínima ceremonia.
+- *No:* en cuanto hay ranking, API y recreación de la vista.
+- *Ya lo traen:* Activity y ViewController *son* el controlador. No hay que «activar MVC»: el SO ya lo impone. El trabajo es *salir* de él cuando engorda.
+
+**** Instanciación: FeriaPPT
+
+La Activity oye «papel», aplica el reglamento y escribe el resultado en un =TextView=. Aceptable como demostración; insostenible cuando hay ranking y sincronización.
 
 *** MVP
 
-- En FeriaPPT: la vista solo sabe =mostrarTiradaRival("piedra")=, =mostrarGanaste()=. El Presenter decide; no importa =Button=.
-- *Fuerzas:* testear el duelo en JVM vs. muchos métodos =showX=.
-- *Riesgo:* el Presenter sujeta la vista y se olvida de soltarla al =onDestroy= → fuga. En FeriaPPT: rotas el teléfono y el Presenter viejo sigue hablando con una pantalla muerta.
+**** Definición
+
+El Presenter concentra la lógica de presentación y habla con la vista por una interfaz (=mostrarResultado=). La vista no decide. Ventaja: prueba en JVM o en escritorio. Riesgo: el Presenter retiene la vista tras =onDestroy= (fuga). Hay que desenganchar de forma explícita.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* lógica de UI densa que debe probarse sin emulador, y el equipo aún no adopta ViewModel.
+- *Por qué:* vista pasiva; el Presenter se testea en JVM.
+- *No:* si se olvida el =detach=; en Android actual el camino documentado es MVVM.
+- *Ya lo traen:* no viene de fábrica. Se escribe. No portar MVP de Android a Flutter: BLoC/Riverpod cubren el mismo hueco.
+
+**** Instanciación: FeriaPPT
+
+La vista solo expone =mostrarTiradaRival= y =mostrarVictoria=. El Presenter no importa =Button=. Si el usuario rota el dispositivo y no hay =detach=, el Presenter antiguo escribe en una pantalla destruida.
 
 *** MVVM
 
-- En FeriaPPT: el ViewModel guarda ={fichas, tuTirada, rival, resultado}=. Giras el teléfono: los botones se recrean; el marcador *sigue ahí*.
-- *Observer:* =StateFlow= / =LiveData= / =Combine= — la lona se suscribe.
-- *Riesgo:* un ViewModel que también sube el ranking y cobra vidas (debería ser UseCase).
+**** Definición
 
-*** MVI y UDF
+El ViewModel expone estado observable; la vista se enlaza o se suscribe (Observer). El ViewModel *no* conoce el *toolkit* de controles y, en Android, sobrevive a la recreación de la Activity. Riesgo: absorber casos de uso (red, cobro) que pertenecen a la capa de aplicación.
 
-- En FeriaPPT: la UI solo manda intenciones: =TiréPapel=, =PedirSync=. Un reductor produce un =UiState= nuevo: =idle | jugando | sincronizando | error=.
-- *Análisis:* State + Command + Observer. Encaja cuando a la vez hay debounce de «tirar», cola offline y push de «te retaron».
-- *Costo:* ceremonia. Tres botones sin red no necesitan una novela de reducers.
+Es el patrón de presentación *por defecto* en las guías contemporáneas de Android e iOS, realizado con =ViewModel= + Compose/SwiftUI, no con una clase bautizada MVVM al margen del marco.
 
-*** BLoC y Redux
+**** Cuándo, por qué, y quién ya lo implementa
 
-- En FeriaPPT: =evento TiréPapel= entra; =estado del duelo= sale. Misma idea que MVI.
-- Justificado si sesión, fichas y ranking se comparten entre pantallas; no si el tooltip de «tijera corta papel» vive en Redux.
+- *Cuándo:* el estado de pantalla debe sobrevivir a la rotación y la vista debe ser pasiva.
+- *Por qué:* Observer nativo + objeto que el SO no destruye con la Activity.
+- *No:* el ViewModel no es el lugar de Retrofit, del cobro ni de =startActivity=.
+- *Ya lo traen:* =androidx.lifecycle.ViewModel= y Compose; SwiftUI + =ObservableObject=. En Flutter el equivalente de marco es BLoC o Riverpod, no una clase =ViewModel= copiada de Android.
 
-*** Tabla comparativa
+**** Instanciación: FeriaPPT
 
-| Pregunta | MVC | MVP | MVVM | MVI/UDF |
-|----------+-----+-----+------+---------|
-| ¿Dónde vive el estado de pantalla? | A menudo en la View | Presenter | ViewModel | State inmutable único |
-| ¿La View conoce al Presenter/VM? | Sí, mucho | Interfaz | Binding/suscripción | Solo despacha intents |
-| ¿Test unitario fácil? | No | Sí (Presenter) | Sí (VM) | Sí (reducer puro) |
-| ¿Ciclo de vida? | Frágil | Hay que detach | VM sobreviviente | Igual que MVVM + disciplina |
+El ViewModel guarda ={ fichas, tuTirada, rival, resultado }=. Tras rotar, los botones se recrean; el marcador permanece. Subir el ranking no es responsabilidad de ese objeto.
+
+*** MVI y flujo unidireccional
+
+**** Definición
+
+La interfaz despacha *intenciones*; un reductor produce un nuevo estado inmutable; la vista se deriva. Composición: Command + State + Observer. Se justifica cuando coinciden varios eventos asíncronos (rebote de toques, cola offline, notificaciones). El costo es ceremonia: un marcador de tres campos no requiere un reductor elaborado.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* toques, sincronización y *push* alteran el mismo estado a la vez.
+- *Por qué:* un reductor puro se prueba sin UI; las transiciones son explícitas (State).
+- *No:* tres campos y un diálogo.
+- *Ya lo traen:* UDF en Compose; MVIKotlin; The Composable Architecture en iOS. BLoC es la misma idea en Dart.
+
+**** Instanciación: FeriaPPT
+
+Intenciones =TiréPapel=, =PedirSincronización=. Estados =idle | jugando | sincronizando | error=. Encaja si hay cola y aviso remoto simultáneos.
+
+*** BLoC y equivalentes
+
+**** Definición
+
+BLoC (Flutter) es MVI con el vocabulario del ecosistema Dart: evento entra, estado sale. Redux y Zustand ocupan el mismo lugar en React Native. No es un cuarto paradigma: es el *idioma del marco* para la misma estructura. Compartir un almacén global se justifica si varias rutas comparten sesión y saldo; no si cada *tooltip* escribe en el almacén.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* el proyecto es Flutter (BLoC/Riverpod) o React Native (Redux/Zustand) y hay estado *compartido* entre rutas.
+- *Por qué:* el marco ya congeló Observer + Command; reimplementar MVVM de Android encima choca con el *toolkit*.
+- *No:* portar BLoC a Android nativo «para unificar»; un texto de ayuda en el almacén global.
+- *Ya lo traen:* =flutter_bloc=, Riverpod; Redux, Zustand, *hooks* de React Native.
+
+**** Instanciación: FeriaPPT
+
+=TiréPapel= entra; el estado del duelo sale. Sesión, fichas y ranking compartidos entre pantallas lo justifican; un texto de ayuda, no.
+
+*** Comparación
+
+| Pregunta | MVC | MVP | MVVM | MVI / BLoC |
+|----------+-----+-----+------+------------|
+| ¿Dónde vive el estado de pantalla? | A menudo en la vista | Presenter | ViewModel | Estado inmutable único |
+| ¿La vista conoce al director? | Sí | Por interfaz | Suscripción / enlace | Solo despacha intenciones |
+| ¿Prueba unitaria? | Difícil | Presenter | ViewModel | Reductor puro |
+| ¿Ciclo de vida? | Frágil | Requiere desenganche | ViewModel superviviente | Igual que MVVM, con más disciplina |
 | ¿Ceremonia | Baja | Media | Media | Alta |
-| ¿Cuándo elegirlo? | Demo | Mucha lógica de UI testeable | Apps modernas estándar | Flujos async complejos |
+| ¿Cuándo | Prototipo | Lógica de UI densa y testeable | Aplicaciones actuales de negocio | Flujos asíncronos concurrentes |
 
-Diseño honesto: *MVVM + casos de uso* cubre el 80 % de apps de negocio. MVI se justifica cuando el estado tiene transiciones que un =if= no puede narrar.
+En la mayoría de aplicaciones de negocio, *MVVM (o BLoC) más casos de uso* basta. MVI se añade cuando las transiciones de estado ya no se narran con condicionales locales.
 
-** Navegación: Coordinator / Router / Navigator
+** Navegación: Coordinator, Router, Navigator
 
-- En FeriaPPT: el ViewModel dice «mostrar ranking», no «abre =RankingActivity=». Un Coordinator/Navigator arma el grafo: menú → duelo → ranking, y el deep link =feriappt://partida/17=.
-- *Es un Mediator* de flujos. En tres pantallas, el Navigation component basta sin bautizar Coordinator.
+**** Definición
 
-** Datos, offline y sincronización
+La navegación es un grafo. Coordinator (o Navigator) es un Mediator: el ViewModel anuncia *que* debe mostrarse el ranking, no *cómo* se instancia =RankingActivity=. *Deep links* y la pila de retroceso viven aquí. En tres pantallas lineales, el componente de navegación del marco suele bastar sin una jerarquía propia bautizada Coordinator.
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* hay varias rutas, pila de retroceso o enlaces profundos.
+- *Por qué:* el dominio y el VM no conocen Activities/Widgets de destino.
+- *No:* tres pantallas en línea: el Navigation del marco basta.
+- *Ya lo traen:* Jetpack Navigation / Compose Navigation; =NavigationStack= (iOS); GoRouter; React Navigation. Un Coordinator propio solo si el grafo desborda ese mecanismo.
+
+**** Instanciación: FeriaPPT
+
+Menú → duelo → ranking; enlace =feriappt://partida/17=. El repositorio no llama a =startActivity=.
+
+** Datos, operación sin red y sincronización
 
 *** Repository con varios orígenes
 
-En FeriaPPT móvil el cajón *no* es solo SQL.
+**** Definición
 
-1. *Remota:* =POST /partidas= cuando hay red.
-2. *Local:* Room / SQLite / Hive con tiradas pendientes.
-3. *Memoria:* marcador de la ronda actual.
+El repositorio oculta *varios* orígenes: remoto, local persistente y, a veces, caché en memoria. Las políticas (network-first, cache-first, solo local + cola) son decisiones de producto con estructura de Adapter hacia cada fuente. Si la vista observa la tabla SQL, la presentación se acopla al esquema.
 
-| Política | En el minijuego |
-|----------+-----------------|
-| *Network-first* | Fichas compradas (tienen que estar frescas). |
-| *Cache-first* | Ranking de la feria: se muestra el papelito y se refresca atrás. |
-| *Offline-only + cola* | Tiradas en el camión: nunca bloquean por Wi-Fi. |
+**** Cuándo, por qué, y quién ya lo implementa
 
-Adapter: JSON del server ↔ ronda en disco ↔ lo que pinta el botón. Tres ritmos, tres formas.
+- *Cuándo:* la app debe funcionar (o degradar) sin red, o hay que mezclar disco y API.
+- *Por qué:* la UI ignora el origen; se cambian políticas sin reescribir pantallas.
+- *No:* un único =fetch= y nunca *offline*.
+- *Ya lo traen:* Room, Core Data/SwiftData, Hive/Isar (local); Retrofit, URLSession, Dio (remoto). El *puerto* Repository se diseña; esas bibliotecas son adaptadores. Guías de Android (*offline-first*) describen esta composición.
 
-*** Cola de comandos y sincronización
+**** Instanciación: FeriaPPT
 
-- *Command:* cada =TiréPapel= offline se guarda con un UUID y se envía al volver la señal.
-- *Idempotencia:* el servidor de FeriaPPT no debe contar dos veces la misma tirada si el camión reintenta.
-- *Conflictos:* jugaste sin red y el ranking web ya avanzó. Política de producto (ganar la local, fusionar, o preguntar), no magia de patrón.
+=POST /partidas= con red; Room (o equivalente) con tiradas pendientes; memoria para la ronda en curso. Fichas compradas: network-first. Ranking: cache-first. Tiradas en desplazamiento: cola, sin bloquear la interfaz.
 
-*** Observer en datos
+*** Command e idempotencia
 
-El marcador se suscribe al *stream de partidas de dominio*, no a filas crudas de Room. Si la UI observa la tabla SQL, acoplaste la lona al cajón.
+**** Definición
+
+Command reifica una operación (identidad, carga útil, estado de envío). En móvil sirve a la cola offline y al trabajo en fondo. El servidor debe tratar el identificador como clave de idempotencia: un reintento no duplica el efecto.
+
+Los conflictos (se jugó sin red y el ranking remoto avanzó) son política de producto, no un patrón que «fusiona solo».
+
+**** Cuándo, por qué, y quién ya lo implementa
+
+- *Cuándo:* la operación debe encolarse, reintentarse o ejecutarse con la UI ya destruida.
+- *Por qué:* la acción tiene identidad (idempotencia) y estado de envío.
+- *No:* un toque que llama a un método y termina.
+- *Ya lo traen:* WorkManager; =BGTaskScheduler=; acciones de Redux como Command de UI. No un hilo suelto que muere con el proceso.
+
+**** Instanciación: FeriaPPT
+
+Cada =TiréPapel= offline se guarda con UUID y se envía al recuperar la señal. WorkManager (u homólogo) sube la cola con la aplicación ya cerrada.
 
 ** Ciclo de vida, concurrencia y recursos
 
-*** Template Method del sistema operativo
+**** Definición
 
-El SO llama =onCreate= / =onResume=: plantilla fija. En FeriaPPT se engancha «restaurar el ViewModel»; el cálculo del rival no va en =onDraw=.
+El sistema operativo aplica Template Method: llama =onCreate=, =onResume=, =onDestroy=. El código de aplicación *engancha* trabajo ligero; el cálculo de dominio no corre en =onDraw=. Proxy virtual y Flyweight cubren listas y medios (carga diferida, celdas reutilizadas). El hilo de UI no analiza JSON.
 
-*** Proxy virtual y lazy
+**** Instanciación: FeriaPPT
 
-Avatares del ranking: no se cargan hasta que la fila es visible. El =RecyclerView.Adapter= es Adapter GoF + Flyweight (celdas reutilizadas).
+Restaurar el ViewModel en la plantilla del SO. Avatares del ranking: carga al ser visibles. =RecyclerView.Adapter= (u homólogo) es Adapter más Flyweight.
 
-*** Command para trabajo en segundo plano
+** Inyección de dependencias
 
-Cerrar la app en el camión: WorkManager sube las tiradas pendientes. El duelo en pantalla ya no existe; el Command sí.
+**** Definición
 
-** Inyección de dependencias en móvil
+El ViewModel recibe abstracciones (Strategy del rival, puerto de repositorio), no las construye. El marco (Hilt, Riverpod, fábricas de Swift) realiza el cableado. Un Singleton de *infraestructura* (registro, cliente HTTP configurado) es admisible; un Singleton de «ronda que se pinta» produce fugas y pruebas sucias.
 
-- En FeriaPPT: el ViewModel recibe =Rival= (Strategy) y =PartidaRepository=. En tests, un =RivalSiemprePiedra= falso. Nada de =new Retrofit= dentro del Fragment de los botones.
-- Singleton del repositorio: bien. Singleton de «ronda que estoy pintando»: fugas y tests sucios.
+**** Cuándo, por qué, y quién ya lo implementa
 
-** Patrones GoF que el móvil usa *con otro disfraz*
+- *Cuándo:* hay que sustituir el rival o el repositorio en prueba, o compartir el cliente HTTP configurado.
+- *Por qué:* el VM no hace =new Retrofit=; Strategy y Repository se inyectan.
+- *No:* Singleton de estado de pantalla.
+- *Ya lo traen:* Hilt/Koin (Android); Riverpod/=get_it= (Flutter); Swinject o fábricas (iOS). El contenedor *es* el cableado: no un segundo Service Locator casero.
 
-| GoF | En FeriaPPT móvil | Disfraz de plataforma |
-|-----+-------------------+------------------------|
-| Adapter | Lista del ranking; JSON ↔ ronda | =RecyclerView.Adapter=, wrappers de SDK |
-| Observer | Marcador que se actualiza solo | LiveData, Flow, Combine, BLoC |
-| Strategy | Rival aleatorio / copión | Igual que en la web |
-| State | idle / jugando / sync / error | sealed =UiState= |
-| Facade | Shake para tirar al azar | No importar el SDK de sensores en la UI |
-| Decorator | Token de pulsera en cada HTTP | Interceptor OkHttp |
-| Command | Tirada offline; undo de la última | WorkManager, intents |
-| Proxy | Caché de avatares | Coil, Glide, SDWebImage |
-| Singleton | Logger, *no* la ronda actual | =object= / =Application= |
+**** Instanciación: FeriaPPT
 
-** Plataformas: el mismo análisis, distintos idiomas
+El ViewModel recibe =Rival= y =PartidaRepository=. En prueba, un rival constante. El Fragment o el Widget no instancia Retrofit.
 
-El curso pide *análisis y diseño*, no fanatismo de toolkit. Una tabla para no perder el nivel:
+** Correspondencia GoF y mecanismos de plataforma
 
-| Decisión de diseño | Android nativo | iOS nativo | Flutter | React Native |
-|--------------------+----------------+------------+---------+--------------|
-| Presentación actual | MVVM + UDF (Compose) | MVVM + SwiftUI / Coordinator | BLoC / Riverpod | Redux / Zustand + hooks |
-| Navegación | Navigation / Compose Nav | Coordinator + NavigationStack | GoRouter / Navigator 2 | React Navigation |
-| DI | Hilt | Swinject / factory | Riverpod / get_it | Context + libs |
-| Local + red | Room + Retrofit/Ktor | Core Data + URLSession | Hive/Isar + Dio | MMKV/SQLite + fetch |
-| Background | WorkManager | BGTask / URLSession background | plugins + isolates | Headless JS (limitado) |
+| Intención GoF | Mecanismo habitual | Nota |
+|---------------+-------------------|------|
+| Adapter | Adaptador de lista; mapeo JSON | Tres ritmos: red, disco, UI |
+| Observer | Flow, Combine, BLoC | Cancelar al destruir la vista |
+| Strategy | Tipo o función inyectada | Igual que en el servidor; otra forma |
+| State | Tipo sellado de =UiState= | Preferible a booleanos concurrentes |
+| Facade | Envoltorio de cámara o de sensores | La UI no importa el SDK |
+| Decorator | Interceptor HTTP | Credencial, registro, reintento |
+| Command | Cola persistida; WorkManager | La vista puede ya no existir |
+| Proxy | Caché de imágenes | Coil, Glide, SDWebImage |
+| Singleton | Registro, *no* el estado de pantalla | El SO puede clonar el proceso |
 
-*Diseño portable:* puertos =Rival=, =PartidaRepository=. Los adapters *son* la plataforma. El reglamento PPT se explica igual en Kotlin o Flutter.
+** El caso FeriaPPT como composición
 
-** Análisis de un caso móvil: FeriaPPT sin red continua
+Hasta aquí el catálogo. El cliente móvil *instancia varios patrones a la vez*.
 
-1. *Fuerzas:* rotación a mitad de ronda, 40 % de red, el SO mata el proceso, push de «te retaron».
-2. *Presentación:* MVVM o MVI con =UiState= del duelo. El ViewModel no sube la partida: despacha =JugarRonda= / =EncolarTirada=.
-3. *Dominio:* =JugarRonda=, =SincronizarPendientes=. Entidad =Partida= con State =local | en_cola | enviada | error=.
-4. *Datos:* Repository cache-first del ranking; Command persistido por tirada; Adapter de la API; Facade de shake detrás de un puerto (tests).
-5. *Plataforma:* WorkManager para la cola; interceptor (Decorator) de pulsera; Coordinator menú → duelo → ranking.
-6. *Fuera de lugar:* Singleton =DueloActual=; bitmap del globo eterno en el ViewModel; asumir que =onDestroy= no ocurrirá.
+1. Fuerzas: rotación a mitad de ronda; red intermitente; el sistema mata el proceso; aviso remoto de desafío.
+2. Presentación: MVVM o MVI con estado del duelo; el ViewModel despacha casos de uso, no sube la partida.
+3. Dominio: =JugarRonda=, =SincronizarPendientes=; entidad con State =local | en_cola | enviada | error=.
+4. Datos: repositorio cache-first del ranking; Command por tirada; Adapter de API; Facade de sensores detrás de un puerto.
+5. Plataforma: trabajo en fondo para la cola; Decorator de credencial; Navigator del grafo de pantallas.
+6. Fuera de lugar: Singleton de duelo actual; mapa de bits retenido en el ViewModel; asumir que =onDestroy= no ocurrirá.
 
-** Comparativa de diseño: el mismo FeriaPPT, dos mundos
+| Si el conflicto es… | Estructura inicial | Lo que no lo resuelve |
+|---------------------+--------------------+------------------------|
+| Pantalla de miles de líneas | ViewModel o Presenter + caso de uso | Activity base «mágica» |
+| Se pierde el estado al rotar | Estado en ViewModel (+ estado guardado) | Variables en la vista |
+| No hay prueba sin emulador | Puerto de =Rival= + inyección | Instanciar el SDK en el Widget |
+| Inutilidad sin red | Repositorio dual + cola | Solo un aviso de «sin conexión» |
+| Lista trabada | Adapter + hilo de UI libre | Analizar JSON al enlazar la celda |
+| Navegación acoplada | Navigator / Coordinator | Arrancar pantallas desde el repositorio |
+| Sensores en el ViewModel | Facade de plataforma | Permisos mezclados con el reglamento |
 
-| Tema | FeriaPPT web | FeriaPPT móvil | Trampa si los copias tal cual |
-|------+--------------+----------------+-------------------------------|
-| Sesión | Cookie/JWT en cada clic | Token en Keystore + refresh | JWT en =SharedPreferences= en claro |
-| Marcador | Store del SPA (se pierde al recargar, o no) | *Debe* sobrevivir rotación y process death | «Igual que Redux web» sin persistir la ronda |
-| Una instancia | Un Node ≠ toda la feria | Un proceso de app; el SO puede clonarla | Singleton de «la ronda actual» |
-| Fallo de red | Spinner + ranking local | Cola de tiradas + indicador offline | Bloquear los botones hasta que haya Wi-Fi |
-| Navegación | URLs =/partidas/17= | Back stack + deep link | Tratar cada URL como una Activity |
-| BFF | JSON rico para la lona | Payload *aún más* chico (batería) | Mandar a la app la API del admin web |
-| Observer | WebSocket opcional del ranking | Streams locales *obligatorios* del marcador | Polling cada segundo y batería a 0 |
+** Comparación: el mismo dominio, dos medios
 
-** Tabla de decisión rápida: móvil
+| Tema | Aplicación web | Aplicación móvil | Error al copiar |
+|------+----------------+------------------+-----------------|
+| Sesión | Cookie o token por petición | Almacén seguro y renovación | Token en claro en preferencias |
+| Estado de UI | Almacén del SPA (volátil al recargar, salvo persistencia) | Debe sobrevivir rotación y muerte de proceso | «Como Redux web» sin persistir la ronda |
+| Una instancia | Un proceso de servidor no es el sistema | Un proceso de app; el SO puede recrearlo | Singleton de «la ronda actual» |
+| Fallo de red | Degradación y tiempo de espera | Cola de operaciones + indicador | Bloquear la entrada hasta que haya red |
+| Navegación | Recursos y URLs | Pila y *deep link* | Cada URL como una Activity |
+| Payload | Agregación (BFF) | Aún más reducido (energía) | Mandar al cliente la API de administración |
+| Observer | Opcional hacia el servidor | Casi obligatorio en el marcador local | Consulta periódica agresiva y batería |
 
-| Si el dolor en FeriaPPT móvil es… | Empieza por… | Evita… |
-|-----------------------------------+--------------+--------|
-| Activity de 2 000 líneas con los botones | VM/Presenter + =JugarRonda= | BaseActivity mágica |
-| Se pierde la ronda al rotar | Estado en ViewModel + savedState | Variables en la View |
-| No se puede testear sin emulador | Puerto de =Rival= + DI | =new= de SDK en los botones |
-| Inútil sin Wi-Fi | Repository dual + cola de tiradas | Toast «sin conexión» y ya |
-| Ranking trabado | Adapter + hilo UI limpio | Parsear JSON en =onBind= |
-| Navegación enredada | Navigator/Coordinator | =startActivity= desde el repo |
-| Shake/cámara/push en el ViewModel | Facades de plataforma | Permisos mezclados con el reglamento |
+** Síntesis
 
-** Idea clave de la parte móvil
-
-En el cliente móvil el patrón de presentación (MVP, MVVM, MVI) es necesario y no basta. El análisis se concentra en el *ciclo de vida* (conservar la ronda), en *dos orígenes de datos* (local y remoto) y en el *trabajo que continúa* cuando la vista ha sido destruida. El ViewModel conserva estado de presentación; el proceso lo administra el sistema operativo.
+En el cliente móvil el patrón de presentación es necesario y no basta. El análisis se concentra en el *ciclo de vida*, en *dos orígenes de datos* y en el *trabajo que continúa* cuando la vista ha sido destruida. El lenguaje y el marco *deciden la forma*: =StateFlow=, BLoC o =ObservableObject= son Observer; Hilt o Riverpod son el cableado. El ViewModel conserva estado de presentación; el proceso lo administra el sistema operativo. FeriaPPT ilustra la composición; no sustituye la definición.
 
 * Mapa integrado de la unidad
 
@@ -1044,22 +1568,23 @@ En el cliente móvil el patrón de presentación (MVP, MVVM, MVI) es necesario y
 ** Chuleta de elección
 
 #+begin_example
-  ¿Varía un ALGORITMO?                 → Strategy (a veces Factory para crearlos)
+  ¿Varía un ALGORITMO?                 → Strategy (función en JS; interfaz+DI en Java)
   ¿Varía una FAMILIA de productos?     → Abstract Factory
   ¿La interfaz AJENA no te sirve?      → Adapter (+ Anti-Corruption si hay lenguaje de negocio)
   ¿Subsistema FEOSO y quieres 3 métodos? → Facade
-  ¿Añadir comportamiento en capas?     → Decorator / Middleware / Interceptor
-  ¿Avisar a muchos sin acoplarlos?     → Observer / Pub-Sub (define in-process vs cola)
-  ¿Pasos de un algoritmo fijos?        → Template Method (¡cuidado con bases gordas!)
+  ¿Añadir comportamiento en capas?     → Decorator / Middleware / Interceptor (Express, OkHttp)
+  ¿Avisar a muchos sin acoplarlos?     → Observer nativo (LiveData, StateFlow, React), no una lista propia
+  ¿Pasos de un algoritmo fijos?        → Template Method (ciclo de vida del SO; ¡cuidado con bases gordas!)
   ¿Objeto que se comporta distinto según fase? → State (ideal para UiState)
-  ¿Acción que quieres encolar, deshacer o loguear? → Command
-  ¿Acceso controlado, remoto o cacheado? → Proxy
-  ¿Crear sin new por todos lados?      → Factory + DI
-  ¿HTTP con políticas transversales?   → Front Controller + Chain of Responsibility
-  ¿UI vs reglas vs datos?              → MVC/MVP/MVVM/MVI + Repository
+  ¿Acción que quieres encolar, deshacer o loguear? → Command (WorkManager, acciones Redux)
+  ¿Acceso controlado, remoto o cacheado? → Proxy (CDN, Coil, Cache-Control)
+  ¿Crear sin new por todos lados?      → Factory + DI (Hilt, Spring)
+  ¿HTTP con políticas transversales?   → Front Controller del marco + su middleware
+  ¿UI vs reglas vs datos?              → MVC/MVP/MVVM/MVI del toolkit + Repository
   ¿Dominio independiente de frameworks? → Hexagonal (puertos y adaptadores)
   ¿Cliente web y app quieren payloads distintos? → BFF
   ¿El tren (móvil) se queda sin señal? → Repository dual + cola de Commands
+  ¿El lenguaje o el marco YA lo traen? → se usa esa API; no se copia el UML de 1994 al lado
 #+end_example
 
 ** Errores de examen y de código más frecuentes
