@@ -1,9 +1,9 @@
 #+TITLE: Introducción a los Patrones de Diseño de Software
-#+SUBTITLE: Tópicos Selectos de Tecnologías Web y Móvil
+#+SUBTITLE: Borrador didáctico (para comparar; no sustituye el archivo canónico)
 #+AUTHOR: Eduardo Alcaraz
 #+LANGUAGE: es
 #+SETUPFILE: /home/likcos/Materias/Graficacion/theme-readtheorg-local.setup
-#+EXPORT_FILE_NAME: index.html
+#+EXPORT_FILE_NAME: patrones_didactico.html
 #+OPTIONS: num:nil toc:3
 #+OPTIONS: tex:mathjax
 #+HTML_HEAD: <style>#content{max-width:1800px;} pre{border-radius:8px;} table{font-size:0.95em;}</style>
@@ -13,7 +13,9 @@
 #+begin_quote
 Materia: *Tópicos Selectos de Tecnologías Web y Móvil*
 Unidad: *Introducción a los Patrones de Diseño de Software*
-Subtemas: Introducción · Análisis y diseño de patrones para aplicaciones web · Análisis y diseño de patrones para aplicaciones móviles
+Este archivo es un *borrador* generado para ver el resultado de una
+reorganización pedagógica. El material canónico sigue siendo
+=introduccion_patrones_diseno_software.org= (exporta a =index.html=).
 #+end_quote
 
 #+begin_quote
@@ -736,7 +738,7 @@ a introducir para resolverlo?
 
 ** Strategy
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 En una cocina hay varias recetas para «hacer el caldo»: caldo de pollo,
 de verduras, de huesos. El mesero no reescribe el menú cada vez que
@@ -747,7 +749,7 @@ En la plataforma de entregas, «planear cómo llega el paquete» es esa
 operación. Camioneta, moto, bici y dron son recetas distintas de *la
 misma* pregunta: ¿cabe? ¿cuánto tarda? ¿cuánto cuesta?
 
-*** Diseño
+*** Nivel 2 — Diseño
 
 Hay una operación =asignarEntrega()=. El medio puede cambiar. Si todas
 las variantes viven en el mismo método, ese método conoce demasiadas
@@ -756,12 +758,12 @@ decisiones.
 Mezcla: (1) coordinar el despacho y (2) las distintas formas de
 planear. Acoplamiento: =Despacho= apunta a cada medio concreto.
 
-*** El problema
+*** 1. Problema
 
 Hay varias formas de hacer *la misma* operación. Queremos
 intercambiarlas sin reescribir al que las usa.
 
-*** Cómo reconocerlo
+*** 2. Síntoma — ¿Cómo sé que tengo este problema?
 
 #+begin_src java
 if (medio.equals("moto"))      { /* peso, zona urbana */ }
@@ -781,20 +783,20 @@ para mantenerlos separados. Tres ramas *estables* que nadie toca no
 obligan. =if (pedido.pesoKg() > 2)= dentro del dron es una regla del
 dron, no un Strategy nuevo.
 
-*** Qué está cambiando
+*** 3. Qué está cambiando
 
 El *algoritmo* de =planear=. No el hecho de «asignar una entrega».
 
 La misma idea aparece en *calcular costo* y en *estimar tiempo*:
 varios algoritmos, misma pregunta.
 
-*** La idea
+*** 4. Idea
 
 Sacar cada forma a su propio componente. El resto habla de un
-*contrato*: «tú sabes planear». Palabra clave: *intercambiar
+**contrato*: «tú sabes planear». Palabra clave: *intercambiar
 comportamiento*.
 
-*** Estructura
+*** 5. Estructura
 
 #+begin_example
               MedioDeEntrega
@@ -807,7 +809,7 @@ comportamiento*.
     Camioneta   Moto      Bici      Dron
 #+end_example
 
-*** Participantes
+*** 6. Participantes
 
 | Quién | Responsabilidad |
 |-------+-----------------|
@@ -815,9 +817,9 @@ comportamiento*.
 | =EntregaDron=, =EntregaMotocicleta=, … | El *cómo* de cada medio |
 | =Despacho= | *Cliente* del patrón: usa el contrato, no las clases concretas |
 
-*Cliente* aquí es código, no el usuario del paquete.
+**Cliente* aquí es código, no el usuario del paquete.
 
-*** Antes
+*** 7. Antes
 
 El punto de partida suele ser inocente:
 
@@ -832,7 +834,7 @@ public class Despacho {
 Después se quiere el dron, luego la camioneta. =Despacho= conoce todos
 los medios. Añadir bicicleta *abre* =Despacho=.
 
-*** Después
+*** 8. Después
 
 =Despacho= solo conoce =MedioDeEntrega=. Se inyecta moto o dron.
 
@@ -853,7 +855,7 @@ Acoplamiento: cuánto depende una parte de otra *concreta*. Si
 =Despacho= apunta a =EntregaDron=, mañana hay que abrirlo para usar
 moto. Si apunta a =MedioDeEntrega=, se conecta cualquiera.
 
-*** Implementación
+*** 9. Implementación
 
 Primero el contrato. *No* afirma «ve en dron». Afirma: si eres un
 =MedioDeEntrega=, debes poder planear.
@@ -938,31 +940,31 @@ Otra analogía, misma estructura: descuentos (normal, socio, VIP). Un
 =PoliticaDescuento.calcular(precio)= permite intercambiar sin tocar
 =Compra=.
 
-*** Por qué funciona
+*** 10. ¿Por qué funciona?
 
 El acoplamiento dejó de ser =Despacho → EntregaDron= y pasó a
 =Despacho → contrato=. Añadir un medio no obliga a abrir el caso de
 uso.
 
-*** Ventajas
+*** 11. Ventajas
 
 - Extender sin editar =Despacho= (abierto/cerrado).
 - Probar cada algoritmo solo.
 - Vocabulario compartido: «esta es una Strategy de entrega».
 
-*** Costos
+*** 12. Costos
 
 Más tipos, más archivos, más indirección. Un mapa mental más largo.
 Un estudiante que no vea el contrato verá «clases de más».
 
-*** Cuándo no utilizarlo
+*** 13. ¿Cuándo NO utilizarlo?
 
 - Una sola motocicleta y no se prevé otra.
 - Un =sumar(a, b)= no necesita =ISuma=.
 - Tres =if= estables que nadie toca.
 - El «algoritmo» es una constante o un dato, no un comportamiento.
 
-*** Con qué se confunde
+*** 14. Patrones con los que se puede confundir
 
 | Patrón | Pregunta que responde | En las entregas |
 |--------+-----------------------+-----------------|
@@ -981,7 +983,7 @@ algoritmo de planeación.
 La fábrica (simple o Factory Method) y Strategy *suelen ir juntos*:
 se construye el objeto que *es* la estrategia. No son el mismo patrón.
 
-*** Ejercicio
+*** 15. Ejercicio
 
 Una aplicación tiene tres algoritmos de cálculo de envío. Hoy usa un
 =switch= de 200 líneas.
@@ -1009,7 +1011,7 @@ a introducir para resolverlo?
 
 ** Adapter
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 Viajas y el enchufe del hotel no coincide con el de tu cargador. No
 cambias la corriente de la casa ni rediseñas el cargador: pones un
@@ -1018,7 +1020,7 @@ adaptador *en medio*.
 La IA del proveedor habla =route_hint: "bike"=. El despacho habla
 =Sugerencia{ medio, motivo }=. El adaptador traduce.
 
-*** Diseño
+*** Nivel 2 — Diseño
 
 Cambia la *interfaz ajena*, no el reglamento de entrega. Si
 =route_hint= se filtra al pedido, al panel y a las fichas, un
@@ -1027,12 +1029,12 @@ proveedor nuevo obliga a tocar medio sistema.
 El Adapter se acopla a *los dos lados*. El despacho solo al contrato
 nuestro.
 
-*** El problema
+*** 1. Problema
 
 Nuestro sistema habla un idioma. Un sistema *externo* habla otro. Hay
 que traducir un idioma que *no controlamos*.
 
-*** Cómo reconocerlo
+*** 2. Síntoma — ¿Cómo sé que tengo este problema?
 
 - =route_hint=, =00=, =OK_N= o etiquetas XML aparecen en el despacho,
   el panel y las pruebas.
@@ -1043,24 +1045,24 @@ que traducir un idioma que *no controlamos*.
 No es Adapter si *tú* controlas ambos lados y puedes pactar el mismo
 JSON. Entonces basta alinear el contrato.
 
-*** Qué está cambiando
+*** 3. Qué está cambiando
 
 La forma del mensaje *ajeno*. No el algoritmo de planear (eso es
 Strategy). No «simplificar nuestro interior» (eso es Facade).
 
-*** La idea
+*** 4. Idea
 
 El dominio define el contrato que *sí* entiende. El Adapter lo
 implementa y por dentro llama a lo ajeno. El JSON muere en un archivo.
 
-*** Estructura
+*** 5. Estructura
 
 #+begin_example
 Despacho → RecomendadorIA ← AdaptadorOpenAI → API del proveedor
               (nuestro)         (traduce)         (ajeno)
 #+end_example
 
-*** Participantes
+*** 6. Participantes
 
 | Quién | Responsabilidad |
 |-------+-----------------|
@@ -1068,17 +1070,17 @@ Despacho → RecomendadorIA ← AdaptadorOpenAI → API del proveedor
 | =AdaptadorOpenAI= (u otro) | Traduce prompt/JSON/XML al contrato |
 | Cliente (=Despacho=, caso de uso) | Solo ve =Sugerencia= |
 
-*** Antes
+*** 7. Antes
 
 =Despacho= lee =n.get("route_hint")=. El vocabulario ajeno vive en el
 negocio.
 
-*** Después
+*** 8. Después
 
 =Despacho= llama =recomendador.sugerir(...)=. Un proveedor nuevo es
-*otro* adaptador, no otro =Despacho=.
+**otro* adaptador, no otro =Despacho=.
 
-*** Implementación
+*** 9. Implementación
 
 #+begin_src java
 public interface RecomendadorIA {
@@ -1097,29 +1099,29 @@ public class AdaptadorOpenAI implements RecomendadorIA {
 En JavaScript basta =mapearRespuestaIA(json)=. No hace falta una
 jerarquía de clases. La idea es la misma: el borde traduce.
 
-*** Por qué funciona
+*** 10. ¿Por qué funciona?
 
 El acoplamiento al proveedor queda encerrado. El resto del sistema
 evoluciona en vocabulario de *nuestro* dominio.
 
-*** Ventajas
+*** 11. Ventajas
 
 Cambiar de IA sin reescribir el despacho. Probar el negocio con un
 adaptador falso.
 
-*** Costos
+*** 12. Costos
 
 Una clase (o función) más. Hay que mantener el mapeo cuando el
 proveedor cambia el JSON.
 
-*** Cuándo no utilizarlo
+*** 13. ¿Cuándo NO utilizarlo?
 
 - Se pacta el mismo JSON con el proveedor.
 - El «adaptador» solo llama a un método nuestro con el mismo nombre
   (ruido).
 - Quieres esconder un =if= de *negocio* (eso no es traducción).
 
-*** Con qué se confunde
+*** 14. Patrones con los que se puede confundir
 
 | | Strategy | Adapter | Facade |
 |---+----------+---------+--------|
@@ -1131,7 +1133,7 @@ Facade: =registrarPedido()= orquesta *nuestro* módulo. Adapter: el
 otro no es nuestro. Strategy: elegir *nuestro* algoritmo de entrega,
 no traducir =bike= a =bici=.
 
-*** Ejercicio
+*** 15. Ejercicio
 
 El proveedor dice =route_hint: "bike"=; el dominio dice
 =Sugerencia{ "bici", motivo }=. ¿Adapter o Facade? Justifica.
@@ -1164,7 +1166,7 @@ Factory Method y no lo es.
 Declarar =abstract class MedioFactory= *no* convierte una fábrica
 simple en Abstract Factory.
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 Primera versión de la plataforma: solo camioneta. El despacho *es*
 camioneta: valida peso, arma la ruta, cobra. Luego piden mar (barco) y
@@ -1182,7 +1184,7 @@ la intuición de *no construir en la mesa*. Factory Method añade:
 quien despacha *sigue despachando*, y una *subclase* decide qué
 vehículo sale.
 
-*** Diseño
+*** Nivel 2 — Diseño
 
 El =new= no desaparece. Se *mueve* a un método (=crearMedio=) que las
 subclases pueden redefinir. Los productos (=camioneta=, =barco=,
@@ -1204,7 +1206,7 @@ Logistica.despachar(pedido)
         └── medio.planear(pedido, ctx)   ← la creadora USA el producto
 #+end_example
 
-*** El problema
+*** 1. Problema
 
 No conoces de antemano el tipo concreto con el que debe trabajar el
 código de despacho. Si dejas =new EntregaCamioneta()= dentro de ese
@@ -1212,7 +1214,7 @@ código, cada medio nuevo obliga a abrirlo otra vez. El programa se
 llena de condicionales que cambian el comportamiento *según la clase*
 del transporte.
 
-*** Cómo reconocerlo
+*** 2. Síntoma — ¿Cómo sé que tengo este problema?
 
 - La lógica de =despachar= menciona =EntregaCamioneta= por su nombre.
 - Añadir barco o dron toca *varios* archivos, no uno.
@@ -1224,13 +1226,13 @@ Un =new ArrayList<>()= no es este problema. Un =new EntregaMotocicleta()=
 construye (fábrica simple) es un problema *menor*: ya no está mezclado
 con el trámite, pero todavía no es Factory Method.
 
-*** Qué está cambiando
+*** 3. Qué está cambiando
 
 El *tipo de producto* que el trámite necesita. No el algoritmo de
 planear (eso ya es Strategy: el producto *es* la estrategia). No el
 JSON de la IA (Adapter).
 
-*** La idea
+*** 4. Idea
 
 En lugar de construir el medio en medio del trámite, el trámite pide
 =crearMedio()=. Las subclases de la creadora devuelven productos
@@ -1245,7 +1247,7 @@ El método no tiene por qué hacer =new= cada vez: puede devolver un
 objeto de un *pool* (conexiones, clientes HTTP). Un constructor no
 puede hacer eso: por definición devuelve una instancia nueva.
 
-*** Estructura
+*** 5. Estructura
 
 #+begin_example
         MedioDeEntrega          ← Producto (contrato)
@@ -1267,7 +1269,7 @@ puede hacer eso: por definición devuelve una instancia nueva.
 Puedes dejar =crearMedio= abstracto (toda subclase *debe* implementarlo)
 o dar un producto por defecto en la base.
 
-*** Participantes
+*** 6. Participantes
 
 | Quién | Responsabilidad |
 |-------+-----------------|
@@ -1280,7 +1282,7 @@ o dar un producto por defecto en la base.
 El cliente elige *qué creadora* instanciar (configuración, entorno,
 tipo de operación). A partir de ahí trabaja contra la clase base.
 
-*** Antes
+*** 7. Antes
 
 #+begin_src java
 public class Logistica {
@@ -1294,7 +1296,7 @@ public class Logistica {
 Para meter el dron hay que *abrir* =despachar= (y el panel, y las
 pruebas). El trámite y la construcción están mezclados.
 
-*** Después
+*** 8. Después
 
 =despachar= no conoce camioneta ni dron. Conoce =MedioDeEntrega=.
 =LogisticaAerea= solo cambia =crearMedio=.
@@ -1308,7 +1310,7 @@ Cliente → Logistica (base)
 despachar() es el mismo código en la clase base.
 #+end_example
 
-*** Implementación
+*** 9. Implementación
 
 Primero el contrato del producto (el mismo de Strategy):
 
@@ -1400,27 +1402,27 @@ por dentro: mezclaría *planear* con *elegir tipo*. Quien orquesta
 (=registrarPedido=) obtiene el medio —por fábrica simple, por Factory
 Method o por inyección— y se lo pasa a =Despacho=.
 
-*** Por qué funciona
+*** 10. ¿Por qué funciona?
 
 El trámite (=despachar=) quedó acoplado al *contrato*, no a
 =EntregaCamioneta=. Añadir un medio es añadir producto + creadora
 concreta (o un =case= en la fábrica simple), no reescribir el caso de
 uso.
 
-*** Ventajas
+*** 11. Ventajas
 
 - Menos acoplamiento entre creador y productos concretos.
 - Un lugar para la creación (responsabilidad única de *ese* recorte).
 - Abierto a un medio nuevo sin abrir =despachar= (abierto/cerrado).
 
-*** Costos
+*** 12. Costos
 
 Más clases. El patrón se justifica sobre todo cuando *ya hay* (o va a
 haber) una jerarquía de creadoras. Si solo necesitas un =switch= de
 tres tipos, la fábrica simple es más barata. Si solo hay motocicleta,
 ni siquiera eso.
 
-*** Cuándo no utilizarlo
+*** 13. ¿Cuándo NO utilizarlo?
 
 - Un solo tipo estable: =new= en un sitio claro.
 - =new ArrayList<>()=.
@@ -1430,7 +1432,7 @@ ni siquiera eso.
 - Reescribir Factory Method junto a Spring, que ya inyecta
   =MedioDeEntrega=.
 
-*** Con qué se confunde
+*** 14. Patrones con los que se puede confundir
 
 | Pregunta | Patrón |
 |----------+--------|
@@ -1450,7 +1452,7 @@ fábrica. Factory Method es, a la vez, un gancho de Template Method:
 
 BFF no es una «fábrica de JSON» para la pantalla de inicio.
 
-*** Ejercicio
+*** 15. Ejercicio
 
 La plataforma solo tenía camioneta. =Logistica.despachar= hace
 =new EntregaCamioneta()=. Piden dron y barco.
@@ -1474,29 +1476,38 @@ a introducir para resolverlo?
 
 ** Facade
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 En un hotel no llamas a limpieza, llaves y caja por separado para el
 check-in. Hablas con *recepción*. Esa puerta corta es una fachada.
 
-*** El problema
+*** Nivel 2 — Diseño
 
 Simplificar el acceso a un *subsistema nuestro* que ya es complejo.
-No traducir a un extraño (eso es Adapter). No intercambiar algoritmos
-(eso es Strategy).
+No traducir a un extraño (Adapter). No intercambiar algoritmos
+(Strategy).
 
-El controlador HTTP —o varias pantallas— conoce diez clases internas
-del registro de pedido: validador, IA, medio, repositorio, cobro. El
-trámite está *inlined* en la ruta, copiado en la app y en un job. Cada
-cliente arma la orquestación a su manera.
+*** 1. Problema
 
-Cambia la *forma de usar* el interior. El interior puede seguir siendo
+El controlador HTTP (o varias pantallas) conoce diez clases internas
+del registro de pedido: validador, IA, medio, repositorio, cobro…
+
+*** 2. Síntoma
+
+=registrarPedido= está *inlined* en la ruta, copiado en la app y en un
+job. Cada cliente del subsistema arma la orquestación a su manera.
+
+*** 3. Qué está cambiando
+
+La *forma de usar* el interior. El interior puede seguir siendo
 complejo; los clientes no deberían verlo.
 
-*** La idea
+*** 4. Idea
 
-Una operación de aplicación, =registrarPedido()=, que orquesta. El
+Una operación de aplicación (=registrarPedido()=) que orquesta. El
 Service Layer *suele realizar* esta idea: el mesero, no la cocina.
+
+*** 5. Estructura
 
 #+begin_example
 HTTP / app / job
@@ -1508,31 +1519,37 @@ HTTP / app / job
         +-- Repository
 #+end_example
 
+*** 6. Participantes
+
 La fachada *no* es el Front Controller (eso es la portería HTTP). No
 es el Adapter (el otro no es nuestro).
 
-*** Antes y después
+*** 7–9. Antes / después / implementación
 
-Antes, la ruta Spring o el =app.post= llama al repositorio, al cliente
-HTTP de la IA y a =new EntregaDron()=. Después, la ruta llama
+Antes: la ruta Spring o el =app.post= llama a repositorio, cliente HTTP
+de IA y =new EntregaDron()=. Después: la ruta llama
 =pedidos.registrar(...)=. El código de orquestación vive *una* vez.
 
 Una clase que solo delega a un método con el mismo nombre es ruido,
 no Facade.
 
+*** 10–13. Por qué, ventajas, costos, cuándo no
+
 Se gana un único trámite. Se paga un tipo más. No hace falta si el
 subsistema es un solo método claro. Las «Facades» de Laravel son
-*otro* mecanismo (acceso estático a servicios): no confundir el
+**otro* mecanismo (acceso estático a servicios); no confundir el
 nombre con el patrón GoF.
+
+*** 14. Confusiones
 
 Adapter vs Facade: ¿el otro es ajeno o nuestro? Strategy vs Facade:
 ¿intercambio algoritmos o escondo un módulo? Service Layer y Facade
 a menudo coinciden en la práctica: nombra el *trámite*.
 
-*** Ejercicio
+*** 15. Ejercicio
 
-El proveedor habla de =route_hint=: ¿Facade? (No: Adapter.)
-=registrarPedido= que oculta validar y persistir: ¿Facade o Service
+=route_hint= en el proveedor: ¿Facade? (No: Adapter.)
+=registrarPedido= que oculta validar + persistir: ¿Facade / Service
 Layer? ¿Hace falta *además* un =PedidoFacade= vacío?
 
 #+begin_quote
@@ -1542,13 +1559,13 @@ a introducir para resolverlo?
 
 ** Observer
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 Un grupo de WhatsApp: publicas un hecho. No tienes la lista de
 teléfonos de todos los parientes en la cabeza cada vez que escribes.
 Quien esté en el grupo se entera. Quien salga, deja de enterarse.
 
-*** El problema
+*** Nivel 2 — Diseño
 
 Cuando cambia el estado del pedido, cliente, repartidor, admin,
 estadísticas e IA *pueden* querer saber. Mezclar esas llamadas en
@@ -1557,8 +1574,12 @@ estadísticas e IA *pueden* querer saber. Mezclar esas llamadas en
 Observer comunica: «el evento *ocurrió*». *No* garantiza: «estas dos
 operaciones se confirman *juntas*». Eso es Unit of Work.
 
-Varios interesados deben enterarse *sin* que el sujeto importe sus
-clases concretas.
+*** 1. Problema
+
+Varios interesados deben enterarse de un hecho *sin* que el sujeto
+importe sus clases concretas.
+
+*** 2. Síntoma — ¿Cómo sé que tengo este problema?
 
 #+begin_src java
 void cambiarEstado(Estado e) {
@@ -1571,24 +1592,30 @@ void cambiarEstado(Estado e) {
 #+end_src
 
 Cada oyente nuevo *abre* ese método. O al revés: el correo está
-*dentro* del cobro y si =mail()= falla a veces no hay envío.
+**dentro* del cobro y si =mail()= falla a veces no hay envío.
 
-Cambia *quién* necesita saber. No el algoritmo de entrega. No la
-atomicidad del cobro.
+*** 3. Qué está cambiando
 
-*** La idea
+**Quién* necesita saber. No el algoritmo de entrega. No la atomicidad
+del cobro.
+
+*** 4. Idea
 
 Publicar un evento de dominio *después* de que el hecho sea real
 (=COMMIT=). Los oyentes se suscriben.
 
+*** 5. Estructura
+
 #+begin_example
 COMMIT
   ↓
-PedidoActualizado
+PedidoActualizado     ← sujeto / evento
   +--> correo
   +--> app del repartidor
   +--> estadísticas
 #+end_example
+
+*** 6. Participantes
 
 | Quién | Responsabilidad |
 |-------+-----------------|
@@ -1596,38 +1623,66 @@ PedidoActualizado
 | Evento (=PedidoActualizado=) | Datos del hecho, no la lógica de cada canal |
 | Oyentes | Correo, push, stats: cada uno una razón de cambio |
 
-Antes: llamadas en línea dentro de =cambiarEstado= o del script de
-pago. Después: la transacción confirma pedido y cobro; *luego* se
-notifica.
+*** 7. Antes
 
-La forma depende del lenguaje y del marco: lista de oyentes a mano
-(legado); eventos de Spring (=ApplicationEventPublisher=);
-=StateFlow=, hooks o BLoC (Observer de *UI*, no de dominio). Ninguno
-exige =Subject= / =ConcreteObserver= de 1994. Duplicar un bus casero
-*junto* a =StateFlow= es el mismo defecto que dos Front Controller.
+Llamadas en línea dentro de =cambiarEstado= o dentro del script de
+pago.
+
+*** 8. Después
+
+La transacción confirma pedido + cobro. *Luego* se notifica.
+
+*** 9. Implementación
+
+La forma depende del lenguaje y del marco:
+
+- Lista de oyentes a mano (legado, servidor mínimo).
+- Eventos de Spring (=ApplicationEventPublisher=).
+- =StateFlow= / hooks / BLoC: Observer de *UI*, no de dominio.
+
+Los tres de UI (Kotlin, Dart, Swift) son Observer de presentación.
+Ninguno exige =Subject= / =ConcreteObserver= de 1994. Duplicar un bus
+casero *junto* a =StateFlow= es el mismo defecto que dos Front
+Controller.
+
+*** 10. ¿Por qué funciona?
 
 Añadir un canal no abre el caso de uso de registro. El dominio no
-importa SMTP. Se paga: orden de notificación, fallos en un oyente,
-depuración menos lineal, y el riesgo de usarlo *en lugar de* la
-transacción.
+importa SMTP.
 
-Un solo llamador evidente: llama directo. Atomicidad de cobro y alta:
-*no* es Observer. Un =setInterval= que pega al servidor cada segundo
+*** 11. Ventajas
+
+Extensión de avisos. Los oyentes se prueban por separado.
+
+*** 12. Costos
+
+Orden de notificación no trivial. Fallos en un oyente. Depuración
+menos lineal. Riesgo de usarlo *en lugar de* la transacción.
+
+*** 13. ¿Cuándo NO utilizarlo?
+
+Un solo llamador evidente: llama directo. Atomicidad de cobro + alta:
+**no* es Observer. Un =setInterval= que pega al servidor cada segundo
 no es este patrón.
+
+*** 14. Patrones con los que se puede confundir
 
 | Patrón | Pregunta |
 |--------+----------|
 | Observer | ¿Quién necesita saber que ocurrió algo? |
-| Command | ¿Encapsulo la solicitud para encolarla o deshacerla? |
+| Command | ¿Encapsulo la solicitud para encolarla / deshacerla? |
 | Unit of Work | ¿Estas escrituras van juntas o ninguna? |
-| Mediator | ¿Evito que todos se conozcan entre todos? |
+| Mediator | ¿Evito que todos se conozcan entre todos? (otro problema) |
 
-El Observer del DOM no es el de =PedidoActualizado=. Nombra *la capa*.
+El Observer del DOM no es el Observer de =PedidoActualizado=. Nombra
+**la capa*.
 
-*** Ejercicio
+*** 15. Ejercicio
 
 Un alumno afirma: «Observer registra el envío cuando hay pago».
 ¿Estás de acuerdo? Defiende o rechaza.
+
+Malo:
 
 #+begin_example
 Pago realizado → Observer → registrar envío
@@ -1643,16 +1698,16 @@ a introducir para resolverlo?
 
 ** Front Controller
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 Un edificio con una *portería*: no entras por la ventana de cada
 oficina. Las reglas de visita se aplican *una* vez.
 
-*** El problema
+*** 1–3. Problema, síntoma, qué cambia
 
 Cada archivo HTTP copia sesión, bitácora y encabezado. Cuando cambia
 la caducidad del token, hay que tocar cuarenta archivos. Cambia la
-*entrada* y las políticas transversales, no el reglamento de entrega.
+**entrada* y las políticas transversales, no el reglamento de entrega.
 
 #+begin_example
 index.php     → sesión
@@ -1660,7 +1715,7 @@ pedidos.php   → sesión
 pagos.php     → sesión
 #+end_example
 
-*** La idea
+*** 4–6. Idea, estructura, participantes
 
 Una portería. El frontal *dirige*. No decide si el dron puede volar.
 Page Controller es el piso (este trámite). Él solo no deja de copiar
@@ -1675,14 +1730,18 @@ Front Controller
 pedidos pagos seguimiento
 #+end_example
 
+*** 7–9. Antes / después / implementación
+
 Spring: =DispatcherServlet=. Express: =app=. Laravel: kernel. Si el
 marco ya lo trae, *no se construye otro* al lado.
 
-Un sitio de tres páginas estáticas no lo pide. No es Strategy. No es
-API Gateway: el Gateway es *borde* entre clientes y *varios*
-servicios; el Front Controller es la portería *de esta* aplicación.
+*** 13–14. Cuándo no y confusiones
 
-*** Ejercicio
+Un sitio de tres páginas estáticas no lo pide. No es Strategy. No es
+API Gateway (el Gateway es *borde* entre clientes y *varios*
+servicios; el Front Controller es la portería *de esta* aplicación).
+
+*** 15. Ejercicio
 
 Conviven =index.php= e =index1.php=, cada uno con su sesión. ¿Hay
 Front Controller? ¿Basta un Page Controller por archivo?
@@ -1694,18 +1753,18 @@ a introducir para resolverlo?
 
 ** Chain of Responsibility / middleware
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 En el aeropuerto: documentación → seguridad → puerta. Cada puesto
 deja pasar, modifica o detiene. El orden importa.
 
-*** El problema
+*** 1–3.
 
 La misma política (sesión, CORS, bitácora) se copia o se aplica en
 el orden equivocado. Autenticar *después* de cobrar cobra a quien no
 debería.
 
-*** La idea
+*** 4–9.
 
 #+begin_example
 Petición → autenticación → autorización → bitácora → controlador
@@ -1722,13 +1781,15 @@ function autenticar(req, res, next) {
 #+end_src
 
 La cadena *no* elige camioneta o motocicleta. Eso es el dominio
-(Strategy). Un solo chequeo en una sola ruta: un =if=, no una cadena.
-No reescribas el diagrama GoF *junto* a =app.use=.
+(Strategy).
 
-*** Ejercicio
+*** 13–15.
+
+Un solo chequeo en una sola ruta: un =if=, no una cadena. No
+reescribas GoF *junto* a =app.use=.
 
 Un compañero pone el =switch= de medios *dentro* del middleware.
-¿Estás de acuerdo?
+¿De acuerdo?
 
 #+begin_quote
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
@@ -1737,18 +1798,18 @@ a introducir para resolverlo?
 
 ** Repository
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 El bibliotecario. Pides «los pedidos de Ana». No entras al depósito
 ni hablas el idioma de las estanterías.
 
-*** El problema
+*** 1–3.
 
 SQL en la plantilla del seguimiento o en el controlador. La vista
 conoce la bodega. Cambia *cómo* se persiste (SQL, memoria, otro
 motor), no el HTML.
 
-*** La idea
+*** 4–9.
 
 #+begin_example
 Controlador → caso de uso → Repository → base de datos
@@ -1764,15 +1825,17 @@ public interface PedidoRepository {
 En pruebas, una lista en memoria. En producción, SQL. Carpetas
 =models/views/controllers= con SQL en las tres *no* son MVC.
 
+*** 13–14.
+
 Un =SELECT= único en un script de migración no pide repositorio.
 Active Record (Laravel Eloquent) *no* es el mismo patrón: el modelo
-*es* la fila. Se puede vivir con ello; no se finja que ya hay
+**es* la fila. Se puede vivir con ello; no se finja que ya hay
 Repository.
 
-*** Ejercicio
+*** 15.
 
 La plantilla ejecuta =SELECT= y además manda correo si hay tres
-reprobadas (el kardex legado). ¿Basta un repositorio? ¿Qué más falta?
+reprobadas (kardex legado). ¿Repository solo? ¿Qué más falta?
 
 #+begin_quote
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
@@ -1781,15 +1844,15 @@ a introducir para resolverlo?
 
 ** Service Layer
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 El mesero toma el pedido. No cocina y no baja a la bodega.
 
-*** El problema y la idea
+*** 1–9.
 
 El Service Layer nombra el *caso de uso*: =registrarPedido()=,
 =realizarPago()=, =cambiarEstado()=. El controlador HTTP recibe y
-*delega*. Debe ser delgado.
+**delega*. Debe ser delgado.
 
 #+begin_example
 HTTP → Controlador → Service (registrarPedido)
@@ -1800,6 +1863,8 @@ HTTP → Controlador → Service (registrarPedido)
 
 En la práctica coincide a menudo con Facade del trámite. Express *no*
 lo impone: hay que extraerlo.
+
+*** 13–15.
 
 Un método que solo llama a un =save= y se llama =PedidoService= es
 ceremonia. El caso de uso existe cuando hay *orquestación* (validar,
@@ -1812,18 +1877,19 @@ a introducir para resolverlo?
 
 ** Template View
 
+*** 1–9.
+
 La vista presenta. No consulta, no cobra, no envía correo.
 
-Malo: HTML más SQL más reglas más correo. Mejor: el caso de uso deja
-datos ya listos y la plantilla (Blade, EJS, Thymeleaf, Jinja) rellena
-huecos.
+Malo: HTML + SQL + reglas + correo. Mejor: Service → datos ya listos
+→ plantilla (Blade, EJS, Thymeleaf, Jinja).
 
 El seguimiento recibe =estado= y =eta=. No ejecuta =SELECT=.
 
 Transform View *construye* la representación (React en el servidor).
 No es el mismo mecanismo; la regla sí: la vista no habla SQL.
 
-*** Ejercicio
+*** 15.
 
 =kardex1.php= pinta filas y, *dentro del =while=*, consulta materias,
 escribe alertas y al final llama =mail=. ¿Es Template View? ¿Qué
@@ -1836,15 +1902,18 @@ a introducir para resolverlo?
 
 ** Unit of Work
 
-*** Intuición
+*** Nivel 1 — Intuición
 
 La cuenta del restaurante: toda, o ninguna. No pagas el segundo plato
 si el primero no salió y aun así te cobraron el vino.
 
-*** El problema
+*** 1–3.
 
-Cobro y alta del envío: juntos o nada. Cada =mysqli_query= confirma
-por su cuenta; si el alta falla a media lista, el saldo ya bajó.
+Cobro y alta del envío: juntos o nada. Síntoma: cada =mysqli_query=
+confirma por su cuenta; si el alta falla a media lista, el saldo ya
+bajó.
+
+*** 4–9.
 
 #+begin_example
 BEGIN → pedido → cobro → saldo → COMMIT
@@ -1852,12 +1921,14 @@ BEGIN → pedido → cobro → saldo → COMMIT
 #+end_example
 
 =@Transactional= y =DB::transaction= *son* Unit of Work. El correo
-*no* entra aquí.
+**no* entra aquí.
+
+*** 13–14.
 
 Un =INSERT= único no pide unidad explícita. Observer *no* sustituye
-esto. Idempotencia es *otro* problema: el mismo cobro dos veces.
+esto. Idempotencia es *otro* problema (el mismo cobro dos veces).
 
-*** Ejercicio
+*** 15.
 
 «El Observer registra el envío cuando el pago se publica.» ¿Por qué
 no basta? Dibuja =COMMIT= y *después* =PedidoActualizado=.
@@ -1871,8 +1942,12 @@ a introducir para resolverlo?
 
 No es un patrón GoF. Es de APIs y sistemas distribuidos.
 
+*** 1–3.
+
 El usuario pulsa dos veces «Pagar». Sin diseño, hay dos cargos. El
 botón que dice «NO ACTUALICE LA PAGINA» es un rótulo, no una clave.
+
+*** 4–9.
 
 #+begin_example
 POST /pagos
@@ -1882,13 +1957,11 @@ Idempotency-Key: ABC123
 Analogía: el botón del elevador. Pulsar dos veces no llama dos
 cabinas. Retry ciego de un cobro *sin* clave duplica el efecto.
 
+*** 13–15.
+
 Un =GET= de seguimiento ya es idempotente por naturaleza HTTP. No
-inventes clave donde no hay efecto.
-
-*** Ejercicio
-
-Un compañero reintenta el cobro ante un 400 de validación. ¿Estás de
-acuerdo?
+inventes clave donde no hay efecto. Un compañero reintenta el cobro
+ante un 400 de validación: ¿de acuerdo?
 
 #+begin_quote
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
@@ -1897,12 +1970,14 @@ a introducir para resolverlo?
 
 ** BFF y API Gateway
 
-La app pide JSON mínimo (folio, estado, eta) y el panel pide HTML con
-mapa: *distinta hambre*. Hoy el equipo de la app hace doce =fetch=
-para el inicio. Eso pide un BFF: un backend *para ese* cliente.
+*** BFF — problema
 
-Varios servicios y una entrada de *borde* (auth, TLS, límites): eso
-es API Gateway.
+App (JSON mínimo: folio, estado, eta) y panel (HTML + mapa): *distinta
+hambre*. Hoy el equipo de la app hace doce =fetch= para el inicio.
+
+*** Gateway — problema
+
+Varios servicios, una entrada de *borde* (auth, TLS, límites).
 
 #+begin_example
 Backend
@@ -1918,7 +1993,7 @@ servicios. El BFF se diseña alrededor de *un* tipo de cliente.
 Factory no alimenta la pantalla de inicio. Si solo hay un cliente y
 un recurso ya adecuado, BFF sobra.
 
-*** Ejercicio
+*** 15.
 
 ¿BFF, Gateway, ambos o ninguno para un CRUD de un solo cliente y un
 =GET /pedidos/{id}= ya suficiente?
@@ -1931,25 +2006,30 @@ a introducir para resolverlo?
 ** Timeout, Retry y Circuit Breaker
 
 La IA y el mapa pueden fallar. El pedido *ya guardado* debe seguir
-consultable. No son GoF. Son de integración y resiliencia.
+consultable. No son GoF. Son de integración / resiliencia.
 
-*Timeout.* Si no responde en X tiempo, se deja de esperar. No el
-=await= infinito. Analogía: cuelgas el teléfono.
+*** Timeout
 
-*Retry.* Solo fallos *temporales* (red, 503), con tope. Un 400 de
-validación no se reintenta. Un cobro sin idempotencia no se reintenta
-a ciegas.
+Si no responde en X tiempo, se deja de esperar. No el =await=
+infinito. Analogía: cuelgas el teléfono.
 
-*Circuit Breaker.* Si el colaborador falla mucho, se deja de llamar
-un rato (fusible). Luego se prueba una vez. Protege *nuestro* sistema.
+*** Retry
+
+Solo fallos *temporales* (red, 503), con tope. Un 400 de validación
+no se reintenta. Un cobro sin idempotencia no se reintenta a ciegas.
+
+*** Circuit Breaker
+
+Si el colaborador falla mucho, se deja de llamar un rato (fusible).
+Luego se prueba una vez. Protege *nuestro* sistema.
 
 #+begin_example
 Normal → muchos errores → circuito abierto → no llamar un rato
 #+end_example
 
-Bulkhead: que la IA no ahogue el seguimiento.
+Bulkhead: que la IA no ahogue el tracking.
 
-*** Ejercicio
+*** 15.
 
 Mapa e IA caídos; el usuario no puede consultar un pedido *ya
 guardado*. ¿Timeout, Retry o Circuit Breaker hacia la IA? ¿Qué *no*

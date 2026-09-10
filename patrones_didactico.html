@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-09-09 mié 23:17 -->
+<!-- 2026-09-09 mié 23:07 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Introducción a los Patrones de Diseño de Software</title>
@@ -207,274 +207,308 @@
 <div id="content" class="content">
 <h1 class="title">Introducción a los Patrones de Diseño de Software
 <br />
-<span class="subtitle">Tópicos Selectos de Tecnologías Web y Móvil</span>
+<span class="subtitle">Borrador didáctico (para comparar; no sustituye el archivo canónico)</span>
 </h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge3339dc">Antes de los patrones: aprender a reconocer estructuras</a>
+<li><a href="#org1e637fd">Antes de los patrones: aprender a reconocer estructuras</a>
 <ul>
-<li><a href="#org36ed0ce">Tres acertijos para entrenar la mirada</a>
+<li><a href="#org5e14851">Tres acertijos para entrenar la mirada</a>
 <ul>
-<li><a href="#org06e102b">Acertijo 1 — Un millón de interruptores</a></li>
-<li><a href="#org7cf1424">Acertijo 2 — El estacionamiento</a></li>
-<li><a href="#orgfc53d3e">Acertijo 3 — La mosca y los dos trenes</a></li>
+<li><a href="#org8791c9c">Acertijo 1 — Un millón de interruptores</a></li>
+<li><a href="#orgdbf3e38">Acertijo 2 — El estacionamiento</a></li>
+<li><a href="#org69d5430">Acertijo 3 — La mosca y los dos trenes</a></li>
 </ul>
 </li>
-<li><a href="#org24b264b">Soluciones y moraleja</a>
+<li><a href="#org71aac4a">Soluciones y moraleja</a>
 <ul>
-<li><a href="#org56d50bc">Revelación del acertijo 1</a></li>
-<li><a href="#org2a17283">Revelación del acertijo 2</a></li>
-<li><a href="#org42eb225">Revelación del acertijo 3</a></li>
-<li><a href="#org4fc185a">Qué tiene esto que ver con el software</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org2ffee7c">Qué es un patrón de diseño</a>
-<ul>
-<li><a href="#org51445c7">Tres niveles de explicación</a></li>
-<li><a href="#orgc077544">Lenguaje, marco y patrón no son lo mismo</a></li>
-<li><a href="#org85db078">Anatomía</a></li>
-<li><a href="#org5e02a09">Un patrón siempre tiene un costo</a></li>
-<li><a href="#org53eb01b">Los patrones también se critican</a></li>
-<li><a href="#orgb1d0c64">Un patrón no se aplica a toda la aplicación</a></li>
-<li><a href="#org6a45076">¿Qué está cambiando?</a></li>
-<li><a href="#orgea3599a">Cómo decidir si un patrón tiene sentido</a></li>
-<li><a href="#org8b8db1c">Conceptos que hay que distinguir</a></li>
-<li><a href="#org98dc487">Niveles</a></li>
-<li><a href="#orgbcd9893">GoF</a></li>
-<li><a href="#orgd134dcd">El lenguaje y el marco ya lo traen</a>
-<ul>
-<li><a href="#orgbfdb960">async/await y hooks no son patrones GoF</a></li>
-</ul>
-</li>
-<li><a href="#org8081c74">Mapa compacto del catálogo GoF</a>
-<ul>
-<li><a href="#org676d125">Creacionales</a></li>
-<li><a href="#org07f7259">Estructurales</a></li>
-<li><a href="#orgf2155cc">Comportamentales</a></li>
-<li><a href="#org8d29ab1">El catálogo en la plataforma de entregas</a></li>
-<li><a href="#org0a2a624">Vecinos que se confunden (ficha corta)</a></li>
+<li><a href="#org0f7bdfe">Revelación del acertijo 1</a></li>
+<li><a href="#orgbaf6e19">Revelación del acertijo 2</a></li>
+<li><a href="#org6bcd4e6">Revelación del acertijo 3</a></li>
+<li><a href="#orgc02abbc">Qué tiene esto que ver con el software</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1feac47">Plataforma de entregas</a></li>
-<li><a href="#org49253ef">Los patrones, uno a uno</a>
+<li><a href="#orgdaddf89">Qué es un patrón de diseño</a>
 <ul>
-<li><a href="#org67b6137">Cómo se enseña cada patrón</a></li>
-<li><a href="#org2e13d88">Strategy</a>
+<li><a href="#org6c57b92">Tres niveles de explicación</a></li>
+<li><a href="#orgc39f42d">Lenguaje, marco y patrón no son lo mismo</a></li>
+<li><a href="#orge6dacf1">Anatomía</a></li>
+<li><a href="#orgc19c1be">Un patrón siempre tiene un costo</a></li>
+<li><a href="#org50b980c">Los patrones también se critican</a></li>
+<li><a href="#org63aed7b">Un patrón no se aplica a toda la aplicación</a></li>
+<li><a href="#org3dc685c">¿Qué está cambiando?</a></li>
+<li><a href="#orgf1feb12">Cómo decidir si un patrón tiene sentido</a></li>
+<li><a href="#org22241fb">Conceptos que hay que distinguir</a></li>
+<li><a href="#org6b43433">Niveles</a></li>
+<li><a href="#org57b8b31">GoF</a></li>
+<li><a href="#org14e936b">El lenguaje y el marco ya lo traen</a>
 <ul>
-<li><a href="#org98f0c69">Intuición</a></li>
-<li><a href="#org484e963">Diseño</a></li>
-<li><a href="#orgd711e84">El problema</a></li>
-<li><a href="#org5a777f8">Cómo reconocerlo</a></li>
-<li><a href="#org15f6c18">Qué está cambiando</a></li>
-<li><a href="#org3aedb60">La idea</a></li>
-<li><a href="#org2209f8c">Estructura</a></li>
-<li><a href="#org8ef3a1c">Participantes</a></li>
-<li><a href="#org6124802">Antes</a></li>
-<li><a href="#orga0ac0f1">Después</a></li>
-<li><a href="#org6b1fcee">Implementación</a></li>
-<li><a href="#org0463e36">Por qué funciona</a></li>
-<li><a href="#org195fcc6">Ventajas</a></li>
-<li><a href="#orga3fbf56">Costos</a></li>
-<li><a href="#orgc21a7dd">Cuándo no utilizarlo</a></li>
-<li><a href="#org8b93bdf">Con qué se confunde</a></li>
-<li><a href="#org4977666">Ejercicio</a></li>
+<li><a href="#org68fb1a7">async/await y hooks no son patrones GoF</a></li>
 </ul>
 </li>
-<li><a href="#org68bf707">Adapter</a>
+<li><a href="#org5e68c53">Mapa compacto del catálogo GoF</a>
 <ul>
-<li><a href="#orgb1bb75f">Intuición</a></li>
-<li><a href="#org375a179">Diseño</a></li>
-<li><a href="#org954e124">El problema</a></li>
-<li><a href="#org6d2174f">Cómo reconocerlo</a></li>
-<li><a href="#orgbdfed51">Qué está cambiando</a></li>
-<li><a href="#orgff88a3b">La idea</a></li>
-<li><a href="#org232056c">Estructura</a></li>
-<li><a href="#org9e9b3f8">Participantes</a></li>
-<li><a href="#org5aa50a9">Antes</a></li>
-<li><a href="#org5414609">Después</a></li>
-<li><a href="#org0426c9f">Implementación</a></li>
-<li><a href="#org5f1f22d">Por qué funciona</a></li>
-<li><a href="#org033006a">Ventajas</a></li>
-<li><a href="#orgc9d6ca2">Costos</a></li>
-<li><a href="#orgb416a79">Cuándo no utilizarlo</a></li>
-<li><a href="#org530b4ba">Con qué se confunde</a></li>
-<li><a href="#orgd80f4dd">Ejercicio</a></li>
+<li><a href="#orge1e1803">Creacionales</a></li>
+<li><a href="#org715424a">Estructurales</a></li>
+<li><a href="#org818b9e0">Comportamentales</a></li>
+<li><a href="#org89ac1dc">El catálogo en la plataforma de entregas</a></li>
+<li><a href="#org164482d">Vecinos que se confunden (ficha corta)</a></li>
 </ul>
 </li>
-<li><a href="#org5108d46">Factory Method</a>
-<ul>
-<li><a href="#org633ba47">Intuición</a></li>
-<li><a href="#org44b718e">Diseño</a></li>
-<li><a href="#orgaf5ddfe">El problema</a></li>
-<li><a href="#org104a56b">Cómo reconocerlo</a></li>
-<li><a href="#org6a8fed8">Qué está cambiando</a></li>
-<li><a href="#orgbe286ad">La idea</a></li>
-<li><a href="#org4c41cb1">Estructura</a></li>
-<li><a href="#orgf31082c">Participantes</a></li>
-<li><a href="#org9a7b9f1">Antes</a></li>
-<li><a href="#orgd4714b3">Después</a></li>
-<li><a href="#orgefc8558">Implementación</a></li>
-<li><a href="#org91ef2bd">Por qué funciona</a></li>
-<li><a href="#orga1a732c">Ventajas</a></li>
-<li><a href="#org772a0b2">Costos</a></li>
-<li><a href="#org430d33e">Cuándo no utilizarlo</a></li>
-<li><a href="#orgad43cd1">Con qué se confunde</a></li>
-<li><a href="#org7107941">Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#org384d171">Facade</a>
+<li><a href="#org447c41d">Plataforma de entregas</a></li>
+<li><a href="#org3c66e68">Los patrones, uno a uno</a>
 <ul>
-<li><a href="#org9de492f">Intuición</a></li>
-<li><a href="#org263adeb">El problema</a></li>
-<li><a href="#org036562a">La idea</a></li>
-<li><a href="#org88a13fb">Antes y después</a></li>
-<li><a href="#org88a09af">Ejercicio</a></li>
+<li><a href="#orgb41522b">Cómo se enseña cada patrón</a></li>
+<li><a href="#orgcf17962">Strategy</a>
+<ul>
+<li><a href="#org077c05d">Nivel 1 — Intuición</a></li>
+<li><a href="#org8149c68">Nivel 2 — Diseño</a></li>
+<li><a href="#org9c92492">1. Problema</a></li>
+<li><a href="#orgc7370a5">2. Síntoma — ¿Cómo sé que tengo este problema?</a></li>
+<li><a href="#org42981e2">3. Qué está cambiando</a></li>
+<li><a href="#orgf8d8071">4. Idea</a></li>
+<li><a href="#org94b9f74">5. Estructura</a></li>
+<li><a href="#orgb76f8a0">6. Participantes</a></li>
+<li><a href="#orgc56e8c3">7. Antes</a></li>
+<li><a href="#org0086d55">8. Después</a></li>
+<li><a href="#orgbf46244">9. Implementación</a></li>
+<li><a href="#org10a3be5">10. ¿Por qué funciona?</a></li>
+<li><a href="#org664f3f7">11. Ventajas</a></li>
+<li><a href="#org91a6b72">12. Costos</a></li>
+<li><a href="#org18778d0">13. ¿Cuándo NO utilizarlo?</a></li>
+<li><a href="#org3851a88">14. Patrones con los que se puede confundir</a></li>
+<li><a href="#org795f0c4">15. Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#orgf9cc0e0">Observer</a>
+<li><a href="#orgb164b97">Adapter</a>
 <ul>
-<li><a href="#org0459655">Intuición</a></li>
-<li><a href="#org8826bde">El problema</a></li>
-<li><a href="#org65c35a2">La idea</a></li>
-<li><a href="#org90c7eaf">Ejercicio</a></li>
+<li><a href="#org0af3e7a">Nivel 1 — Intuición</a></li>
+<li><a href="#org933c5b0">Nivel 2 — Diseño</a></li>
+<li><a href="#org71e84f5">1. Problema</a></li>
+<li><a href="#org9bb9447">2. Síntoma — ¿Cómo sé que tengo este problema?</a></li>
+<li><a href="#orgbd544ce">3. Qué está cambiando</a></li>
+<li><a href="#org6cc49ad">4. Idea</a></li>
+<li><a href="#org3017b2d">5. Estructura</a></li>
+<li><a href="#orge30cd13">6. Participantes</a></li>
+<li><a href="#orgb3f14a1">7. Antes</a></li>
+<li><a href="#orgafe54fa">8. Después</a></li>
+<li><a href="#orgdc4ff4f">9. Implementación</a></li>
+<li><a href="#org1726baf">10. ¿Por qué funciona?</a></li>
+<li><a href="#org6057807">11. Ventajas</a></li>
+<li><a href="#org4a4363b">12. Costos</a></li>
+<li><a href="#org060f803">13. ¿Cuándo NO utilizarlo?</a></li>
+<li><a href="#orgc6f0b39">14. Patrones con los que se puede confundir</a></li>
+<li><a href="#org3aa7d0b">15. Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#org58a478b">Front Controller</a>
+<li><a href="#org6d4f910">Factory Method</a>
 <ul>
-<li><a href="#org5d8e691">Intuición</a></li>
-<li><a href="#orgd5ebc1f">El problema</a></li>
-<li><a href="#orgc16fead">La idea</a></li>
-<li><a href="#org1c74d17">Ejercicio</a></li>
+<li><a href="#orgb82bd44">Nivel 1 — Intuición</a></li>
+<li><a href="#org125f4f3">Nivel 2 — Diseño</a></li>
+<li><a href="#orgc64aabf">1. Problema</a></li>
+<li><a href="#orge5ae668">2. Síntoma — ¿Cómo sé que tengo este problema?</a></li>
+<li><a href="#orgda128c2">3. Qué está cambiando</a></li>
+<li><a href="#orgce0ee4f">4. Idea</a></li>
+<li><a href="#org5b6c2c5">5. Estructura</a></li>
+<li><a href="#org1c806d8">6. Participantes</a></li>
+<li><a href="#org1b90f22">7. Antes</a></li>
+<li><a href="#org83db22c">8. Después</a></li>
+<li><a href="#org6459f59">9. Implementación</a></li>
+<li><a href="#org3639623">10. ¿Por qué funciona?</a></li>
+<li><a href="#orgfaa2e84">11. Ventajas</a></li>
+<li><a href="#org0fdd058">12. Costos</a></li>
+<li><a href="#orgf4017da">13. ¿Cuándo NO utilizarlo?</a></li>
+<li><a href="#orgea40399">14. Patrones con los que se puede confundir</a></li>
+<li><a href="#org1e3716a">15. Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#org4946c71">Chain of Responsibility / middleware</a>
+<li><a href="#orgf13aa11">Facade</a>
 <ul>
-<li><a href="#orgaa56397">Intuición</a></li>
-<li><a href="#orgd90fbc1">El problema</a></li>
-<li><a href="#org201823a">La idea</a></li>
-<li><a href="#orgd9eb6b2">Ejercicio</a></li>
+<li><a href="#orgb4a1bcd">Nivel 1 — Intuición</a></li>
+<li><a href="#orgf2f5638">Nivel 2 — Diseño</a></li>
+<li><a href="#org8159a3a">1. Problema</a></li>
+<li><a href="#org7b014eb">2. Síntoma</a></li>
+<li><a href="#orgafde58a">3. Qué está cambiando</a></li>
+<li><a href="#orgec4ef88">4. Idea</a></li>
+<li><a href="#org6950e22">5. Estructura</a></li>
+<li><a href="#org28cddf4">6. Participantes</a></li>
+<li><a href="#org8e7874d">7–9. Antes / después / implementación</a></li>
+<li><a href="#org98c9c18">10–13. Por qué, ventajas, costos, cuándo no</a></li>
+<li><a href="#org3b38665">14. Confusiones</a></li>
+<li><a href="#orgf71b0b4">15. Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#org3d453d0">Repository</a>
+<li><a href="#org4961822">Observer</a>
 <ul>
-<li><a href="#org8478f35">Intuición</a></li>
-<li><a href="#orge12319c">El problema</a></li>
-<li><a href="#org1df30ed">La idea</a></li>
-<li><a href="#org805159e">Ejercicio</a></li>
+<li><a href="#org9268fb9">Nivel 1 — Intuición</a></li>
+<li><a href="#orge79e944">Nivel 2 — Diseño</a></li>
+<li><a href="#orgf3726f2">1. Problema</a></li>
+<li><a href="#org7de46b7">2. Síntoma — ¿Cómo sé que tengo este problema?</a></li>
+<li><a href="#org59b85d6">3. Qué está cambiando</a></li>
+<li><a href="#org8140297">4. Idea</a></li>
+<li><a href="#orgcb76417">5. Estructura</a></li>
+<li><a href="#orgd600fb4">6. Participantes</a></li>
+<li><a href="#org437132d">7. Antes</a></li>
+<li><a href="#org87eef3e">8. Después</a></li>
+<li><a href="#org71d39fe">9. Implementación</a></li>
+<li><a href="#org4283327">10. ¿Por qué funciona?</a></li>
+<li><a href="#org9de72d7">11. Ventajas</a></li>
+<li><a href="#orgeeae351">12. Costos</a></li>
+<li><a href="#org4b75e3c">13. ¿Cuándo NO utilizarlo?</a></li>
+<li><a href="#org6eb9f9f">14. Patrones con los que se puede confundir</a></li>
+<li><a href="#org7cd4a85">15. Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#org35c5b56">Service Layer</a>
+<li><a href="#org060b95c">Front Controller</a>
 <ul>
-<li><a href="#org75d6bb6">Intuición</a></li>
-<li><a href="#orgf6dbd70">El problema y la idea</a></li>
+<li><a href="#orgd0db5a6">Nivel 1 — Intuición</a></li>
+<li><a href="#org3e2c289">1–3. Problema, síntoma, qué cambia</a></li>
+<li><a href="#orgb5eb668">4–6. Idea, estructura, participantes</a></li>
+<li><a href="#org9fd33fc">7–9. Antes / después / implementación</a></li>
+<li><a href="#orgf259b89">13–14. Cuándo no y confusiones</a></li>
+<li><a href="#org68ffbac">15. Ejercicio</a></li>
 </ul>
 </li>
-<li><a href="#org3200ee7">Template View</a>
+<li><a href="#org8c3da41">Chain of Responsibility / middleware</a>
 <ul>
-<li><a href="#org0fede1f">Ejercicio</a></li>
+<li><a href="#orgce5e6e9">Nivel 1 — Intuición</a></li>
+<li><a href="#org1e15778">1–3.</a></li>
+<li><a href="#orgbf138d3">4–9.</a></li>
+<li><a href="#orgcbf3d02">13–15.</a></li>
 </ul>
 </li>
-<li><a href="#org5119a60">Unit of Work</a>
+<li><a href="#org411658d">Repository</a>
 <ul>
-<li><a href="#org76bbefa">Intuición</a></li>
-<li><a href="#org35f236e">El problema</a></li>
-<li><a href="#org1b5e137">Ejercicio</a></li>
+<li><a href="#orgd7053b6">Nivel 1 — Intuición</a></li>
+<li><a href="#orge9f6fdd">1–3.</a></li>
+<li><a href="#org2afe1e1">4–9.</a></li>
+<li><a href="#org699fae8">13–14.</a></li>
+<li><a href="#org65d3fe4">15.</a></li>
 </ul>
 </li>
-<li><a href="#org861648a">Idempotencia</a>
+<li><a href="#orge2dafc5">Service Layer</a>
 <ul>
-<li><a href="#org34fc338">Ejercicio</a></li>
+<li><a href="#org848a6ce">Nivel 1 — Intuición</a></li>
+<li><a href="#org96fe004">1–9.</a></li>
+<li><a href="#orgdae5118">13–15.</a></li>
 </ul>
 </li>
-<li><a href="#orge3e1483">BFF y API Gateway</a>
+<li><a href="#orgdcd03ed">Template View</a>
 <ul>
-<li><a href="#orgb9fc435">Ejercicio</a></li>
+<li><a href="#orgb91b127">1–9.</a></li>
+<li><a href="#org2cc7b61">15.</a></li>
 </ul>
 </li>
-<li><a href="#org280059f">Timeout, Retry y Circuit Breaker</a>
+<li><a href="#org27ec3bc">Unit of Work</a>
 <ul>
-<li><a href="#org5990519">Ejercicio</a></li>
+<li><a href="#org6fc5319">Nivel 1 — Intuición</a></li>
+<li><a href="#org7ed1586">1–3.</a></li>
+<li><a href="#orgd2f4458">4–9.</a></li>
+<li><a href="#orgcec558e">13–14.</a></li>
+<li><a href="#org92cd425">15.</a></li>
 </ul>
 </li>
-<li><a href="#org12b26c4">Cómo se combinan (sin Golden Hammer)</a>
+<li><a href="#org4423642">Idempotencia</a>
 <ul>
-<li><a href="#orge6f1db2">Cómo analizar antes de elegir</a></li>
+<li><a href="#org499d865">1–3.</a></li>
+<li><a href="#org195561b">4–9.</a></li>
+<li><a href="#org5db5b27">13–15.</a></li>
+</ul>
+</li>
+<li><a href="#org174e604">BFF y API Gateway</a>
+<ul>
+<li><a href="#orge34dab6">BFF — problema</a></li>
+<li><a href="#org36f543a">Gateway — problema</a></li>
+<li><a href="#org05ff63b">15.</a></li>
+</ul>
+</li>
+<li><a href="#orga545c93">Timeout, Retry y Circuit Breaker</a>
+<ul>
+<li><a href="#orgf628f53">Timeout</a></li>
+<li><a href="#org1defae9">Retry</a></li>
+<li><a href="#org0d4331e">Circuit Breaker</a></li>
+<li><a href="#org2ef2cb6">15.</a></li>
+</ul>
+</li>
+<li><a href="#org4c46cdc">Cómo se combinan (sin Golden Hammer)</a>
+<ul>
+<li><a href="#org26b1900">Cómo analizar antes de elegir</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a href="#patrones-web">Patrones de software para aplicaciones web</a>
 <ul>
-<li><a href="#org346d810">Un proyecto no tiene un patrón: tiene una composición</a></li>
-<li><a href="#orgeb81a2e">Cuándo no componer</a></li>
-<li><a href="#org9dda23e">Fuerzas que impone la web</a></li>
-<li><a href="#org98fdeec">El marco congela el diseño web</a></li>
-<li><a href="#org3a8cecd">Cómo leer este capítulo</a></li>
-<li><a href="#org153be78">Presentación en el servidor</a>
+<li><a href="#org70012d3">Un proyecto no tiene un patrón: tiene una composición</a></li>
+<li><a href="#orge6b82dc">Cuándo no componer</a></li>
+<li><a href="#orge4aee21">Fuerzas que impone la web</a></li>
+<li><a href="#org0e7ca8a">El marco congela el diseño web</a></li>
+<li><a href="#orge7b3f5b">Cómo leer este capítulo</a></li>
+<li><a href="#orga77e075">Presentación en el servidor</a>
 <ul>
-<li><a href="#org32571c3">Front Controller y Page Controller</a></li>
-<li><a href="#org3550c1e">Template View y Transform View</a></li>
-<li><a href="#org96bfdd2">MVC (tres MVCs distintos)</a></li>
-<li><a href="#orge909027">Post-Redirect-Get</a></li>
-<li><a href="#orgc3da204">Sesión y token</a></li>
-<li><a href="#org415e337">REST: recursos, no verbos sueltos</a></li>
-<li><a href="#org8fdcfd7">El cliente web (SPA)</a></li>
+<li><a href="#org1e0719b">Front Controller y Page Controller</a></li>
+<li><a href="#orgbf7fb4d">Template View y Transform View</a></li>
+<li><a href="#org655a15b">MVC (tres MVCs distintos)</a></li>
+<li><a href="#org0f6837d">Post-Redirect-Get</a></li>
+<li><a href="#org814249a">Sesión y token</a></li>
+<li><a href="#org561443d">REST: recursos, no verbos sueltos</a></li>
+<li><a href="#org7a46702">El cliente web (SPA)</a></li>
 </ul>
 </li>
-<li><a href="#orge408c39">Middleware (en la petición)</a></li>
-<li><a href="#org793f1fc">Dominio, datos e integración</a></li>
-<li><a href="#orgda26631">SSR, CSR e híbrido</a></li>
-<li><a href="#org07fb5da">Ejemplo de análisis: registrar un pedido (y cobrar)</a></li>
-<li><a href="#org28e78a1">Ejercicios (web)</a></li>
+<li><a href="#org297b19d">Middleware (en la petición)</a></li>
+<li><a href="#org730cc54">Dominio, datos e integración</a></li>
+<li><a href="#org38cde61">SSR, CSR e híbrido</a></li>
+<li><a href="#org535127b">Ejemplo de análisis: registrar un pedido (y cobrar)</a></li>
+<li><a href="#org1794c84">Ejercicios (web)</a></li>
 </ul>
 </li>
 <li><a href="#patrones-movil">Patrones de software para aplicaciones móviles</a>
 <ul>
-<li><a href="#org43bd8d4">Fuerzas</a></li>
-<li><a href="#org6b67720">Nivel 1 — Intuición</a></li>
-<li><a href="#orgd7b0b8d">Antes: la Activity (o el Widget) lo hace todo</a></li>
-<li><a href="#org42e7197">Presentación: MVC, MVP, MVVM, MVI, BLoC</a></li>
-<li><a href="#org5118fce">El lenguaje cambia la forma de Observer</a></li>
-<li><a href="#org035e6de">El marco congela la presentación</a></li>
-<li><a href="#org37dc0a6">Navegación (Coordinator)</a></li>
-<li><a href="#orgb41933e">Datos: repositorio dual y cola</a></li>
-<li><a href="#org4107f03">Listas y hilo que pinta</a></li>
-<li><a href="#org6cd8d97">Puertos: el mismo Strategy, otro borde</a></li>
-<li><a href="#org858b27c">El mismo dominio, dos medios</a></li>
-<li><a href="#orgc376d87">Ejercicios (móvil)</a></li>
+<li><a href="#org12fa26d">Fuerzas</a></li>
+<li><a href="#orga9cc72b">Nivel 1 — Intuición</a></li>
+<li><a href="#orgf5fb28e">Antes: la Activity (o el Widget) lo hace todo</a></li>
+<li><a href="#orgb04c8a9">Presentación: MVC, MVP, MVVM, MVI, BLoC</a></li>
+<li><a href="#orgf329237">El lenguaje cambia la forma de Observer</a></li>
+<li><a href="#org53dd97c">El marco congela la presentación</a></li>
+<li><a href="#org7cdc5d8">Navegación (Coordinator)</a></li>
+<li><a href="#org28efcd1">Datos: repositorio dual y cola</a></li>
+<li><a href="#org5633b86">Listas y hilo que pinta</a></li>
+<li><a href="#org57e53ec">Puertos: el mismo Strategy, otro borde</a></li>
+<li><a href="#orge73ed98">El mismo dominio, dos medios</a></li>
+<li><a href="#org19c3bce">Ejercicios (móvil)</a></li>
 </ul>
 </li>
-<li><a href="#orga2a2fa8">Cómo analizar, elegir y no usar</a>
+<li><a href="#orgd72952e">Cómo analizar, elegir y no usar</a>
 <ul>
-<li><a href="#orgd61624c">Método para un ejercicio</a></li>
-<li><a href="#org19d332a">Diagnóstico de código espagueti</a></li>
-<li><a href="#orgdf9b4fa">Antipatrones</a></li>
-<li><a href="#org4084807">Chuleta</a></li>
-<li><a href="#org5d40d15">Autoevaluación breve</a></li>
-<li><a href="#orgf244201">Referencias</a></li>
+<li><a href="#orgf6fb858">Método para un ejercicio</a></li>
+<li><a href="#org10431cf">Diagnóstico de código espagueti</a></li>
+<li><a href="#org4945ee7">Antipatrones</a></li>
+<li><a href="#orgba38b03">Chuleta</a></li>
+<li><a href="#orgb2f985e">Autoevaluación breve</a></li>
+<li><a href="#org5d1d4ce">Referencias</a></li>
 </ul>
 </li>
-<li><a href="#org0fcfe6f">IA, caso integrador y ejercicios de razonamiento</a>
+<li><a href="#org6a9f029">IA, caso integrador y ejercicios de razonamiento</a>
 <ul>
-<li><a href="#org02a0f61">Uso de IA en el diseño de software</a>
+<li><a href="#org41d3edd">Uso de IA en el diseño de software</a>
 <ul>
-<li><a href="#org4e34cd0">Diez usos (análisis, no solo código)</a></li>
-<li><a href="#orge60665f">La IA como segundo diseñador</a></li>
-<li><a href="#org6bb4344">Prompts que los estudiantes pueden utilizar</a></li>
+<li><a href="#org51b19ec">Diez usos (análisis, no solo código)</a></li>
+<li><a href="#orgf12871c">La IA como segundo diseñador</a></li>
+<li><a href="#org8f86f95">Prompts que los estudiantes pueden utilizar</a></li>
 </ul>
 </li>
-<li><a href="#org6a938a1">Caso integrador: POST /pedidos</a></li>
-<li><a href="#org0e9762f">Ejercicios extra (razonar, no definir)</a>
+<li><a href="#orgc72b814">Caso integrador: POST /pedidos</a></li>
+<li><a href="#org12af5d6">Ejercicios extra (razonar, no definir)</a>
 <ul>
-<li><a href="#org7dd55b9">Caso — el switch de envío</a></li>
-<li><a href="#orgfb98ecd">Contraargumentación</a></li>
-<li><a href="#org216af3b">Detección de errores (sobreingeniería)</a></li>
+<li><a href="#org7a6f837">Caso — el switch de envío</a></li>
+<li><a href="#org601f38e">Contraargumentación</a></li>
+<li><a href="#orgfff6e5b">Detección de errores (sobreingeniería)</a></li>
 </ul>
 </li>
 </ul>
@@ -483,24 +517,24 @@
 <ul>
 <li><a href="#misiones-web">Misiones: patrones de software para aplicaciones web</a>
 <ul>
-<li><a href="#org23acd88">El problema</a></li>
-<li><a href="#orgb537c4c">Qué se evalúa</a></li>
-<li><a href="#orgaa1a116">Misión 1 — La plataforma no es un patrón</a></li>
-<li><a href="#orgcdd6013">Misión 2 — Una petición, varios patrones</a></li>
-<li><a href="#org99da2a3">Misión 3 — Políticas transversales</a></li>
-<li><a href="#orgea1348e">Misión 4 — Entrega e IA: Strategy, Adapter y Factory</a></li>
-<li><a href="#orgdb25222">Misión 5 — Atomicidad frente a aviso</a></li>
-<li><a href="#org7be2fee">Misión 6 — Varios clientes y un colaborador inestable</a></li>
-<li><a href="#orgf3e8e94">Misión 7 — El marco ya lo trae</a></li>
-<li><a href="#org4fd9450">Misión 8 — El mismo pedido en el teléfono</a></li>
-<li><a href="#org7cc46b4">Pauta de revisión</a></li>
-<li><a href="#org670b4f5">Respuestas: misiones 1 a 3</a></li>
+<li><a href="#org7b52453">El problema</a></li>
+<li><a href="#org0f814c0">Qué se evalúa</a></li>
+<li><a href="#orgfae1714">Misión 1 — La plataforma no es un patrón</a></li>
+<li><a href="#org60251cb">Misión 2 — Una petición, varios patrones</a></li>
+<li><a href="#org2af2dde">Misión 3 — Políticas transversales</a></li>
+<li><a href="#orgdeb6994">Misión 4 — Entrega e IA: Strategy, Adapter y Factory</a></li>
+<li><a href="#orgaae6fcf">Misión 5 — Atomicidad frente a aviso</a></li>
+<li><a href="#org27c9323">Misión 6 — Varios clientes y un colaborador inestable</a></li>
+<li><a href="#org5969d71">Misión 7 — El marco ya lo trae</a></li>
+<li><a href="#org811dd9c">Misión 8 — El mismo pedido en el teléfono</a></li>
+<li><a href="#org898b347">Pauta de revisión</a></li>
+<li><a href="#orga72b0c7">Respuestas: misiones 1 a 3</a></li>
 <li><a href="#analisis-codigo-espagueti">Análisis del código espagueti</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org0371b42">Cierre</a></li>
+<li><a href="#orgc171e32">Cierre</a></li>
 </ul>
 </div>
 </div>
@@ -508,7 +542,9 @@
 <p>
 Materia: <b>Tópicos Selectos de Tecnologías Web y Móvil</b>
 Unidad: <b>Introducción a los Patrones de Diseño de Software</b>
-Subtemas: Introducción · Análisis y diseño de patrones para aplicaciones web · Análisis y diseño de patrones para aplicaciones móviles
+Este archivo es un <b>borrador</b> generado para ver el resultado de una
+reorganización pedagógica. El material canónico sigue siendo
+<code>introduccion_patrones_diseno_software.org</code> (exporta a <code>index.html</code>).
 </p>
 </blockquote>
 
@@ -527,7 +563,7 @@ un problema de diseño que se repite.
 La pregunta principal de toda la unidad será:
 </p>
 
-<pre class="example" id="org8176ad6">
+<pre class="example" id="org10240f4">
 ¿Qué problema de diseño tengo?
         ↓
 ¿Qué está cambiando?
@@ -547,7 +583,7 @@ No: «¿qué patrón puedo meter en mi proyecto?»
 El estudiante debería poder recorrer esta escalera:
 </p>
 
-<pre class="example" id="org38b9bcf">
+<pre class="example" id="org1d78786">
 «No sé qué es un patrón»
         ↓
 «Entiendo qué problema intenta resolver»
@@ -563,14 +599,14 @@ El estudiante debería poder recorrer esta escalera:
 «Puedo justificar por qué lo utilicé»
 </pre>
 </blockquote>
-<div id="outline-container-orge3339dc" class="outline-2">
-<h2 id="orge3339dc">Antes de los patrones: aprender a reconocer estructuras</h2>
-<div class="outline-text-2" id="text-orge3339dc">
+<div id="outline-container-org1e637fd" class="outline-2">
+<h2 id="org1e637fd">Antes de los patrones: aprender a reconocer estructuras</h2>
+<div class="outline-text-2" id="text-org1e637fd">
 <p>
 Un error frecuente es comenzar memorizando nombres:
 </p>
 
-<pre class="example" id="org6ec0b7f">
+<pre class="example" id="orgde7f464">
 Strategy = ...
 Factory  = ...
 Adapter  = ...
@@ -584,18 +620,18 @@ se repite y preguntar si existe una solución que otras personas ya
 han estudiado.
 </p>
 </div>
-<div id="outline-container-org36ed0ce" class="outline-3">
-<h3 id="org36ed0ce">Tres acertijos para entrenar la mirada</h3>
-<div class="outline-text-3" id="text-org36ed0ce">
+<div id="outline-container-org5e14851" class="outline-3">
+<h3 id="org5e14851">Tres acertijos para entrenar la mirada</h3>
+<div class="outline-text-3" id="text-org5e14851">
 <p>
 Antes de Observer o Strategy, <b>patrón</b> aquí es una <b>regularidad oculta</b>.
 La fuerza bruta funciona; <b>no escala</b>. Quien ve la estructura responde
 en un renglón.
 </p>
 </div>
-<div id="outline-container-org06e102b" class="outline-4">
-<h4 id="org06e102b">Acertijo 1 — Un millón de interruptores</h4>
-<div class="outline-text-4" id="text-org06e102b">
+<div id="outline-container-org8791c9c" class="outline-4">
+<h4 id="org8791c9c">Acertijo 1 — Un millón de interruptores</h4>
+<div class="outline-text-4" id="text-org8791c9c">
 <p>
 Hay <b>n</b> focos apagados e <b>n</b> pasadas. En la pasada <b>k</b> (k = 1 … n) se
 conmutan exactamente los múltiplos de <b>k</b>.
@@ -617,14 +653,14 @@ existe el acertijo.
 </p>
 </div>
 </div>
-<div id="outline-container-org7cf1424" class="outline-4">
-<h4 id="org7cf1424">Acertijo 2 — El estacionamiento</h4>
-<div class="outline-text-4" id="text-org7cf1424">
+<div id="outline-container-orgdbf3e38" class="outline-4">
+<h4 id="orgdbf3e38">Acertijo 2 — El estacionamiento</h4>
+<div class="outline-text-4" id="text-orgdbf3e38">
 <p>
 Un coche tapa un cajón:
 </p>
 
-<pre class="example" id="orge978b04">
+<pre class="example" id="orga5e3060">
 16   |   06   |   68   |   88   |   [COCHE]   |   98
 </pre>
 
@@ -638,9 +674,9 @@ No es sucesión aritmética, ni geométrica, ni Fibonacci. Si salió 89,
 </p>
 </div>
 </div>
-<div id="outline-container-orgfc53d3e" class="outline-4">
-<h4 id="orgfc53d3e">Acertijo 3 — La mosca y los dos trenes</h4>
-<div class="outline-text-4" id="text-orgfc53d3e">
+<div id="outline-container-org69d5430" class="outline-4">
+<h4 id="org69d5430">Acertijo 3 — La mosca y los dos trenes</h4>
+<div class="outline-text-4" id="text-org69d5430">
 <p>
 Dos trenes salen al mismo tiempo uno hacia el otro. Distancia inicial:
 <b>240 km</b>. Cada uno va a <b>60 km/h</b>. Una mosca vuela a <b>90 km/h</b> desde el
@@ -659,13 +695,13 @@ forma de no escribir esa serie.
 </div>
 </div>
 </div>
-<div id="outline-container-org24b264b" class="outline-3">
-<h3 id="org24b264b">Soluciones y moraleja</h3>
-<div class="outline-text-3" id="text-org24b264b">
+<div id="outline-container-org71aac4a" class="outline-3">
+<h3 id="org71aac4a">Soluciones y moraleja</h3>
+<div class="outline-text-3" id="text-org71aac4a">
 </div>
-<div id="outline-container-org56d50bc" class="outline-4">
-<h4 id="org56d50bc">Revelación del acertijo 1</h4>
-<div class="outline-text-4" id="text-org56d50bc">
+<div id="outline-container-org0f7bdfe" class="outline-4">
+<h4 id="org0f7bdfe">Revelación del acertijo 1</h4>
+<div class="outline-text-4" id="text-org0f7bdfe">
 <p>
 Cada foco <b>k</b> se toca una vez por cada divisor de <b>k</b>. Los divisores van
 en parejas, salvo en los <b>cuadrados perfectos</b> (un divisor se empareja
@@ -718,9 +754,9 @@ Primero hay que preguntar qué estructura se esconde detrás del problema.
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org2a17283" class="outline-4">
-<h4 id="org2a17283">Revelación del acertijo 2</h4>
-<div class="outline-text-4" id="text-org2a17283">
+<div id="outline-container-orgbaf6e19" class="outline-4">
+<h4 id="orgbaf6e19">Revelación del acertijo 2</h4>
+<div class="outline-text-4" id="text-orgbaf6e19">
 <p>
 Gira la hoja <b>180°</b>. Los dígitos 0, 1, 6, 8 y 9 siguen siendo dígitos
 al revés.
@@ -743,9 +779,9 @@ sino en cambiar la forma de representar el problema.
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org42eb225" class="outline-4">
-<h4 id="org42eb225">Revelación del acertijo 3</h4>
-<div class="outline-text-4" id="text-org42eb225">
+<div id="outline-container-org6bcd4e6" class="outline-4">
+<h4 id="org6bcd4e6">Revelación del acertijo 3</h4>
+<div class="outline-text-4" id="text-org6bcd4e6">
 <p>
 Los trenes cierran 120 km/h sobre 240 km → chocan a las <b>2 horas</b>. La
 mosca vuela esas 2 h a 90 km/h → <b>180 km</b>.
@@ -765,15 +801,15 @@ el problema.
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org4fc185a" class="outline-4">
-<h4 id="org4fc185a">Qué tiene esto que ver con el software</h4>
-<div class="outline-text-4" id="text-org4fc185a">
+<div id="outline-container-orgc02abbc" class="outline-4">
+<h4 id="orgc02abbc">Qué tiene esto que ver con el software</h4>
+<div class="outline-text-4" id="text-orgc02abbc">
 <p>
 Ninguno de los tres es Observer ni Factory. Los tres <b>sí</b> son patrones:
 instinto de simularlo todo → estructura oculta → receta ya nombrada.
 </p>
 
-<pre class="example" id="orgf29d1d6">
+<pre class="example" id="org8faa1e1">
 Fuerza bruta
     ↓
 if / else / switch / copia y pega
@@ -823,9 +859,9 @@ móvil.
 </div>
 </div>
 </div>
-<div id="outline-container-org2ffee7c" class="outline-2">
-<h2 id="org2ffee7c">Qué es un patrón de diseño</h2>
-<div class="outline-text-2" id="text-org2ffee7c">
+<div id="outline-container-orgdaddf89" class="outline-2">
+<h2 id="orgdaddf89">Qué es un patrón de diseño</h2>
+<div class="outline-text-2" id="text-orgdaddf89">
 <p>
 Un patrón de diseño es una solución <b>nombrada</b> y reutilizable para un
 problema de diseño que aparece de forma recurrente dentro de un
@@ -882,9 +918,9 @@ patrón <b>no se aplica por catálogo</b>; se <b>reconoce</b> cuando las fuerzas
 coinciden.
 </p>
 </div>
-<div id="outline-container-org51445c7" class="outline-3">
-<h3 id="org51445c7">Tres niveles de explicación</h3>
-<div class="outline-text-3" id="text-org51445c7">
+<div id="outline-container-org6c57b92" class="outline-3">
+<h3 id="org6c57b92">Tres niveles de explicación</h3>
+<div class="outline-text-3" id="text-org6c57b92">
 <p>
 Cada concepto de estos apuntes se lee en este orden. El código nunca
 va primero.
@@ -901,10 +937,10 @@ que ese código intenta resolver.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-orgc077544" class="outline-3">
-<h3 id="orgc077544">Lenguaje, marco y patrón no son lo mismo</h3>
-<div class="outline-text-3" id="text-orgc077544">
-<pre class="example" id="orgc5feef3">
+<div id="outline-container-orgc39f42d" class="outline-3">
+<h3 id="orgc39f42d">Lenguaje, marco y patrón no son lo mismo</h3>
+<div class="outline-text-3" id="text-orgc39f42d">
+<pre class="example" id="orgff3db19">
 async/await     = característica para trabajar con asincronía
 hooks de React  = idioma para estado y efectos en un componente
 clases / interfaces / funciones / closures = el lenguaje
@@ -921,14 +957,14 @@ margen.
 </p>
 </div>
 </div>
-<div id="outline-container-org85db078" class="outline-3">
-<h3 id="org85db078">Anatomía</h3>
-<div class="outline-text-3" id="text-org85db078">
+<div id="outline-container-orge6dacf1" class="outline-3">
+<h3 id="orge6dacf1">Anatomía</h3>
+<div class="outline-text-3" id="text-orge6dacf1">
 <p>
 Para estudiar cualquier patrón usaremos estas preguntas:
 </p>
 
-<pre class="example" id="orgbc1b0c6">
+<pre class="example" id="orgafd1465">
 1. ¿Cuál es el problema?
 2. ¿En qué contexto aparece?
 3. ¿Qué está cambiando?
@@ -1005,14 +1041,14 @@ diagrama.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e02a09" class="outline-3">
-<h3 id="org5e02a09">Un patrón siempre tiene un costo</h3>
-<div class="outline-text-3" id="text-org5e02a09">
+<div id="outline-container-orgc19c1be" class="outline-3">
+<h3 id="orgc19c1be">Un patrón siempre tiene un costo</h3>
+<div class="outline-text-3" id="text-orgc19c1be">
 <p>
 Strategy puede reducir acoplamiento:
 </p>
 
-<pre class="example" id="org3f4ce08">
+<pre class="example" id="org9b64e0c">
 ANTES                    DESPUÉS
 
 Cliente                  Cliente
@@ -1038,9 +1074,9 @@ La pregunta correcta no es «¿puedo aplicar un patrón?», sino:
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org53eb01b" class="outline-3">
-<h3 id="org53eb01b">Los patrones también se critican</h3>
-<div class="outline-text-3" id="text-org53eb01b">
+<div id="outline-container-org50b980c" class="outline-3">
+<h3 id="org50b980c">Los patrones también se critican</h3>
+<div class="outline-text-3" id="text-org50b980c">
 <p>
 Tres objeciones serias (no son «los patrones están pasados de moda»):
 </p>
@@ -1061,9 +1097,9 @@ El catálogo es un vocabulario. No es una lista de compras.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb1d0c64" class="outline-3">
-<h3 id="orgb1d0c64">Un patrón no se aplica a toda la aplicación</h3>
-<div class="outline-text-3" id="text-orgb1d0c64">
+<div id="outline-container-org63aed7b" class="outline-3">
+<h3 id="org63aed7b">Un patrón no se aplica a toda la aplicación</h3>
+<div class="outline-text-3" id="text-org63aed7b">
 <p>
 Una plataforma grande usa <b>muchos</b> patrones a la vez. Cada uno
 responde a <b>un</b> problema.
@@ -1153,9 +1189,9 @@ resuelve un problema diferente. Pueden combinarse.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a45076" class="outline-3">
-<h3 id="org6a45076">¿Qué está cambiando?</h3>
-<div class="outline-text-3" id="text-org6a45076">
+<div id="outline-container-org3dc685c" class="outline-3">
+<h3 id="org3dc685c">¿Qué está cambiando?</h3>
+<div class="outline-text-3" id="text-org3dc685c">
 <p>
 Si toda la lógica está en <code>if moto / else if dron</code>, el problema no es
 que exista un <code>if</code>. Están mezclados selección, implementación, detalles
@@ -1174,9 +1210,9 @@ la situación es candidata a Strategy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgea3599a" class="outline-3">
-<h3 id="orgea3599a">Cómo decidir si un patrón tiene sentido</h3>
-<div class="outline-text-3" id="text-orgea3599a">
+<div id="outline-container-orgf1feb12" class="outline-3">
+<h3 id="orgf1feb12">Cómo decidir si un patrón tiene sentido</h3>
+<div class="outline-text-3" id="text-orgf1feb12">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1235,9 +1271,9 @@ problema de diseño tengo?».
 </p>
 </div>
 </div>
-<div id="outline-container-org8b8db1c" class="outline-3">
-<h3 id="org8b8db1c">Conceptos que hay que distinguir</h3>
-<div class="outline-text-3" id="text-org8b8db1c">
+<div id="outline-container-org22241fb" class="outline-3">
+<h3 id="org22241fb">Conceptos que hay que distinguir</h3>
+<div class="outline-text-3" id="text-org22241fb">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1353,14 +1389,14 @@ un procedimiento claro gana a un Strategy de tres tipos.
 </p>
 </div>
 </div>
-<div id="outline-container-org98dc487" class="outline-3">
-<h3 id="org98dc487">Niveles</h3>
-<div class="outline-text-3" id="text-org98dc487">
+<div id="outline-container-org6b43433" class="outline-3">
+<h3 id="org6b43433">Niveles</h3>
+<div class="outline-text-3" id="text-org6b43433">
 <p>
 Confundir niveles es el error de diseño más frecuente.
 </p>
 
-<pre class="example" id="org193a320">
+<pre class="example" id="org20d898b">
 [Estilo arquitectónico]     capas, hexagonal, offline-first
          ↑ se implementa con
 [Patrones de diseño]        Observer, Strategy, Repository, Adapter
@@ -1378,9 +1414,9 @@ saber cómo se cablea.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbcd9893" class="outline-3">
-<h3 id="orgbcd9893">GoF</h3>
-<div class="outline-text-3" id="text-orgbcd9893">
+<div id="outline-container-org57b8b31" class="outline-3">
+<h3 id="org57b8b31">GoF</h3>
+<div class="outline-text-3" id="text-org57b8b31">
 <p>
 GoF significa <b>Gang of Four</b>: Erich Gamma, Richard Helm, Ralph Johnson
 y John Vlissides. Su libro de 1994, <i>Design Patterns</i>, cataloga 23
@@ -1494,9 +1530,9 @@ patrón en otra escala.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd134dcd" class="outline-3">
-<h3 id="orgd134dcd">El lenguaje y el marco ya lo traen</h3>
-<div class="outline-text-3" id="text-orgd134dcd">
+<div id="outline-container-org14e936b" class="outline-3">
+<h3 id="org14e936b">El lenguaje y el marco ya lo traen</h3>
+<div class="outline-text-3" id="text-org14e936b">
 <p>
 Gamma et al. separan <b>Structure</b> de <b>Implementation</b>. La estructura es
 estable; el código depende del lenguaje. Un marco de trabajo <b>congela</b>
@@ -1614,9 +1650,9 @@ La idea del patrón permanece; la sintaxis cambia:
 </tbody>
 </table>
 </div>
-<div id="outline-container-orgbfdb960" class="outline-4">
-<h4 id="orgbfdb960">async/await y hooks no son patrones GoF</h4>
-<div class="outline-text-4" id="text-orgbfdb960">
+<div id="outline-container-org68fb1a7" class="outline-4">
+<h4 id="org68fb1a7">async/await y hooks no son patrones GoF</h4>
+<div class="outline-text-4" id="text-org68fb1a7">
 <p>
 <code>async/await</code> expresa espera de una operación asíncrona. No es
 Strategy ni Observer. Es un <b>idioma</b> del lenguaje:
@@ -1638,9 +1674,9 @@ inventar un <code>Subject</code> de 1994 al lado.
 </div>
 </div>
 </div>
-<div id="outline-container-org8081c74" class="outline-3">
-<h3 id="org8081c74">Mapa compacto del catálogo GoF</h3>
-<div class="outline-text-3" id="text-org8081c74">
+<div id="outline-container-org5e68c53" class="outline-3">
+<h3 id="org5e68c53">Mapa compacto del catálogo GoF</h3>
+<div class="outline-text-3" id="text-org5e68c53">
 <p>
 GoF cataloga <b>23</b> patrones. Algunos catálogos didácticos (p. ej.
 Refactoring Guru) muestran <b>22</b> y dejan Interpreter fuera: no es que
@@ -1662,9 +1698,9 @@ idempotencia). El resto del catálogo está aquí para <b>no confundirlo</b>
 y para no reinventar lo que el lenguaje ya hace.
 </p>
 </div>
-<div id="outline-container-org676d125" class="outline-4">
-<h4 id="org676d125">Creacionales</h4>
-<div class="outline-text-4" id="text-org676d125">
+<div id="outline-container-orge1e1803" class="outline-4">
+<h4 id="orge1e1803">Creacionales</h4>
+<div class="outline-text-4" id="text-orge1e1803">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1724,9 +1760,9 @@ y para no reinventar lo que el lenguaje ya hace.
 </table>
 </div>
 </div>
-<div id="outline-container-org07f7259" class="outline-4">
-<h4 id="org07f7259">Estructurales</h4>
-<div class="outline-text-4" id="text-org07f7259">
+<div id="outline-container-org715424a" class="outline-4">
+<h4 id="org715424a">Estructurales</h4>
+<div class="outline-text-4" id="text-org715424a">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1800,9 +1836,9 @@ y para no reinventar lo que el lenguaje ya hace.
 </table>
 </div>
 </div>
-<div id="outline-container-orgf2155cc" class="outline-4">
-<h4 id="orgf2155cc">Comportamentales</h4>
-<div class="outline-text-4" id="text-orgf2155cc">
+<div id="outline-container-org818b9e0" class="outline-4">
+<h4 id="org818b9e0">Comportamentales</h4>
+<div class="outline-text-4" id="text-org818b9e0">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -1904,9 +1940,9 @@ y para no reinventar lo que el lenguaje ya hace.
 </table>
 </div>
 </div>
-<div id="outline-container-org8d29ab1" class="outline-4">
-<h4 id="org8d29ab1">El catálogo en la plataforma de entregas</h4>
-<div class="outline-text-4" id="text-org8d29ab1">
+<div id="outline-container-org89ac1dc" class="outline-4">
+<h4 id="org89ac1dc">El catálogo en la plataforma de entregas</h4>
+<div class="outline-text-4" id="text-org89ac1dc">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -2023,17 +2059,17 @@ creación, fábrica simple y Factory Method.
 </p>
 </div>
 </div>
-<div id="outline-container-org0a2a624" class="outline-4">
-<h4 id="org0a2a624">Vecinos que se confunden (ficha corta)</h4>
-<div class="outline-text-4" id="text-org0a2a624">
+<div id="outline-container-org164482d" class="outline-4">
+<h4 id="org164482d">Vecinos que se confunden (ficha corta)</h4>
+<div class="outline-text-4" id="text-org164482d">
 <p>
 No se desarrollan como Strategy. Sirven para <b>descartarlos</b> con
 criterio. Intuición → síntoma → cuándo no.
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="orgaec6b78"></a>Singleton<br />
-<div class="outline-text-5" id="text-orgaec6b78">
+<li><a id="orgb4b65bd"></a>Singleton<br />
+<div class="outline-text-5" id="text-orgb4b65bd">
 <p>
 <b>Problema.</b> Quieres <b>una</b> instancia de infraestructura (configuración,
 pool). <b>Síntoma.</b> <code>Sesion.getInstance()</code> como carrito o como «el
@@ -2045,8 +2081,8 @@ otro.
 </p>
 </div>
 </li>
-<li><a id="org7c8c93b"></a>Decorator<br />
-<div class="outline-text-5" id="text-org7c8c93b">
+<li><a id="org1733ab1"></a>Decorator<br />
+<div class="outline-text-5" id="text-org1733ab1">
 <p>
 <b>Problema.</b> Quieres <b>añadir</b> comportamiento (seguro, frágil, bitácora)
 sin copiar <code>EntregaDron</code> ni hincharla de <code>if</code>. <b>Síntoma.</b> Subclases
@@ -2058,8 +2094,8 @@ responsabilidad. Un extra único y estable: un <code>if</code>.
 </p>
 </div>
 </li>
-<li><a id="org8e89b2d"></a>Proxy<br />
-<div class="outline-text-5" id="text-org8e89b2d">
+<li><a id="org36cf45f"></a>Proxy<br />
+<div class="outline-text-5" id="text-org36cf45f">
 <p>
 <b>Problema.</b> Hay una <b>política</b> al usar un objeto caro o remoto (caché
 del mapa, carga perezosa, permiso). <b>Síntoma.</b> El caso de uso llama
@@ -2068,8 +2104,8 @@ suelo ser <b>el mismo</b>, no se traduce un idioma ajeno.
 </p>
 </div>
 </li>
-<li><a id="org147084d"></a>Command<br />
-<div class="outline-text-5" id="text-org147084d">
+<li><a id="org24241ea"></a>Command<br />
+<div class="outline-text-5" id="text-org24241ea">
 <p>
 <b>Problema.</b> La <b>solicitud</b> debe viajar (cola, deshacer, trabajo en
 fondo): «cobrar este folio cuando haya red». <b>Síntoma.</b> La Activity
@@ -2079,8 +2115,8 @@ lo realizan.
 </p>
 </div>
 </li>
-<li><a id="orga0c0bb3"></a>State<br />
-<div class="outline-text-5" id="text-orga0c0bb3">
+<li><a id="org1b61c75"></a>State<br />
+<div class="outline-text-5" id="text-org1b61c75">
 <p>
 <b>Problema.</b> El <b>mismo</b> objeto responde distinto según la <b>fase</b>
 (<code>CREADO</code> no se puede entregar; <code>EN_CAMINO</code> sí puede actualizar ETA).
@@ -2090,8 +2126,8 @@ promovido de fase». Dos estados estables: <code>if</code>.
 </p>
 </div>
 </li>
-<li><a id="org37bcb26"></a>Template Method<br />
-<div class="outline-text-5" id="text-org37bcb26">
+<li><a id="org77a8c03"></a>Template Method<br />
+<div class="outline-text-5" id="text-org77a8c03">
 <p>
 <b>Problema.</b> Un esqueleto fijo (<code>despachar</code>: crear medio, planear,
 persistir) con <b>pasos</b> que las subclases rellenan. Factory Method
@@ -2101,8 +2137,8 @@ Una clase base de mil líneas que «ya trae todo». Preferir composición
 </p>
 </div>
 </li>
-<li><a id="org7ab7c5c"></a>Builder, Composite, Mediator (una línea cada uno)<br />
-<div class="outline-text-5" id="text-org7ab7c5c">
+<li><a id="org71ad72e"></a>Builder, Composite, Mediator (una línea cada uno)<br />
+<div class="outline-text-5" id="text-org71ad72e">
 <ul class="org-ul">
 <li><b>Builder:</b> armar un <code>Pedido</code> con muchos opcionales; no para dos
 campos.</li>
@@ -2113,8 +2149,8 @@ el mediador no debe volverse God Object.</li>
 </ul>
 </div>
 </li>
-<li><a id="org88763b8"></a>Lo que este curso no pide implementar<br />
-<div class="outline-text-5" id="text-org88763b8">
+<li><a id="orgdf3a94a"></a>Lo que este curso no pide implementar<br />
+<div class="outline-text-5" id="text-orgdf3a94a">
 <p>
 Bridge, Flyweight, Prototype, Abstract Factory, Visitor, Memento,
 Interpreter. Si salen en un diagrama: familia + «¿qué problema de
@@ -2127,9 +2163,9 @@ que el proyecto «se vea completo».
 </div>
 </div>
 </div>
-<div id="outline-container-org1feac47" class="outline-2">
-<h2 id="org1feac47">Plataforma de entregas</h2>
-<div class="outline-text-2" id="text-org1feac47">
+<div id="outline-container-org447c41d" class="outline-2">
+<h2 id="org447c41d">Plataforma de entregas</h2>
+<div class="outline-text-2" id="text-org447c41d">
 <p>
 Una empresa de mensajería quiere una sola plataforma para registrar
 pedidos (origen, destino, peso, dimensiones, urgencia, fecha límite)
@@ -2157,18 +2193,18 @@ el pedido y asignar una entrega.
 </p>
 </div>
 </div>
-<div id="outline-container-org49253ef" class="outline-2">
-<h2 id="org49253ef">Los patrones, uno a uno</h2>
-<div class="outline-text-2" id="text-org49253ef">
+<div id="outline-container-org3c66e68" class="outline-2">
+<h2 id="org3c66e68">Los patrones, uno a uno</h2>
+<div class="outline-text-2" id="text-org3c66e68">
 </div>
-<div id="outline-container-org67b6137" class="outline-3">
-<h3 id="org67b6137">Cómo se enseña cada patrón</h3>
-<div class="outline-text-3" id="text-org67b6137">
+<div id="outline-container-orgb41522b" class="outline-3">
+<h3 id="orgb41522b">Cómo se enseña cada patrón</h3>
+<div class="outline-text-3" id="text-orgb41522b">
 <p>
 No como definición para memorizar. Como una secuencia de diseño:
 </p>
 
-<pre class="example" id="org9734935">
+<pre class="example" id="org63c2044">
 PROBLEMA
     ↓
 ¿Qué está cambiando?
@@ -2206,13 +2242,13 @@ a introducir para resolverlo?
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org2e13d88" class="outline-3">
-<h3 id="org2e13d88">Strategy</h3>
-<div class="outline-text-3" id="text-org2e13d88">
+<div id="outline-container-orgcf17962" class="outline-3">
+<h3 id="orgcf17962">Strategy</h3>
+<div class="outline-text-3" id="text-orgcf17962">
 </div>
-<div id="outline-container-org98f0c69" class="outline-4">
-<h4 id="org98f0c69">Intuición</h4>
-<div class="outline-text-4" id="text-org98f0c69">
+<div id="outline-container-org077c05d" class="outline-4">
+<h4 id="org077c05d">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-org077c05d">
 <p>
 En una cocina hay varias recetas para «hacer el caldo»: caldo de pollo,
 de verduras, de huesos. El mesero no reescribe el menú cada vez que
@@ -2227,9 +2263,9 @@ misma</b> pregunta: ¿cabe? ¿cuánto tarda? ¿cuánto cuesta?
 </p>
 </div>
 </div>
-<div id="outline-container-org484e963" class="outline-4">
-<h4 id="org484e963">Diseño</h4>
-<div class="outline-text-4" id="text-org484e963">
+<div id="outline-container-org8149c68" class="outline-4">
+<h4 id="org8149c68">Nivel 2 — Diseño</h4>
+<div class="outline-text-4" id="text-org8149c68">
 <p>
 Hay una operación <code>asignarEntrega()</code>. El medio puede cambiar. Si todas
 las variantes viven en el mismo método, ese método conoce demasiadas
@@ -2242,18 +2278,18 @@ planear. Acoplamiento: <code>Despacho</code> apunta a cada medio concreto.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd711e84" class="outline-4">
-<h4 id="orgd711e84">El problema</h4>
-<div class="outline-text-4" id="text-orgd711e84">
+<div id="outline-container-org9c92492" class="outline-4">
+<h4 id="org9c92492">1. Problema</h4>
+<div class="outline-text-4" id="text-org9c92492">
 <p>
 Hay varias formas de hacer <b>la misma</b> operación. Queremos
 intercambiarlas sin reescribir al que las usa.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a777f8" class="outline-4">
-<h4 id="org5a777f8">Cómo reconocerlo</h4>
-<div class="outline-text-4" id="text-org5a777f8">
+<div id="outline-container-orgc7370a5" class="outline-4">
+<h4 id="orgc7370a5">2. Síntoma — ¿Cómo sé que tengo este problema?</h4>
+<div class="outline-text-4" id="text-orgc7370a5">
 <div class="org-src-container">
 <pre class="src src-java">if (medio.equals("moto"))      { /* peso, zona urbana */ }
 else if (medio.equals("dron")) { /* peso, distancia, clima */ }
@@ -2280,9 +2316,9 @@ dron, no un Strategy nuevo.
 </p>
 </div>
 </div>
-<div id="outline-container-org15f6c18" class="outline-4">
-<h4 id="org15f6c18">Qué está cambiando</h4>
-<div class="outline-text-4" id="text-org15f6c18">
+<div id="outline-container-org42981e2" class="outline-4">
+<h4 id="org42981e2">3. Qué está cambiando</h4>
+<div class="outline-text-4" id="text-org42981e2">
 <p>
 El <b>algoritmo</b> de <code>planear</code>. No el hecho de «asignar una entrega».
 </p>
@@ -2293,20 +2329,20 @@ varios algoritmos, misma pregunta.
 </p>
 </div>
 </div>
-<div id="outline-container-org3aedb60" class="outline-4">
-<h4 id="org3aedb60">La idea</h4>
-<div class="outline-text-4" id="text-org3aedb60">
+<div id="outline-container-orgf8d8071" class="outline-4">
+<h4 id="orgf8d8071">4. Idea</h4>
+<div class="outline-text-4" id="text-orgf8d8071">
 <p>
 Sacar cada forma a su propio componente. El resto habla de un
-<b>contrato</b>: «tú sabes planear». Palabra clave: <b>intercambiar
+<b>*contrato</b>: «tú sabes planear». Palabra clave: <b>intercambiar
 comportamiento</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-org2209f8c" class="outline-4">
-<h4 id="org2209f8c">Estructura</h4>
-<div class="outline-text-4" id="text-org2209f8c">
-<pre class="example" id="org50fef7c">
+<div id="outline-container-org94b9f74" class="outline-4">
+<h4 id="org94b9f74">5. Estructura</h4>
+<div class="outline-text-4" id="text-org94b9f74">
+<pre class="example" id="org64ca397">
           MedioDeEntrega
               ↑
         contrato común
@@ -2318,9 +2354,9 @@ Camioneta   Moto      Bici      Dron
 </pre>
 </div>
 </div>
-<div id="outline-container-org8ef3a1c" class="outline-4">
-<h4 id="org8ef3a1c">Participantes</h4>
-<div class="outline-text-4" id="text-org8ef3a1c">
+<div id="outline-container-orgb76f8a0" class="outline-4">
+<h4 id="orgb76f8a0">6. Participantes</h4>
+<div class="outline-text-4" id="text-orgb76f8a0">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -2354,13 +2390,13 @@ Camioneta   Moto      Bici      Dron
 </table>
 
 <p>
-<b>Cliente</b> aquí es código, no el usuario del paquete.
+<b>*Cliente</b> aquí es código, no el usuario del paquete.
 </p>
 </div>
 </div>
-<div id="outline-container-org6124802" class="outline-4">
-<h4 id="org6124802">Antes</h4>
-<div class="outline-text-4" id="text-org6124802">
+<div id="outline-container-orgc56e8c3" class="outline-4">
+<h4 id="orgc56e8c3">7. Antes</h4>
+<div class="outline-text-4" id="text-orgc56e8c3">
 <p>
 El punto de partida suele ser inocente:
 </p>
@@ -2380,14 +2416,14 @@ los medios. Añadir bicicleta <b>abre</b> <code>Despacho</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orga0ac0f1" class="outline-4">
-<h4 id="orga0ac0f1">Después</h4>
-<div class="outline-text-4" id="text-orga0ac0f1">
+<div id="outline-container-org0086d55" class="outline-4">
+<h4 id="org0086d55">8. Después</h4>
+<div class="outline-text-4" id="text-org0086d55">
 <p>
 <code>Despacho</code> solo conoce <code>MedioDeEntrega</code>. Se inyecta moto o dron.
 </p>
 
-<pre class="example" id="orga854cbd">
+<pre class="example" id="orgc6396b9">
 Despacho
   |
   | conoce
@@ -2407,9 +2443,9 @@ moto. Si apunta a <code>MedioDeEntrega</code>, se conecta cualquiera.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b1fcee" class="outline-4">
-<h4 id="org6b1fcee">Implementación</h4>
-<div class="outline-text-4" id="text-org6b1fcee">
+<div id="outline-container-orgbf46244" class="outline-4">
+<h4 id="orgbf46244">9. Implementación</h4>
+<div class="outline-text-4" id="text-orgbf46244">
 <p>
 Primero el contrato. <b>No</b> afirma «ve en dron». Afirma: si eres un
 <code>MedioDeEntrega</code>, debes poder planear.
@@ -2515,9 +2551,9 @@ Otra analogía, misma estructura: descuentos (normal, socio, VIP). Un
 </p>
 </div>
 </div>
-<div id="outline-container-org0463e36" class="outline-4">
-<h4 id="org0463e36">Por qué funciona</h4>
-<div class="outline-text-4" id="text-org0463e36">
+<div id="outline-container-org10a3be5" class="outline-4">
+<h4 id="org10a3be5">10. ¿Por qué funciona?</h4>
+<div class="outline-text-4" id="text-org10a3be5">
 <p>
 El acoplamiento dejó de ser <code>Despacho → EntregaDron</code> y pasó a
 <code>Despacho → contrato</code>. Añadir un medio no obliga a abrir el caso de
@@ -2525,9 +2561,9 @@ uso.
 </p>
 </div>
 </div>
-<div id="outline-container-org195fcc6" class="outline-4">
-<h4 id="org195fcc6">Ventajas</h4>
-<div class="outline-text-4" id="text-org195fcc6">
+<div id="outline-container-org664f3f7" class="outline-4">
+<h4 id="org664f3f7">11. Ventajas</h4>
+<div class="outline-text-4" id="text-org664f3f7">
 <ul class="org-ul">
 <li>Extender sin editar <code>Despacho</code> (abierto/cerrado).</li>
 <li>Probar cada algoritmo solo.</li>
@@ -2535,18 +2571,18 @@ uso.
 </ul>
 </div>
 </div>
-<div id="outline-container-orga3fbf56" class="outline-4">
-<h4 id="orga3fbf56">Costos</h4>
-<div class="outline-text-4" id="text-orga3fbf56">
+<div id="outline-container-org91a6b72" class="outline-4">
+<h4 id="org91a6b72">12. Costos</h4>
+<div class="outline-text-4" id="text-org91a6b72">
 <p>
 Más tipos, más archivos, más indirección. Un mapa mental más largo.
 Un estudiante que no vea el contrato verá «clases de más».
 </p>
 </div>
 </div>
-<div id="outline-container-orgc21a7dd" class="outline-4">
-<h4 id="orgc21a7dd">Cuándo no utilizarlo</h4>
-<div class="outline-text-4" id="text-orgc21a7dd">
+<div id="outline-container-org18778d0" class="outline-4">
+<h4 id="org18778d0">13. ¿Cuándo NO utilizarlo?</h4>
+<div class="outline-text-4" id="text-org18778d0">
 <ul class="org-ul">
 <li>Una sola motocicleta y no se prevé otra.</li>
 <li>Un <code>sumar(a, b)</code> no necesita <code>ISuma</code>.</li>
@@ -2555,9 +2591,9 @@ Un estudiante que no vea el contrato verá «clases de más».
 </ul>
 </div>
 </div>
-<div id="outline-container-org8b93bdf" class="outline-4">
-<h4 id="org8b93bdf">Con qué se confunde</h4>
-<div class="outline-text-4" id="text-org8b93bdf">
+<div id="outline-container-org3851a88" class="outline-4">
+<h4 id="org3851a88">14. Patrones con los que se puede confundir</h4>
+<div class="outline-text-4" id="text-org3851a88">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -2627,9 +2663,9 @@ se construye el objeto que <b>es</b> la estrategia. No son el mismo patrón.
 </p>
 </div>
 </div>
-<div id="outline-container-org4977666" class="outline-4">
-<h4 id="org4977666">Ejercicio</h4>
-<div class="outline-text-4" id="text-org4977666">
+<div id="outline-container-org795f0c4" class="outline-4">
+<h4 id="org795f0c4">15. Ejercicio</h4>
+<div class="outline-text-4" id="text-org795f0c4">
 <p>
 Una aplicación tiene tres algoritmos de cálculo de envío. Hoy usa un
 <code>switch</code> de 200 líneas.
@@ -2666,13 +2702,13 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org68bf707" class="outline-3">
-<h3 id="org68bf707">Adapter</h3>
-<div class="outline-text-3" id="text-org68bf707">
+<div id="outline-container-orgb164b97" class="outline-3">
+<h3 id="orgb164b97">Adapter</h3>
+<div class="outline-text-3" id="text-orgb164b97">
 </div>
-<div id="outline-container-orgb1bb75f" class="outline-4">
-<h4 id="orgb1bb75f">Intuición</h4>
-<div class="outline-text-4" id="text-orgb1bb75f">
+<div id="outline-container-org0af3e7a" class="outline-4">
+<h4 id="org0af3e7a">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-org0af3e7a">
 <p>
 Viajas y el enchufe del hotel no coincide con el de tu cargador. No
 cambias la corriente de la casa ni rediseñas el cargador: pones un
@@ -2685,9 +2721,9 @@ La IA del proveedor habla <code>route_hint: "bike"</code>. El despacho habla
 </p>
 </div>
 </div>
-<div id="outline-container-org375a179" class="outline-4">
-<h4 id="org375a179">Diseño</h4>
-<div class="outline-text-4" id="text-org375a179">
+<div id="outline-container-org933c5b0" class="outline-4">
+<h4 id="org933c5b0">Nivel 2 — Diseño</h4>
+<div class="outline-text-4" id="text-org933c5b0">
 <p>
 Cambia la <b>interfaz ajena</b>, no el reglamento de entrega. Si
 <code>route_hint</code> se filtra al pedido, al panel y a las fichas, un
@@ -2700,18 +2736,18 @@ nuestro.
 </p>
 </div>
 </div>
-<div id="outline-container-org954e124" class="outline-4">
-<h4 id="org954e124">El problema</h4>
-<div class="outline-text-4" id="text-org954e124">
+<div id="outline-container-org71e84f5" class="outline-4">
+<h4 id="org71e84f5">1. Problema</h4>
+<div class="outline-text-4" id="text-org71e84f5">
 <p>
 Nuestro sistema habla un idioma. Un sistema <b>externo</b> habla otro. Hay
 que traducir un idioma que <b>no controlamos</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d2174f" class="outline-4">
-<h4 id="org6d2174f">Cómo reconocerlo</h4>
-<div class="outline-text-4" id="text-org6d2174f">
+<div id="outline-container-org9bb9447" class="outline-4">
+<h4 id="org9bb9447">2. Síntoma — ¿Cómo sé que tengo este problema?</h4>
+<div class="outline-text-4" id="text-org9bb9447">
 <ul class="org-ul">
 <li><code>route_hint</code>, <code>00</code>, <code>OK_N</code> o etiquetas XML aparecen en el despacho,
 el panel y las pruebas.</li>
@@ -2726,36 +2762,36 @@ JSON. Entonces basta alinear el contrato.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbdfed51" class="outline-4">
-<h4 id="orgbdfed51">Qué está cambiando</h4>
-<div class="outline-text-4" id="text-orgbdfed51">
+<div id="outline-container-orgbd544ce" class="outline-4">
+<h4 id="orgbd544ce">3. Qué está cambiando</h4>
+<div class="outline-text-4" id="text-orgbd544ce">
 <p>
 La forma del mensaje <b>ajeno</b>. No el algoritmo de planear (eso es
 Strategy). No «simplificar nuestro interior» (eso es Facade).
 </p>
 </div>
 </div>
-<div id="outline-container-orgff88a3b" class="outline-4">
-<h4 id="orgff88a3b">La idea</h4>
-<div class="outline-text-4" id="text-orgff88a3b">
+<div id="outline-container-org6cc49ad" class="outline-4">
+<h4 id="org6cc49ad">4. Idea</h4>
+<div class="outline-text-4" id="text-org6cc49ad">
 <p>
 El dominio define el contrato que <b>sí</b> entiende. El Adapter lo
 implementa y por dentro llama a lo ajeno. El JSON muere en un archivo.
 </p>
 </div>
 </div>
-<div id="outline-container-org232056c" class="outline-4">
-<h4 id="org232056c">Estructura</h4>
-<div class="outline-text-4" id="text-org232056c">
-<pre class="example" id="orgd3b8303">
+<div id="outline-container-org3017b2d" class="outline-4">
+<h4 id="org3017b2d">5. Estructura</h4>
+<div class="outline-text-4" id="text-org3017b2d">
+<pre class="example" id="org5e891df">
 Despacho → RecomendadorIA ← AdaptadorOpenAI → API del proveedor
               (nuestro)         (traduce)         (ajeno)
 </pre>
 </div>
 </div>
-<div id="outline-container-org9e9b3f8" class="outline-4">
-<h4 id="org9e9b3f8">Participantes</h4>
-<div class="outline-text-4" id="text-org9e9b3f8">
+<div id="outline-container-orge30cd13" class="outline-4">
+<h4 id="orge30cd13">6. Participantes</h4>
+<div class="outline-text-4" id="text-orge30cd13">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -2789,27 +2825,27 @@ Despacho → RecomendadorIA ← AdaptadorOpenAI → API del proveedor
 </table>
 </div>
 </div>
-<div id="outline-container-org5aa50a9" class="outline-4">
-<h4 id="org5aa50a9">Antes</h4>
-<div class="outline-text-4" id="text-org5aa50a9">
+<div id="outline-container-orgb3f14a1" class="outline-4">
+<h4 id="orgb3f14a1">7. Antes</h4>
+<div class="outline-text-4" id="text-orgb3f14a1">
 <p>
 <code>Despacho</code> lee <code>n.get("route_hint")</code>. El vocabulario ajeno vive en el
 negocio.
 </p>
 </div>
 </div>
-<div id="outline-container-org5414609" class="outline-4">
-<h4 id="org5414609">Después</h4>
-<div class="outline-text-4" id="text-org5414609">
+<div id="outline-container-orgafe54fa" class="outline-4">
+<h4 id="orgafe54fa">8. Después</h4>
+<div class="outline-text-4" id="text-orgafe54fa">
 <p>
 <code>Despacho</code> llama <code>recomendador.sugerir(...)</code>. Un proveedor nuevo es
-<b>otro</b> adaptador, no otro <code>Despacho</code>.
+<b>*otro</b> adaptador, no otro <code>Despacho</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org0426c9f" class="outline-4">
-<h4 id="org0426c9f">Implementación</h4>
-<div class="outline-text-4" id="text-org0426c9f">
+<div id="outline-container-orgdc4ff4f" class="outline-4">
+<h4 id="orgdc4ff4f">9. Implementación</h4>
+<div class="outline-text-4" id="text-orgdc4ff4f">
 <div class="org-src-container">
 <pre class="src src-java">public interface RecomendadorIA {
     Sugerencia sugerir(Pedido pedido, ContextoViaje ctx);
@@ -2831,36 +2867,36 @@ jerarquía de clases. La idea es la misma: el borde traduce.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f1f22d" class="outline-4">
-<h4 id="org5f1f22d">Por qué funciona</h4>
-<div class="outline-text-4" id="text-org5f1f22d">
+<div id="outline-container-org1726baf" class="outline-4">
+<h4 id="org1726baf">10. ¿Por qué funciona?</h4>
+<div class="outline-text-4" id="text-org1726baf">
 <p>
 El acoplamiento al proveedor queda encerrado. El resto del sistema
 evoluciona en vocabulario de <b>nuestro</b> dominio.
 </p>
 </div>
 </div>
-<div id="outline-container-org033006a" class="outline-4">
-<h4 id="org033006a">Ventajas</h4>
-<div class="outline-text-4" id="text-org033006a">
+<div id="outline-container-org6057807" class="outline-4">
+<h4 id="org6057807">11. Ventajas</h4>
+<div class="outline-text-4" id="text-org6057807">
 <p>
 Cambiar de IA sin reescribir el despacho. Probar el negocio con un
 adaptador falso.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9d6ca2" class="outline-4">
-<h4 id="orgc9d6ca2">Costos</h4>
-<div class="outline-text-4" id="text-orgc9d6ca2">
+<div id="outline-container-org4a4363b" class="outline-4">
+<h4 id="org4a4363b">12. Costos</h4>
+<div class="outline-text-4" id="text-org4a4363b">
 <p>
 Una clase (o función) más. Hay que mantener el mapeo cuando el
 proveedor cambia el JSON.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb416a79" class="outline-4">
-<h4 id="orgb416a79">Cuándo no utilizarlo</h4>
-<div class="outline-text-4" id="text-orgb416a79">
+<div id="outline-container-org060f803" class="outline-4">
+<h4 id="org060f803">13. ¿Cuándo NO utilizarlo?</h4>
+<div class="outline-text-4" id="text-org060f803">
 <ul class="org-ul">
 <li>Se pacta el mismo JSON con el proveedor.</li>
 <li>El «adaptador» solo llama a un método nuestro con el mismo nombre
@@ -2869,9 +2905,9 @@ proveedor cambia el JSON.
 </ul>
 </div>
 </div>
-<div id="outline-container-org530b4ba" class="outline-4">
-<h4 id="org530b4ba">Con qué se confunde</h4>
-<div class="outline-text-4" id="text-org530b4ba">
+<div id="outline-container-orgc6f0b39" class="outline-4">
+<h4 id="orgc6f0b39">14. Patrones con los que se puede confundir</h4>
+<div class="outline-text-4" id="text-orgc6f0b39">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -2923,9 +2959,9 @@ no traducir <code>bike</code> a <code>bici</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd80f4dd" class="outline-4">
-<h4 id="orgd80f4dd">Ejercicio</h4>
-<div class="outline-text-4" id="text-orgd80f4dd">
+<div id="outline-container-org3aa7d0b" class="outline-4">
+<h4 id="org3aa7d0b">15. Ejercicio</h4>
+<div class="outline-text-4" id="text-org3aa7d0b">
 <p>
 El proveedor dice <code>route_hint: "bike"</code>; el dominio dice
 <code>Sugerencia{ "bici", motivo }</code>. ¿Adapter o Facade? Justifica.
@@ -2949,9 +2985,9 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org5108d46" class="outline-3">
-<h3 id="org5108d46">Factory Method</h3>
-<div class="outline-text-3" id="text-org5108d46">
+<div id="outline-container-org6d4f910" class="outline-3">
+<h3 id="org6d4f910">Factory Method</h3>
+<div class="outline-text-3" id="text-org6d4f910">
 <p>
 La palabra <b>fábrica</b> es ambigua. Antes del patrón, hay que saber <b>de
 cuál</b> se habla. Si no, se etiqueta <code>MedioFactory.crear("dron")</code> como
@@ -3019,9 +3055,9 @@ Declarar <code>abstract class MedioFactory</code> <b>no</b> convierte una fábri
 simple en Abstract Factory.
 </p>
 </div>
-<div id="outline-container-org633ba47" class="outline-4">
-<h4 id="org633ba47">Intuición</h4>
-<div class="outline-text-4" id="text-org633ba47">
+<div id="outline-container-orgb82bd44" class="outline-4">
+<h4 id="orgb82bd44">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-orgb82bd44">
 <p>
 Primera versión de la plataforma: solo camioneta. El despacho <b>es</b>
 camioneta: valida peso, arma la ruta, cobra. Luego piden mar (barco) y
@@ -3045,9 +3081,9 @@ vehículo sale.
 </p>
 </div>
 </div>
-<div id="outline-container-org44b718e" class="outline-4">
-<h4 id="org44b718e">Diseño</h4>
-<div class="outline-text-4" id="text-org44b718e">
+<div id="outline-container-org125f4f3" class="outline-4">
+<h4 id="org125f4f3">Nivel 2 — Diseño</h4>
+<div class="outline-text-4" id="text-org125f4f3">
 <p>
 El <code>new</code> no desaparece. Se <b>mueve</b> a un método (<code>crearMedio</code>) que las
 subclases pueden redefinir. Los productos (<code>camioneta</code>, <code>barco</code>,
@@ -3062,7 +3098,7 @@ fábrica cambia <b>indirectamente</b> esa lógica, porque ahora trabaja con
 otro producto.
 </p>
 
-<pre class="example" id="org3f6b339">
+<pre class="example" id="org752daf1">
 Logistica.despachar(pedido)
         │
         ├── crearMedio()     ← las subclases cambian ESTO
@@ -3073,9 +3109,9 @@ Logistica.despachar(pedido)
 </pre>
 </div>
 </div>
-<div id="outline-container-orgaf5ddfe" class="outline-4">
-<h4 id="orgaf5ddfe">El problema</h4>
-<div class="outline-text-4" id="text-orgaf5ddfe">
+<div id="outline-container-orgc64aabf" class="outline-4">
+<h4 id="orgc64aabf">1. Problema</h4>
+<div class="outline-text-4" id="text-orgc64aabf">
 <p>
 No conoces de antemano el tipo concreto con el que debe trabajar el
 código de despacho. Si dejas <code>new EntregaCamioneta()</code> dentro de ese
@@ -3085,9 +3121,9 @@ del transporte.
 </p>
 </div>
 </div>
-<div id="outline-container-org104a56b" class="outline-4">
-<h4 id="org104a56b">Cómo reconocerlo</h4>
-<div class="outline-text-4" id="text-org104a56b">
+<div id="outline-container-orge5ae668" class="outline-4">
+<h4 id="orge5ae668">2. Síntoma — ¿Cómo sé que tengo este problema?</h4>
+<div class="outline-text-4" id="text-orge5ae668">
 <ul class="org-ul">
 <li>La lógica de <code>despachar</code> menciona <code>EntregaCamioneta</code> por su nombre.</li>
 <li>Añadir barco o dron toca <b>varios</b> archivos, no uno.</li>
@@ -3103,9 +3139,9 @@ con el trámite, pero todavía no es Factory Method.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a8fed8" class="outline-4">
-<h4 id="org6a8fed8">Qué está cambiando</h4>
-<div class="outline-text-4" id="text-org6a8fed8">
+<div id="outline-container-orgda128c2" class="outline-4">
+<h4 id="orgda128c2">3. Qué está cambiando</h4>
+<div class="outline-text-4" id="text-orgda128c2">
 <p>
 El <b>tipo de producto</b> que el trámite necesita. No el algoritmo de
 planear (eso ya es Strategy: el producto <b>es</b> la estrategia). No el
@@ -3113,9 +3149,9 @@ JSON de la IA (Adapter).
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe286ad" class="outline-4">
-<h4 id="orgbe286ad">La idea</h4>
-<div class="outline-text-4" id="text-orgbe286ad">
+<div id="outline-container-orgce0ee4f" class="outline-4">
+<h4 id="orgce0ee4f">4. Idea</h4>
+<div class="outline-text-4" id="text-orgce0ee4f">
 <p>
 En lugar de construir el medio en medio del trámite, el trámite pide
 <code>crearMedio()</code>. Las subclases de la creadora devuelven productos
@@ -3136,10 +3172,10 @@ puede hacer eso: por definición devuelve una instancia nueva.
 </p>
 </div>
 </div>
-<div id="outline-container-org4c41cb1" class="outline-4">
-<h4 id="org4c41cb1">Estructura</h4>
-<div class="outline-text-4" id="text-org4c41cb1">
-<pre class="example" id="orgced8ef4">
+<div id="outline-container-org5b6c2c5" class="outline-4">
+<h4 id="org5b6c2c5">5. Estructura</h4>
+<div class="outline-text-4" id="text-org5b6c2c5">
+<pre class="example" id="org71fbe94">
        MedioDeEntrega          ← Producto (contrato)
              ↑
     +--------+--------+
@@ -3162,9 +3198,9 @@ o dar un producto por defecto en la base.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf31082c" class="outline-4">
-<h4 id="orgf31082c">Participantes</h4>
-<div class="outline-text-4" id="text-orgf31082c">
+<div id="outline-container-org1c806d8" class="outline-4">
+<h4 id="org1c806d8">6. Participantes</h4>
+<div class="outline-text-4" id="text-org1c806d8">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -3213,9 +3249,9 @@ tipo de operación). A partir de ahí trabaja contra la clase base.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a7b9f1" class="outline-4">
-<h4 id="org9a7b9f1">Antes</h4>
-<div class="outline-text-4" id="text-org9a7b9f1">
+<div id="outline-container-org1b90f22" class="outline-4">
+<h4 id="org1b90f22">7. Antes</h4>
+<div class="outline-text-4" id="text-org1b90f22">
 <div class="org-src-container">
 <pre class="src src-java">public class Logistica {
     public Plan despachar(Pedido pedido, ContextoViaje ctx) {
@@ -3232,15 +3268,15 @@ pruebas). El trámite y la construcción están mezclados.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4714b3" class="outline-4">
-<h4 id="orgd4714b3">Después</h4>
-<div class="outline-text-4" id="text-orgd4714b3">
+<div id="outline-container-org83db22c" class="outline-4">
+<h4 id="org83db22c">8. Después</h4>
+<div class="outline-text-4" id="text-org83db22c">
 <p>
 <code>despachar</code> no conoce camioneta ni dron. Conoce <code>MedioDeEntrega</code>.
 <code>LogisticaAerea</code> solo cambia <code>crearMedio</code>.
 </p>
 
-<pre class="example" id="org7a7b819">
+<pre class="example" id="orgc5e60da">
 Cliente → Logistica (base)
               │
               ├── LogisticaTerrestre.crearMedio() → EntregaCamioneta
@@ -3250,9 +3286,9 @@ despachar() es el mismo código en la clase base.
 </pre>
 </div>
 </div>
-<div id="outline-container-orgefc8558" class="outline-4">
-<h4 id="orgefc8558">Implementación</h4>
-<div class="outline-text-4" id="text-orgefc8558">
+<div id="outline-container-org6459f59" class="outline-4">
+<h4 id="org6459f59">9. Implementación</h4>
+<div class="outline-text-4" id="text-org6459f59">
 <p>
 Primero el contrato del producto (el mismo de Strategy):
 </p>
@@ -3322,8 +3358,8 @@ defecto, déjalo como implementación por defecto.</li>
 </ol>
 </div>
 <ul class="org-ul">
-<li><a id="org8291418"></a>Paso intermedio: la fábrica simple<br />
-<div class="outline-text-5" id="text-org8291418">
+<li><a id="org1cb9af3"></a>Paso intermedio: la fábrica simple<br />
+<div class="outline-text-5" id="text-org1cb9af3">
 <p>
 Esto es lo que suele escribir primero un estudiante —y lo que las
 misiones de <code>POST /pedidos</code> a menudo <b>sí</b> piden:
@@ -3369,9 +3405,9 @@ Method o por inyección— y se lo pasa a <code>Despacho</code>.
 </li>
 </ul>
 </div>
-<div id="outline-container-org91ef2bd" class="outline-4">
-<h4 id="org91ef2bd">Por qué funciona</h4>
-<div class="outline-text-4" id="text-org91ef2bd">
+<div id="outline-container-org3639623" class="outline-4">
+<h4 id="org3639623">10. ¿Por qué funciona?</h4>
+<div class="outline-text-4" id="text-org3639623">
 <p>
 El trámite (<code>despachar</code>) quedó acoplado al <b>contrato</b>, no a
 <code>EntregaCamioneta</code>. Añadir un medio es añadir producto + creadora
@@ -3380,9 +3416,9 @@ uso.
 </p>
 </div>
 </div>
-<div id="outline-container-orga1a732c" class="outline-4">
-<h4 id="orga1a732c">Ventajas</h4>
-<div class="outline-text-4" id="text-orga1a732c">
+<div id="outline-container-orgfaa2e84" class="outline-4">
+<h4 id="orgfaa2e84">11. Ventajas</h4>
+<div class="outline-text-4" id="text-orgfaa2e84">
 <ul class="org-ul">
 <li>Menos acoplamiento entre creador y productos concretos.</li>
 <li>Un lugar para la creación (responsabilidad única de <b>ese</b> recorte).</li>
@@ -3390,9 +3426,9 @@ uso.
 </ul>
 </div>
 </div>
-<div id="outline-container-org772a0b2" class="outline-4">
-<h4 id="org772a0b2">Costos</h4>
-<div class="outline-text-4" id="text-org772a0b2">
+<div id="outline-container-org0fdd058" class="outline-4">
+<h4 id="org0fdd058">12. Costos</h4>
+<div class="outline-text-4" id="text-org0fdd058">
 <p>
 Más clases. El patrón se justifica sobre todo cuando <b>ya hay</b> (o va a
 haber) una jerarquía de creadoras. Si solo necesitas un <code>switch</code> de
@@ -3401,9 +3437,9 @@ ni siquiera eso.
 </p>
 </div>
 </div>
-<div id="outline-container-org430d33e" class="outline-4">
-<h4 id="org430d33e">Cuándo no utilizarlo</h4>
-<div class="outline-text-4" id="text-org430d33e">
+<div id="outline-container-orgf4017da" class="outline-4">
+<h4 id="orgf4017da">13. ¿Cuándo NO utilizarlo?</h4>
+<div class="outline-text-4" id="text-orgf4017da">
 <ul class="org-ul">
 <li>Un solo tipo estable: <code>new</code> en un sitio claro.</li>
 <li><code>new ArrayList&lt;&gt;()</code>.</li>
@@ -3415,9 +3451,9 @@ Strategy; la fábrica solo <b>construye</b> ese objeto.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgad43cd1" class="outline-4">
-<h4 id="orgad43cd1">Con qué se confunde</h4>
-<div class="outline-text-4" id="text-orgad43cd1">
+<div id="outline-container-orgea40399" class="outline-4">
+<h4 id="orgea40399">14. Patrones con los que se puede confundir</h4>
+<div class="outline-text-4" id="text-orgea40399">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -3483,9 +3519,9 @@ BFF no es una «fábrica de JSON» para la pantalla de inicio.
 </p>
 </div>
 </div>
-<div id="outline-container-org7107941" class="outline-4">
-<h4 id="org7107941">Ejercicio</h4>
-<div class="outline-text-4" id="text-org7107941">
+<div id="outline-container-org1e3716a" class="outline-4">
+<h4 id="org1e3716a">15. Ejercicio</h4>
+<div class="outline-text-4" id="text-org1e3716a">
 <p>
 La plataforma solo tenía camioneta. <code>Logistica.despachar</code> hace
 <code>new EntregaCamioneta()</code>. Piden dron y barco.
@@ -3516,50 +3552,69 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org384d171" class="outline-3">
-<h3 id="org384d171">Facade</h3>
-<div class="outline-text-3" id="text-org384d171">
+<div id="outline-container-orgf13aa11" class="outline-3">
+<h3 id="orgf13aa11">Facade</h3>
+<div class="outline-text-3" id="text-orgf13aa11">
 </div>
-<div id="outline-container-org9de492f" class="outline-4">
-<h4 id="org9de492f">Intuición</h4>
-<div class="outline-text-4" id="text-org9de492f">
+<div id="outline-container-orgb4a1bcd" class="outline-4">
+<h4 id="orgb4a1bcd">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-orgb4a1bcd">
 <p>
 En un hotel no llamas a limpieza, llaves y caja por separado para el
 check-in. Hablas con <b>recepción</b>. Esa puerta corta es una fachada.
 </p>
 </div>
 </div>
-<div id="outline-container-org263adeb" class="outline-4">
-<h4 id="org263adeb">El problema</h4>
-<div class="outline-text-4" id="text-org263adeb">
+<div id="outline-container-orgf2f5638" class="outline-4">
+<h4 id="orgf2f5638">Nivel 2 — Diseño</h4>
+<div class="outline-text-4" id="text-orgf2f5638">
 <p>
 Simplificar el acceso a un <b>subsistema nuestro</b> que ya es complejo.
-No traducir a un extraño (eso es Adapter). No intercambiar algoritmos
-(eso es Strategy).
+No traducir a un extraño (Adapter). No intercambiar algoritmos
+(Strategy).
 </p>
-
+</div>
+</div>
+<div id="outline-container-org8159a3a" class="outline-4">
+<h4 id="org8159a3a">1. Problema</h4>
+<div class="outline-text-4" id="text-org8159a3a">
 <p>
-El controlador HTTP —o varias pantallas— conoce diez clases internas
-del registro de pedido: validador, IA, medio, repositorio, cobro. El
-trámite está <b>inlined</b> en la ruta, copiado en la app y en un job. Cada
-cliente arma la orquestación a su manera.
+El controlador HTTP (o varias pantallas) conoce diez clases internas
+del registro de pedido: validador, IA, medio, repositorio, cobro…
 </p>
-
+</div>
+</div>
+<div id="outline-container-org7b014eb" class="outline-4">
+<h4 id="org7b014eb">2. Síntoma</h4>
+<div class="outline-text-4" id="text-org7b014eb">
 <p>
-Cambia la <b>forma de usar</b> el interior. El interior puede seguir siendo
+<code>registrarPedido</code> está <b>inlined</b> en la ruta, copiado en la app y en un
+job. Cada cliente del subsistema arma la orquestación a su manera.
+</p>
+</div>
+</div>
+<div id="outline-container-orgafde58a" class="outline-4">
+<h4 id="orgafde58a">3. Qué está cambiando</h4>
+<div class="outline-text-4" id="text-orgafde58a">
+<p>
+La <b>forma de usar</b> el interior. El interior puede seguir siendo
 complejo; los clientes no deberían verlo.
 </p>
 </div>
 </div>
-<div id="outline-container-org036562a" class="outline-4">
-<h4 id="org036562a">La idea</h4>
-<div class="outline-text-4" id="text-org036562a">
+<div id="outline-container-orgec4ef88" class="outline-4">
+<h4 id="orgec4ef88">4. Idea</h4>
+<div class="outline-text-4" id="text-orgec4ef88">
 <p>
-Una operación de aplicación, <code>registrarPedido()</code>, que orquesta. El
+Una operación de aplicación (<code>registrarPedido()</code>) que orquesta. El
 Service Layer <b>suele realizar</b> esta idea: el mesero, no la cocina.
 </p>
-
-<pre class="example" id="org124d38c">
+</div>
+</div>
+<div id="outline-container-org6950e22" class="outline-4">
+<h4 id="org6950e22">5. Estructura</h4>
+<div class="outline-text-4" id="text-org6950e22">
+<pre class="example" id="orgf3914eb">
 HTTP / app / job
         ↓
   registrarPedido()   ← fachada del trámite
@@ -3568,19 +3623,23 @@ HTTP / app / job
         +-- Factory → Strategy
         +-- Repository
 </pre>
-
+</div>
+</div>
+<div id="outline-container-org28cddf4" class="outline-4">
+<h4 id="org28cddf4">6. Participantes</h4>
+<div class="outline-text-4" id="text-org28cddf4">
 <p>
 La fachada <b>no</b> es el Front Controller (eso es la portería HTTP). No
 es el Adapter (el otro no es nuestro).
 </p>
 </div>
 </div>
-<div id="outline-container-org88a13fb" class="outline-4">
-<h4 id="org88a13fb">Antes y después</h4>
-<div class="outline-text-4" id="text-org88a13fb">
+<div id="outline-container-org8e7874d" class="outline-4">
+<h4 id="org8e7874d">7–9. Antes / después / implementación</h4>
+<div class="outline-text-4" id="text-org8e7874d">
 <p>
-Antes, la ruta Spring o el <code>app.post</code> llama al repositorio, al cliente
-HTTP de la IA y a <code>new EntregaDron()</code>. Después, la ruta llama
+Antes: la ruta Spring o el <code>app.post</code> llama a repositorio, cliente HTTP
+de IA y <code>new EntregaDron()</code>. Después: la ruta llama
 <code>pedidos.registrar(...)</code>. El código de orquestación vive <b>una</b> vez.
 </p>
 
@@ -3588,14 +3647,22 @@ HTTP de la IA y a <code>new EntregaDron()</code>. Después, la ruta llama
 Una clase que solo delega a un método con el mismo nombre es ruido,
 no Facade.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org98c9c18" class="outline-4">
+<h4 id="org98c9c18">10–13. Por qué, ventajas, costos, cuándo no</h4>
+<div class="outline-text-4" id="text-org98c9c18">
 <p>
 Se gana un único trámite. Se paga un tipo más. No hace falta si el
 subsistema es un solo método claro. Las «Facades» de Laravel son
-<b>otro</b> mecanismo (acceso estático a servicios): no confundir el
+<b>*otro</b> mecanismo (acceso estático a servicios); no confundir el
 nombre con el patrón GoF.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org3b38665" class="outline-4">
+<h4 id="org3b38665">14. Confusiones</h4>
+<div class="outline-text-4" id="text-org3b38665">
 <p>
 Adapter vs Facade: ¿el otro es ajeno o nuestro? Strategy vs Facade:
 ¿intercambio algoritmos o escondo un módulo? Service Layer y Facade
@@ -3603,12 +3670,12 @@ a menudo coinciden en la práctica: nombra el <b>trámite</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-org88a09af" class="outline-4">
-<h4 id="org88a09af">Ejercicio</h4>
-<div class="outline-text-4" id="text-org88a09af">
+<div id="outline-container-orgf71b0b4" class="outline-4">
+<h4 id="orgf71b0b4">15. Ejercicio</h4>
+<div class="outline-text-4" id="text-orgf71b0b4">
 <p>
-El proveedor habla de <code>route_hint</code>: ¿Facade? (No: Adapter.)
-<code>registrarPedido</code> que oculta validar y persistir: ¿Facade o Service
+<code>route_hint</code> en el proveedor: ¿Facade? (No: Adapter.)
+<code>registrarPedido</code> que oculta validar + persistir: ¿Facade / Service
 Layer? ¿Hace falta <b>además</b> un <code>PedidoFacade</code> vacío?
 </p>
 
@@ -3621,13 +3688,13 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-orgf9cc0e0" class="outline-3">
-<h3 id="orgf9cc0e0">Observer</h3>
-<div class="outline-text-3" id="text-orgf9cc0e0">
+<div id="outline-container-org4961822" class="outline-3">
+<h3 id="org4961822">Observer</h3>
+<div class="outline-text-3" id="text-org4961822">
 </div>
-<div id="outline-container-org0459655" class="outline-4">
-<h4 id="org0459655">Intuición</h4>
-<div class="outline-text-4" id="text-org0459655">
+<div id="outline-container-org9268fb9" class="outline-4">
+<h4 id="org9268fb9">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-org9268fb9">
 <p>
 Un grupo de WhatsApp: publicas un hecho. No tienes la lista de
 teléfonos de todos los parientes en la cabeza cada vez que escribes.
@@ -3635,9 +3702,9 @@ Quien esté en el grupo se entera. Quien salga, deja de enterarse.
 </p>
 </div>
 </div>
-<div id="outline-container-org8826bde" class="outline-4">
-<h4 id="org8826bde">El problema</h4>
-<div class="outline-text-4" id="text-org8826bde">
+<div id="outline-container-orge79e944" class="outline-4">
+<h4 id="orge79e944">Nivel 2 — Diseño</h4>
+<div class="outline-text-4" id="text-orge79e944">
 <p>
 Cuando cambia el estado del pedido, cliente, repartidor, admin,
 estadísticas e IA <b>pueden</b> querer saber. Mezclar esas llamadas en
@@ -3648,12 +3715,20 @@ estadísticas e IA <b>pueden</b> querer saber. Mezclar esas llamadas en
 Observer comunica: «el evento <b>ocurrió*». *No</b> garantiza: «estas dos
 operaciones se confirman *juntas*». Eso es Unit of Work.
 </p>
-
+</div>
+</div>
+<div id="outline-container-orgf3726f2" class="outline-4">
+<h4 id="orgf3726f2">1. Problema</h4>
+<div class="outline-text-4" id="text-orgf3726f2">
 <p>
-Varios interesados deben enterarse <b>sin</b> que el sujeto importe sus
-clases concretas.
+Varios interesados deben enterarse de un hecho <b>sin</b> que el sujeto
+importe sus clases concretas.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org7de46b7" class="outline-4">
+<h4 id="org7de46b7">2. Síntoma — ¿Cómo sé que tengo este problema?</h4>
+<div class="outline-text-4" id="text-org7de46b7">
 <div class="org-src-container">
 <pre class="src src-java">void cambiarEstado(Estado e) {
     this.estado = e;
@@ -3667,32 +3742,44 @@ clases concretas.
 
 <p>
 Cada oyente nuevo <b>abre</b> ese método. O al revés: el correo está
-<b>dentro</b> del cobro y si <code>mail()</code> falla a veces no hay envío.
+<b>*dentro</b> del cobro y si <code>mail()</code> falla a veces no hay envío.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org59b85d6" class="outline-4">
+<h4 id="org59b85d6">3. Qué está cambiando</h4>
+<div class="outline-text-4" id="text-org59b85d6">
 <p>
-Cambia <b>quién</b> necesita saber. No el algoritmo de entrega. No la
-atomicidad del cobro.
+<b>*Quién</b> necesita saber. No el algoritmo de entrega. No la atomicidad
+del cobro.
 </p>
 </div>
 </div>
-<div id="outline-container-org65c35a2" class="outline-4">
-<h4 id="org65c35a2">La idea</h4>
-<div class="outline-text-4" id="text-org65c35a2">
+<div id="outline-container-org8140297" class="outline-4">
+<h4 id="org8140297">4. Idea</h4>
+<div class="outline-text-4" id="text-org8140297">
 <p>
 Publicar un evento de dominio <b>después</b> de que el hecho sea real
 (<code>COMMIT</code>). Los oyentes se suscriben.
 </p>
-
-<pre class="example" id="orgf16cc20">
+</div>
+</div>
+<div id="outline-container-orgcb76417" class="outline-4">
+<h4 id="orgcb76417">5. Estructura</h4>
+<div class="outline-text-4" id="text-orgcb76417">
+<pre class="example" id="org86ed102">
 COMMIT
   ↓
-PedidoActualizado
+PedidoActualizado     ← sujeto / evento
   +--&gt; correo
   +--&gt; app del repartidor
   +--&gt; estadísticas
 </pre>
-
+</div>
+</div>
+<div id="outline-container-orgd600fb4" class="outline-4">
+<h4 id="orgd600fb4">6. Participantes</h4>
+<div class="outline-text-4" id="text-orgd600fb4">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -3724,34 +3811,85 @@ PedidoActualizado
 </tr>
 </tbody>
 </table>
-
+</div>
+</div>
+<div id="outline-container-org437132d" class="outline-4">
+<h4 id="org437132d">7. Antes</h4>
+<div class="outline-text-4" id="text-org437132d">
 <p>
-Antes: llamadas en línea dentro de <code>cambiarEstado</code> o del script de
-pago. Después: la transacción confirma pedido y cobro; <b>luego</b> se
-notifica.
+Llamadas en línea dentro de <code>cambiarEstado</code> o dentro del script de
+pago.
+</p>
+</div>
+</div>
+<div id="outline-container-org87eef3e" class="outline-4">
+<h4 id="org87eef3e">8. Después</h4>
+<div class="outline-text-4" id="text-org87eef3e">
+<p>
+La transacción confirma pedido + cobro. <b>Luego</b> se notifica.
+</p>
+</div>
+</div>
+<div id="outline-container-org71d39fe" class="outline-4">
+<h4 id="org71d39fe">9. Implementación</h4>
+<div class="outline-text-4" id="text-org71d39fe">
+<p>
+La forma depende del lenguaje y del marco:
 </p>
 
-<p>
-La forma depende del lenguaje y del marco: lista de oyentes a mano
-(legado); eventos de Spring (<code>ApplicationEventPublisher</code>);
-<code>StateFlow</code>, hooks o BLoC (Observer de <b>UI</b>, no de dominio). Ninguno
-exige <code>Subject</code> / <code>ConcreteObserver</code> de 1994. Duplicar un bus casero
-<b>junto</b> a <code>StateFlow</code> es el mismo defecto que dos Front Controller.
-</p>
+<ul class="org-ul">
+<li>Lista de oyentes a mano (legado, servidor mínimo).</li>
+<li>Eventos de Spring (<code>ApplicationEventPublisher</code>).</li>
+<li><code>StateFlow</code> / hooks / BLoC: Observer de <b>UI</b>, no de dominio.</li>
+</ul>
 
+<p>
+Los tres de UI (Kotlin, Dart, Swift) son Observer de presentación.
+Ninguno exige <code>Subject</code> / <code>ConcreteObserver</code> de 1994. Duplicar un bus
+casero <b>junto</b> a <code>StateFlow</code> es el mismo defecto que dos Front
+Controller.
+</p>
+</div>
+</div>
+<div id="outline-container-org4283327" class="outline-4">
+<h4 id="org4283327">10. ¿Por qué funciona?</h4>
+<div class="outline-text-4" id="text-org4283327">
 <p>
 Añadir un canal no abre el caso de uso de registro. El dominio no
-importa SMTP. Se paga: orden de notificación, fallos en un oyente,
-depuración menos lineal, y el riesgo de usarlo <b>en lugar de</b> la
-transacción.
+importa SMTP.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org9de72d7" class="outline-4">
+<h4 id="org9de72d7">11. Ventajas</h4>
+<div class="outline-text-4" id="text-org9de72d7">
 <p>
-Un solo llamador evidente: llama directo. Atomicidad de cobro y alta:
-<b>no</b> es Observer. Un <code>setInterval</code> que pega al servidor cada segundo
+Extensión de avisos. Los oyentes se prueban por separado.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeeae351" class="outline-4">
+<h4 id="orgeeae351">12. Costos</h4>
+<div class="outline-text-4" id="text-orgeeae351">
+<p>
+Orden de notificación no trivial. Fallos en un oyente. Depuración
+menos lineal. Riesgo de usarlo <b>en lugar de</b> la transacción.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b75e3c" class="outline-4">
+<h4 id="org4b75e3c">13. ¿Cuándo NO utilizarlo?</h4>
+<div class="outline-text-4" id="text-org4b75e3c">
+<p>
+Un solo llamador evidente: llama directo. Atomicidad de cobro + alta:
+<b>*no</b> es Observer. Un <code>setInterval</code> que pega al servidor cada segundo
 no es este patrón.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org6eb9f9f" class="outline-4">
+<h4 id="org6eb9f9f">14. Patrones con los que se puede confundir</h4>
+<div class="outline-text-4" id="text-org6eb9f9f">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -3774,7 +3912,7 @@ no es este patrón.
 
 <tr>
 <td class="org-left">Command</td>
-<td class="org-left">¿Encapsulo la solicitud para encolarla o deshacerla?</td>
+<td class="org-left">¿Encapsulo la solicitud para encolarla / deshacerla?</td>
 </tr>
 
 <tr>
@@ -3784,25 +3922,30 @@ no es este patrón.
 
 <tr>
 <td class="org-left">Mediator</td>
-<td class="org-left">¿Evito que todos se conozcan entre todos?</td>
+<td class="org-left">¿Evito que todos se conozcan entre todos? (otro problema)</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-El Observer del DOM no es el de <code>PedidoActualizado</code>. Nombra <b>la capa</b>.
+El Observer del DOM no es el Observer de <code>PedidoActualizado</code>. Nombra
+<b>*la capa</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-org90c7eaf" class="outline-4">
-<h4 id="org90c7eaf">Ejercicio</h4>
-<div class="outline-text-4" id="text-org90c7eaf">
+<div id="outline-container-org7cd4a85" class="outline-4">
+<h4 id="org7cd4a85">15. Ejercicio</h4>
+<div class="outline-text-4" id="text-org7cd4a85">
 <p>
 Un alumno afirma: «Observer registra el envío cuando hay pago».
 ¿Estás de acuerdo? Defiende o rechaza.
 </p>
 
-<pre class="example" id="org5446aa8">
+<p>
+Malo:
+</p>
+
+<pre class="example" id="org6271fb8">
 Pago realizado → Observer → registrar envío
 </pre>
 
@@ -3820,45 +3963,45 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org58a478b" class="outline-3">
-<h3 id="org58a478b">Front Controller</h3>
-<div class="outline-text-3" id="text-org58a478b">
+<div id="outline-container-org060b95c" class="outline-3">
+<h3 id="org060b95c">Front Controller</h3>
+<div class="outline-text-3" id="text-org060b95c">
 </div>
-<div id="outline-container-org5d8e691" class="outline-4">
-<h4 id="org5d8e691">Intuición</h4>
-<div class="outline-text-4" id="text-org5d8e691">
+<div id="outline-container-orgd0db5a6" class="outline-4">
+<h4 id="orgd0db5a6">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-orgd0db5a6">
 <p>
 Un edificio con una <b>portería</b>: no entras por la ventana de cada
 oficina. Las reglas de visita se aplican <b>una</b> vez.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd5ebc1f" class="outline-4">
-<h4 id="orgd5ebc1f">El problema</h4>
-<div class="outline-text-4" id="text-orgd5ebc1f">
+<div id="outline-container-org3e2c289" class="outline-4">
+<h4 id="org3e2c289">1–3. Problema, síntoma, qué cambia</h4>
+<div class="outline-text-4" id="text-org3e2c289">
 <p>
 Cada archivo HTTP copia sesión, bitácora y encabezado. Cuando cambia
 la caducidad del token, hay que tocar cuarenta archivos. Cambia la
-<b>entrada</b> y las políticas transversales, no el reglamento de entrega.
+<b>*entrada</b> y las políticas transversales, no el reglamento de entrega.
 </p>
 
-<pre class="example" id="orgc14f9e3">
+<pre class="example" id="org1bba78c">
 index.php     → sesión
 pedidos.php   → sesión
 pagos.php     → sesión
 </pre>
 </div>
 </div>
-<div id="outline-container-orgc16fead" class="outline-4">
-<h4 id="orgc16fead">La idea</h4>
-<div class="outline-text-4" id="text-orgc16fead">
+<div id="outline-container-orgb5eb668" class="outline-4">
+<h4 id="orgb5eb668">4–6. Idea, estructura, participantes</h4>
+<div class="outline-text-4" id="text-orgb5eb668">
 <p>
 Una portería. El frontal <b>dirige</b>. No decide si el dron puede volar.
 Page Controller es el piso (este trámite). Él solo no deja de copiar
 la sesión.
 </p>
 
-<pre class="example" id="orgec3d22e">
+<pre class="example" id="org46f7818">
 HTTP
   ↓
 Front Controller
@@ -3866,22 +4009,30 @@ Front Controller
   |     |     |
 pedidos pagos seguimiento
 </pre>
-
+</div>
+</div>
+<div id="outline-container-org9fd33fc" class="outline-4">
+<h4 id="org9fd33fc">7–9. Antes / después / implementación</h4>
+<div class="outline-text-4" id="text-org9fd33fc">
 <p>
 Spring: <code>DispatcherServlet</code>. Express: <code>app</code>. Laravel: kernel. Si el
 marco ya lo trae, <b>no se construye otro</b> al lado.
 </p>
-
+</div>
+</div>
+<div id="outline-container-orgf259b89" class="outline-4">
+<h4 id="orgf259b89">13–14. Cuándo no y confusiones</h4>
+<div class="outline-text-4" id="text-orgf259b89">
 <p>
 Un sitio de tres páginas estáticas no lo pide. No es Strategy. No es
-API Gateway: el Gateway es <b>borde</b> entre clientes y <b>varios</b>
-servicios; el Front Controller es la portería <b>de esta</b> aplicación.
+API Gateway (el Gateway es <b>borde</b> entre clientes y <b>varios</b>
+servicios; el Front Controller es la portería <b>de esta</b> aplicación).
 </p>
 </div>
 </div>
-<div id="outline-container-org1c74d17" class="outline-4">
-<h4 id="org1c74d17">Ejercicio</h4>
-<div class="outline-text-4" id="text-org1c74d17">
+<div id="outline-container-org68ffbac" class="outline-4">
+<h4 id="org68ffbac">15. Ejercicio</h4>
+<div class="outline-text-4" id="text-org68ffbac">
 <p>
 Conviven <code>index.php</code> e <code>index1.php</code>, cada uno con su sesión. ¿Hay
 Front Controller? ¿Basta un Page Controller por archivo?
@@ -3896,22 +4047,22 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org4946c71" class="outline-3">
-<h3 id="org4946c71">Chain of Responsibility / middleware</h3>
-<div class="outline-text-3" id="text-org4946c71">
+<div id="outline-container-org8c3da41" class="outline-3">
+<h3 id="org8c3da41">Chain of Responsibility / middleware</h3>
+<div class="outline-text-3" id="text-org8c3da41">
 </div>
-<div id="outline-container-orgaa56397" class="outline-4">
-<h4 id="orgaa56397">Intuición</h4>
-<div class="outline-text-4" id="text-orgaa56397">
+<div id="outline-container-orgce5e6e9" class="outline-4">
+<h4 id="orgce5e6e9">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-orgce5e6e9">
 <p>
 En el aeropuerto: documentación → seguridad → puerta. Cada puesto
 deja pasar, modifica o detiene. El orden importa.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd90fbc1" class="outline-4">
-<h4 id="orgd90fbc1">El problema</h4>
-<div class="outline-text-4" id="text-orgd90fbc1">
+<div id="outline-container-org1e15778" class="outline-4">
+<h4 id="org1e15778">1–3.</h4>
+<div class="outline-text-4" id="text-org1e15778">
 <p>
 La misma política (sesión, CORS, bitácora) se copia o se aplica en
 el orden equivocado. Autenticar <b>después</b> de cobrar cobra a quien no
@@ -3919,10 +4070,10 @@ debería.
 </p>
 </div>
 </div>
-<div id="outline-container-org201823a" class="outline-4">
-<h4 id="org201823a">La idea</h4>
-<div class="outline-text-4" id="text-org201823a">
-<pre class="example" id="orgfbde093">
+<div id="outline-container-orgbf138d3" class="outline-4">
+<h4 id="orgbf138d3">4–9.</h4>
+<div class="outline-text-4" id="text-orgbf138d3">
+<pre class="example" id="org24a9980">
 Petición → autenticación → autorización → bitácora → controlador
 </pre>
 
@@ -3941,17 +4092,21 @@ En web se llama <b>middleware</b> (<code>app.use</code>, filtros).
 
 <p>
 La cadena <b>no</b> elige camioneta o motocicleta. Eso es el dominio
-(Strategy). Un solo chequeo en una sola ruta: un <code>if</code>, no una cadena.
-No reescribas el diagrama GoF <b>junto</b> a <code>app.use</code>.
+(Strategy).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd9eb6b2" class="outline-4">
-<h4 id="orgd9eb6b2">Ejercicio</h4>
-<div class="outline-text-4" id="text-orgd9eb6b2">
+<div id="outline-container-orgcbf3d02" class="outline-4">
+<h4 id="orgcbf3d02">13–15.</h4>
+<div class="outline-text-4" id="text-orgcbf3d02">
+<p>
+Un solo chequeo en una sola ruta: un <code>if</code>, no una cadena. No
+reescribas GoF <b>junto</b> a <code>app.use</code>.
+</p>
+
 <p>
 Un compañero pone el <code>switch</code> de medios <b>dentro</b> del middleware.
-¿Estás de acuerdo?
+¿De acuerdo?
 </p>
 
 <blockquote>
@@ -3963,22 +4118,22 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org3d453d0" class="outline-3">
-<h3 id="org3d453d0">Repository</h3>
-<div class="outline-text-3" id="text-org3d453d0">
+<div id="outline-container-org411658d" class="outline-3">
+<h3 id="org411658d">Repository</h3>
+<div class="outline-text-3" id="text-org411658d">
 </div>
-<div id="outline-container-org8478f35" class="outline-4">
-<h4 id="org8478f35">Intuición</h4>
-<div class="outline-text-4" id="text-org8478f35">
+<div id="outline-container-orgd7053b6" class="outline-4">
+<h4 id="orgd7053b6">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-orgd7053b6">
 <p>
 El bibliotecario. Pides «los pedidos de Ana». No entras al depósito
 ni hablas el idioma de las estanterías.
 </p>
 </div>
 </div>
-<div id="outline-container-orge12319c" class="outline-4">
-<h4 id="orge12319c">El problema</h4>
-<div class="outline-text-4" id="text-orge12319c">
+<div id="outline-container-orge9f6fdd" class="outline-4">
+<h4 id="orge9f6fdd">1–3.</h4>
+<div class="outline-text-4" id="text-orge9f6fdd">
 <p>
 SQL en la plantilla del seguimiento o en el controlador. La vista
 conoce la bodega. Cambia <b>cómo</b> se persiste (SQL, memoria, otro
@@ -3986,10 +4141,10 @@ motor), no el HTML.
 </p>
 </div>
 </div>
-<div id="outline-container-org1df30ed" class="outline-4">
-<h4 id="org1df30ed">La idea</h4>
-<div class="outline-text-4" id="text-org1df30ed">
-<pre class="example" id="orgc594dff">
+<div id="outline-container-org2afe1e1" class="outline-4">
+<h4 id="org2afe1e1">4–9.</h4>
+<div class="outline-text-4" id="text-org2afe1e1">
+<pre class="example" id="orgfb65c0e">
 Controlador → caso de uso → Repository → base de datos
 </pre>
 
@@ -4005,21 +4160,25 @@ Controlador → caso de uso → Repository → base de datos
 En pruebas, una lista en memoria. En producción, SQL. Carpetas
 <code>models/views/controllers</code> con SQL en las tres <b>no</b> son MVC.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org699fae8" class="outline-4">
+<h4 id="org699fae8">13–14.</h4>
+<div class="outline-text-4" id="text-org699fae8">
 <p>
 Un <code>SELECT</code> único en un script de migración no pide repositorio.
 Active Record (Laravel Eloquent) <b>no</b> es el mismo patrón: el modelo
-<b>es</b> la fila. Se puede vivir con ello; no se finja que ya hay
+<b>*es</b> la fila. Se puede vivir con ello; no se finja que ya hay
 Repository.
 </p>
 </div>
 </div>
-<div id="outline-container-org805159e" class="outline-4">
-<h4 id="org805159e">Ejercicio</h4>
-<div class="outline-text-4" id="text-org805159e">
+<div id="outline-container-org65d3fe4" class="outline-4">
+<h4 id="org65d3fe4">15.</h4>
+<div class="outline-text-4" id="text-org65d3fe4">
 <p>
 La plantilla ejecuta <code>SELECT</code> y además manda correo si hay tres
-reprobadas (el kardex legado). ¿Basta un repositorio? ¿Qué más falta?
+reprobadas (kardex legado). ¿Repository solo? ¿Qué más falta?
 </p>
 
 <blockquote>
@@ -4031,28 +4190,28 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org35c5b56" class="outline-3">
-<h3 id="org35c5b56">Service Layer</h3>
-<div class="outline-text-3" id="text-org35c5b56">
+<div id="outline-container-orge2dafc5" class="outline-3">
+<h3 id="orge2dafc5">Service Layer</h3>
+<div class="outline-text-3" id="text-orge2dafc5">
 </div>
-<div id="outline-container-org75d6bb6" class="outline-4">
-<h4 id="org75d6bb6">Intuición</h4>
-<div class="outline-text-4" id="text-org75d6bb6">
+<div id="outline-container-org848a6ce" class="outline-4">
+<h4 id="org848a6ce">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-org848a6ce">
 <p>
 El mesero toma el pedido. No cocina y no baja a la bodega.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6dbd70" class="outline-4">
-<h4 id="orgf6dbd70">El problema y la idea</h4>
-<div class="outline-text-4" id="text-orgf6dbd70">
+<div id="outline-container-org96fe004" class="outline-4">
+<h4 id="org96fe004">1–9.</h4>
+<div class="outline-text-4" id="text-org96fe004">
 <p>
 El Service Layer nombra el <b>caso de uso</b>: <code>registrarPedido()</code>,
 <code>realizarPago()</code>, <code>cambiarEstado()</code>. El controlador HTTP recibe y
-<b>delega</b>. Debe ser delgado.
+<b>*delega</b>. Debe ser delgado.
 </p>
 
-<pre class="example" id="org4b06b43">
+<pre class="example" id="orgc94335e">
 HTTP → Controlador → Service (registrarPedido)
                        +----&gt; Repository
                        +----&gt; Adapter
@@ -4063,7 +4222,11 @@ HTTP → Controlador → Service (registrarPedido)
 En la práctica coincide a menudo con Facade del trámite. Express <b>no</b>
 lo impone: hay que extraerlo.
 </p>
-
+</div>
+</div>
+<div id="outline-container-orgdae5118" class="outline-4">
+<h4 id="orgdae5118">13–15.</h4>
+<div class="outline-text-4" id="text-orgdae5118">
 <p>
 Un método que solo llama a un <code>save</code> y se llama <code>PedidoService</code> es
 ceremonia. El caso de uso existe cuando hay <b>orquestación</b> (validar,
@@ -4079,17 +4242,20 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org3200ee7" class="outline-3">
-<h3 id="org3200ee7">Template View</h3>
-<div class="outline-text-3" id="text-org3200ee7">
+<div id="outline-container-orgdcd03ed" class="outline-3">
+<h3 id="orgdcd03ed">Template View</h3>
+<div class="outline-text-3" id="text-orgdcd03ed">
+</div>
+<div id="outline-container-orgb91b127" class="outline-4">
+<h4 id="orgb91b127">1–9.</h4>
+<div class="outline-text-4" id="text-orgb91b127">
 <p>
 La vista presenta. No consulta, no cobra, no envía correo.
 </p>
 
 <p>
-Malo: HTML más SQL más reglas más correo. Mejor: el caso de uso deja
-datos ya listos y la plantilla (Blade, EJS, Thymeleaf, Jinja) rellena
-huecos.
+Malo: HTML + SQL + reglas + correo. Mejor: Service → datos ya listos
+→ plantilla (Blade, EJS, Thymeleaf, Jinja).
 </p>
 
 <p>
@@ -4101,9 +4267,10 @@ Transform View <b>construye</b> la representación (React en el servidor).
 No es el mismo mecanismo; la regla sí: la vista no habla SQL.
 </p>
 </div>
-<div id="outline-container-org0fede1f" class="outline-4">
-<h4 id="org0fede1f">Ejercicio</h4>
-<div class="outline-text-4" id="text-org0fede1f">
+</div>
+<div id="outline-container-org2cc7b61" class="outline-4">
+<h4 id="org2cc7b61">15.</h4>
+<div class="outline-text-4" id="text-org2cc7b61">
 <p>
 <code>kardex1.php</code> pinta filas y, <b>dentro del <code>while</code></b>, consulta materias,
 escribe alertas y al final llama <code>mail</code>. ¿Es Template View? ¿Qué
@@ -4119,46 +4286,55 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org5119a60" class="outline-3">
-<h3 id="org5119a60">Unit of Work</h3>
-<div class="outline-text-3" id="text-org5119a60">
+<div id="outline-container-org27ec3bc" class="outline-3">
+<h3 id="org27ec3bc">Unit of Work</h3>
+<div class="outline-text-3" id="text-org27ec3bc">
 </div>
-<div id="outline-container-org76bbefa" class="outline-4">
-<h4 id="org76bbefa">Intuición</h4>
-<div class="outline-text-4" id="text-org76bbefa">
+<div id="outline-container-org6fc5319" class="outline-4">
+<h4 id="org6fc5319">Nivel 1 — Intuición</h4>
+<div class="outline-text-4" id="text-org6fc5319">
 <p>
 La cuenta del restaurante: toda, o ninguna. No pagas el segundo plato
 si el primero no salió y aun así te cobraron el vino.
 </p>
 </div>
 </div>
-<div id="outline-container-org35f236e" class="outline-4">
-<h4 id="org35f236e">El problema</h4>
-<div class="outline-text-4" id="text-org35f236e">
+<div id="outline-container-org7ed1586" class="outline-4">
+<h4 id="org7ed1586">1–3.</h4>
+<div class="outline-text-4" id="text-org7ed1586">
 <p>
-Cobro y alta del envío: juntos o nada. Cada <code>mysqli_query</code> confirma
-por su cuenta; si el alta falla a media lista, el saldo ya bajó.
+Cobro y alta del envío: juntos o nada. Síntoma: cada <code>mysqli_query</code>
+confirma por su cuenta; si el alta falla a media lista, el saldo ya
+bajó.
 </p>
-
-<pre class="example" id="org52c8038">
+</div>
+</div>
+<div id="outline-container-orgd2f4458" class="outline-4">
+<h4 id="orgd2f4458">4–9.</h4>
+<div class="outline-text-4" id="text-orgd2f4458">
+<pre class="example" id="org2cdfb8b">
 BEGIN → pedido → cobro → saldo → COMMIT
                     (si falla: ROLLBACK)
 </pre>
 
 <p>
 <code>@Transactional</code> y <code>DB::transaction</code> <b>son</b> Unit of Work. El correo
-<b>no</b> entra aquí.
+<b>*no</b> entra aquí.
 </p>
-
+</div>
+</div>
+<div id="outline-container-orgcec558e" class="outline-4">
+<h4 id="orgcec558e">13–14.</h4>
+<div class="outline-text-4" id="text-orgcec558e">
 <p>
 Un <code>INSERT</code> único no pide unidad explícita. Observer <b>no</b> sustituye
-esto. Idempotencia es <b>otro</b> problema: el mismo cobro dos veces.
+esto. Idempotencia es <b>otro</b> problema (el mismo cobro dos veces).
 </p>
 </div>
 </div>
-<div id="outline-container-org1b5e137" class="outline-4">
-<h4 id="org1b5e137">Ejercicio</h4>
-<div class="outline-text-4" id="text-org1b5e137">
+<div id="outline-container-org92cd425" class="outline-4">
+<h4 id="org92cd425">15.</h4>
+<div class="outline-text-4" id="text-org92cd425">
 <p>
 «El Observer registra el envío cuando el pago se publica.» ¿Por qué
 no basta? Dibuja <code>COMMIT</code> y <b>después</b> <code>PedidoActualizado</code>.
@@ -4173,19 +4349,26 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org861648a" class="outline-3">
-<h3 id="org861648a">Idempotencia</h3>
-<div class="outline-text-3" id="text-org861648a">
+<div id="outline-container-org4423642" class="outline-3">
+<h3 id="org4423642">Idempotencia</h3>
+<div class="outline-text-3" id="text-org4423642">
 <p>
 No es un patrón GoF. Es de APIs y sistemas distribuidos.
 </p>
-
+</div>
+<div id="outline-container-org499d865" class="outline-4">
+<h4 id="org499d865">1–3.</h4>
+<div class="outline-text-4" id="text-org499d865">
 <p>
 El usuario pulsa dos veces «Pagar». Sin diseño, hay dos cargos. El
 botón que dice «NO ACTUALICE LA PAGINA» es un rótulo, no una clave.
 </p>
-
-<pre class="example" id="org649f0b2">
+</div>
+</div>
+<div id="outline-container-org195561b" class="outline-4">
+<h4 id="org195561b">4–9.</h4>
+<div class="outline-text-4" id="text-org195561b">
+<pre class="example" id="org69b627d">
 POST /pagos
 Idempotency-Key: ABC123
 </pre>
@@ -4194,18 +4377,15 @@ Idempotency-Key: ABC123
 Analogía: el botón del elevador. Pulsar dos veces no llama dos
 cabinas. Retry ciego de un cobro <b>sin</b> clave duplica el efecto.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org5db5b27" class="outline-4">
+<h4 id="org5db5b27">13–15.</h4>
+<div class="outline-text-4" id="text-org5db5b27">
 <p>
 Un <code>GET</code> de seguimiento ya es idempotente por naturaleza HTTP. No
-inventes clave donde no hay efecto.
-</p>
-</div>
-<div id="outline-container-org34fc338" class="outline-4">
-<h4 id="org34fc338">Ejercicio</h4>
-<div class="outline-text-4" id="text-org34fc338">
-<p>
-Un compañero reintenta el cobro ante un 400 de validación. ¿Estás de
-acuerdo?
+inventes clave donde no hay efecto. Un compañero reintenta el cobro
+ante un 400 de validación: ¿de acuerdo?
 </p>
 
 <blockquote>
@@ -4217,21 +4397,27 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-orge3e1483" class="outline-3">
-<h3 id="orge3e1483">BFF y API Gateway</h3>
-<div class="outline-text-3" id="text-orge3e1483">
+<div id="outline-container-org174e604" class="outline-3">
+<h3 id="org174e604">BFF y API Gateway</h3>
+<div class="outline-text-3" id="text-org174e604">
+</div>
+<div id="outline-container-orge34dab6" class="outline-4">
+<h4 id="orge34dab6">BFF — problema</h4>
+<div class="outline-text-4" id="text-orge34dab6">
 <p>
-La app pide JSON mínimo (folio, estado, eta) y el panel pide HTML con
-mapa: <b>distinta hambre</b>. Hoy el equipo de la app hace doce <code>fetch</code>
-para el inicio. Eso pide un BFF: un backend <b>para ese</b> cliente.
+App (JSON mínimo: folio, estado, eta) y panel (HTML + mapa): <b>distinta
+hambre</b>. Hoy el equipo de la app hace doce <code>fetch</code> para el inicio.
+</p>
+</div>
+</div>
+<div id="outline-container-org36f543a" class="outline-4">
+<h4 id="org36f543a">Gateway — problema</h4>
+<div class="outline-text-4" id="text-org36f543a">
+<p>
+Varios servicios, una entrada de <b>borde</b> (auth, TLS, límites).
 </p>
 
-<p>
-Varios servicios y una entrada de <b>borde</b> (auth, TLS, límites): eso
-es API Gateway.
-</p>
-
-<pre class="example" id="orgcd03c27">
+<pre class="example" id="org53f33c1">
 Backend
    /        \
  App         Panel     ← BFF si el hambre es distinta
@@ -4247,9 +4433,10 @@ Factory no alimenta la pantalla de inicio. Si solo hay un cliente y
 un recurso ya adecuado, BFF sobra.
 </p>
 </div>
-<div id="outline-container-orgb9fc435" class="outline-4">
-<h4 id="orgb9fc435">Ejercicio</h4>
-<div class="outline-text-4" id="text-orgb9fc435">
+</div>
+<div id="outline-container-org05ff63b" class="outline-4">
+<h4 id="org05ff63b">15.</h4>
+<div class="outline-text-4" id="text-org05ff63b">
 <p>
 ¿BFF, Gateway, ambos o ninguno para un CRUD de un solo cliente y un
 <code>GET /pedidos/{id}</code> ya suficiente?
@@ -4264,41 +4451,52 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org280059f" class="outline-3">
-<h3 id="org280059f">Timeout, Retry y Circuit Breaker</h3>
-<div class="outline-text-3" id="text-org280059f">
+<div id="outline-container-orga545c93" class="outline-3">
+<h3 id="orga545c93">Timeout, Retry y Circuit Breaker</h3>
+<div class="outline-text-3" id="text-orga545c93">
 <p>
 La IA y el mapa pueden fallar. El pedido <b>ya guardado</b> debe seguir
-consultable. No son GoF. Son de integración y resiliencia.
+consultable. No son GoF. Son de integración / resiliencia.
 </p>
-
+</div>
+<div id="outline-container-orgf628f53" class="outline-4">
+<h4 id="orgf628f53">Timeout</h4>
+<div class="outline-text-4" id="text-orgf628f53">
 <p>
-<b>Timeout.</b> Si no responde en X tiempo, se deja de esperar. No el
-<code>await</code> infinito. Analogía: cuelgas el teléfono.
+Si no responde en X tiempo, se deja de esperar. No el <code>await</code>
+infinito. Analogía: cuelgas el teléfono.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org1defae9" class="outline-4">
+<h4 id="org1defae9">Retry</h4>
+<div class="outline-text-4" id="text-org1defae9">
 <p>
-<b>Retry.</b> Solo fallos <b>temporales</b> (red, 503), con tope. Un 400 de
-validación no se reintenta. Un cobro sin idempotencia no se reintenta
-a ciegas.
+Solo fallos <b>temporales</b> (red, 503), con tope. Un 400 de validación
+no se reintenta. Un cobro sin idempotencia no se reintenta a ciegas.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org0d4331e" class="outline-4">
+<h4 id="org0d4331e">Circuit Breaker</h4>
+<div class="outline-text-4" id="text-org0d4331e">
 <p>
-<b>Circuit Breaker.</b> Si el colaborador falla mucho, se deja de llamar
-un rato (fusible). Luego se prueba una vez. Protege <b>nuestro</b> sistema.
+Si el colaborador falla mucho, se deja de llamar un rato (fusible).
+Luego se prueba una vez. Protege <b>nuestro</b> sistema.
 </p>
 
-<pre class="example" id="org92c46e9">
+<pre class="example" id="org20b0ace">
 Normal → muchos errores → circuito abierto → no llamar un rato
 </pre>
 
 <p>
-Bulkhead: que la IA no ahogue el seguimiento.
+Bulkhead: que la IA no ahogue el tracking.
 </p>
 </div>
-<div id="outline-container-org5990519" class="outline-4">
-<h4 id="org5990519">Ejercicio</h4>
-<div class="outline-text-4" id="text-org5990519">
+</div>
+<div id="outline-container-org2ef2cb6" class="outline-4">
+<h4 id="org2ef2cb6">15.</h4>
+<div class="outline-text-4" id="text-org2ef2cb6">
 <p>
 Mapa e IA caídos; el usuario no puede consultar un pedido <b>ya
 guardado</b>. ¿Timeout, Retry o Circuit Breaker hacia la IA? ¿Qué <b>no</b>
@@ -4314,10 +4512,10 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-org12b26c4" class="outline-3">
-<h3 id="org12b26c4">Cómo se combinan (sin Golden Hammer)</h3>
-<div class="outline-text-3" id="text-org12b26c4">
-<pre class="example" id="orgc15967c">
+<div id="outline-container-org4c46cdc" class="outline-3">
+<h3 id="org4c46cdc">Cómo se combinan (sin Golden Hammer)</h3>
+<div class="outline-text-3" id="text-org4c46cdc">
+<pre class="example" id="org7f85a43">
 HTTP
   ↓
 Front Controller
@@ -4343,9 +4541,9 @@ de la IA, se toca Adapter. No se agrega una capa porque «se ve más
 profesional». Cada pieza tiene <b>una</b> pregunta.
 </p>
 </div>
-<div id="outline-container-orge6f1db2" class="outline-4">
-<h4 id="orge6f1db2">Cómo analizar antes de elegir</h4>
-<div class="outline-text-4" id="text-orge6f1db2">
+<div id="outline-container-org26b1900" class="outline-4">
+<h4 id="org26b1900">Cómo analizar antes de elegir</h4>
+<div class="outline-text-4" id="text-org26b1900">
 <ol class="org-ol">
 <li>¿Qué está ocurriendo?</li>
 <li>¿Cuál es la responsabilidad problemática?</li>
@@ -4361,7 +4559,7 @@ profesional». Cada pieza tiene <b>una</b> pregunta.
 <li>¿Hace falta el patrón?</li>
 </ol>
 
-<pre class="example" id="org1dc3b1f">
+<pre class="example" id="orge44f4aa">
 NO:  «Tengo que utilizar Strategy.»
 SÍ:  «Tengo varios comportamientos intercambiables
       y quiero cambiar uno sin modificar al cliente.»
@@ -4381,9 +4579,9 @@ interpreta por sí misma salvo que el diseño añada sesión o token; la
 red puede fallar a medias; hay varios clientes sobre el mismo dominio.
 </p>
 </div>
-<div id="outline-container-org346d810" class="outline-3">
-<h3 id="org346d810">Un proyecto no tiene un patrón: tiene una composición</h3>
-<div class="outline-text-3" id="text-org346d810">
+<div id="outline-container-org70012d3" class="outline-3">
+<h3 id="org70012d3">Un proyecto no tiene un patrón: tiene una composición</h3>
+<div class="outline-text-3" id="text-org70012d3">
 <p>
 Preguntar «¿cuál es el patrón de esta aplicación?» confunde el sistema
 con una de sus colaboraciones. En un mismo pedido pueden convivir Strategy (cómo se entrega),
@@ -4395,7 +4593,7 @@ El caso de uso <b>los emplea</b>; no «es» ninguno.
 La petición HTTP típica atraviesa una cadena de estructuras:
 </p>
 
-<pre class="example" id="orgb19f347">
+<pre class="example" id="orge69f58b">
 Cliente (MVC / MVVM)
     ↓
 Borde (Gateway, BFF, caché)     —solo si hace falta—
@@ -4475,9 +4673,9 @@ capa</b> además del patrón.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb81a2e" class="outline-3">
-<h3 id="orgeb81a2e">Cuándo no componer</h3>
-<div class="outline-text-3" id="text-orgeb81a2e">
+<div id="outline-container-orge6b82dc" class="outline-3">
+<h3 id="orge6b82dc">Cuándo no componer</h3>
+<div class="outline-text-3" id="text-orge6b82dc">
 <p>
 Un patrón es solución a un problema que <b>ya existe</b> (o se prevé con
 fundamento). Acumular hexagonal, CQRS, Event Sourcing y BFF sobre un
@@ -4486,9 +4684,9 @@ YAGNI). La pregunta útil no es «¿cuántos patrones tiene el proyecto?».
 </p>
 </div>
 </div>
-<div id="outline-container-org9dda23e" class="outline-3">
-<h3 id="org9dda23e">Fuerzas que impone la web</h3>
-<div class="outline-text-3" id="text-org9dda23e">
+<div id="outline-container-orge4aee21" class="outline-3">
+<h3 id="orge4aee21">Fuerzas que impone la web</h3>
+<div class="outline-text-3" id="text-orge4aee21">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -4537,9 +4735,9 @@ YAGNI). La pregunta útil no es «¿cuántos patrones tiene el proyecto?».
 </table>
 </div>
 </div>
-<div id="outline-container-org98fdeec" class="outline-3">
-<h3 id="org98fdeec">El marco congela el diseño web</h3>
-<div class="outline-text-3" id="text-org98fdeec">
+<div id="outline-container-org0e7ca8a" class="outline-3">
+<h3 id="org0e7ca8a">El marco congela el diseño web</h3>
+<div class="outline-text-3" id="text-org0e7ca8a">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -4584,9 +4782,9 @@ GoF casera <b>junto</b> a la del marco.
 </p>
 </div>
 </div>
-<div id="outline-container-org3a8cecd" class="outline-3">
-<h3 id="org3a8cecd">Cómo leer este capítulo</h3>
-<div class="outline-text-3" id="text-org3a8cecd">
+<div id="outline-container-orge7b3f5b" class="outline-3">
+<h3 id="orge7b3f5b">Cómo leer este capítulo</h3>
+<div class="outline-text-3" id="text-orge7b3f5b">
 <p>
 No es un GoF distinto. Es el mismo catálogo <b>bajo las fuerzas de
 HTTP</b>. La secuencia sigue siendo: problema → qué cambia →
@@ -4601,13 +4799,13 @@ al margen de Spring o Express.
 </p>
 </div>
 </div>
-<div id="outline-container-org153be78" class="outline-3">
-<h3 id="org153be78">Presentación en el servidor</h3>
-<div class="outline-text-3" id="text-org153be78">
+<div id="outline-container-orga77e075" class="outline-3">
+<h3 id="orga77e075">Presentación en el servidor</h3>
+<div class="outline-text-3" id="text-orga77e075">
 </div>
-<div id="outline-container-org32571c3" class="outline-4">
-<h4 id="org32571c3">Front Controller y Page Controller</h4>
-<div class="outline-text-4" id="text-org32571c3">
+<div id="outline-container-org1e0719b" class="outline-4">
+<h4 id="org1e0719b">Front Controller y Page Controller</h4>
+<div class="outline-text-4" id="text-org1e0719b">
 <p>
 <b>Nivel 1.</b> Un edificio con una portería frente a cada oficina con su
 propio portero. Si cambia el horario de visita, en el segundo caso
@@ -4618,7 +4816,7 @@ toca cuarenta puertas.
 <b>Síntoma.</b>
 </p>
 
-<pre class="example" id="orga20779a">
+<pre class="example" id="org5c2fd6c">
 index.php     → sesión + bitácora + encabezado
 pedidos.php   → sesión + bitácora + encabezado
 pagos.php     → sesión + bitácora + encabezado
@@ -4629,7 +4827,7 @@ pagos.php     → sesión + bitácora + encabezado
 piso: este trámite (<code>POST /pedidos</code>).
 </p>
 
-<pre class="example" id="org8c6a163">
+<pre class="example" id="org9152ba3">
 HTTP
   ↓
 Front Controller del marco
@@ -4656,9 +4854,9 @@ cadena.
 </p>
 </div>
 </div>
-<div id="outline-container-org3550c1e" class="outline-4">
-<h4 id="org3550c1e">Template View y Transform View</h4>
-<div class="outline-text-4" id="text-org3550c1e">
+<div id="outline-container-orgbf7fb4d" class="outline-4">
+<h4 id="orgbf7fb4d">Template View y Transform View</h4>
+<div class="outline-text-4" id="text-orgbf7fb4d">
 <p>
 <b>Nivel 1.</b> Template View: un formulario con huecos (<code>estado</code>, <code>eta</code>).
 Transform View: armas el HTML (o el JSON) con código, como un LEGO.
@@ -4682,9 +4880,9 @@ obligatorio para un CRUD.
 </p>
 </div>
 </div>
-<div id="outline-container-org96bfdd2" class="outline-4">
-<h4 id="org96bfdd2">MVC (tres MVCs distintos)</h4>
-<div class="outline-text-4" id="text-org96bfdd2">
+<div id="outline-container-org655a15b" class="outline-4">
+<h4 id="org655a15b">MVC (tres MVCs distintos)</h4>
+<div class="outline-text-4" id="text-org655a15b">
 <p>
 Modelo: reglas. Vista: presentación. Controlador: traduce el clic en
 una operación.
@@ -4708,9 +4906,9 @@ llama a la IA, hace <code>new EntregaDron()</code>, cobra y pinta HTML.
 </p>
 </div>
 </div>
-<div id="outline-container-orge909027" class="outline-4">
-<h4 id="orge909027">Post-Redirect-Get</h4>
-<div class="outline-text-4" id="text-orge909027">
+<div id="outline-container-org0f6837d" class="outline-4">
+<h4 id="org0f6837d">Post-Redirect-Get</h4>
+<div class="outline-text-4" id="text-org0f6837d">
 <p>
 Tras <code>POST /pedidos</code> no se deja el navegador en la página del POST:
 se responde <b>redirección</b> a <code>GET /pedidos/{id}</code> (el seguimiento).
@@ -4724,9 +4922,9 @@ las dos si hay dinero.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3da204" class="outline-4">
-<h4 id="orgc3da204">Sesión y token</h4>
-<div class="outline-text-4" id="text-orgc3da204">
+<div id="outline-container-org814249a" class="outline-4">
+<h4 id="org814249a">Sesión y token</h4>
+<div class="outline-text-4" id="text-org814249a">
 <p>
 HTTP no recuerda al usuario. Cookie de sesión o <code>Authorization: Bearer</code>
 son <b>diseño</b>, no un Singleton de proceso.
@@ -4739,9 +4937,9 @@ solo en el navegador no sustituye al servidor.
 </p>
 </div>
 </div>
-<div id="outline-container-org415e337" class="outline-4">
-<h4 id="org415e337">REST: recursos, no verbos sueltos</h4>
-<div class="outline-text-4" id="text-org415e337">
+<div id="outline-container-org561443d" class="outline-4">
+<h4 id="org561443d">REST: recursos, no verbos sueltos</h4>
+<div class="outline-text-4" id="text-org561443d">
 <p>
 <code>GET /pedidos/{id}</code> es el seguimiento. <code>POST /pedidos</code> da de alta.
 <code>/asignar</code> es una acción disfrazada: ¿GET? ¿POST? ¿qué se cachea?
@@ -4754,9 +4952,9 @@ agregación si el hambre es distinta.
 </p>
 </div>
 </div>
-<div id="outline-container-org8fdcfd7" class="outline-4">
-<h4 id="org8fdcfd7">El cliente web (SPA)</h4>
-<div class="outline-text-4" id="text-org8fdcfd7">
+<div id="outline-container-org7a46702" class="outline-4">
+<h4 id="org7a46702">El cliente web (SPA)</h4>
+<div class="outline-text-4" id="text-org7a46702">
 <p>
 Varias zonas leen <code>{ estado, eta, posicion }</code>: un estado de UI
 compartido (MVVM, store). Tres campos y un diálogo no piden Redux.
@@ -4771,9 +4969,9 @@ el mismo error que dos Front Controller.
 </div>
 </div>
 </div>
-<div id="outline-container-orge408c39" class="outline-3">
-<h3 id="orge408c39">Middleware (en la petición)</h3>
-<div class="outline-text-3" id="text-orge408c39">
+<div id="outline-container-org297b19d" class="outline-3">
+<h3 id="org297b19d">Middleware (en la petición)</h3>
+<div class="outline-text-3" id="text-org297b19d">
 <p>
 La cadena es Chain of Responsibility que el marco ya instancia.
 </p>
@@ -4798,9 +4996,9 @@ dron.
 </p>
 </div>
 </div>
-<div id="outline-container-org793f1fc" class="outline-3">
-<h3 id="org793f1fc">Dominio, datos e integración</h3>
-<div class="outline-text-3" id="text-org793f1fc">
+<div id="outline-container-org730cc54" class="outline-3">
+<h3 id="org730cc54">Dominio, datos e integración</h3>
+<div class="outline-text-3" id="text-org730cc54">
 <p>
 Service Layer: <code>registrarPedido(...)</code> vive <b>fuera</b> de la ruta.
 Express <b>no</b> lo impone: hay que extraerlo.
@@ -4823,9 +5021,9 @@ servicios. Factory no alimenta la pantalla de inicio.
 </p>
 </div>
 </div>
-<div id="outline-container-orgda26631" class="outline-3">
-<h3 id="orgda26631">SSR, CSR e híbrido</h3>
-<div class="outline-text-3" id="text-orgda26631">
+<div id="outline-container-org38cde61" class="outline-3">
+<h3 id="org38cde61">SSR, CSR e híbrido</h3>
+<div class="outline-text-3" id="text-org38cde61">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -4870,9 +5068,9 @@ Elegir SPA no elimina Service Layer ni la transacción. Solo mueve
 </p>
 </div>
 </div>
-<div id="outline-container-org07fb5da" class="outline-3">
-<h3 id="org07fb5da">Ejemplo de análisis: registrar un pedido (y cobrar)</h3>
-<div class="outline-text-3" id="text-org07fb5da">
+<div id="outline-container-org535127b" class="outline-3">
+<h3 id="org535127b">Ejemplo de análisis: registrar un pedido (y cobrar)</h3>
+<div class="outline-text-3" id="text-org535127b">
 <p>
 El cliente envía <code>POST /pedidos</code>.
 </p>
@@ -4896,9 +5094,9 @@ bloquearse.
 </p>
 </div>
 </div>
-<div id="outline-container-org28e78a1" class="outline-3">
-<h3 id="org28e78a1">Ejercicios (web)</h3>
-<div class="outline-text-3" id="text-org28e78a1">
+<div id="outline-container-org1794c84" class="outline-3">
+<h3 id="org1794c84">Ejercicios (web)</h3>
+<div class="outline-text-3" id="text-org1794c84">
 <ol class="org-ol">
 <li><code>pagos.php</code> y <code>pedidos.php</code> copian la sesión. ¿Front Controller,
 Page Controller, o ambos? ¿Qué <b>no</b> reescribes en Express?</li>
@@ -4938,9 +5136,9 @@ teléfono respecto del panel web, y qué estructura <b>ya trae</b> Android,
 iOS o Flutter.
 </p>
 </div>
-<div id="outline-container-org43bd8d4" class="outline-3">
-<h3 id="org43bd8d4">Fuerzas</h3>
-<div class="outline-text-3" id="text-org43bd8d4">
+<div id="outline-container-org12fa26d" class="outline-3">
+<h3 id="org12fa26d">Fuerzas</h3>
+<div class="outline-text-3" id="text-org12fa26d">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -4989,9 +5187,9 @@ iOS o Flutter.
 </table>
 </div>
 </div>
-<div id="outline-container-org6b67720" class="outline-3">
-<h3 id="org6b67720">Nivel 1 — Intuición</h3>
-<div class="outline-text-3" id="text-org6b67720">
+<div id="outline-container-orga9cc72b" class="outline-3">
+<h3 id="orga9cc72b">Nivel 1 — Intuición</h3>
+<div class="outline-text-3" id="text-orga9cc72b">
 <p>
 En la web, recargar es casi «nacer de nuevo». En el teléfono, girar
 la pantalla <b>mata los controles</b> y deja vivo (si está bien diseñado)
@@ -5001,9 +5199,9 @@ estado</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd7b0b8d" class="outline-3">
-<h3 id="orgd7b0b8d">Antes: la Activity (o el Widget) lo hace todo</h3>
-<div class="outline-text-3" id="text-orgd7b0b8d">
+<div id="outline-container-orgf5fb28e" class="outline-3">
+<h3 id="orgf5fb28e">Antes: la Activity (o el Widget) lo hace todo</h3>
+<div class="outline-text-3" id="text-orgf5fb28e">
 <div class="org-src-container">
 <pre class="src src-java">public class SeguimientoActivity extends Activity {
     void onCreate(...) {
@@ -5023,9 +5221,9 @@ navegación están mezclados con el pintado.
 </p>
 </div>
 </div>
-<div id="outline-container-org42e7197" class="outline-3">
-<h3 id="org42e7197">Presentación: MVC, MVP, MVVM, MVI, BLoC</h3>
-<div class="outline-text-3" id="text-org42e7197">
+<div id="outline-container-orgb04c8a9" class="outline-3">
+<h3 id="orgb04c8a9">Presentación: MVC, MVP, MVVM, MVI, BLoC</h3>
+<div class="outline-text-3" id="text-orgb04c8a9">
 <p>
 <b>Nivel 2.</b> Quién posee el estado de la UI y quién sobrevive al ciclo
 de vida.
@@ -5089,7 +5287,7 @@ de vida.
 </tbody>
 </table>
 
-<pre class="example" id="org12e851e">
+<pre class="example" id="org4c9ee65">
 Vista (Compose / SwiftUI / Widget)
         ↑  observa
 ViewModel / BLoC     { estado, eta, posicion }
@@ -5123,9 +5321,9 @@ que dos Front Controller.
 </p>
 </div>
 </div>
-<div id="outline-container-org5118fce" class="outline-3">
-<h3 id="org5118fce">El lenguaje cambia la forma de Observer</h3>
-<div class="outline-text-3" id="text-org5118fce">
+<div id="outline-container-orgf329237" class="outline-3">
+<h3 id="orgf329237">El lenguaje cambia la forma de Observer</h3>
+<div class="outline-text-3" id="text-orgf329237">
 <p>
 El seguimiento debe actualizarse y la suscripción debe <b>cancelarse</b>
 al destruirse la vista. Polling cada segundo drena la batería; el
@@ -5167,9 +5365,9 @@ en el servidor.
 </p>
 </div>
 </div>
-<div id="outline-container-org035e6de" class="outline-3">
-<h3 id="org035e6de">El marco congela la presentación</h3>
-<div class="outline-text-3" id="text-org035e6de">
+<div id="outline-container-org53dd97c" class="outline-3">
+<h3 id="org53dd97c">El marco congela la presentación</h3>
+<div class="outline-text-3" id="text-org53dd97c">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -5241,15 +5439,15 @@ Criterio: se usa esa API. Un bus casero al lado es diseñar dos veces.
 </p>
 </div>
 </div>
-<div id="outline-container-org37dc0a6" class="outline-3">
-<h3 id="org37dc0a6">Navegación (Coordinator)</h3>
-<div class="outline-text-3" id="text-org37dc0a6">
+<div id="outline-container-org7cdc5d8" class="outline-3">
+<h3 id="org7cdc5d8">Navegación (Coordinator)</h3>
+<div class="outline-text-3" id="text-org7cdc5d8">
 <p>
 El ViewModel anuncia <b>que</b> hay que mostrar el detalle del pedido, no
 <b>cómo</b> se instancia la Activity.
 </p>
 
-<pre class="example" id="org1977fd6">
+<pre class="example" id="org4ade2fc">
 VM: «mostrar detalle del folio X»
         ↓
 Coordinator / Navigation del marco
@@ -5263,14 +5461,14 @@ Tres pantallas en línea: basta el Navigation del marco. El dominio
 </p>
 </div>
 </div>
-<div id="outline-container-orgb41933e" class="outline-3">
-<h3 id="orgb41933e">Datos: repositorio dual y cola</h3>
-<div class="outline-text-3" id="text-orgb41933e">
+<div id="outline-container-org28efcd1" class="outline-3">
+<h3 id="org28efcd1">Datos: repositorio dual y cola</h3>
+<div class="outline-text-3" id="text-org28efcd1">
 <p>
 La UI ignora si el dato vino del disco o de la API.
 </p>
 
-<pre class="example" id="org5c3aabe">
+<pre class="example" id="org43bb56e">
 Seguimiento (UI)
       ↓
 PedidoRepository
@@ -5293,9 +5491,9 @@ Sourcing.
 </p>
 </div>
 </div>
-<div id="outline-container-org4107f03" class="outline-3">
-<h3 id="org4107f03">Listas y hilo que pinta</h3>
-<div class="outline-text-3" id="text-org4107f03">
+<div id="outline-container-org5633b86" class="outline-3">
+<h3 id="org5633b86">Listas y hilo que pinta</h3>
+<div class="outline-text-3" id="text-org5633b86">
 <p>
 Cientos de pedidos en una lista: el marco virtualiza (RecyclerView,
 LazyColumn, ListView). Eso se parece a Flyweight; no se reimplementa.
@@ -5304,9 +5502,9 @@ batería duele.
 </p>
 </div>
 </div>
-<div id="outline-container-org6cd8d97" class="outline-3">
-<h3 id="org6cd8d97">Puertos: el mismo Strategy, otro borde</h3>
-<div class="outline-text-3" id="text-org6cd8d97">
+<div id="outline-container-org57e53ec" class="outline-3">
+<h3 id="org57e53ec">Puertos: el mismo Strategy, otro borde</h3>
+<div class="outline-text-3" id="text-org57e53ec">
 <p>
 <code>MedioDeEntrega</code> y <code>registrarPedido</code> no saben de Android. El ViewModel
 recibe esas abstracciones (Hilt, Riverpod). En prueba, un medio
@@ -5319,9 +5517,9 @@ token va en almacén <b>seguro</b>, no en preferencias en claro.
 </p>
 </div>
 </div>
-<div id="outline-container-org858b27c" class="outline-3">
-<h3 id="org858b27c">El mismo dominio, dos medios</h3>
-<div class="outline-text-3" id="text-org858b27c">
+<div id="outline-container-orge73ed98" class="outline-3">
+<h3 id="orge73ed98">El mismo dominio, dos medios</h3>
+<div class="outline-text-3" id="text-orge73ed98">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -5388,9 +5586,9 @@ token va en almacén <b>seguro</b>, no en preferencias en claro.
 </table>
 </div>
 </div>
-<div id="outline-container-orgc376d87" class="outline-3">
-<h3 id="orgc376d87">Ejercicios (móvil)</h3>
-<div class="outline-text-3" id="text-orgc376d87">
+<div id="outline-container-org19c3bce" class="outline-3">
+<h3 id="org19c3bce">Ejercicios (móvil)</h3>
+<div class="outline-text-3" id="text-org19c3bce">
 <ol class="org-ol">
 <li>El usuario gira el teléfono en el mapa. El pin vuelve al origen.
 ¿Dónde vivía el estado? ¿Qué estructura del marco lo sostiene?</li>
@@ -5419,13 +5617,13 @@ a introducir para resolverlo?
 </div>
 </div>
 </div>
-<div id="outline-container-orga2a2fa8" class="outline-2">
-<h2 id="orga2a2fa8">Cómo analizar, elegir y no usar</h2>
-<div class="outline-text-2" id="text-orga2a2fa8">
+<div id="outline-container-orgd72952e" class="outline-2">
+<h2 id="orgd72952e">Cómo analizar, elegir y no usar</h2>
+<div class="outline-text-2" id="text-orgd72952e">
 </div>
-<div id="outline-container-orgd61624c" class="outline-3">
-<h3 id="orgd61624c">Método para un ejercicio</h3>
-<div class="outline-text-3" id="text-orgd61624c">
+<div id="outline-container-orgf6fb858" class="outline-3">
+<h3 id="orgf6fb858">Método para un ejercicio</h3>
+<div class="outline-text-3" id="text-orgf6fb858">
 <ol class="org-ol">
 <li>Describe el problema <b>sin</b> mencionar patrones. («Hay cuatro formas
 de calcular el precio y cada una obliga a editar el mismo bloque.»)</li>
@@ -5438,9 +5636,9 @@ de calcular el precio y cada una obliga a editar el mismo bloque.»)</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org19d332a" class="outline-3">
-<h3 id="org19d332a">Diagnóstico de código espagueti</h3>
-<div class="outline-text-3" id="text-org19d332a">
+<div id="outline-container-org10431cf" class="outline-3">
+<h3 id="org10431cf">Diagnóstico de código espagueti</h3>
+<div class="outline-text-3" id="text-org10431cf">
 <p>
 No basta con «el <code>switch</code> está feo».
 </p>
@@ -5550,9 +5748,9 @@ No basta con «el <code>switch</code> está feo».
 </table>
 </div>
 </div>
-<div id="outline-container-orgdf9b4fa" class="outline-3">
-<h3 id="orgdf9b4fa">Antipatrones</h3>
-<div class="outline-text-3" id="text-orgdf9b4fa">
+<div id="outline-container-org4945ee7" class="outline-3">
+<h3 id="org4945ee7">Antipatrones</h3>
+<div class="outline-text-3" id="text-org4945ee7">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -5606,10 +5804,10 @@ cuando cada variante obliga a tocar muchos sitios.
 </p>
 </div>
 </div>
-<div id="outline-container-org4084807" class="outline-3">
-<h3 id="org4084807">Chuleta</h3>
-<div class="outline-text-3" id="text-org4084807">
-<pre class="example" id="org3ebf15f">
+<div id="outline-container-orgba38b03" class="outline-3">
+<h3 id="orgba38b03">Chuleta</h3>
+<div class="outline-text-3" id="text-orgba38b03">
+<pre class="example" id="org01b5c9a">
 ¿QUÉ ESTÁ CAMBIANDO?
         |
         +--&gt; Algoritmo                    → Strategy
@@ -5634,9 +5832,9 @@ confirma; Observer avisa.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d40d15" class="outline-3">
-<h3 id="org5d40d15">Autoevaluación breve</h3>
-<div class="outline-text-3" id="text-org5d40d15">
+<div id="outline-container-orgb2f985e" class="outline-3">
+<h3 id="orgb2f985e">Autoevaluación breve</h3>
+<div class="outline-text-3" id="text-orgb2f985e">
 <ol class="org-ol">
 <li>¿Qué es un patrón y qué no es?</li>
 <li>¿Factory frente a Strategy?</li>
@@ -5653,9 +5851,9 @@ confirma; Observer avisa.
 </ol>
 </div>
 </div>
-<div id="outline-container-orgf244201" class="outline-3">
-<h3 id="orgf244201">Referencias</h3>
-<div class="outline-text-3" id="text-orgf244201">
+<div id="outline-container-org5d1d4ce" class="outline-3">
+<h3 id="org5d1d4ce">Referencias</h3>
+<div class="outline-text-3" id="text-org5d1d4ce">
 <ul class="org-ul">
 <li>Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides. <i>Design Patterns</i>.</li>
 <li>Martin Fowler. <i>Patterns of Enterprise Application Architecture</i>.</li>
@@ -5686,13 +5884,13 @@ ayude a enfrentarlo.
 </div>
 </div>
 </div>
-<div id="outline-container-org0fcfe6f" class="outline-2">
-<h2 id="org0fcfe6f">IA, caso integrador y ejercicios de razonamiento</h2>
-<div class="outline-text-2" id="text-org0fcfe6f">
+<div id="outline-container-org6a9f029" class="outline-2">
+<h2 id="org6a9f029">IA, caso integrador y ejercicios de razonamiento</h2>
+<div class="outline-text-2" id="text-org6a9f029">
 </div>
-<div id="outline-container-org02a0f61" class="outline-3">
-<h3 id="org02a0f61">Uso de IA en el diseño de software</h3>
-<div class="outline-text-3" id="text-org02a0f61">
+<div id="outline-container-org41d3edd" class="outline-3">
+<h3 id="org41d3edd">Uso de IA en el diseño de software</h3>
+<div class="outline-text-3" id="text-org41d3edd">
 <p>
 La IA es una <b>herramienta de análisis</b>, no un oráculo que decide el
 patrón. No debe concluir:
@@ -5709,9 +5907,9 @@ El estudiante proporciona el razonamiento. La IA propone candidatos,
 contraejemplos y revisiones.
 </p>
 </div>
-<div id="outline-container-org4e34cd0" class="outline-4">
-<h4 id="org4e34cd0">Diez usos (análisis, no solo código)</h4>
-<div class="outline-text-4" id="text-org4e34cd0">
+<div id="outline-container-org51b19ec" class="outline-4">
+<h4 id="org51b19ec">Diez usos (análisis, no solo código)</h4>
+<div class="outline-text-4" id="text-org51b19ec">
 <ol class="org-ol">
 <li>Analizar código existente.</li>
 <li>Detectar responsabilidades mezcladas.</li>
@@ -5726,10 +5924,10 @@ contraejemplos y revisiones.
 </ol>
 </div>
 </div>
-<div id="outline-container-orge60665f" class="outline-4">
-<h4 id="orge60665f">La IA como segundo diseñador</h4>
-<div class="outline-text-4" id="text-orge60665f">
-<pre class="example" id="org92524b4">
+<div id="outline-container-orgf12871c" class="outline-4">
+<h4 id="orgf12871c">La IA como segundo diseñador</h4>
+<div class="outline-text-4" id="text-orgf12871c">
+<pre class="example" id="org7c99486">
 Código
   ↓
 Estudiante analiza
@@ -5758,13 +5956,13 @@ un contraejemplo.
 </p>
 </div>
 </div>
-<div id="outline-container-org6bb4344" class="outline-4">
-<h4 id="org6bb4344">Prompts que los estudiantes pueden utilizar</h4>
-<div class="outline-text-4" id="text-org6bb4344">
+<div id="outline-container-org8f86f95" class="outline-4">
+<h4 id="org8f86f95">Prompts que los estudiantes pueden utilizar</h4>
+<div class="outline-text-4" id="text-org8f86f95">
 </div>
 <ul class="org-ul">
-<li><a id="org2cd6550"></a>Identificación<br />
-<div class="outline-text-5" id="text-org2cd6550">
+<li><a id="org73195ea"></a>Identificación<br />
+<div class="outline-text-5" id="text-org73195ea">
 <blockquote>
 <p>
 Analiza este código.
@@ -5793,8 +5991,8 @@ No elijas por mí.
 </blockquote>
 </div>
 </li>
-<li><a id="org460ac66"></a>Comparación<br />
-<div class="outline-text-5" id="text-org460ac66">
+<li><a id="orgc033f67"></a>Comparación<br />
+<div class="outline-text-5" id="text-orgc033f67">
 <blockquote>
 <p>
 Tengo este problema de diseño.
@@ -5827,8 +6025,8 @@ el <code>switch</code> de medios y el JSON <code>route_hint</code>.
 </p>
 </div>
 </li>
-<li><a id="orgac330ac"></a>Detección de sobreingeniería<br />
-<div class="outline-text-5" id="text-orgac330ac">
+<li><a id="orgc362bcc"></a>Detección de sobreingeniería<br />
+<div class="outline-text-5" id="text-orgc362bcc">
 <blockquote>
 <p>
 Analiza esta solución.
@@ -5849,8 +6047,8 @@ Propón una solución más sencilla si es posible.
 </blockquote>
 </div>
 </li>
-<li><a id="org17668e9"></a>Revisión<br />
-<div class="outline-text-5" id="text-org17668e9">
+<li><a id="org0aa05be"></a>Revisión<br />
+<div class="outline-text-5" id="text-org0aa05be">
 <blockquote>
 <p>
 Revisa mi implementación.
@@ -5879,8 +6077,8 @@ Después muestra una posible implementación mejorada.
 </blockquote>
 </div>
 </li>
-<li><a id="org162051e"></a>Contraejemplo (para no casarse con un nombre)<br />
-<div class="outline-text-5" id="text-org162051e">
+<li><a id="org81e4096"></a>Contraejemplo (para no casarse con un nombre)<br />
+<div class="outline-text-5" id="text-org81e4096">
 <blockquote>
 <p>
 Asume que yo quiero usar Strategy aquí.
@@ -5897,15 +6095,15 @@ No concluyas.
 </ul>
 </div>
 </div>
-<div id="outline-container-org6a938a1" class="outline-3">
-<h3 id="org6a938a1">Caso integrador: POST /pedidos</h3>
-<div class="outline-text-3" id="text-org6a938a1">
+<div id="outline-container-orgc72b814" class="outline-3">
+<h3 id="orgc72b814">Caso integrador: POST /pedidos</h3>
+<div class="outline-text-3" id="text-orgc72b814">
 <p>
 El estudiante justifica <b>cada</b> caja con un problema. Prohibido: «lo
 puse porque el patrón lo pide».
 </p>
 
-<pre class="example" id="org84ab902">
+<pre class="example" id="orgdf8fcaf">
 Cliente
   |
   v
@@ -5962,13 +6160,13 @@ de temas, segundo Front Controller)?</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org0e9762f" class="outline-3">
-<h3 id="org0e9762f">Ejercicios extra (razonar, no definir)</h3>
-<div class="outline-text-3" id="text-org0e9762f">
+<div id="outline-container-org12af5d6" class="outline-3">
+<h3 id="org12af5d6">Ejercicios extra (razonar, no definir)</h3>
+<div class="outline-text-3" id="text-org12af5d6">
 </div>
-<div id="outline-container-org7dd55b9" class="outline-4">
-<h4 id="org7dd55b9">Caso — el switch de envío</h4>
-<div class="outline-text-4" id="text-org7dd55b9">
+<div id="outline-container-org7a6f837" class="outline-4">
+<h4 id="org7a6f837">Caso — el switch de envío</h4>
+<div class="outline-text-4" id="text-org7a6f837">
 <p>
 Una aplicación tiene tres algoritmos de cálculo de envío. Actualmente
 utiliza un switch de 200 líneas.
@@ -5982,9 +6180,9 @@ aparece un cuarto algoritmo.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb98ecd" class="outline-4">
-<h4 id="orgfb98ecd">Contraargumentación</h4>
-<div class="outline-text-4" id="text-orgfb98ecd">
+<div id="outline-container-org601f38e" class="outline-4">
+<h4 id="org601f38e">Contraargumentación</h4>
+<div class="outline-text-4" id="text-org601f38e">
 <p>
 Un alumno afirma: «Aquí debemos utilizar Strategy».
 </p>
@@ -6001,15 +6199,15 @@ por si acaso».
 </p>
 </div>
 </div>
-<div id="outline-container-org216af3b" class="outline-4">
-<h4 id="org216af3b">Detección de errores (sobreingeniería)</h4>
-<div class="outline-text-4" id="text-org216af3b">
+<div id="outline-container-orgfff6e5b" class="outline-4">
+<h4 id="orgfff6e5b">Detección de errores (sobreingeniería)</h4>
+<div class="outline-text-4" id="text-orgfff6e5b">
 <p>
 Una aplicación solamente tiene un algoritmo de cálculo. El estudiante
 implementa:
 </p>
 
-<pre class="example" id="orgf723515">
+<pre class="example" id="org9df5125">
 Strategy
   ↓
 Interface
@@ -6047,9 +6245,9 @@ misiones 1 a 3 aparecen al final de esta actividad. La pauta de
 revisión cubre el conjunto del relato.
 </p>
 </div>
-<div id="outline-container-org23acd88" class="outline-4">
-<h4 id="org23acd88">El problema</h4>
-<div class="outline-text-4" id="text-org23acd88">
+<div id="outline-container-org7b52453" class="outline-4">
+<h4 id="org7b52453">El problema</h4>
+<div class="outline-text-4" id="text-org7b52453">
 <p>
 Una empresa de mensajería centraliza pedidos (origen, destino, peso,
 dimensiones, urgencia, fecha límite) y asigna cómo se entregan.
@@ -6107,9 +6305,9 @@ al lado un diagrama del libro.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb537c4c" class="outline-4">
-<h4 id="orgb537c4c">Qué se evalúa</h4>
-<div class="outline-text-4" id="text-orgb537c4c">
+<div id="outline-container-org0f814c0" class="outline-4">
+<h4 id="org0f814c0">Qué se evalúa</h4>
+<div class="outline-text-4" id="text-org0f814c0">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -6158,9 +6356,9 @@ al lado un diagrama del libro.
 </table>
 </div>
 </div>
-<div id="outline-container-orgaa1a116" class="outline-4">
-<h4 id="orgaa1a116">Misión 1 — La plataforma no es un patrón</h4>
-<div class="outline-text-4" id="text-orgaa1a116">
+<div id="outline-container-orgfae1714" class="outline-4">
+<h4 id="orgfae1714">Misión 1 — La plataforma no es un patrón</h4>
+<div class="outline-text-4" id="text-orgfae1714">
 <p>
 Enuncie <b>seis</b> problemas distintos del relato. Para cada uno complete:
 </p>
@@ -6210,9 +6408,9 @@ soluciones concretas.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcdd6013" class="outline-4">
-<h4 id="orgcdd6013">Misión 2 — Una petición, varios patrones</h4>
-<div class="outline-text-4" id="text-orgcdd6013">
+<div id="outline-container-org60251cb" class="outline-4">
+<h4 id="org60251cb">Misión 2 — Una petición, varios patrones</h4>
+<div class="outline-text-4" id="text-org60251cb">
 <p>
 Siga <code>POST /pedidos</code> desde que llega al servidor hasta persistir y
 notificar. Indique:
@@ -6230,7 +6428,7 @@ notificar. Indique:
 <li>¿Cuándo se generan las notificaciones?</li>
 </ol>
 
-<pre class="example" id="org9f8b04e">
+<pre class="example" id="orga25f674">
 HTTP → Front Controller → Middleware → Controlador
     → registrarPedido()
          +--&gt; Adapter IA
@@ -6244,9 +6442,9 @@ tiene una responsabilidad.
 </p>
 </div>
 </div>
-<div id="outline-container-org99da2a3" class="outline-4">
-<h4 id="org99da2a3">Misión 3 — Políticas transversales</h4>
-<div class="outline-text-4" id="text-org99da2a3">
+<div id="outline-container-org2af2dde" class="outline-4">
+<h4 id="org2af2dde">Misión 3 — Políticas transversales</h4>
+<div class="outline-text-4" id="text-org2af2dde">
 <ol class="org-ol">
 <li>¿Cuándo corresponde Front Controller y por qué?</li>
 <li>¿Qué ofrece ya Spring, Laravel o Express?</li>
@@ -6256,9 +6454,9 @@ autenticar <b>después</b> de cobrar sería un error de diseño?</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-orgea1348e" class="outline-4">
-<h4 id="orgea1348e">Misión 4 — Entrega e IA: Strategy, Adapter y Factory</h4>
-<div class="outline-text-4" id="text-orgea1348e">
+<div id="outline-container-orgdeb6994" class="outline-4">
+<h4 id="orgdeb6994">Misión 4 — Entrega e IA: Strategy, Adapter y Factory</h4>
+<div class="outline-text-4" id="text-orgdeb6994">
 <p>
 Tres hechos: varios <b>medios</b> (camioneta, moto, bici, dron); un
 <b>protocolo ajeno</b> de cada IA; la <b>creación</b> del medio según el pedido
@@ -6276,9 +6474,9 @@ Factory Method? ¿Cuándo convendría pasar a Factory Method
 </ol>
 </div>
 </div>
-<div id="outline-container-orgdb25222" class="outline-4">
-<h4 id="orgdb25222">Misión 5 — Atomicidad frente a aviso</h4>
-<div class="outline-text-4" id="text-orgdb25222">
+<div id="outline-container-orgaae6fcf" class="outline-4">
+<h4 id="orgaae6fcf">Misión 5 — Atomicidad frente a aviso</h4>
+<div class="outline-text-4" id="text-orgaae6fcf">
 <p>
 El alta del envío <b>no</b> puede quedar a medias respecto del cobro. El
 correo al cliente <b>sí</b> puede retrasarse.
@@ -6292,9 +6490,9 @@ recurso REST?</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org7be2fee" class="outline-4">
-<h4 id="org7be2fee">Misión 6 — Varios clientes y un colaborador inestable</h4>
-<div class="outline-text-4" id="text-org7be2fee">
+<div id="outline-container-org27c9323" class="outline-4">
+<h4 id="org27c9323">Misión 6 — Varios clientes y un colaborador inestable</h4>
+<div class="outline-text-4" id="text-org27c9323">
 <ol class="org-ol">
 <li>App JSON mínimo y panel HTML con mapa: ¿BFF, Gateway, o ambos?</li>
 <li>Un recurso REST para el pedido. ¿Por qué <code>/asignar</code> sería una
@@ -6306,9 +6504,9 @@ rechaza, y qué sí basta?</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-orgf3e8e94" class="outline-4">
-<h4 id="orgf3e8e94">Misión 7 — El marco ya lo trae</h4>
-<div class="outline-text-4" id="text-orgf3e8e94">
+<div id="outline-container-org5969d71" class="outline-4">
+<h4 id="org5969d71">Misión 7 — El marco ya lo trae</h4>
+<div class="outline-text-4" id="text-org5969d71">
 <p>
 Mitad Spring Boot, mitad Express. Sin código:
 </p>
@@ -6365,9 +6563,9 @@ Mitad Spring Boot, mitad Express. Sin código:
 </table>
 </div>
 </div>
-<div id="outline-container-org4fd9450" class="outline-4">
-<h4 id="org4fd9450">Misión 8 — El mismo pedido en el teléfono</h4>
-<div class="outline-text-4" id="text-org4fd9450">
+<div id="outline-container-org811dd9c" class="outline-4">
+<h4 id="org811dd9c">Misión 8 — El mismo pedido en el teléfono</h4>
+<div class="outline-text-4" id="text-org811dd9c">
 <p>
 La app de seguimiento (Android, iOS o Flutter: elija uno) muestra el
 mismo pedido que el panel web.
@@ -6386,9 +6584,9 @@ Justifique con la tabla del marco.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org7cc46b4" class="outline-4">
-<h4 id="org7cc46b4">Pauta de revisión</h4>
-<div class="outline-text-4" id="text-org7cc46b4">
+<div id="outline-container-org898b347" class="outline-4">
+<h4 id="org898b347">Pauta de revisión</h4>
+<div class="outline-text-4" id="text-org898b347">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -6497,13 +6695,13 @@ estado.
 </p>
 </div>
 </div>
-<div id="outline-container-org670b4f5" class="outline-4">
-<h4 id="org670b4f5">Respuestas: misiones 1 a 3</h4>
-<div class="outline-text-4" id="text-org670b4f5">
+<div id="outline-container-orga72b0c7" class="outline-4">
+<h4 id="orga72b0c7">Respuestas: misiones 1 a 3</h4>
+<div class="outline-text-4" id="text-orga72b0c7">
 </div>
 <ul class="org-ul">
-<li><a id="org466fc60"></a>Respuesta a la misión 1<br />
-<div class="outline-text-5" id="text-org466fc60">
+<li><a id="orgfe540d1"></a>Respuesta a la misión 1<br />
+<div class="outline-text-5" id="text-orgfe540d1">
 <p>
 Seis problemas distintos, no un título para toda la plataforma. «Es
 MVC» o «es hexagonal» no describe <b>todo</b>. Conviven varios patrones.
@@ -6573,8 +6771,8 @@ la consulta local.
 </p>
 </div>
 </li>
-<li><a id="org2c2691d"></a>Respuesta a la misión 2<br />
-<div class="outline-text-5" id="text-org2c2691d">
+<li><a id="orgfb5ff88"></a>Respuesta a la misión 2<br />
+<div class="outline-text-5" id="text-orgfb5ff88">
 <p>
 <code>POST /pedidos</code>: borde (si hay Gateway/BFF) → Front Controller del
 marco → middleware (sesión, bitácora) → controlador delgado →
@@ -6584,8 +6782,8 @@ marco → middleware (sesión, bitácora) → controlador delgado →
 </p>
 </div>
 </li>
-<li><a id="org732c52a"></a>Respuesta a la misión 3<br />
-<div class="outline-text-5" id="text-org732c52a">
+<li><a id="org778fc82"></a>Respuesta a la misión 3<br />
+<div class="outline-text-5" id="text-org778fc82">
 <p>
 Front Controller cuando muchas URLs copiarían sesión y errores. El
 marco ya lo trae. Orden: autenticar → bitácora → caso de uso.
@@ -6607,8 +6805,8 @@ de diseño están en ambos.
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="orgf76869c"></a>La documentación frente al esquema que el programa usa<br />
-<div class="outline-text-5" id="text-orgf76869c">
+<li><a id="orgccf724b"></a>La documentación frente al esquema que el programa usa<br />
+<div class="outline-text-5" id="text-orgccf724b">
 <p>
 El único documento de diseño es
 <code>documentacion/diagrama_base_datos.txt</code>. Se presenta como «DOCUMENTACION
@@ -6642,8 +6840,8 @@ La nota del arquitecto («el junior se equivocó») es parte del material: docum
 </p>
 </div>
 </li>
-<li><a id="org1957bcd"></a>Dos portales, no uno<br />
-<div class="outline-text-5" id="text-org1957bcd">
+<li><a id="orgf0e8884"></a>Dos portales, no uno<br />
+<div class="outline-text-5" id="text-orgf0e8884">
 <p>
 Conviven <code>index.php</code> e <code>index1.php</code>, <code>pagar.php</code> y <code>pagar1.php</code>, <code>kardex.php</code> y <code>kardex1.php</code>, <code>config/</code> y <code>config1/</code>. El título en pantalla de <code>index1.php</code> dice «SISTEMA UNIVERSITARIO V4 FINAL». Ninguno de esos archivos es un controlador frontal: no hay un solo punto que reciba todas las URLs y despache. Cada script es una puerta HTTP.
 </p>
@@ -6653,8 +6851,8 @@ Eso es el punto 1 del relato, no un detalle de nomenclatura. Front Controller ex
 </p>
 </div>
 </li>
-<li><a id="org836c8a6"></a>Políticas transversales: no hay cadena porque no hay frontal<br />
-<div class="outline-text-5" id="text-org836c8a6">
+<li><a id="org723d4a5"></a>Políticas transversales: no hay cadena porque no hay frontal<br />
+<div class="outline-text-5" id="text-org723d4a5">
 <p>
 <code>index.php</code> arranca sesión y, si no hay <code>$_SESSION['user_id']</code>, acepta la cookie <code>admin_bypass</code> y fabrica el usuario 1. Eso no es autenticar: es saltarse la política de acceso.
 </p>
@@ -6688,8 +6886,8 @@ La cookie <code>admin_bypass</code> y el <code>perfil_id</code> en la query ilus
 </p>
 </div>
 </li>
-<li><a id="orgaaa941f"></a>El pago: Strategy, Adapter, Factory, transacción y aviso, todo en el mismo script<br />
-<div class="outline-text-5" id="text-orgaaa941f">
+<li><a id="org21720a6"></a>El pago: Strategy, Adapter, Factory, transacción y aviso, todo en el mismo script<br />
+<div class="outline-text-5" id="text-org21720a6">
 <p>
 El camino real de «pagar la inscripción» no atraviesa enrutador, filtro, controlador delgado ni servicio. En <code>pagar1.php</code> el navegador hace <code>POST</code> al propio archivo. Un <code>if</code> distingue tarjeta, tres etiquetas SPEI y caja. Si el medio es tarjeta, el mismo bloque arma XML, llama al banco, interpreta la respuesta, descuenta saldo, inserta recibo, pasa <code>pre_alta</code> a <code>alta_materias</code>, envía <code>mail</code> y pinta un <code>alert</code>.
 </p>
@@ -6719,8 +6917,8 @@ La petición no recorre una composición; se aplasta en un procedimiento.
 </p>
 </div>
 </li>
-<li><a id="org2d3a213"></a>El kardex: SQL, reglamento y correo dentro de la vista<br />
-<div class="outline-text-5" id="text-org2d3a213">
+<li><a id="org96f5e0b"></a>El kardex: SQL, reglamento y correo dentro de la vista<br />
+<div class="outline-text-5" id="text-org96f5e0b">
 <p>
 <code>kardex1.php</code> abre la conexión, escribe el HTML del título, lanza <code>SELECT</code> sobre <code>kardex_historial</code> y, <b>dentro del <code>while</code> que pinta filas</b>, consulta <code>materias</code> y <code>profesores</code> (una consulta por materia: el clásico N+1). En el mismo bucle decide letra A/B/C/NA, escribe <code>alertas_academicas</code> si la materia no acredita, acumula promedio y, al final, si hay más de tres reprobadas, llama a <code>mail</code> hacia control escolar. La plantilla ejecuta el reglamento y el aviso.
 </p>
@@ -6738,15 +6936,15 @@ El diagrama negaba tabla de calificaciones. El código las tiene, y además las 
 </p>
 </div>
 </li>
-<li><a id="org1ff9cee"></a>Muchas peticiones para una pantalla<br />
-<div class="outline-text-5" id="text-org1ff9cee">
+<li><a id="orgb333488"></a>Muchas peticiones para una pantalla<br />
+<div class="outline-text-5" id="text-orgb333488">
 <p>
 Al final de <code>index.php</code>, tras pintar, el servidor hace una serie de <code>file_get_contents</code> a <code>api.php?modulo=0</code> … <code>modulo=19</code>, una por módulo de la pantalla. <code>index1.php</code> pide la nota materia a materia al host local. Eso es el hambre de la misión 6, aunque aquí el cliente «móvil» sea el propio PHP: el inicio no tiene un recurso agregado. No hay BFF; hay N viajes. Factory no arregla eso.
 </p>
 </div>
 </li>
-<li><a id="org71d7272"></a>Código muerto y fallos ajenos al catálogo<br />
-<div class="outline-text-5" id="text-org71d7272">
+<li><a id="org9beb3ae"></a>Código muerto y fallos ajenos al catálogo<br />
+<div class="outline-text-5" id="text-org9beb3ae">
 <p>
 <code>index.php</code> declara cientos de clases CSS <code>clase_basura_*</code>. <code>pagar.php</code> declara cientos de <code>$dummy_var_*</code> antes del <code>switch</code>. <code>global/funciones.php</code> expone miles de <code>formatear_string_vN</code>. <code>js1/utilerias1.js</code> define cientos de <code>accion_interfaz_N</code> que solo escriben en la consola. <code>kardex.php</code> calcula <code>md5</code> en un bucle vacío. Eso es código muerto. Puede llamarse God file o lava flow. No es Strategy.
 </p>
@@ -6760,8 +6958,8 @@ Al final de <code>index.php</code>, tras pintar, el servidor hace una serie de <
 </p>
 </div>
 </li>
-<li><a id="org2d882eb"></a>Correspondencia con las misiones<br />
-<div class="outline-text-5" id="text-org2d882eb">
+<li><a id="orge0b7e8f"></a>Correspondencia con las misiones<br />
+<div class="outline-text-5" id="text-orge0b7e8f">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -6853,9 +7051,9 @@ Al final de <code>index.php</code>, tras pintar, el servidor hace una serie de <
 </div>
 </div>
 </div>
-<div id="outline-container-org0371b42" class="outline-2">
-<h2 id="org0371b42">Cierre</h2>
-<div class="outline-text-2" id="text-org0371b42">
+<div id="outline-container-orgc171e32" class="outline-2">
+<h2 id="orgc171e32">Cierre</h2>
+<div class="outline-text-2" id="text-orgc171e32">
 <p>
 La pregunta importante no es «¿cuántos patrones utilicé?». Es:
 </p>
@@ -6887,7 +7085,7 @@ Si la respuesta es «demasiadas cosas», hay un problema de diseño.
 </div>
 <div id="postamble" class="status">
 <p class="author">Autor: Eduardo Alcaraz</p>
-<p class="date">Created: 2026-09-09 mié 23:17</p>
+<p class="date">Created: 2026-09-09 mié 23:07</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
