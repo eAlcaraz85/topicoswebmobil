@@ -194,6 +194,40 @@ cada cambio rompe más cosas
 El resto de estos apuntes pone *nombre* a esas perspectivas en web y
 móvil.
 
+* La empresa de entregas (el hilo de toda la unidad)
+
+Olvida un momento los 23 nombres. Imagina que entras a trabajar a una
+empresa de mensajería.
+
+Hay que registrar un pedido: origen, destino, peso, urgencia. Hay que
+decidir *cómo* llega: camioneta, moto, bici o dron. Una IA sugiere el
+medio, pero cada proveedor de IA responde en su propio JSON o XML.
+Cuando el pedido cambia de estado, se enteran el cliente, el
+repartidor, el panel, las estadísticas. Hay web, hay app, hay mapa,
+hay cobro.
+
+#+begin_quote
+Para y responde (sin buscar el nombre de un patrón):
+
+Si mañana aparece un quinto medio —un triciclo eléctrico—, ¿cuántos
+archivos tendrías que abrir *hoy*, con el diseño que sueles hacer
+(un =if= o un =switch= gigante)?
+
+Si el proveedor de IA cambia =route_hint= por =vehicle=, ¿el panel
+también se rompe?
+
+Si el correo al cliente falla, ¿el cobro se deshace?
+#+end_quote
+
+Esas tres preguntas *son* la unidad. Los nombres (Strategy, Adapter,
+Observer…) llegan después, cuando ya vimos el problema.
+
+Lo que *cambia*: medios, IA, extras (seguro, urgente), quién se
+entera, cómo se pinta en el teléfono o en el panel.
+
+Lo que *debe quedarse quieto*: registrar el pedido y asignar una
+entrega.
+
 * Qué es un patrón (y qué no)
 
 Un patrón no es un archivo para copiar. Es una forma *ya nombrada* de
@@ -229,660 +263,14 @@ Observer de 1994: puede *avisar* a la UI. Middleware de Express *sí*
 es, en la práctica, una cadena de responsabilidades que el marco ya
 trajo: no la reescribas al lado.
 
-El catálogo de los 23 viene *a continuación*, con analogía, problema
-e idea de cada uno. Después entra el enunciado de la empresa y, con
-él, Strategy.
-
-* Catálogo GoF
-
-GoF («Gang of Four») son Erich Gamma, Richard Helm, Ralph Johnson y
-John Vlissides, y el libro de 1994 que agrupa *23* formas de organizar
-clases. No son 23 recetas para copiar: son 23 *problemas* que se
-repiten, cada uno con un plano ya nombrado.
-
-Tres familias:
-
-| Familia | Pregunta que responden | Cuántos |
-|---------+------------------------+---------|
-| Creacionales | ¿De dónde nace el objeto? | 5 |
-| Estructurales | ¿Cómo se ensamblan las piezas? | 7 |
-| Comportamentales | ¿Cómo se hablan y se reparte el trabajo? | 11 |
-
-Algunos sitios (p. ej. Refactoring Guru) muestran *22* y dejan
-Interpreter fuera: no «falta uno»; casi nunca se necesita inventar un
-lenguaje propio.
-
-Abajo cada patrón se cuenta igual: una analogía cotidiana, qué duele
-en el código, la idea, cómo se vería en la *plataforma de entregas*, y
-cuándo *no* hace falta. El semestre no pide implementar los 23. Sí
-pide reconocerlos, no confundir vecinos, y no meter uno «para que el
-proyecto se vea completo».
-
-El lenguaje y el marco ya realizan varios. Si Spring, Express o
-Android ya traen la portería, el middleware o el contenedor, *se usa
-eso*; no se pinta el diagrama de 1994 al lado.
-
-** Creacionales: de dónde nace el objeto
-
-*** Factory Method — el trámite no nombra el vehículo
-
-En un restaurante el mesero toma la comanda; no entra a la estufa a
-hacer el plato. Si mañana el menú cambia de pasta a arroz, el bloc de
-comandas sigue igual. Quien cambia es *quién cocina*.
-
-En código el trámite «despachar» no debería decir
-=new EntregaCamioneta()=. Ese =new= fija una clase concreta en medio
-del oficio. Mañana piden dron y hay que abrir el despacho, el panel y
-las pruebas.
-
-La idea: el trámite llama a un *gancho* (=crearMedio()=) y trabaja con
-el contrato (=MedioDeEntrega=). Una variante terrestre devuelve
-camioneta; una aérea, dron. El =new= no desaparece: se *mueve* a quien
-sí debe conocer la clase concreta.
-
-En las entregas: =Logistica.despachar= valida y planea;
-=LogisticaAerea.crearMedio= es quien sabe de drones.
-
-*No es* un =if= gigante con =new= según un string: eso es una *fábrica
-simple* (=MedioFactory.crear("dron")=), útil y más corta. Factory
-Method de verdad aparece cuando hay *familias de trámite* que redefinen
-el gancho. Un solo medio estable: un constructor normal.
-
-*** Abstract Factory — las piezas tienen que ser del mismo juego
-
-Un juego de té: taza, plato y tetera del mismo diseño. Si mezclas la
-taza floral con el plato geométrico, «funciona» y se ve mal. El juego
-nace junto.
-
-A veces no varía *un* objeto, sino un *kit*: medio + manifiesto +
-etiqueta. Nacional e internacional no deben mezclarse (un dron
-doméstico con manifiesto aduanero, o al revés).
-
-La idea: una fábrica *abstracta* declara «dame medio, manifiesto y
-etiqueta». =FabricaNacional= y =FabricaInternacional= producen kits
-coherentes. El trámite pide el kit, no cada pieza suelta.
-
-*Cuándo no.* Si solo cambia el medio, Factory Method o la fábrica
-simple bastan. Tres =if= sueltos «por si acaso» no son Abstract
-Factory: son ceremonia.
-
-*** Builder — muchos opcionales, un solo «ya está»
-
-Un sándwich: pan, y luego «¿queso, jalapeño, doble carne?». Nadie
-recita quince ingredientes en el mismo aliento; se van pidiendo y al
-final hay *un* sándwich.
-
-Un =new Pedido(origen, destino, peso, alto, ancho, urgente, seguro,
-frágil, firma, horaVentana, …)= no se puede leer. Añadir un opcional
-rompe a todos los que llamaban el constructor.
-
-La idea: un director (o el propio cliente) dice los pasos
-(=conSeguro()=, =urgente()=) y al final =construir()= devuelve el
-pedido ya válido. El objeto sale *completo*, no a medias.
-
-En las entregas: el alta con extras. *Cuándo no.* Tres campos
-obligatorios: el constructor. Otro constructor más «para el caso
-urgente» acaba en una familia de constructores que nadie distingue.
-
-*** Prototype — a veces copiar es más fiel que volver a llenar
-
-Fotocopiar una hoja ya llena suele ser más fiel que reescribirla de
-memoria. La plantilla ya tenía los márgenes bien.
-
-Si cada día se captura la misma ruta (misma bodega, mismos horarios,
-mismo tipo de paquete) y el equipo vuelve a teclear veinte campos,
-conviene *clonar una plantilla* y cambiar lo que sí es de hoy.
-
-La idea: un objeto sabe *copiarse* (=clonar()=). No se llama otra vez
-al constructor con la receta completa.
-
-*Cuándo no.* Clonar el folio *ya cobrado* para «hacer otro pedido»
-copia el cobro. Prototype es para *configuración o plantilla*, no para
-duplicar un trámite con efectos.
-
-*** Singleton — una presidencia, no «el cliente de ahora»
-
-Hay un ayuntamiento, no un ayuntamiento por vecino. El error es
-declarar presidente al *visitante de turno*.
-
-Hace falta *una* instancia de infraestructura: el pool de conexiones,
-la configuración cargada, el cliente HTTP compartido. El síntoma de
-abuso: =PedidoActual.getInstance()=, =Sesion.getInstance()= como «el
-usuario logueado», el carrito global. Eso se rompe con dos pestañas,
-dos nodos y las pruebas.
-
-La idea: garantizar una instancia y un punto de acceso. En 2026 el
-*contenedor* del marco (Spring, el injector de Android) *ya es* ese
-punto. Un =getInstance()= con candados, *al lado* del marco, es diseñar
-dos veces.
-
-*Cuándo no.* Casi todo lo que parece Singleton es «quiero llegar fácil
-a esto». Eso se llama servicio inyectado, no presidencia.
-
-** Estructurales: cómo se ensamblan las piezas
-
-*** Adapter — el otro habla otro idioma
-
-Un enchufe europeo en un toma de México: la corriente es la misma
-idea; la *forma* no entra. Pones un adaptador. No reescribes el
-electrodoméstico ni la instalación.
-
-La IA del proveedor responde =route_hint= y =score=. Otra habla XML.
-Una interna devuelve un objeto distinto. El dominio, en cambio, quiere
-=Sugerencia{ medio, motivo }=. Si =Despacho= lee =route_hint=, el
-idioma ajeno se metió al corazón del trámite. Mañana el proveedor
-cambia =vehicle= y se rompe el panel.
-
-La idea: una pieza *traduce*. Por fuera parece del dominio; por dentro
-llama al extraño. En JavaScript a menudo basta una función
-=mapearRespuestaIA(json)=.
-
-*No es Facade:* Facade simplifica *lo nuestro*. *No es Proxy:* Proxy
-no cambia el idioma, controla el acceso. Si *tú* controlas ambos lados
-y puedes pactar el mismo JSON, no hace falta.
-
-*** Bridge — dos cosas varían a la vez, y no quieres el producto cartesiano
-
-El control remoto y el televisor pueden cambiar cada uno por su lado:
-un control nuevo no obliga a un televisor nuevo. Si juntas «marca ×
-tipo de pantalla» en una sola jerarquía, explota el número de clases.
-
-En software: una *abstracción* (p. ej. «cómo presento el seguimiento»)
-y una *implementación* (p. ej. «cómo hablo con el GPS») varían
-independientes. Se *puentean* por un enlace, no por subclases de todas
-las combinaciones.
-
-En este curso casi no aparece. Un CRUD no lo pide. Si solo varía un
-lado, Strategy o Adapter bastan.
-
-*** Composite — el grupo se trata como la hoja
-
-Una caja de mudanza puede llevar un vaso o *otra caja*. El cargador no
-cambia de oficio: «esto se mueve». Árbol de hojas y grupos, mismo
-trato.
-
-Un palé con cajas, cada caja con paquetes: =planear()= del palé suma
-lo de adentro. Quien despacha no pregunta «¿eres caja o sobre?».
-
-*Cuándo no.* Una lista plana de paquetes. Inventar Composite para un
-array es teatro. El DOM y los widgets de Flutter *ya son* árboles
-Composite.
-
-*** Decorator — se apila, no se sustituye
-
-En la cafetería el café es café; el extra (leche, jarabe) *se envuelve*
-encima. No inventas la clase =CafeConLecheYJarabeYCanela=.
-
-Quieres seguro, frágil o bitácora *encima* del mismo plan de dron, sin
-copiar =EntregaDron= ni llenarla de =if=. El síntoma: subclases
-=DronConSeguro=, =DronFragilConSeguro=.
-
-La idea: el decorador *es* un =MedioDeEntrega=. Delega en el que
-envuelve y suma la responsabilidad.
-
-*No es Strategy:* Strategy *cambia* el algoritmo (dron vs moto).
-Decorator *apila* capas sobre el mismo. *No es Proxy:* Proxy controla
-*acceso*; Decorator añade oficio. Un extra único y estable: un =if=.
-Middleware e interceptores OkHttp son esta idea en la práctica.
-
-*** Facade — una puerta al trámite nuestro
-
-En el restaurante no entras a la cocina a coordinar al asador, al
-ensaladero y al postre. El mesero es *una puerta*. La cocina sigue
-siendo compleja; tú no la ves.
-
-El controlador HTTP —o varias pantallas— conoce diez clases internas:
-validador, IA, medio, repositorio, cobro. Cada cliente arma la
-orquestación a su manera. La idea: =registrarPedido()= orquesta. El
-Service Layer *suele realizar* esta fachada.
-
-*No es Adapter:* el otro no es ajeno; es nuestro. *No es Front
-Controller:* eso es la portería HTTP. Las «Facades» de Laravel son
-otro uso de la palabra (atajos estáticos), no este patrón. Delegar a
-un solo método que ya era simple: no hace falta.
-
-*** Flyweight — lo compartido no se copia mil veces
-
-En un bosque dibujado, el *tipo* de pino (forma, textura) se comparte;
-la posición de cada árbol es única. No cargas mil modelos idénticos.
-
-Miles de pines en el mapa: el icono y el tipo de vehículo se
-comparten; la coordenada es de cada pedido. Celdas de una lista
-larga: la plantilla se reutiliza.
-
-*Cuándo no.* Pocas instancias. Optimizar la memoria de veinte pedidos
-es perder el tiempo. Las fuentes del sistema y las celdas de
-=RecyclerView= ya juegan a esto.
-
-*** Proxy — una política antes de llegar al objeto de verdad
-
-La recepcionista no *es* el director; decide si pasas, si hay cita, si
-se deja recado. El oficio aparente es el mismo («hablar con
-dirección»); el acceso está controlado.
-
-Hay un objeto caro o remoto (geocoder, mapa, archivo) y una *política*:
-caché, carga perezosa, permiso, log. El caso de uso no debería llamar
-al geocoder en crudo en diez sitios.
-
-La idea: el proxy *implementa el mismo contrato* y por delante aplica
-la política. CDN, carga perezosa del ORM, stub en pruebas.
-
-*No es Adapter:* no se traduce un idioma distinto. *No es Decorator:*
-no añades un extra de negocio; controlas *cuándo y cómo se toca* lo
-real. Si no hay política, llama directo.
-
-** Comportamentales: cómo se hablan
-
-*** Chain of Responsibility — la fila del aeropuerto
-
-En el aeropuerto pasas seguridad, migración, embarque. Cada puesto
-hace *lo suyo* y te pasa al siguiente. No discutes el menú del avión
-en la fila de pasaportes.
-
-Cada trámite copia «¿hay sesión?», bitácora y encabezado. Cambia la
-caducidad del token y tocas cuarenta archivos.
-
-La idea: una cadena. Quien puede, actúa o deja pasar. En web eso *ya
-es* el middleware: autenticar → bitácora → caso de uso. Express,
-Django, Laravel lo instancian.
-
-La cadena *no* elige camioneta o dron (eso es Strategy). Un solo
-chequeo en una sola ruta: un =if=, no una cadena. Autenticar *después*
-de cobrar cobra a quien no debería.
-
-*** Command — el recado escrito, no el grito
-
-Dejas un recado: «cobrar este folio cuando haya red». El papel viaja;
-quien lo escribió puede haberse ido. Puedes encolar, deshacer, auditar.
-
-La Activity hace el =POST= de cobro y, si el proceso muere, se perdió
-la intención. «Reintentar cobro» en segundo plano pide que la
-*solicitud* sea un objeto: qué hacer, con qué datos.
-
-La idea: reificar la petición (=CobrarPedido=) con =ejecutar()= (y a
-veces =deshacer()=). WorkManager, un job, una cola, las acciones de
-Redux *ya* son esto.
-
-*No es Strategy:* no eliges *cómo* planear; guardas *qué hay que
-hacer*. Un botón que solo llama un método en el mismo proceso: no hace
-falta.
-
-*** Interpreter — un idioma pequeño, solo si de verdad lo hay
-
-A veces las reglas se *escriben* (un mini lenguaje: «si peso < 2 y
-zona = centro → bici»). Un intérprete recorre esa gramática.
-
-Casi nunca en este curso. Un =if= o un parser que ya existe ganan a
-inventar un DSL de rutas. No «falta» en el temario: se deja fuera
-porque el costo es enorme y el beneficio, en un CRUD, nulo.
-
-*** Iterator — recorrer sin abrir el cajón
-
-El mesero recita el menú sin que veas la receta ni el almacén. Tú
-pides «el siguiente»; no metes la mano en la cocina.
-
-Recorrer pedidos, paradas o resultados de una consulta sin exponer si
-por detrás hay un arreglo, un árbol o un cursor de base. En Java y en
-JavaScript el =for= moderno *ya es* Iterator. No se escribe uno sobre
-un array.
-
-*** Mediator — la torre de control, no todos contra todos
-
-En un aeropuerto los aviones no se coordinan por radio cada uno con
-cada uno: hablan con la torre. Si la torre empieza a *ser* el
-aeropuerto entero (cobro, mapa, IA, nómina), tienes un God Object.
-
-Mapa, chat del repartidor y panel del admin no deben llamarse todos
-entre todos: cada cambio de ETA (tiempo estimado de llegada) reabre seis clases. Un mediador
-(Coordinator de navegación en móvil, un hub de UI) concentra el
-tráfico *de ese círculo*.
-
-*Cuándo no.* Dos objetos que ya se conocen. El mediador que «hace de
-todo» es peor que el acoplamiento que querías evitar.
-
-*** Memento — una foto para poder volver
-
-El videojuego guarda la partida. No reescribes la historia: restauras
-un estado que alguien capturó *sin romper el encapsulamiento*.
-
-Deshacer en un editor de ruta, o volver al formulario del pedido como
-estaba hace un minuto. Capturas un retrato interno y luego lo
-reaplicas.
-
-*Cuándo no.* Reasignar un campo (=pedido.eta = anterior=) basta. No
-es Observer (avisar) ni Command (la acción); es *la foto*.
-
-*** Observer — avisar sin conocer a todos
-
-En un grupo de WhatsApp escribes una vez; se enteran quienes están.
-No tienes la lista de teléfonos en la cabeza cada vez.
-
-Cuando el pedido cambia de estado se enteran cliente, repartidor,
-panel, estadísticas, a veces la IA. Si =Despacho= llama a cada uno
-por nombre, añadir un canal obliga a editar el despacho.
-
-La idea: el sujeto avisa «pasó esto» (=PedidoActualizado=). Los
-observadores se suscriben. En este curso el aviso va *después del
-COMMIT*: si el cobro se deshace, no dispares el correo.
-
-=StateFlow=, eventos del DOM, BLoC, =LiveData= realizan Observer en la
-UI. Eso *no* sustituye avisar en el servidor, ni sustituye una
-transacción. Un solo llamador: una llamada directa.
-
-*** State — el mismo objeto, otra fase
-
-Un semáforo no es tres semáforos: es *uno* que a veces deja pasar y a
-veces no. El comportamiento cambia con la *fase*.
-
-=CREADO= no se entrega; =EN_CAMINO= sí actualiza ETA; =ENTREGADO= ya
-no se cancela igual. El síntoma: =switch (pedido.estado)= enorme
-*dentro* de =Pedido=, que crece con cada fase nueva.
-
-La idea: el estado es un objeto (o un tipo sellado) que responde a las
-mismas preguntas de forma distinta. El pedido *delega* en su fase
-actual y, cuando corresponde, *cambia* de fase.
-
-*No es Strategy:* Strategy no depende de que el pedido «haya promovido».
-Dos fases estables: =if=. =UiState= en Android es primo de presentación,
-no el ciclo de vida del envío.
-
-*** Strategy — varias formas de hacer lo mismo
-
-En la cocina hay varias recetas de caldo. El mesero pide *un caldo*;
-quien cocina cambia el procedimiento. El menú no se reescribe.
-
-Camioneta, moto, bici y dron responden la *misma* pregunta —¿cabe?
-¿cuánto tarda? ¿cuánto cuesta?— de formas distintas. El =switch= de
-doscientas líneas mezcla todas las recetas. Un medio nuevo obliga a
-editarlo.
-
-La idea: un contrato (=MedioDeEntrega.planear=) y una clase (o función)
-por receta. =Despacho= usa el contrato, no los nombres concretos. En
-Java, interfaz y una clase por medio; en JavaScript, a menudo una
-función.
-
-*Cuándo no.* Un solo algoritmo que no va a variar. Un =if= de dos
-casos estables. Strategy *sustituye* el algoritmo; no apila extras
-(eso es Decorator) ni traduce un JSON ajeno (eso es Adapter).
-
-*** Template Method — el esqueleto fijo, los pasos variables
-
-La receta del pastel: hornea, rellena, cubre. El relleno cambia; el
-orden no. Quien hereda rellena los huecos; no reescribe el horneado.
-
-=despachar= siempre: crear medio, planear, persistir. Las variantes
-cambian *un paso* (cuál medio, cómo se etiqueta). Factory Method *es*
-a menudo un paso de ese esqueleto (=crearMedio=). =onCreate= de
-Android y =setUp= de JUnit son esqueletos del marco.
-
-*Cuándo no.* Una clase base de mil líneas que «ya trae todo». Si no
-hay esqueleto claro, composición (Strategy) duele menos que heredar.
-
-*** Visitor — una operación nueva sin abrir cada clase
-
-Un inspector recorre las habitaciones: cada cuarto *acepta* la visita
-y el inspector hace su oficio (inventario, peritaje) *sin* convertirse
-en mueble.
-
-Tienes una jerarquía estable (sobre, caja, palé) y quieres *añadir
-operaciones* (exportar XML, calcular arancel, pintar un informe) sin
-modificar cada clase. El visitante concentra la operación nueva.
-
-*Cuándo no.* Un =export= único. El CRUD de pedidos. Añadir tipos de
-paquete a cada rato: Visitor se vuelve pesado (hay que tocar todos los
-visitantes). En este curso casi no se implementa.
-
-** Cómo no usar este catálogo
-
-El catálogo no es una lista de la compra. Un proyecto no «es»
-Strategy, ni MVC, ni hexagonal. Un trámite puede *usar* varios a la
-vez: Factory crea una Strategy; Adapter traduce la IA; Observer avisa
-después del =COMMIT=.
-
-Si el problema no existe, la solución sobra. Meter diez patrones en
-un alta de tres campos es Golden Hammer: el PDF de guía no pide Event
-Sourcing.
-
-Lo que este curso pide *reconocer* (y no forzar): Abstract Factory,
-Builder, Prototype, Singleton, Decorator, Proxy, Command, State,
-Template Method, Composite, Mediator.
-
-Lo que casi nunca se implementa aquí: Bridge, Flyweight, Visitor,
-Memento, Interpreter.
-
-Las misiones caminan el enunciado de la empresa, no los 23 nombres.
-
-** Referencias
-
-- Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides. /Design Patterns/.
-- Martin Fowler. /Patterns of Enterprise Application Architecture/.
-- Frank Buschmann et al. /Pattern-Oriented Software Architecture/.
-- Michael T. Nygard. /Release It!/
-- Christopher Alexander. /A Pattern Language/.
-- Guías de Android, SwiftUI y Flutter.
-- Refactoring Guru. Catálogo de patrones de diseño (clasificación,
-  crítica, fichas y comparación de fábricas).
-  https://refactoring.guru/es/design-patterns
-
-#+begin_quote
-*La pregunta que conviene llevarse:*
-
-«Si mañana cambia esto, ¿qué parte de mi código tendría que modificar?»
-
-Si la respuesta es «demasiadas cosas», hay un problema de diseño.
-Si además ese problema se repite, probablemente exista un patrón que
-ayude a enfrentarlo.
-#+end_quote
-
-* La empresa de entregas (el problema del semestre)
-
-Una empresa de mensajería quiere *una sola plataforma* para registrar
-pedidos y asignar cómo se entregan. Un pedido no es un folio vacío:
-tiene origen, destino, peso, dimensiones, urgencia y fecha límite.
-
-Hoy el proceso no es una plataforma. Está partido en páginas sueltas,
-un Excel de rutas y tres APIs de mensajería distintas. El equipo
-copia, pega y reza. El semestre consiste en pasar de ese desorden a
-un diseño que se pueda cambiar *sin* reabrir medio sistema cada vez.
-
-Hay varios medios: camioneta, motocicleta, bicicleta, dron. Cada uno
-tiene restricciones, costo y tiempo distintos. Una IA recomienda, por
-ejemplo: «motocicleta: tráfico alto y paquete pequeño». No se depende
-de un solo proveedor de IA: mañana puede ser otro servicio o uno
-propio, cada uno con su interfaz (JSON, XML, un objeto interno).
-
-Cuando cambia el estado del pedido se enteran cliente, repartidor,
-administrador, notificaciones, estadísticas e IA. Habrá panel web,
-app del cliente, app del repartidor, mapas, pagos y seguimiento en
-tiempo real.
-
-Lo que *cambia* a lo largo del semestre: medios, costos, tiempos,
-proveedores de IA, extras (seguro, urgente), quién se entera, cómo se
-pinta en el teléfono o en el panel.
-
-Lo que *debe quedarse quieto*: registrar el pedido y asignar una
-entrega. Si para añadir un medio o un proveedor hay que tocar el
-HTML, el SQL y el cobro, el diseño no está haciendo su trabajo.
-
-** Cosas a tomar en cuenta
-
-No es un solo «problema de la app». Son *varios* conflictos que
-conviven. Si etiquetas todo como «MVC» o como «hexagonal», no has
-descrito nada.
-
-1. Cada trámite (alta de pedido, cobro, seguimiento, panel del
-   repartidor) es un archivo distinto. En todos se copia «¿hay
-   sesión?», la bitácora y el encabezado. Cuando cambia la caducidad
-   del token, hay que tocar cuarenta archivos.
-
-2. Asignar la entrega admite *camioneta, motocicleta, bicicleta y
-   dron*. El script es un =switch= de doscientas líneas. Cada medio
-   nuevo obliga a editarlo. Un proveedor de IA recomienda el medio con
-   un JSON propio (=route_hint=, =score=); otro usa XML; uno interno
-   devuelve un objeto distinto. El dominio, en cambio, habla de
-   =Sugerencia{ medio, motivo }=. Ahí hay *dos* problemas pegados: cómo se
-   *planea* cada medio, y cómo se *traduce* lo que dice la IA.
-
-3. La plantilla del seguimiento ejecuta SQL para pintar mapa y ETA
-   (tiempo estimado de llegada). El reporte de gerencia duplica esas
-   consultas con otro formato. La vista conoce la bodega.
-
-4. Cuando el cobro se acredita, el mismo script da de alta el envío,
-   dispara un correo al cliente y avisa al repartidor. Si el correo
-   falla, a veces no hay envío. Si el cliente pulsa dos veces
-   «pagar», hay *dos* cargos. Atomicidad y aviso se mezclaron; el
-   doble clic no está pensado.
-
-5. La app del cliente, la app del repartidor y el panel web deben
-   mostrar el *mismo* pedido. La app pide un JSON mínimo (folio,
-   estado, eta). El panel pide HTML con mapa. Hoy el equipo de la app
-   hace *doce peticiones* para pintar el inicio.
-
-6. El mapa y la IA *se caen* con frecuencia. Mientras no responden, el
-   usuario ve la rueda y no puede ni consultar un pedido *ya
-   guardado*, que no depende de esos colaboradores. Un fallo ajeno
-   tumba lo que sí está en nuestra base.
-
-7. Un proveedor propone Event Sourcing, CQRS y Redux global para
-   generar un PDF de guía. El trámite real es: autenticar, consultar
-   un pedido existente y generar un archivo. Eso no es madurez: es
-   ceremonia. Parte del semestre es *saber decir que no*.
-
-** Actividad en clase — ¿Qué está pasando aquí?
-
-Trabajan en *equipos de cinco*. Hoy no se programa: se entiende el
-relato. Al final del tiempo de clase entregan un solo documento del
-equipo (papel, Docs o un =.md= corto) con las tablas y el paso 3.
-
-El cliente de esta plataforma *ya está decidido*: hay *panel web* y
-hay *app móvil*. No eligen «web o móvil»: diseñan para *los dos*.
-
-Pueden mirar el *Catálogo GoF* cuando lleguen al paso 2. Antes, el
-trabajo es decir con sus palabras *cuál es el inconveniente principal*.
-Un nombre suelto no cuenta como análisis.
-
-*** Paso 1 — Cuenten el inconveniente con sus palabras
-
-Vuelvan a leer los siete puntos. Completen *los siete* renglones.
-Si una celda se les atasca, háblenlo en el equipo: casi siempre es
-que dos cosas se pegaron.
-
-El punto 2 son dos inconvenientes juntos. Si lo ven así, úsenlo en dos
-renglones (2a y 2b).
-
-| # | Cuál es el inconveniente principal (una frase) | Qué está cambiando o va a cambiar | Qué *no* debería reescribirse cada vez | Qué se mezcló que no debía |
-|---+-----------------------------+-----------------------------------+----------------------------------------+----------------------------|
-| 1 |                             |                                   |                                        |                            |
-| 2 |                             |                                   |                                        |                            |
-| 3 |                             |                                   |                                        |                            |
-| 4 |                             |                                   |                                        |                            |
-| 5 |                             |                                   |                                        |                            |
-| 6 |                             |                                   |                                        |                            |
-| 7 |                             |                                   |                                        |                            |
-
-Cuando la tabla esté lista, respondan por escrito estas cuatro
-preguntas. Todavía *sin* nombres del catálogo. Sirven para
-comprobar que el equipo entendió el mismo relato:
-
-- Si mañana aparece un quinto medio —un triciclo eléctrico—, ¿cuántos
-  archivos abrirían *hoy*?
-- Si el proveedor de IA cambia =route_hint= por =vehicle=, ¿se rompe
-  también el panel? ¿Y la app?
-- Si el correo al cliente falla, ¿el cobro se deshace?
-- Si la IA está caída, ¿pueden ver un pedido que *ayer* sí se guardó?
-
-*** Paso 2 — Pongan un nombre del catálogo (o escriban «ninguno»)
-
-Arriba está el *Catálogo GoF*: los 23 patrones del libro (Factory,
-Adapter, Strategy, Observer, etc.).
-
-Para *cada* punto de la lista (1 a 7) hagan *una* de estas dos cosas:
-
-1. Escriban *el nombre de un patrón de ese catálogo* que crean que
-   ayuda con *ese* inconveniente. En la columna de al lado expliquen
-   *por qué*, con algo que sí esté en el relato (no «porque sale en
-   el temario»).
-2. Si *ninguno* de los 23 encaja, escriban la palabra *ninguno* y
-   expliquen por qué no conviene forzar un nombre.
-
-No todos los inconvenientes de la plataforma salen del libro de
-1994. Por ejemplo: que haya *panel web y app* a la vez, o que el
-mapa y la IA se caigan, a veces se resuelven con ideas de
-aplicaciones web o de servicios que fallan, no con un patrón GoF.
-En esos casos *ninguno* es una respuesta válida: lo que no vale es
-inventar un nombre para rellenar.
-
-En la tercera columna pongan un patrón que *se parece* pero *no* es
-(por ejemplo, no confundir Adapter con Facade). Si pusieron
-*ninguno*, esa columna puede decir qué nombre estarían tentados a
-meter y por qué lo descartan.
-
-| # | Nombre del catálogo, o «ninguno» | ¿Por qué este? (con algo del relato) | Uno que se parece pero *no* es (y por qué) |
-|---+----------------------------------+--------------------------------------+--------------------------------------------|
-| 1 |                                  |                                      |                                            |
-| 2a |                                 |                                      |                                            |
-| 2b |                                 |                                      |                                            |
-| 3 |                                  |                                      |                                            |
-| 4 |                                  |                                      |                                            |
-| 5 |                                  |                                      |                                            |
-| 6 |                                  |                                      |                                            |
-| 7 |                                  |                                      |                                            |
-
-Algunas pistas, sin dar la respuesta:
-
-- «MVC» o «hexagonal» no sirven aquí: no dicen *cuál* de los siete
-  inconvenientes están resolviendo.
-- El punto 7 pregunta si hace falta tanto aparato (Event Sourcing,
-  CQRS, Redux) para generar un PDF. Si no pueden decir qué
-  inconveniente concreto resuelve, escriban *ninguno* y expliquen
-  que sobra.
-- Los puntos 5 y 6 (varios clientes; mapa o IA caídos) muchas veces
-  no tienen un patrón GoF claro. Pueden poner *ninguno* y decirlo
-  con sus palabras.
-- No se busca que adivinen el nombre «oficial». Se busca que
-  separen inconvenientes y que no pongan un patrón donde no hace
-  falta.
-
-*** Paso 3 — Un conflicto y el cliente web + móvil
-
-El equipo elige *un* punto (el que más les haya costado) y escribe,
-sin código:
-
-1. Qué harían *mañana* si no pueden rehacer todo el sistema: el
-   primer corte, no la arquitectura soñada.
-2. Qué parte *no* tocarían al hacer ese corte.
-3. Cómo se nota que hay *web y móvil*: ¿el mismo trámite se ve
-   distinto en el panel y en el teléfono? ¿Qué tendría que quedar
-   igual en los dos (el pedido, el estado, el medio) y qué sí puede
-   cambiar (HTML con mapa frente a un JSON corto)?
-
-Con eso alcanza. No hay exposición oral: el documento del equipo es
-la entrega.
-
-** Qué se pide, más allá del código
-
-El cliente *es* web y móvil: panel en el navegador y app en el
-teléfono. Eso no se discute; se diseña para los dos.
-
-Antes de implementar, el equipo justifica por escrito el resto (no
-basta enumerar nombres): el backend y el lenguaje; el marco; el tipo
-de API; la base de datos; la autenticación; cómo se engancha la IA y
-los mapas; si hace falta tiempo real y con qué; cómo se organiza el
-código; pruebas y despliegue.
-
-Cada decisión tiene que atarse a *este* dominio, no al temario. El
-análisis de patrones no exige un marco. Sí exige que, *si* se elige
-Spring, Laravel o Express, se use lo que ese marco ya trae y no se
-copie al lado un diagrama del libro.
-
-Lo que sigue empieza por el primero de esos conflictos: varias formas
-de entregar. Las misiones del final vuelven a este mismo relato: no
-es otro problema.
+El catálogo de los 23 (GoF) está al final, como consulta. No hace
+falta memorizarlo para seguir.
 
 * Los problemas de esta plataforma
 
-Empezamos por el =switch= de medios. Ahí aparece Strategy. El nombre
-llega cuando ya vimos el código que duele, no antes.
+Seguimos en la empresa de entregas. Cada apartado es un *problema concreto*.
+El nombre del patrón aparece cuando ya vimos el código que duele, no
+antes.
 
 ** Varias formas de entregar
 
@@ -1073,7 +461,10 @@ tiene el idioma ajeno en el corazón del trámite.
 
 ** Quién hace el =new=
 
-Strategy nos dio =MedioDeEntrega=, pero alguien sigue haciendo
+En el restaurante no eliges la cazuela. Pides el plato; cocina
+*construye*.
+
+Strategy ya nos dio =MedioDeEntrega=. Pero alguien sigue haciendo
 =new EntregaDron()= en el panel, en la app y en las pruebas. El
 acoplamiento volvió por la puerta de atrás.
 
@@ -1694,315 +1085,6 @@ SÍ:  «Tengo varios comportamientos intercambiables
       y quiero cambiar uno sin modificar al cliente.»
 #+end_example
 
-* De dónde salen los objetos
-
-Ya vimos cómo *planea* cada medio (Strategy) y que alguien tiene que
-hacer el =new=. Esta parte agrupa las formas de *nacer* un objeto.
-
-En los primeros cursos escribes:
-
-#+begin_src java
-EntregaCamioneta c = new EntregaCamioneta();
-Pedido p = new Pedido(origen, destino);
-#+end_src
-
-=new= quiere decir: «crea *esta* clase, aquí, ahora». Funciona. El
-problema empieza cuando ese =new= se repite en diez archivos, o
-cuando el objeto es tan complicado que nadie recuerda qué ponerle en
-el constructor, o cuando juras que «solo puede haber uno» y resulta
-que cada pestaña del navegador tiene el suyo.
-
-Los libros llaman *creacionales* a un puñado de formas de organizar
-ese nacimiento. No son cinco recetas para lo mismo. Son cinco
-*dolores* distintos:
-
-- a veces el trámite nombra una clase concreta y mañana hay que
-  cambiarla;
-- a veces varias piezas tienen que nacer *del mismo mundo* (si
-  mezclas, el sistema se rompe);
-- a veces el objeto tiene tantos opcionales que el constructor es
-  ilegible;
-- a veces ya tienes un ejemplar bueno y conviene *copiarlo*;
-- a veces de verdad hace falta *una sola* instancia de
-  infraestructura.
-
-Abajo vamos despacio, con analogías de la vida diaria y luego con la
-empresa de entregas. El nombre del patrón llega *después* de que el
-problema se entienda. Si en tu proyecto el =new= no duele, no tienes
-que usar ninguno.
-
-** El restaurante sigue sirviendo; cambia lo que sale de la cocina
-
-Imagina un restaurante. El mesero toma la comanda y la cocina
-*produce* el plato. El comensal no entra a la estufa a hacer
-=new PastaCarbonara()=. Si mañana el menú cambia de pasta a arroz,
-el mesero sigue tomando comandas. Quien cambia es *quién cocina y
-qué sale*.
-
-En un programa pasa lo mismo. Tienes un trámite —por ejemplo,
-«despachar un paquete»— que valida, cobra y guarda. En la primera
-versión la empresa *solo* tiene camionetas, así que en medio del
-trámite escribes =new EntregaCamioneta()=. Es natural. Un mes después
-piden dron y barco. Entonces el trámite está *lleno* del nombre
-=EntregaCamioneta=. Para añadir dron hay que abrir ese archivo (y el
-panel, y las pruebas). El oficio «despachar» y el oficio «fabricar el
-vehículo» se mezclaron.
-
-#+begin_quote
-Para. Si fueras el mesero, ¿te gustaría que cada vez que la cocina
-cambia el plato te reescriban el bloc de comandas? Eso es lo que
-hace un =new ClaseConcreta= *dentro* del trámite.
-#+end_quote
-
-La idea es sencilla, aunque el nombre asuste: deja el trámite como
-está («despachar») y saca la creación a un *gancho* que alguien
-pueda redefinir. El =new= no desaparece. Se *mueve* a un método tipo
-=crearMedio()=. Una variante «terrestre» devuelve camioneta; una
-«aérea» devuelve dron. Quien usa el trámite no ve la diferencia: le
-dan *algo que sabe entregar*.
-
-#+begin_src java
-public abstract class Logistica {
-    // El gancho: las subclases deciden el vehículo.
-    protected abstract MedioDeEntrega crearMedio();
-
-    // El oficio de verdad: despachar. No nombra camioneta ni dron.
-    public Plan despachar(Pedido pedido, ContextoViaje ctx) {
-        MedioDeEntrega medio = crearMedio();
-        return medio.planear(pedido, ctx);
-    }
-}
-
-public class LogisticaAerea extends Logistica {
-    @Override
-    protected MedioDeEntrega crearMedio() {
-        return new EntregaDron();
-    }
-}
-#+end_src
-
-Eso, en los libros, se llama *Factory Method* (método fábrica). La
-palabra «fábrica» se usa para mil cosas, y por eso hay confusión.
-Tres aclaraciones, sin prisa:
-
-1. Un método que envuelve un =new= (=Pedido.siguienteFolio()=) es
-   solo un *método de creación*. No es este patrón.
-2. Un =MedioFactory.crear("dron")= con un =switch= es una *fábrica
-   simple*: concentra los =new= en un sitio. Suele ser suficiente.
-   No es Factory Method, porque no hay subclases redefiniendo un
-   gancho.
-3. Factory Method es cuando hay una clase con *oficio* (logística,
-   un diálogo, un marco) y las *subclases* cambian el tipo que nace.
-
-Si la empresa tiene una sola moto y no prevé otra, un =new= en un
-sitio claro basta. Si usas Spring y te inyectan el medio, el marco
-ya hizo el trabajo: no dibujes el patrón al lado.
-
-Más adelante, cuando veamos *cómo* planea cada medio, ese objeto que
-acabamos de crear será el que intercambia el comportamiento. Por
-ahora basta con: **el trámite no debería conocer las clases
-concretas por su nombre**.
-
-** El juego de té: las piezas tienen que ser del mismo juego
-
-Piensa en un juego de té. Taza, platito y tetera se venden *juntos*
-porque combinan. Si mezclas la taza floreada con la tetera de metal
-barato, «funciona» para servir, pero el conjunto queda mal. En
-software, a veces varias piezas *tienen* que nacer del mismo mundo:
-si mezclas, el sistema no es que quede feo, es que *falla*.
-
-En la empresa: un envío *nacional* lleva camioneta, manifiesto de
-carretera y etiqueta térmica chica. Un envío *internacional* lleva
-avión, manifiesto de aduana y etiqueta con código de aeropuerto. Si
-armas camioneta + manifiesto de aduana, el paquete se atora. No es
-que falte «un algoritmo». Es que faltó un *kit coherente*.
-
-#+begin_quote
-Para. ¿Pedirías al programador tres =if= sueltos (uno para el medio,
-otro para el papel, otro para la etiqueta) o le pedirías «dame el
-kit nacional» y que *él* sepa qué tres cosas van juntas?
-#+end_quote
-
-Eso es *Abstract Factory* (fábrica abstracta). No devuelve *un*
-objeto. Devuelve una *familia*. Cambiar de nacional a internacional
-es cambiar *de fábrica*, no tocar tres rincones del despacho.
-
-#+begin_example
-Pediste el kit nacional:
-   crearMedio()      → camioneta
-   crearManifiesto() → carretera
-   crearEtiqueta()   → térmica chica
-
-Pediste el kit internacional:
-   crearMedio()      → avión
-   crearManifiesto() → aduana
-   crearEtiqueta()   → código IATA
-#+end_example
-
-Otro ejemplo, fuera de las entregas: el tema claro y el tema oscuro
-de una pantalla. El botón, el campo de texto y el diálogo tienen que
-ser del *mismo* tema. No quieres un botón oscuro con un campo claro.
-
-Cuándo *no* hace falta. Si solo cambia el medio (moto o dron) y el
-manifiesto es siempre el mismo, no hay familia. Una fábrica simple
-basta. Truco que no vale: ponerle =abstract= a una clase con un
-=switch= no la convierte en Abstract Factory. «Abstract» en el nombre
-del patrón habla de *familias*, no de la palabra clave de Java.
-
-Este patrón es fácil de sobreingenierizar. Si no tienes dos kits de
-verdad, no lo uses. En las misiones de este curso casi nunca se pide.
-
-** El sándwich: muchos opcionales, un solo «ya está»
-
-En una sandwichera no gritas quince datos de un golpe al entrar
-(«jamón, no queso, sí tomate, no cebolla, pan integral, …»). Vas
-eligiendo y al final dices «así». El sándwich *no existe* a medias
-en tu mano: existe cuando lo terminan.
-
-Un pedido de mensajería se parece a eso. No es solo origen y destino.
-Hay peso, medidas, seguro sí o no, frágil, fecha límite, «dejar con
-el portero», foto del paquete… Si juntas todo en un constructor,
-sale esto, y nadie sabe qué era el quinto =true=:
-
-#+begin_src java
-new Pedido(o, d, 1.2, true, false, true, fecha, null, "portero", foto);
-#+end_src
-
-O peor: diez constructores casi iguales («telescopio»: cada uno suma
-un parámetro). Cada vez que un campo se vuelve opcional, otro
-constructor.
-
-#+begin_quote
-Para. ¿Preferirías leer quince argumentos en una línea, o una lista
-de frases (=.fragil()=, =.seguro(200)=) y un =.build()= al final que
-diga «si falta el destino, no construyo»?
-#+end_quote
-
-Eso es *Builder* (constructor por pasos). Un objeto auxiliar va
-juntando las piezas. Al final entrega el =Pedido= ya coherente, o
-se niega si falta algo esencial.
-
-#+begin_src java
-Pedido p = new PedidoBuilder()
-    .origen("Roma Nte. 12")
-    .destino("Insurgentes 800")
-    .pesoKg(1.2)
-    .fragil()
-    .seguro(200)
-    .build();
-#+end_src
-
-No lo confundas con las fábricas de arriba. Allí el dilema era *qué
-clase* nace (camioneta o dron, kit nacional o internacional). Aquí
-la clase es una sola (=Pedido=); el dilema es *cómo llenarla* sin
-volverte loco.
-
-Cuándo *no*. Dos o tres campos: =new Pedido(origen, destino, peso)=
-es más claro. Android ya trae =NotificationCompat.Builder=; los ORM
-traen query builders. No inventes un Builder para un formulario de
-tres cajas «porque sale en el libro».
-
-** La fotocopia: a veces copiar es más fiel que volver a llenar
-
-En una oficina hay un formulario de «visita al cliente» ya lleno: la
-ruta, el horario, lo que hay que llevar. El de hoy es *casi* igual;
-solo cambia el nombre. Nadie reescribe todo el formulario a mano:
-saca una fotocopia y corrige el nombre.
-
-En la empresa hay rutas frecuentes: oficina → aeropuerto, dos kilos,
-moto, sin seguro. Cada mañana el operador vuelve a teclear lo mismo.
-Puedes armarlo otra vez (Builder) o *clonar* una plantilla y cambiar
-el destinatario.
-
-Eso es *Prototype* (prototipo): el objeto sabe copiarse. Sirve cuando
-construir desde cero es largo o fácil de equivocarse, y ya tienes un
-ejemplar bueno.
-
-Hay un detalle que en clase se entiende mejor con una analogía. Si
-fotocopias una hoja, la copia es independiente: rayar una no raya la
-otra. Si en cambio pegas un post-it *compartido* en las dos, al
-moverlo se mueve en las dos. En programación: copia *profunda* (todo
-nuevo) frente a copia *superficial* (se comparte una lista por
-dentro). Si clonas un pedido y las dos copias comparten la misma
-lista de paquetes, al borrar un paquete en uno lo borramos en el
-otro sin querer.
-
-#+begin_quote
-Para. Al clonar la ruta de ayer, ¿debería copiarse también el folio
-ya cobrado? (No: ese número es único. Se clona la *ruta*, no el
-cobro.)
-#+end_quote
-
-En JavaScript, =structuredClone= resuelve muchos casos. Un objeto de
-dos campos no necesita este patrón. Un literal claro
-={ origen, destino }= gana.
-
-** Una presidencia, no «el cliente de ahora»
-
-En una ciudad hay *un* ayuntamiento. No hay un ayuntamiento por
-peatón. Eso sí justifica «una sola instancia»: la configuración del
-servidor, el pool de conexiones a la base. Abrir mil conexiones
-porque mil usuarios pidieron un pedido sería un desastre.
-
-El error —muy común— es usar la misma idea para «el pedido que se
-está pintando», «el usuario que inició sesión» o «el carrito». Eso
-no es un recurso único de la máquina. Es el estado de *una persona*
-o de *una petición*.
-
-#+begin_src java
-// Dos pestañas, dos pruebas, dos desastres:
-PedidoActual.getInstance().setFolio("A-1");
-#+end_src
-
-Si el servidor tiene dos máquinas, cada una tendría «su» pedido
-actual y se contradirían. Si quieres probar otro folio, el
-=getInstance()= no te deja. Has escondido un global con nombre de
-patrón.
-
-#+begin_quote
-Para. ¿Esto debe existir una vez en *todo el programa*, o una vez
-*por usuario*? Si es por usuario, no es este patrón. Pásalo como
-parámetro o guárdalo en la sesión / en el ViewModel.
-#+end_quote
-
-Los libros lo llaman *Singleton*. Hoy casi nunca hay que escribirlo
-a mano. Spring (=@Component=), un módulo de JavaScript o la inyección
-en Android ya te dan un único objeto de infraestructura. Copiar el
-diagrama de 1994 con =getInstance()= y candados para hilos, *al lado*
-del marco, es diseñar dos veces.
-
-Además junta dos oficios: «crearse una sola vez» y «ser el punto al
-que todo el mundo llama». Por eso cuesta probarlo y por eso el código
-empieza a conocerse demasiado.
-
-** Cómo elegir, sin memorizar la lista
-
-Antes de seguir a *cómo se entrega* un paquete, quédate con esto:
-
-| Lo que te está pasando | Por dónde ir | Qué no hacer |
-|------------------------+--------------+--------------|
-| El trámite nombra =EntregaCamioneta= | Mover el =new= (fábrica simple o Factory Method) | Llenar el método de =if= de clases |
-| Nacional e internacional son *kits* | Abstract Factory | Tres =if= sueltos; o Abstract Factory «por si acaso» |
-| El constructor tiene quince parámetros | Builder | Otro constructor más |
-| Todos los días teclean la misma ruta | Prototype (plantilla) | Clonar el folio cobrado |
-| Hace falta un pool o una config | El Singleton *del marco* | =PedidoActual.getInstance()= |
-
-No se apilan los cinco. Empieza por el =new= que de verdad duele. Si
-no duele ninguno, un constructor normal es diseño adulto, no pobreza
-de patrones.
-
-#+begin_quote
-Un compañero, con tres campos y una sola motocicleta, pone Abstract
-Factory + Builder + Singleton. ¿Qué dejarías?
-
-Un =new Pedido(origen, destino, peso)=. Si acaso,
-=crear("moto")=. El resto es ceremonia.
-#+end_quote
-
-En la plataforma ya apareció *quién hace el new*. Aquí se profundiza
-en los creacionales. El mapa de los 23 —con los estructurales y de
-comportamiento— está *arriba*, en *Catálogo GoF*.
-
 * Patrones de software para aplicaciones web
 :PROPERTIES:
 :CUSTOM_ID: patrones-web
@@ -2584,6 +1666,179 @@ confirma; Observer avisa.
 11. Tras =POST /pedidos=, ¿por qué redirigir a un =GET=?
 12. Al rotar el teléfono se pierde el pin del mapa: ¿qué falló?
 
+* Apéndice: catálogo GoF (consulta)
+
+GoF cataloga *23* patrones. Algunos catálogos didácticos (p. ej.
+Refactoring Guru) muestran *22* y dejan Interpreter fuera: no es que
+«falte uno», es que casi nunca se necesita un DSL propio.
+
+Reconocer la *familia* importa más que memorizar cada diagrama. Cada
+ficha se lee: ¿cuándo?, ¿por qué no el vecino?, ¿el marco ya lo trae?,
+¿aparece en *esta* plataforma de entregas o sería forzarla?
+
+Estos apuntes *desarrollan* Strategy, Factory Method (y la fábrica
+simple), Adapter, Facade, Observer y Chain of Responsibility, más
+patrones de aplicación web que *no* son GoF (Front Controller,
+Repository, Service Layer, Unit of Work, BFF, Circuit Breaker,
+idempotencia). El resto del catálogo está aquí para *no confundirlo*
+y para no reinventar lo que el lenguaje ya hace.
+
+** Creacionales
+
+| Patrón           | Cuándo y por qué                                         | No usarlo                                   | Ya lo trae                                    |
+|------------------+----------------------------------------------------------+---------------------------------------------+-----------------------------------------------|
+| Factory Method   | El creador usa el producto; las *subclases* eligen el tipo | Un solo tipo; o basta un =switch= concentrado | DI de Spring; en JS a menudo una función      |
+| Abstract Factory | Familias que combinan (tema claro/oscuro)                | Un objeto aislado                           | Temas de Flutter y de CSS                     |
+| Builder          | Muchos pasos u opciones                                  | Dos o tres campos                           | =NotificationCompat.Builder=, query builders    |
+| Prototype        | Clonar es más fiel que construir                         | Un literal es más claro                     | =structuredClone=, =copy=                         |
+| Singleton        | Un punto de acceso a *infraestructura* (pool, config)      | Sesión, carrito, «el pedido en curso»       | Contenedor de DI; módulo ES. *No* escribir otro |
+
+** Estructurales
+
+| Patrón | Cuándo y por qué | No usarlo | Ya lo trae |
+|--------+------------------+-----------+------------|
+| Adapter | Una API *ajena* no coincide con el dominio | Se controlan ambos lados | Convertidores JSON. Ojo: =RecyclerView.Adapter= es *otro* uso de la palabra |
+| Bridge | Varían a la vez abstracción e implementación | Solo varía un lado | Raro en un CRUD |
+| Composite | Árbol hoja/grupo con el mismo trato | Lista plana | DOM; widgets de Flutter |
+| Decorator | Añadir comportamiento sin copiar el núcleo | Un =if= único basta | Middleware; interceptores OkHttp |
+| Facade | Simplificar un subsistema *propio* | Delegar a un solo método | Servicio de aplicación. *No* es Adapter. Las «Facades» de Laravel son otra cosa |
+| Flyweight | Miles de objetos con estado compartible | Pocas instancias | Celdas de lista; caché de fuentes |
+| Proxy | Controlar acceso (caché, remoto, seguridad) | No hay política | CDN; carga perezosa del ORM |
+
+** Comportamentales
+
+| Patrón | Cuándo y por qué | No usarlo | Ya lo trae |
+|--------+------------------+-----------+------------|
+| Chain of Responsibility | Varios manejadores en orden (auth, bitácora) | Un solo manejador | Middleware de Express, Django, Laravel |
+| Command | La acción se reifica (cola, deshacer, fondo) | Un botón que llama a un método | WorkManager; acciones de Redux |
+| Iterator | Recorrer sin exponer la representación | Nunca se escribe sobre un arreglo | =for...of=, cursores |
+| Mediator | Evitar que todos se conozcan entre todos | El mediador se vuelve God Object | Coordinator de navegación |
+| Memento | Capturar y restaurar un estado interno | Reasignar un campo basta | Deshacer de un editor |
+| Observer | Varios interesados sin que el sujeto los importe | Un solo llamador; o atomicidad (ahí va la transacción) | =StateFlow=, eventos del DOM, BLoC |
+| State | El comportamiento cambia según una fase | Un par de =if= estables | =UiState=; tipos sellados |
+| Strategy | Familia de algoritmos intercambiables | Un solo algoritmo | Interfaz+DI en Java; función en JS |
+| Template Method | Esqueleto fijo, pasos variables | Clase base de miles de líneas | =onCreate= de Android; =setUp= de JUnit |
+| Visitor | Nueva operación sobre una jerarquía *sin* abrir cada clase | Un =export= único | Informes raros; no el CRUD |
+| Interpreter | Un lenguaje pequeño de reglas | Un =if= o un parser que ya existe | No inventar un DSL de rutas |
+
+** El catálogo en la plataforma de entregas
+
+| Patrón | ¿Qué problema *de este dominio* podría ser? | ¿Forzar? |
+|--------+---------------------------------------------+----------|
+| Strategy | Planear camioneta / moto / dron | No, si hay varios medios |
+| Factory Method | =LogisticaTerrestre= vs =LogisticaAerea= crean el medio | Sí, si basta =crear("dron")= |
+| Adapter | JSON =route_hint= → =Sugerencia= | No, si el proveedor es ajeno |
+| Facade / Service Layer | =registrarPedido()= | No, si hay orquestación |
+| Observer | =PedidoActualizado= tras el =COMMIT= | No, si hay varios canales |
+| CoR / middleware | Sesión y bitácora en todas las rutas | No, si se copia en cada PHP |
+| Decorator | Seguro, firma o frágil *encima* del mismo plan | Sí, si un =if= de extra basta |
+| Proxy | Caché del geocoder o mapa perezoso | Sí, si no hay política de acceso |
+| Command | «Reintentar cobro» en cola *offline* | Sí, si el botón solo llama un método |
+| State | =CREADO= → =EN_CAMINO= → =ENTREGADO= | Sí, si son dos =if= estables |
+| Singleton | Pool de conexiones, no «el pedido en curso» | Casi siempre: usa el contenedor |
+| Builder | Pedido con muchos opcionales | Sí, si hay tres campos |
+| Composite | Palé / caja de cajas con el mismo trato | Sí, si la lista de paquetes es plana |
+| Abstract Factory | Familia medio+manifiesto+etiqueta del mismo «tema» | Sí, si solo varía el medio |
+| Bridge / Flyweight / Visitor / Memento / Interpreter | Casi nunca en este curso | Sí, salvo un problema *concreto* |
+
+La palabra «fábrica» es ambigua: más abajo se distingue método de
+creación, fábrica simple y Factory Method.
+
+** Vecinos que se confunden (ficha corta)
+
+No se desarrollan como Strategy. Sirven para *descartarlos* con
+criterio. Intuición → síntoma → cuándo no.
+
+*** Singleton
+
+*Problema.* Quieres *una* instancia de infraestructura (configuración,
+pool). *Síntoma.* =Sesion.getInstance()= como carrito o como «el
+pedido que se pinta». *Idea.* Un acceso global controlado. *Cuándo
+no.* Estado de usuario, de petición o de UI. Enmascarar acoplamiento
+(todo el mundo importa el Singleton). Dificulta pruebas. El contenedor
+de DI o un módulo ES *ya* dan un único objeto de infra: no escribas
+otro.
+
+*** Decorator
+
+*Problema.* Quieres *añadir* comportamiento (seguro, frágil, bitácora)
+sin copiar =EntregaDron= ni hincharla de =if=. *Síntoma.* Subclases
+=DronConSeguro=, =DronFragilConSeguro=. *Idea.* Envolver el mismo
+contrato: el decorador *es* un =MedioDeEntrega= que delega y suma.
+*No es Strategy:* Strategy *sustituye* el algoritmo; Decorator *apila*
+capas. *No es Proxy:* Proxy controla *acceso*; Decorator añade
+responsabilidad. Un extra único y estable: un =if=.
+
+*** Proxy
+
+*Problema.* Hay una *política* al usar un objeto caro o remoto (caché
+del mapa, carga perezosa, permiso). *Síntoma.* El caso de uso llama
+al geocoder en crudo en diez sitios. *No es Adapter:* el contrato
+suelo ser *el mismo*, no se traduce un idioma ajeno.
+
+*** Command
+
+*Problema.* La *solicitud* debe viajar (cola, deshacer, trabajo en
+fondo): «cobrar este folio cuando haya red». *Síntoma.* La Activity
+hace el =POST= y se pierde si el proceso muere. *No es Strategy:* no
+eliges *cómo* planear; reificas *qué hacer*. WorkManager / un job ya
+lo realizan.
+
+*** State
+
+*Problema.* El *mismo* objeto responde distinto según la *fase*
+(=CREADO= no se puede entregar; =EN_CAMINO= sí puede actualizar ETA).
+*Síntoma.* =switch (pedido.estado)= enorme *dentro* de =Pedido=.
+*No es Strategy:* Strategy no depende de que el pedido «haya
+promovido de fase». Dos estados estables: =if=.
+
+*** Template Method
+
+*Problema.* Un esqueleto fijo (=despachar=: crear medio, planear,
+persistir) con *pasos* que las subclases rellenan. Factory Method
+*es* a menudo un paso de ese esqueleto (=crearMedio=). *Cuándo no.*
+Una clase base de mil líneas que «ya trae todo». Preferir composición
+(Strategy) si no hay esqueleto claro.
+
+*** Builder, Composite, Mediator (una línea cada uno)
+
+- *Builder:* armar un =Pedido= con muchos opcionales; no para dos
+  campos.
+- *Composite:* un envío que contiene envíos (palé) con el mismo
+  =planear=; no una lista plana de paquetes.
+- *Mediator:* mapa, chat y panel no deben llamarse todos entre todos;
+  el mediador no debe volverse God Object.
+
+*** Lo que este curso no pide implementar
+
+Bridge, Flyweight, Prototype, Abstract Factory, Visitor, Memento,
+Interpreter. Si salen en un diagrama: familia + «¿qué problema de
+*este* código?» + «¿el lenguaje ya lo trae?». No se agregan para
+que el proyecto «se vea completo».
+
+
+** Referencias
+
+- Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides. /Design Patterns/.
+- Martin Fowler. /Patterns of Enterprise Application Architecture/.
+- Frank Buschmann et al. /Pattern-Oriented Software Architecture/.
+- Michael T. Nygard. /Release It!/
+- Christopher Alexander. /A Pattern Language/.
+- Guías de Android, SwiftUI y Flutter.
+- Refactoring Guru. Catálogo de patrones de diseño (clasificación,
+  crítica, fichas y comparación de fábricas).
+  https://refactoring.guru/es/design-patterns
+
+#+begin_quote
+*La pregunta que conviene llevarse:*
+
+«Si mañana cambia esto, ¿qué parte de mi código tendría que modificar?»
+
+Si la respuesta es «demasiadas cosas», hay un problema de diseño.
+Si además ese problema se repite, probablemente exista un patrón que
+ayude a enfrentarlo.
+#+end_quote
+
 * IA, caso integrador y ejercicios de razonamiento
 
 ** Uso de IA en el diseño de software
@@ -2841,11 +2096,6 @@ revisión cubre el conjunto del relato.
 
 *** El problema
 
-El relato de la plataforma —páginas sueltas, Excel, tres APIs y las
-cosas a tomar en cuenta— está al inicio, en *La empresa de entregas
-(el problema del semestre)*. Aquí se retoma para las misiones: no es
-otro enunciado.
-
 Una empresa de mensajería centraliza pedidos (origen, destino, peso,
 dimensiones, urgencia, fecha límite) y asigna cómo se entregan.
 Hoy el proceso está repartido en páginas sueltas, un Excel de rutas y
@@ -2885,7 +2135,7 @@ tres APIs de mensajería distintas.
    pedido existente y generar un archivo.
 
 Antes de implementar, el equipo justifica por escrito (no basta
-enumerar): el cliente *es* web y móvil (panel y app); backend y lenguaje, marco,
+enumerar): frontend (web, móvil o ambas), backend y lenguaje, marco,
 tipo de API, base de datos, autenticación, cómo se engancha la IA y
 los mapas, si hace falta tiempo real y con qué, organización del
 código, pruebas y despliegue.
