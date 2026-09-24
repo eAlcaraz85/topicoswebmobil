@@ -1073,16 +1073,32 @@ tiene el idioma ajeno en el corazón del trámite.
 
 ** Quién hace el =new=
 
-Strategy nos dio =MedioDeEntrega=, pero alguien sigue haciendo
-=new EntregaDron()= en el panel, en la app y en las pruebas. El
-acoplamiento volvió por la puerta de atrás.
+Strategy ya nos dio =MedioDeEntrega=: camioneta, moto, bici y dron
+responden la misma pregunta de formas distintas. Eso resuelve *cómo
+se planea* la entrega. No resuelve *quién construye* el objeto.
 
-#+begin_quote
-Para. ¿Strategy elige el *algoritmo* o *construye* el objeto? (El
-algoritmo.) Entonces, ¿quién debería conocer las clases concretas?
-#+end_quote
+En el panel, en la app y en las pruebas alguien sigue escribiendo
+=new EntregaDron()=. El día que el dron se sustituye por un barco hay
+que abrir otra vez tres sitios. El acoplamiento volvió por la puerta
+de atrás: ahora no por el algoritmo, sino por el =new=.
 
-*** Lo que casi siempre basta: una fábrica simple
+Strategy elige el comportamiento. No fabrica el objeto. Entonces hay
+que preguntar con claridad: ¿quién tiene permiso de conocer las clases
+concretas =EntregaDron=, =EntregaMotocicleta= y =EntregaCamioneta=?
+Quien planea no debería ser esa persona. Quien pinta la pantalla
+tampoco, si se puede evitar.
+
+Hay dos respuestas habituales. La más corta se llama *fábrica
+simple*. La del libro GoF se llama *Factory Method*. Las dos mueven
+el =new=. No son el mismo patrón.
+
+*** Una fábrica simple (casi siempre alcanza)
+
+Una fábrica simple es una clase o una función cuyo único trabajo es
+crear el medio a partir de un dato (un string, un enum, lo que haya
+dicho la IA). Concentra todos los =new= en un solo lugar. El
+=switch= no desaparece: se junta para no repetirlo en el panel, en la
+app y en las pruebas.
 
 #+begin_src java
 public class MedioFactory {
@@ -1096,61 +1112,99 @@ public class MedioFactory {
 }
 #+end_src
 
-El =switch= *no desaparece*: se *concentra*. =Despacho= no debería
-llamar a esto por dentro (mezclaría planear con elegir tipo). Quien
-orquesta =registrarPedido= pide el objeto y se lo pasa al despacho.
+=Despacho= no debería llamar a =crear= por dentro. Si lo hace, vuelve
+a mezclar *planear* con *elegir el tipo*. Quien orquesta
+=registrarPedido= pide el objeto a la fábrica y se lo pasa al
+despacho ya listo.
 
-En JavaScript, =crearMedio(tipo)= *es* esa fábrica. Muchas misiones de
-=POST /pedidos= piden *esto*. Aún no es el patrón GoF.
+En JavaScript basta una función =crearMedio(tipo)=. En muchas
+misiones de =POST /pedidos= esto es exactamente lo que hace falta. Es
+útil y es honesto. Todavía *no* es Factory Method: no hay una clase
+base con un trámite y subclases que redefinen la creación.
 
-*** Cuándo sí es Factory Method
+*** Factory Method: qué es
 
-La primera versión de logística *era* camioneta: =despachar= hacía
-=new EntregaCamioneta()= y además cobraba, validaba, persistía. Pedir
-barco y dron obliga a abrir *el trámite*.
+Factory Method es un patrón *creacional*. Sirve cuando una clase ya
+tiene un oficio claro (despachar, registrar, cobrar) y, en medio de
+ese oficio, aparece un =new= de una clase concreta. Ese =new= obliga
+a abrir el trámite cada vez que nace un producto nuevo.
 
-El oficio de =Logistica= es *despachar*, no fabricar vehículos. Se
-deja un gancho =crearMedio()= y las subclases eligen el producto. El
-=new= no desaparece: se *mueve*.
+La idea es dejar el oficio en una clase base y sacar la creación a un
+método que las subclases pueden redefinir. Ese método es el *factory
+method*: un gancho cuyo trabajo es devolver un objeto del contrato
+(=MedioDeEntrega=), no ejecutar el trámite. El =new= no desaparece.
+Se muda a la subclase que sí debe saber si el producto es un dron o
+una camioneta.
+
+En un restaurante el mesero toma la comanda, cobra y sirve. No entra
+a la estufa a construir el plato. Si mañana el menú cambia de pasta a
+arroz, el bloc de comandas sigue igual. Quien decide el plato es la
+cocina, y puede haber cocinas distintas. Eso es Factory Method en la
+vida diaria: el servicio no nombra el producto concreto; un gancho
+elige qué nace.
+
+En la plataforma el oficio de =Logistica= es *despachar*: validar,
+pedir un medio y planear. La primera versión era solo camioneta, así
+que =despachar= hacía =new EntregaCamioneta()= y de paso cobraba y
+guardaba. Pedir barco y dron obliga a abrir *ese* trámite. El arreglo
+es dejar un gancho =crearMedio()=. =LogisticaTerrestre= devuelve
+camioneta. =LogisticaAerea= devuelve dron. Quien llama a
+=despachar= no ve la diferencia: recibe un plan.
 
 #+begin_example
 Logistica.despachar(pedido)
         │
-        ├── crearMedio()          ← esto lo cambian las subclases
+        ├── crearMedio()          ← las subclases eligen el producto
         │         ↓
-        └── medio.planear(...)    ← el trámite USA el producto
+        └── medio.planear(...)    ← el trámite usa el producto, no lo fabrica
 #+end_example
 
 #+begin_src java
 public abstract class Logistica {
+    // El gancho: las subclases deciden el vehículo.
     protected abstract MedioDeEntrega crearMedio();
 
+    // El oficio de verdad. No nombra camioneta ni dron.
     public Plan despachar(Pedido pedido, ContextoViaje ctx) {
-        return crearMedio().planear(pedido, ctx);
+        MedioDeEntrega medio = crearMedio();
+        return medio.planear(pedido, ctx);
     }
 }
 
 public class LogisticaAerea extends Logistica {
-    @Override protected MedioDeEntrega crearMedio() {
+    @Override
+    protected MedioDeEntrega crearMedio() {
         return new EntregaDron();
     }
 }
 #+end_src
 
-El cliente elige *qué logística* instanciar (configuración), y a
-partir de ahí habla de la clase base.
+El programa elige *qué logística* instanciar (un archivo de
+configuración, el contenedor, una línea al arrancar). A partir de ahí
+habla de =Logistica=, no de =EntregaDron=.
 
-Ojo con los nombres: un método estático =crear= no es Factory Method
-(no se redefine en subclases). Declarar =abstract class MedioFactory=
-con un =switch= no es Abstract Factory. Abstract Factory es para
-*familias* que deben combinar (medio + manifiesto + etiqueta del mismo
-«tema»). Si solo varía el medio, es ceremonia.
+Cuándo sí hace falta esta forma y no la fábrica simple: cuando hay
+*familias de trámite* que comparten el mismo esqueleto y solo cambia
+el producto (logística terrestre frente a aérea, alta nacional frente
+a internacional). Si lo único que varía es un string =tipo=,
+=MedioFactory.crear("dron")= es más corto y más claro.
 
-Spring a menudo *inyecta* =MedioDeEntrega=: no dupliques Factory Method
-al lado del contenedor.
+Qué no es Factory Method. Un método estático =crear(String tipo)= no
+lo es, porque no se redefine en subclases: eso es la fábrica simple
+de arriba. Una clase =abstract class MedioFactory= llena de
+=switch= tampoco es Abstract Factory. Abstract Factory sirve cuando
+tienen que nacer *varias piezas del mismo juego* (medio, manifiesto y
+etiqueta nacionales, o las tres internacionales). Si solo varía el
+medio, montar Abstract Factory es ceremonia.
+
+Si usan Spring (o un contenedor parecido) y el marco ya inyecta
+=MedioDeEntrega=, no construyan Factory Method al lado. El contenedor
+ya está eligiendo la clase concreta. Duplicar el patrón es diseñar
+dos veces.
 
 #+begin_quote
-¿Qué problema estoy resolviendo y qué complejidad acepto a cambio?
+Para. ¿Strategy elige el algoritmo o construye el objeto? ¿Y Factory
+Method, entonces, qué pregunta responde?
 #+end_quote
 
 ** Una puerta al trámite (Facade)
@@ -2828,7 +2882,10 @@ mínimo que resolvería el problema *actual*.
 :CUSTOM_ID: actividades
 :END:
 
-Las actividades se resuelven por escrito a partir de los apartados teóricos de la unidad.
+Las actividades se resuelven a partir de los apartados teóricos de la
+unidad. Las misiones de abajo son análisis escrito. El bloque *Cinco
+días* es trabajo autónomo: estudiar, pensar e *implementar* el
+enunciado en web (Django).
 
 ** Misiones: patrones de software para aplicaciones web
 :PROPERTIES:
@@ -3198,6 +3255,165 @@ Al final de =index.php=, tras pintar, el servidor hace una serie de =file_get_co
 | El botón pide no recargar; no hay clave | =pagar1.php= | 5 | Idempotencia sobre el pago. No es GoF |
 | Diez o más =file_get_contents= al pintar el inicio | =index.php=, =index1.php= | 6 | Agregación (BFF o un =GET= de pantalla). No Factory |
 | Diagrama =Estudiantes_V2= y XML; el SQL y el PHP usan =perfiles= / =usuarios_sys= / =historial_academico= | =documentacion/=, =bd/=, login y kardex | — | El modelo del papel no es el del programa; lava flow, no un patrón de pago |
+
+** Cinco días — Estudiar, pensar e implementar (sin clase)
+
+Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
+implementa el enunciado de *La empresa de entregas* como aplicación
+*web*, leyendo *Patrones de software para aplicaciones web*. El marco
+recomendado es *Django*: ya trae portería, middleware, plantillas y
+ORM. Si el equipo justifica por escrito otro marco (Laravel, Spring,
+Express), vale; lo que no vale es copiar un proyecto listo ni
+reimplementar el diagrama GoF *al lado* de lo que Django ya instancia.
+
+El cliente del semestre es *web y móvil*. En estos cinco días el
+alcance obligatorio es: panel web + un =GET= JSON del mismo pedido
+(para que la app exista como contrato, aunque la app aún no se
+programe). No se pide Event Sourcing, ni Redux, ni un PDF con CQRS.
+
+No se les entrega el código de la plataforma. Lo escriben ustedes.
+Las definiciones están en los apuntes (Strategy, Adapter, quién hace
+el =new=, Front Controller, Template View, Service Layer, PRG,
+transacción). Un asistente de IA puede explicar; no puede ser el
+autor del diseño: cada decisión se justifica con una fuerza *de este*
+relato.
+
+Entrega al volver (un repo o una carpeta por equipo):
+
+- código que arranca;
+- un =README= de una página (cómo correrlo y qué patrón cubre cada
+  conflicto);
+- las notas escritas de cada día (pueden ir en =notas/=).
+
+*** Día 1 — Estudiar el caso web (sin código de dominio)
+
+Lectura obligatoria, en este orden:
+
+1. *La empresa de entregas* y *Cosas a tomar en cuenta*.
+2. *Patrones de software para aplicaciones web*, hasta *Ejemplo de
+   análisis: registrar un pedido (y cobrar)*.
+3. En Django, qué pieza ya es Front Controller, middleware, plantilla
+   y vista (la documentación corta del propio marco basta).
+
+Por escrito, una tabla. No pongan «MVC» como respuesta de un renglón.
+
+| # | Inconveniente del enunciado | Qué *ya trae* Django | Qué tendremos que escribir nosotros | Qué *no* vamos a copiar del libro |
+|---+-----------------------------+----------------------+-------------------------------------|-----------------------------------|
+| 1 |                             |                      |                                     |                                   |
+| … |                             |                      |                                     |                                   |
+| 7 |                             |                      |                                     |                                   |
+
+Al final del día: tres renglones. ¿=urls.py= es Front Controller, Page
+Controller, o el camino hacia los dos? ¿La plantilla Jinja/Django
+puede hacer =SELECT=? ¿Por qué sí o por qué no?
+
+*** Día 2 — Pensar el primer corte y arrancar Django
+
+Objetivo: que exista el proyecto y *una* petición, todavía sin los
+cuatro medios ni la IA.
+
+1. Crear el proyecto Django. Una app, por ejemplo =entregas=.
+2. Recursos: =POST /pedidos= da de alta (aunque sea a mano, sin IA);
+   =GET /pedidos/<id>= muestra seguimiento. Tras el POST, *redirigir*
+   al GET (PRG). Recargar no debe crear otro folio.
+3. La vista (Page Controller) queda delgada: llama a algo con nombre
+   de trámite, p. ej. =registrar_pedido(...)=. No pongan el
+   =switch= de camioneta en la vista. No pongan SQL en la plantilla:
+   el contexto llega *ya listo* (folio, estado, un ETA de mentira
+   vale hoy).
+
+Por escrito: el camino de =POST /pedidos= como en el ejemplo de
+análisis de los apuntes, pero con *nombres de Django* (middleware,
+=urls=, vista, servicio, plantilla). Marquen qué línea *no* es GoF
+porque el marco ya la instancia.
+
+Al final del día el servidor levanta y se ve un pedido. Feo vale;
+mezclar sesión, SQL y medios en la vista no.
+
+*** Día 3 — Strategy, Adapter y quién hace el =new=
+
+Objetivo: el inconveniente 2 del enunciado, con las definiciones de
+*Los problemas de esta plataforma* (no con un ejemplo ajeno
+terminado).
+
+1. Contrato =MedioDeEntrega.planear(pedido, contexto) → plan= y una
+   clase (o función) por medio: camioneta, motocicleta, bicicleta,
+   dron. Eso es Strategy. Un =if= de dos casos estables no sustituye
+   a cuatro medios que van a crecer.
+2. Un proveedor *falso* de IA que devuelve JSON con =route_hint= y
+   =score= (no hace falta pagar OpenAI). Otro camino, aunque sea un
+   string XML con =vehicle=. El dominio solo entiende
+   =Sugerencia(medio, motivo)=. Eso es Adapter. Si =route_hint=
+   aparece en la vista o en el =planear=, el idioma ajeno se coló.
+3. Quien hace el =new=: con el string que ya vino en la sugerencia,
+   una *fábrica simple* =crear("dron")= es lo esperado. Factory Method
+   (=LogisticaAerea.crearMedio=) solo si tienen *familias de trámite*
+   que redefinen el gancho; no lo monten para disfrazar el =switch=.
+
+=registrar_pedido= orquesta: Adapter → crear medio → Strategy. La
+vista sigue sin conocer =EntregaDron=.
+
+Por escrito: una frase por patrón (qué inconveniente, qué vecino no
+es). Si usaron Factory Method, justifiquen por qué no bastaba la
+fábrica simple.
+
+*** Día 4 — Plantilla limpia, transacción e IA caída
+
+Objetivo: inconvenientes 3, 4 y 6, con lo que ya dice el capítulo
+web.
+
+1. La plantilla de seguimiento *pinta* mapa (aunque sea un recuadro) y
+   ETA. No consulta la base. Si hay un reporte, no copia las mismas
+   consultas dentro de otro HTML: reutiliza el trámite que ya armó los
+   datos.
+2. Alta de pedido (y un cobro *simulado* si les da tiempo) dentro de
+   =transaction.atomic=. El aviso (correo o un =print= / señal) va
+   *después* de que la transacción confirmó. Si el aviso falla, el
+   pedido *sí* quedó. Observer no sustituye la transacción.
+3. El colaborador de IA se puede apagar (un flag, un timeout, un
+   error a propósito). =GET /pedidos/<id>= de un folio *ya guardado*
+   sigue respondiendo. La rueda infinita mientras la IA no habla no
+   es diseño.
+
+Por escrito: qué harían si el cliente pulsa dos veces «crear» (PRG y,
+   si hay dinero de mentira, idempotencia). No pidan Event Sourcing
+   para esto.
+
+*** Día 5 — El mismo pedido en JSON y la defensa
+
+Objetivo: inconveniente 5 (el panel y la app no tienen la misma
+hambre) y poder explicar el repo sin el docente al lado.
+
+1. El mismo folio: HTML en el panel y =GET /api/pedidos/<id>= con
+   JSON mínimo (=folio=, =estado=, =eta=). No hagan doce consultas
+   para armar el inicio. Un recurso de agregación basta para esta
+   semana.
+2. =README=: cómo se corre; Django qué patrón *ya traía* y ustedes
+   *no* reescribieron; qué archivo es Adapter, Strategy y el
+   trámite; qué se rechazó (punto 7 del enunciado).
+3. Ensayo de tres minutos (grabado o apuntes): «si mañana hay
+   triciclo, ¿cuántos archivos abrimos?». Si la respuesta es «la
+   vista, el XML y el =registrar=», el día 3 no quedó.
+
+No hace falta la app nativa estos cinco días. Sí hace falta que el
+JSON exista: el semestre ya pidió web *y* móvil.
+
+#+begin_quote
+No se califica cuántos nombres del catálogo aparecen en el repo. Se
+califica si el inconveniente del enunciado se ve en el código, si
+Django se usó como marco y no como disfraz, y si supieron no
+implementar lo que no hacía falta.
+#+end_quote
+
+*** Pauta mínima al volver
+
+| Día | Se espera ver                                                              |
+|-----+----------------------------------------------------------------------------|
+|   1 | Tabla de los siete inconvenientes atada a Django                           |
+|   2 | =POST /pedidos= + PRG + vista delgada                                        |
+|   3 | Strategy + Adapter + =new= fuera de la vista                                 |
+|   4 | Plantilla sin SQL; transacción; pedido guardado si la IA falla             |
+|   5 | JSON del mismo folio; README; saber decir que no al PDF con Event Sourcing |
 
 * Cierre
 
