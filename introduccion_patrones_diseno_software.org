@@ -2057,499 +2057,1459 @@ En la plataforma ya apareció *quién hace el new*. Aquí se profundiza
 en los creacionales. El mapa de los 23 —con los estructurales y de
 comportamiento— está *arriba*, en *Catálogo GoF*.
 
-* Patrones de software para aplicaciones web
-:PROPERTIES:
-:CUSTOM_ID: patrones-web
-:END:
+* Patrones de Diseño en Aplicaciones Web y Móviles
 
-Un patrón web no es una clase especial de GoF. Es un patrón —de
-presentación, de dominio, de datos o de integración— *cuyas fuerzas las
-pone HTTP*: cliente y servidor no comparten memoria; cada petición se
-interpreta por sí misma salvo que el diseño añada sesión o token; la
-red puede fallar a medias; hay varios clientes sobre el mismo dominio.
+** Introducción
 
-** Un proyecto no tiene un patrón: tiene una composición
+Cuando desarrollamos una aplicación web o móvil aparecen problemas que
+se repiten constantemente.
 
-Preguntar «¿cuál es el patrón de esta aplicación?» confunde el sistema
-con una de sus colaboraciones. En un mismo pedido pueden convivir Strategy (cómo se entrega),
-Factory (quién crea el medio), Adapter (la IA) y Observer (el estado).
-El caso de uso *los emplea*; no «es» ninguno.
+Por ejemplo:
 
-La petición HTTP típica atraviesa una cadena de estructuras:
+- ¿Cómo separar la interfaz de usuario de la lógica del sistema?
+- ¿Cómo cambiar un algoritmo sin modificar todo el programa?
+- ¿Cómo reaccionar cuando cambia cierta información?
+- ¿Cómo crear diferentes objetos sin llenar el código de condicionales?
+- ¿Cómo conectar nuestro sistema con una API externa?
+- ¿Cómo organizar una aplicación que empieza a crecer?
 
-#+begin_example
-Cliente (MVC / MVVM)
-    ↓
-Borde (Gateway, BFF, caché)     —solo si hace falta—
-    ↓
-Front Controller
-    ↓
-Middleware (sesión, bitácora)
-    ↓
-Controlador delgado
-    ↓
-Service Layer
-    ↓  Strategy, Factory, Adapter
-Repository + Unit of Work
-    ↓
-COMMIT → Observer (cliente, repartidor, estadísticas)
-#+end_example
+Muchos de estos problemas ya han sido estudiados anteriormente.
 
-| Capa                     | Pregunta                                      | Familia                         |
-|--------------------------+-----------------------------------------------+---------------------------------|
-| Presentación cliente     | ¿Quién posee el estado de la UI?              | MVC, MVVM, Observer de DOM      |
-| Presentación servidor    | ¿Quién recibe y quién pinta?                  | Front Controller, Template View |
-| Políticas transversales  | ¿Dónde viven sesión, CORS, bitácora?          | Cadena / middleware             |
-| Aplicación / dominio     | ¿Dónde está el trámite, sin HTTP?             | Service Layer, Strategy         |
-| Datos                    | ¿Cómo se persiste de forma coherente?         | Repository, Unit of Work        |
-| Integración              | ¿Cómo se habla con otros y se tolera el fallo? | Adapter, BFF, Circuit Breaker   |
-
-El Observer del DOM no es el Observer de dominio. Hay que nombrar *la
-capa* además del patrón.
-
-** Cuándo no componer
-
-Un patrón es solución a un problema que *ya existe* (o se prevé con
-fundamento). Acumular hexagonal, CQRS, Event Sourcing y BFF sobre un
-CRUD de tres pantallas no es madurez: es ceremonia (Golden Hammer +
-YAGNI). La pregunta útil no es «¿cuántos patrones tiene el proyecto?».
-
-** Fuerzas que impone la web
-
-| Fuerza                    | Implicación                                                         |
-|---------------------------+---------------------------------------------------------------------|
-| HTTP sin estado           | Un Singleton de proceso no es el estado del usuario                 |
-| Cliente ≠ servidor        | Validar en el navegador no sustituye al servidor                    |
-| Representación separable  | El mismo recurso admite HTML o JSON                                 |
-| Fallo parcial y latencia  | Tiempo de espera y degradación, no espera infinita                  |
-| Evolución de la API       | Idempotencia y contratos estables                                   |
-| Varios nodos              | El estado mutable global de proceso no es fuente de verdad          |
-
-** El marco congela el diseño web
-
-| Marco                    | Qué usar, no reescribir                                              |
-|--------------------------+----------------------------------------------------------------------|
-| Spring MVC               | =DispatcherServlet=; =@Component=; filtros; =@Transactional=         |
-| Express                  | =app=; =app.use= / =next=                                            |
-| Laravel / Django / Rails | Kernel y rutas; Blade/Jinja; ORM (Active Record ≠ Repository)        |
-| React / Vue              | El estado del *toolkit* como Observer; no un bus paralelo            |
-
-Si la plataforma se sirve con Express, autenticación y bitácora son
-middleware. Si se sirve con Spring, filtros. No se añade una cadena
-GoF casera *junto* a la del marco.
-
-** Presentación en el servidor
-
-*** Front Controller y Page Controller
-
-*Nivel 1.* Un edificio con una portería frente a cada oficina con su
-propio portero. Si cambia el horario de visita, en el segundo caso
-toca cuarenta puertas.
-
-*Síntoma.*
-
-#+begin_example
-index.php     → sesión + bitácora + encabezado
-pedidos.php   → sesión + bitácora + encabezado
-pagos.php     → sesión + bitácora + encabezado
-#+end_example
-
-*Después.* Una entrada. El frontal *dirige*. El Page Controller es el
-piso: este trámite (=POST /pedidos=).
-
-#+begin_example
-HTTP
-  ↓
-Front Controller del marco
-  +-----+-----+-----+
-  |     |     |
-pedidos pagos seguimiento   ← Page Controller (delgado)
-#+end_example
-
-El frontal no decide si el dron puede volar. Meter el reglamento en el
-enrutador mezcla políticas HTTP con el dominio.
-
-*Cuándo no.* Tres páginas estáticas. *Ya lo traen:*
-=DispatcherServlet=, =app= de Express, kernel de Laravel, =urls.py=.
-Dos Front Controller (un servlet casero *y* =@PostMapping=) es el
-mismo defecto que dos porterías.
-
-Page Controller *solo* no deja de copiar la sesión: hace falta la
-cadena.
-
-*** Template View y Transform View
-
-*Nivel 1.* Template View: un formulario con huecos (=estado=, =eta=).
-Transform View: armas el HTML (o el JSON) con código, como un LEGO.
-
-*Síntoma.* La plantilla del seguimiento ejecuta =SELECT= y manda
-correo si el pedido va tarde.
-
-*Después.* El caso de uso deja datos *ya listos*. Blade, EJS, Jinja o
-Thymeleaf rellenan. React en el servidor *construye* el árbol: eso es
-Transform View. La regla es la misma: la vista no habla SQL.
-
-Two Step View (plantilla de *layout* + contenido) solo si el panel y
-el seguimiento comparten un marco visual que se está duplicando. No es
-obligatorio para un CRUD.
-
-*** MVC (tres MVCs distintos)
-
-Modelo: reglas. Vista: presentación. Controlador: traduce el clic en
-una operación.
-
-El MVC de Smalltalk, el de Rails y el de Angular *no* son el mismo
-dibujo. Carpetas =models/views/controllers= con SQL en las tres *no*
-son MVC: son un disfraz.
-
-En las entregas: el modelo son pedidos, medios y restricciones; la
-vista, el mapa y el listado; el controlador HTTP traduce «crear
-pedido» en =registrarPedido= y se acaba.
-
-*Síntoma de controlador gordo:* la ruta Spring o el =app.post= valida,
-llama a la IA, hace =new EntregaDron()=, cobra y pinta HTML.
-
-*** Post-Redirect-Get
-
-Tras =POST /pedidos= no se deja el navegador en la página del POST:
-se responde *redirección* a =GET /pedidos/{id}= (el seguimiento).
-
-*Síntoma.* Recargar «Pagar» vuelve a cobrar. El botón «NO ACTUALICE»
-no es un patrón: es un rótulo. PRG evita el *doble envío de la vista*;
-la *idempotencia* evita el doble cargo en el servidor. Hacen falta
-las dos si hay dinero.
-
-*** Sesión y token
-
-HTTP no recuerda al usuario. Cookie de sesión o =Authorization: Bearer=
-son *diseño*, no un Singleton de proceso.
-
-=Sesion.getInstance()= como «el cliente logueado» falla en varios
-nodos y en pruebas. El identificador viaja *en la petición*. Validar
-solo en el navegador no sustituye al servidor.
-
-*** REST: recursos, no verbos sueltos
-
-=GET /pedidos/{id}= es el seguimiento. =POST /pedidos= da de alta.
-=/asignar= es una acción disfrazada: ¿GET? ¿POST? ¿qué se cachea?
-
-El mismo recurso puede representarse como HTML (panel) o JSON (app).
-Eso no obliga a un BFF: obliga a *negociar* o a dos recursos de
-agregación si el hambre es distinta.
-
-*** El cliente web (SPA)
-
-Varias zonas leen ={ estado, eta, posicion }=: un estado de UI
-compartido (MVVM, store). Tres campos y un diálogo no piden Redux.
-
-El Observer del DOM (React, Vue) no es =PedidoActualizado= del
-servidor. React Router enruta *en el navegador*; no sustituye al Front
-Controller del API. Un bus de eventos casero *junto* a =useState= es
-el mismo error que dos Front Controller.
-
-** Middleware (en la petición)
-
-La cadena es Chain of Responsibility que el marco ya instancia.
-
-#+begin_src javascript
-function autenticar(req, res, next) {
-  if (!req.headers.authorization) return res.status(401).end();
-  next();
-}
-// app.post("/pedidos", autenticar, registrarPedido)
-#+end_src
-
-Orden: autenticar → bitácora → caso de uso. Autenticar *después* de
-cobrar cobra a quien no debería. La cadena *no* elige camioneta o
-dron.
-
-*Cuándo no.* Un chequeo en una sola ruta: un =if=.
-
-** Dominio, datos e integración
-
-Service Layer: =registrarPedido(...)= vive *fuera* de la ruta.
-Express *no* lo impone: hay que extraerlo.
-
-Repository + Unit of Work: =pedidos.guardar=; el =COMMIT= junta alta
-y cobro. =@Transactional= *es* la unidad. Active Record (Eloquent)
-no es Repository: el modelo *es* la fila; se puede vivir con ello
-sin fingir el patrón.
-
-Adapter: =route_hint= muere antes del despacho.
-
-BFF: la app no orquesta doce =fetch=. Gateway: borde hacia *varios*
-servicios. Factory no alimenta la pantalla de inicio.
-
-** SSR, CSR e híbrido
-
-| Forma | Quién pinta | Cuándo |
-|-------+-------------+--------|
-| Plantilla en servidor | El servidor (Template View) | Panel, SEO, primer pintado |
-| SPA | El navegador (CSR) | App rica de seguimiento |
-| Híbrido | Primero HTML, luego hidrata | Costo extra; no por moda |
-
-Elegir SPA no elimina Service Layer ni la transacción. Solo mueve
-*quién arma el HTML*.
-
-** Ejemplo de análisis: registrar un pedido (y cobrar)
-
-El cliente envía =POST /pedidos=.
-
-1. HTTP entra por el Front Controller del marco.
-2. Middleware: sesión, bitácora.
-3. Controlador delgado → =registrarPedido=.
-4. Factory + Strategy del medio; Adapter de la IA.
-5. Transacción: pedido y cobro juntos.
-6. Después del =COMMIT=: cliente, repartidor, estadísticas.
-7. Respuesta: redirección (PRG) o JSON del pedido creado, no un
-   formulario POST «reenviable».
-
-=POST /pagos= es otro trámite: Strategy del medio de cobro, Adapter
-del banco, Circuit Breaker si el banco o la IA fallan. El
-*seguimiento* de un pedido ya guardado *no* pasa por esa fila: no debe
-bloquearse.
-
-** Ejercicios (web)
-
-1. =pagos.php= y =pedidos.php= copian la sesión. ¿Front Controller,
-   Page Controller, o ambos? ¿Qué *no* reescribes en Express?
-2. La plantilla del mapa hace =SELECT= y, si =eta > 60=, =mail()=.
-   ¿Template View? ¿Qué falta?
-3. Un compañero pone Redux para un formulario de tres campos. ¿De
-   acuerdo?
-4. =POST /asignar= elige el medio. Propón un recurso REST y di qué
-   patrón *no* es (Factory no arregla la URL).
-5. Tras pagar, el HTML del POST se recarga y hay dos cargos. ¿PRG,
-   idempotencia, o los dos?
+Los *patrones de diseño* representan soluciones generales que pueden
+adaptarse a problemas que aparecen de manera recurrente durante el
+desarrollo de software.
 
 #+begin_quote
-¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
-a introducir para resolverlo?
+Un patrón de diseño no es código que simplemente copiamos.
+
+Es una forma conocida de organizar clases, objetos y responsabilidades
+para solucionar un problema recurrente.
 #+end_quote
 
-* Patrones de software para aplicaciones móviles
-:PROPERTIES:
-:CUSTOM_ID: patrones-movil
-:END:
 
-El *dominio* puede ser el de la plataforma de entregas. Las *fuerzas*
-no: la vista se destruye al rotar; el proceso puede morir; la red se
-cae; la batería es finita. Transcribir MVVM de Android con =LiveData=
-a Flutter no es «el mismo patrón»: es ignorar el diseño que el marco
-ya instancia.
+** 1. ¿Qué es un patrón de diseño?
 
-Este capítulo no inventa un GoF móvil. Pregunta: qué cambia el
-teléfono respecto del panel web, y qué estructura *ya trae* Android,
-iOS o Flutter.
+Un patrón de diseño describe una solución general para un determinado
+tipo de problema de diseño de software.
 
-** Fuerzas
+Normalmente un patrón define:
 
-| Fuerza                 | Implicación                                                    |
-|------------------------+----------------------------------------------------------------|
-| Ciclo de vida agresivo | El estado no puede vivir solo en los controles                 |
-| Muerte del proceso     | La cola se reifica (Command), no se deja en un objeto de UI    |
-| Red intermitente       | Disco y API son *dos* orígenes                                 |
-| Recursos finitos       | Listas virtualizadas; nada pesado en el hilo que pinta         |
-| Navegación como grafo  | El dominio no arranca pantallas                                |
-| Varios ecosistemas     | Puertos en el dominio; adaptadores de plataforma               |
+- un problema,
+- un contexto,
+- una posible solución,
+- los participantes de la solución,
+- las responsabilidades de cada participante,
+- y las consecuencias de utilizar ese diseño.
 
-** Intuición
+Podemos imaginar un patrón como una especie de *plantilla conceptual*.
 
-En la web, recargar es casi «nacer de nuevo». En el teléfono, girar
-la pantalla *mata los controles* y deja vivo (si está bien diseñado)
-el seguimiento. Si el estado vivía en los =TextView=, el mapa vuelve
-a cero. Eso no es un bug de GPS: es un problema de *dónde vive el
-estado*.
+No nos indica exactamente qué código debemos escribir.
 
-** Antes: la Activity (o el Widget) lo hace todo
+Nos indica *cómo organizar una posible solución*.
+
+
+*** 1.1 Una analogía sencilla
+
+Supongamos que queremos construir una casa.
+
+No todas las casas son iguales.
+
+Sin embargo, existen soluciones arquitectónicas que aparecen con
+frecuencia:
+
+- puertas,
+- ventanas,
+- escaleras,
+- pasillos,
+- columnas,
+- habitaciones.
+
+Un arquitecto no necesita inventar nuevamente el concepto de
+"escalera" cada vez que diseña una casa.
+
+Conoce la idea general y la adapta a cada proyecto.
+
+En programación sucede algo parecido.
+
+Un programador puede reconocer que determinado problema se parece a
+otros problemas conocidos y utilizar un patrón como punto de partida.
+
+
+** 2. ¿Por qué utilizar patrones de diseño?
+
+Los patrones ayudan principalmente a construir software más fácil de:
+
+- entender,
+- modificar,
+- probar,
+- mantener,
+- extender,
+- reutilizar.
+
+También proporcionan un vocabulario común entre desarrolladores.
+
+Por ejemplo, un programador puede decir:
+
+#+begin_quote
+"Para cambiar los algoritmos de recomendación podríamos utilizar
+Strategy."
+#+end_quote
+
+Un desarrollador que conoce el patrón puede comprender rápidamente
+la propuesta sin necesidad de explicar toda la implementación.
+
+
+** 3. Los patrones no dependen de un lenguaje específico
+
+Los patrones representan *ideas de diseño*.
+
+Por eso pueden implementarse utilizando diferentes tecnologías.
+
+Por ejemplo:
+
+- Java
+- JavaScript
+- TypeScript
+- Python
+- Kotlin
+- Swift
+- Dart
+- C#
+- PHP
+
+La implementación puede ser diferente dependiendo de las
+características del lenguaje.
+
+Por ejemplo, en Java podemos implementar Strategy mediante interfaces.
 
 #+begin_src java
-public class SeguimientoActivity extends Activity {
-    void onCreate(...) {
-        Pedido p = api.get("/pedidos/" + id);   // red en el hilo UI
-        db.insert(p);                           // SQL aquí
-        mapa.mover(p.lat, p.lng);
-        startActivity(new Intent(this, Pago.class));
-    }
+public interface EstrategiaPago {
+
+    void pagar(double cantidad);
+
 }
 #+end_src
 
-Síntomas: al rotar se pierde el pedido; al cortar la red la pantalla
-se congela; no se puede probar el trámite sin emulador; Retrofit y
-navegación están mezclados con el pintado.
+Mientras que en JavaScript podríamos simplemente pasar una función.
 
-** Presentación: MVC, MVP, MVVM, MVI, BLoC
+#+begin_src javascript
+function procesarPago(cantidad, estrategia) {
 
-*Nivel 2.* Quién posee el estado de la UI y quién sobrevive al ciclo
-de vida.
+    estrategia(cantidad);
 
-| Pregunta                 | MVC              | MVP            | MVVM / BLoC              | MVI                    |
-|--------------------------+------------------+----------------+--------------------------+------------------------|
-| ¿Dónde está el estado?   | A menudo la vista | Presenter     | ViewModel / estado BLoC  | Estado inmutable       |
-| ¿Ciclo de vida?          | Frágil           | Hay que =detach= | El VM sobrevive        | Igual, más disciplina  |
-| ¿Ceremonia               | Baja             | Media          | Media                    | Alta                   |
-| ¿Cuándo                  | Prototipo        | UI densa testeable | Apps de negocio      | Muchos eventos a la vez |
-
-#+begin_example
-Vista (Compose / SwiftUI / Widget)
-        ↑  observa
-ViewModel / BLoC     { estado, eta, posicion }
-        ↓  llama
-Caso de uso (registrar, consultar)
-        ↓
-Repository (disco y red)
-#+end_example
-
-En la mayoría de apps de negocio, *MVVM (o BLoC) más casos de uso*
-basta. El ViewModel *no* es el lugar de Retrofit, del cobro ni de
-=startActivity=.
-
-- *MVC:* la vista se llena de reglas; al rotar se pierde todo.
-- *MVP:* el Presenter es testeable, pero hay que =detach= o hay fugas.
-- *MVVM:* la vista observa; el VM sobrevive a la rotación.
-- *MVI:* un flujo de eventos → nuevo estado inmutable. Útil con muchos
-  eventos a la vez; caro si la pantalla es un formulario.
-- *BLoC / Riverpod:* en Flutter *son* el punto de extensión. Copiar
-  una clase =ViewModel= de Android «para unificar» duplica el
-  contenedor de estado.
-
-*Cuándo no.* Tres campos y un botón: un estado local del toolkit, no
-un store global. Dos BLoC *y* un ViewModel copiado: el mismo defecto
-que dos Front Controller.
-
-** El lenguaje cambia la forma de Observer
-
-El seguimiento debe actualizarse y la suscripción debe *cancelarse*
-al destruirse la vista. Polling cada segundo drena la batería; el
-marco ya tiene flujos.
-
-#+begin_src kotlin
-class SeguimientoViewModel : ViewModel() {
-  private val _ui = MutableStateFlow(UiState())
-  val ui: StateFlow<UiState> = _ui.asStateFlow()
-  fun onEstado(nuevo: String) {
-    _ui.update { it.copy(estado = nuevo) }
-  }
 }
 #+end_src
 
-#+begin_src dart
-class SeguimientoBloc extends Bloc<SeguimientoEvento, SeguimientoEstado> {
-  SeguimientoBloc() : super(SeguimientoEstado.inicial()) {
-    on<EstadoLlego>((e, emit) => emit(state.copyWith(estado: e.estado)));
-  }
-}
-#+end_src
-
-#+begin_src swift
-final class SeguimientoModelo: ObservableObject {
-  @Published var estado: String = ""
-  func onEstado(_ nuevo: String) { estado = nuevo }
-}
-#+end_src
-
-Los tres son Observer de *presentación*. Ninguno exige =Subject= /
-=ConcreteObserver= de 1994. No es el Observer de =PedidoActualizado=
-en el servidor.
-
-** El marco congela la presentación
-
-| Intención     | Android              | iOS                    | Flutter            | React Native      |
-|---------------+----------------------+------------------------+--------------------+-------------------|
-| Presentación  | ViewModel + Compose  | SwiftUI                | BLoC, Riverpod     | hooks, Zustand    |
-| Observer UI   | =StateFlow=          | =@Published=           | Stream / cubit     | estado de React   |
-| Navegación    | Navigation           | =NavigationStack=      | GoRouter           | React Navigation  |
-| Local + red   | Room + Retrofit      | SwiftData + URLSession | Hive + Dio         | SQLite + =fetch=  |
-| Fondo         | WorkManager          | =BGTaskScheduler=      | isolates + plugins | limitado          |
-
-Criterio: se usa esa API. Un bus casero al lado es diseñar dos veces.
-
-** Navegación (Coordinator)
-
-El ViewModel anuncia *que* hay que mostrar el detalle del pedido, no
-*cómo* se instancia la Activity.
-
-#+begin_example
-VM: «mostrar detalle del folio X»
-        ↓
-Coordinator / Navigation del marco
-        ↓
-pantalla de detalle
-#+end_example
-
-Tres pantallas en línea: basta el Navigation del marco. El dominio
-(=Pedido=) no importa =Context= ni =NavController=.
-
-** Datos: repositorio dual y cola
-
-La UI ignora si el dato vino del disco o de la API.
-
-#+begin_example
-Seguimiento (UI)
-      ↓
-PedidoRepository
-      +-- memoria / disco   (ya guardado: debe verse sin red)
-      +-- API               (puede fallar)
-#+end_example
-
-Sin señal: se consulta lo local; un indicador de «sin red», no una
-rueda infinita. Un cambio (cobro, foto del paquete) se encola con
-UUID: *Command* en el dispositivo + *idempotencia* en el servidor.
-WorkManager / =BGTaskScheduler= suben la cola con la app cerrada. Un
-hilo dentro de la Activity muere con ella.
-
-Conflicto (se editó offline y el servidor también): hay que decidir
-una regla (el servidor gana, o se muestra al usuario). No es Event
-Sourcing.
-
-** Listas y hilo que pinta
-
-Cientos de pedidos en una lista: el marco virtualiza (RecyclerView,
-LazyColumn, ListView). Eso se parece a Flyweight; no se reimplementa.
-Nada de JSON pesado ni IA en el hilo que pinta: la UI se congela y la
-batería duele.
-
-** Puertos: el mismo Strategy, otro borde
-
-=MedioDeEntrega= y =registrarPedido= no saben de Android. El ViewModel
-recibe esas abstracciones (Hilt, Riverpod). En prueba, un medio
-constante. El Widget no instancia Retrofit.
-
-Un Singleton de «pedido que se pinta» produce fugas al rotar. El
-token va en almacén *seguro*, no en preferencias en claro.
-
-** El mismo dominio, dos medios
-
-| Tema        | Web                                      | Móvil                                      | Error al copiar                    |
-|-------------+------------------------------------------+--------------------------------------------+------------------------------------|
-| Sesión      | Cookie o token por petición              | Almacén seguro                             | Token en claro                     |
-| Estado UI   | Volátil al recargar (salvo persistir)    | Debe sobrevivir rotación y muerte          | Redux web sin persistir el pedido  |
-| Red         | Degradación y timeout                    | Cola + indicador                           | Bloquear hasta que haya señal      |
-| Observer    | Opcional hacia el servidor               | Casi obligatorio en el seguimiento local   | Polling agresivo y batería         |
-| Payload     | Agregación (BFF)                         | Aún más reducido                           | Mandar la API de administración    |
-| Fondo       | Un job en el servidor basta              | El SO mata el proceso: Command + scheduler | =AsyncTask= olvidada en la Activity |
-
-** Ejercicios (móvil)
-
-1. El usuario gira el teléfono en el mapa. El pin vuelve al origen.
-   ¿Dónde vivía el estado? ¿Qué estructura del marco lo sostiene?
-2. Un compañero porta BLoC a Android nativo «para unificar el
-   equipo». ¿De acuerdo? ¿Qué ya trae Android?
-3. Sin red, la app no muestra un pedido *que ayer sí cargó*. ¿Falta
-   repositorio dual, Circuit Breaker, o los dos?
-4. El ViewModel llama =startActivity=. ¿Coordinator o fuga de
-   marco? Propón el anuncio «mostrar detalle» sin =Context=.
-5. Foto del paquete y cobro con la app en segundo plano. ¿Hilo en la
-   Activity, WorkManager, o Observer de UI?
-
-Contraargumentación: «hay que usar MVI porque es más moderno que
-MVVM». Defiende o rechaza con las fuerzas de *esta* pantalla de
-seguimiento.
+El concepto es el mismo:
 
 #+begin_quote
-¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
-a introducir para resolverlo?
+El comportamiento puede cambiar sin modificar al código que lo utiliza.
 #+end_quote
+
+
+** 4. Clasificación tradicional de los patrones
+
+Los patrones de diseño clásicos suelen dividirse en tres grupos.
+
+#+begin_example
+                Patrones de Diseño
+                       |
+        +--------------+--------------+
+        |              |              |
+    Creacionales   Estructurales   Comportamiento
+#+end_example
+
+
+*** 4.1 Patrones creacionales
+
+Se concentran en la creación de objetos.
+
+Algunos ejemplos son:
+
+- Factory Method
+- Abstract Factory
+- Builder
+- Prototype
+- Singleton
+
+
+*** 4.2 Patrones estructurales
+
+Se concentran en la forma en que diferentes objetos o componentes
+se relacionan.
+
+Ejemplos:
+
+- Adapter
+- Decorator
+- Facade
+- Proxy
+- Composite
+
+
+*** 4.3 Patrones de comportamiento
+
+Se concentran en la comunicación y responsabilidades entre objetos.
+
+Ejemplos:
+
+- Strategy
+- Observer
+- Command
+- State
+- Template Method
+- Iterator
+
+
+** 5. Patrones en aplicaciones web y móviles
+
+Los patrones clásicos también aparecen constantemente en aplicaciones
+web y móviles.
+
+Consideremos una aplicación moderna.
+
+#+begin_example
+              Aplicación
+
+        +-------------------+
+        |     Interfaz      |
+        | Web / Aplicación  |
+        |      móvil        |
+        +---------+---------+
+                  |
+                  v
+        +-------------------+
+        | Lógica del sistema|
+        +---------+---------+
+                  |
+                  v
+        +-------------------+
+        |       Datos       |
+        +-------------------+
+#+end_example
+
+Dentro de cada una de estas partes pueden utilizarse diferentes
+patrones.
+
+
+** 6. MVC — Model View Controller
+
+Uno de los patrones arquitectónicos más conocidos en desarrollo web
+es *MVC*.
+
+MVC significa:
+
+- Model
+- View
+- Controller
+
+
+*** 6.1 Problema
+
+Supongamos que tenemos una aplicación que permite consultar estudiantes.
+
+Una mala organización podría mezclar en un mismo archivo:
+
+- consultas a la base de datos,
+- validaciones,
+- reglas de negocio,
+- generación de HTML,
+- procesamiento de peticiones.
+
+Conforme el sistema crece, modificarlo se vuelve complicado.
+
+
+*** 6.2 Idea de MVC
+
+MVC divide las responsabilidades.
+
+#+begin_example
+                   Usuario
+                      |
+                      v
+                +-----------+
+                |   View    |
+                +-----+-----+
+                      |
+                      v
+                +-----------+
+                |Controller |
+                +-----+-----+
+                      |
+                      v
+                +-----------+
+                |   Model   |
+                +-----------+
+#+end_example
+
+
+**** Model
+
+Representa:
+
+- información,
+- reglas de negocio,
+- acceso a los datos.
+
+
+**** View
+
+Representa lo que observa el usuario.
+
+Por ejemplo:
+
+- página HTML,
+- interfaz móvil,
+- formulario,
+- tabla,
+- pantalla.
+
+
+**** Controller
+
+Recibe las acciones del usuario y coordina la aplicación.
+
+
+*** 6.3 Ejemplo
+
+Un usuario solicita:
+
+#+begin_example
+/alumnos/25
+#+end_example
+
+El flujo podría ser:
+
+#+begin_example
+Usuario
+   |
+   v
+Controller
+   |
+   | solicita alumno 25
+   v
+Model
+   |
+   | obtiene datos
+   v
+Controller
+   |
+   v
+View
+   |
+   v
+HTML
+#+end_example
+
+
+** 7. Strategy
+
+El patrón *Strategy* permite intercambiar diferentes algoritmos que
+realizan una tarea similar.
+
+
+*** 7.1 Problema
+
+Supongamos una tienda en línea.
+
+El sistema puede calcular descuentos dependiendo del cliente.
+
+Podríamos tener:
+
+- descuento normal,
+- descuento estudiante,
+- descuento cliente frecuente,
+- descuento promocional.
+
+Una solución poco flexible sería:
+
+#+begin_src javascript
+if (tipo === "normal") {
+
+    // cálculo
+
+} else if (tipo === "estudiante") {
+
+    // cálculo
+
+} else if (tipo === "frecuente") {
+
+    // cálculo
+
+}
+#+end_src
+
+Conforme aparecen nuevas estrategias el código comienza a crecer.
+
+
+*** 7.2 Solución
+
+Cada algoritmo puede convertirse en una estrategia.
+
+#+begin_example
+             EstrategiaDescuento
+                    |
+       +------------+-------------+
+       |            |             |
+     Normal     Estudiante     Frecuente
+#+end_example
+
+
+*** 7.3 Ejemplo JavaScript
+
+#+begin_src javascript
+const descuentoNormal = precio => precio;
+
+const descuentoEstudiante = precio => precio * 0.90;
+
+const descuentoFrecuente = precio => precio * 0.80;
+
+
+function calcularPrecio(precio, estrategia) {
+
+    return estrategia(precio);
+
+}
+
+
+console.log(
+
+    calcularPrecio(1000, descuentoEstudiante)
+
+);
+#+end_src
+
+
+*** 7.4 Ejemplos web y móviles
+
+Strategy puede utilizarse para:
+
+- métodos de pago,
+- algoritmos de búsqueda,
+- sistemas de recomendación,
+- métodos de autenticación,
+- diferentes formas de ordenar información,
+- estrategias de sincronización,
+- algoritmos de compresión.
+
+
+** 8. Observer
+
+Observer permite que diferentes componentes sean notificados cuando
+ocurre un cambio.
+
+
+*** 8.1 Analogía
+
+Podemos pensar en un canal de YouTube.
+
+#+begin_example
+                Canal
+                  |
+       publica un video
+                  |
+        +---------+---------+
+        |         |         |
+        v         v         v
+ Usuario A   Usuario B   Usuario C
+#+end_example
+
+Los usuarios están suscritos.
+
+Cuando aparece contenido nuevo reciben una notificación.
+
+
+*** 8.2 En aplicaciones web
+
+Este comportamiento aparece constantemente.
+
+Por ejemplo:
+
+#+begin_example
+Usuario agrega producto
+        |
+        v
+   Carrito cambia
+        |
+    +---+----------+
+    |              |
+    v              v
+Contador       Precio total
+#+end_example
+
+Varios componentes reaccionan ante el mismo cambio.
+
+
+*** 8.3 Ejemplos
+
+Observer aparece en:
+
+- sistemas de eventos,
+- notificaciones,
+- interfaces gráficas,
+- WebSockets,
+- programación reactiva,
+- manejo de estados,
+- eventos del navegador.
+
+
+** 9. Factory Method
+
+Factory Method ayuda a separar la creación de objetos de las clases que
+los utilizan.
+
+
+*** 9.1 Problema
+
+Supongamos una aplicación móvil que puede enviar notificaciones mediante:
+
+- correo electrónico,
+- SMS,
+- notificación Push.
+
+Una implementación podría contener:
+
+#+begin_src java
+if (tipo.equals("email")) {
+
+    Email notificacion = new Email();
+
+} else if (tipo.equals("sms")) {
+
+    SMS notificacion = new SMS();
+
+} else if (tipo.equals("push")) {
+
+    Push notificacion = new Push();
+
+}
+#+end_src
+
+Esto hace que el código que utiliza las notificaciones también tenga
+que conocer cómo se construyen.
+
+
+*** 9.2 Factory
+
+Podemos delegar la creación.
+
+#+begin_example
+            NotificacionFactory
+                    |
+         crearNotificacion()
+                    |
+          +---------+---------+
+          |         |         |
+          v         v         v
+        Email      SMS       Push
+#+end_example
+
+Entonces el cliente solamente solicita una notificación.
+
+No necesita conocer todos los detalles de construcción.
+
+
+** 10. Adapter
+
+Adapter permite que dos componentes con interfaces incompatibles
+puedan trabajar juntos.
+
+
+*** 10.1 Ejemplo web
+
+Supongamos que nuestra aplicación espera:
+
+#+begin_src javascript
+usuario.nombre
+usuario.correo
+#+end_src
+
+Pero una API externa devuelve:
+
+#+begin_src javascript
+{
+    "full_name": "Ana García",
+    "email_address": "ana@email.com"
+}
+#+end_src
+
+Podríamos construir un adaptador.
+
+#+begin_src javascript
+function adaptarUsuario(usuarioExterno) {
+
+    return {
+
+        nombre: usuarioExterno.full_name,
+
+        correo: usuarioExterno.email_address
+
+    };
+
+}
+#+end_src
+
+
+*** 10.2 Aplicaciones
+
+Adapter es especialmente útil cuando utilizamos:
+
+- APIs externas,
+- librerías,
+- sistemas antiguos,
+- diferentes proveedores de servicios,
+- plataformas de pago,
+- servicios de almacenamiento.
+
+
+** 11. Facade
+
+Facade proporciona una interfaz sencilla para utilizar un sistema
+complejo.
+
+
+*** 11.1 Ejemplo
+
+Para realizar una compra tal vez sea necesario:
+
+#+begin_example
+validarUsuario()
+      |
+validarInventario()
+      |
+calcularPrecio()
+      |
+procesarPago()
+      |
+generarFactura()
+      |
+enviarCorreo()
+#+end_example
+
+El cliente podría tener que conocer todos esos procesos.
+
+Con Facade podemos proporcionar una operación sencilla.
+
+#+begin_src javascript
+tienda.realizarCompra();
+#+end_src
+
+Internamente:
+
+#+begin_example
+                   TiendaFacade
+                        |
+       +----------------+---------------+
+       |                |               |
+       v                v               v
+   Inventario          Pago          Facturación
+#+end_example
+
+
+** 12. Repository
+
+Repository es muy utilizado en aplicaciones web y móviles.
+
+Su objetivo es separar la lógica del sistema del mecanismo utilizado
+para obtener los datos.
+
+
+*** 12.1 Sin Repository
+
+Una clase podría ejecutar directamente:
+
+#+begin_src sql
+SELECT *
+FROM alumnos
+WHERE id = 25;
+#+end_src
+
+La lógica del sistema estaría muy relacionada con PostgreSQL.
+
+
+*** 12.2 Utilizando Repository
+
+Podríamos tener:
+
+#+begin_src java
+Alumno alumno = alumnoRepository.buscarPorId(25);
+#+end_src
+
+El resto de la aplicación no necesita conocer si los datos vienen de:
+
+- PostgreSQL,
+- MySQL,
+- SQLite,
+- una API REST,
+- Firebase,
+- almacenamiento local.
+
+
+*** 12.3 Estructura
+
+#+begin_example
+          Aplicación
+              |
+              v
+        AlumnoRepository
+              |
+       +------+------+
+       |             |
+       v             v
+ PostgreSQL         API
+#+end_example
+
+
+** 13. Patrones utilizados frecuentemente en aplicaciones web y móviles
+
+Podemos encontrar muchos patrones trabajando juntos.
+
+Por ejemplo:
+
+| Patrón     | Posible aplicación                  |
+|------------+-------------------------------------|
+| MVC        | Separar interfaz, lógica y datos    |
+| Strategy   | Intercambiar algoritmos             |
+| Observer   | Reaccionar ante eventos             |
+| Factory    | Crear objetos                       |
+| Adapter    | Integrar servicios externos         |
+| Facade     | Simplificar sistemas complejos      |
+| Repository | Separar acceso a datos              |
+| State      | Manejar diferentes estados          |
+| Command    | Representar acciones                |
+| Decorator  | Añadir comportamiento dinámicamente |
+
+
+** 14. Patrones y frameworks
+
+Es importante comprender que muchos frameworks ya utilizan patrones.
+
+Por ejemplo:
+
+#+begin_example
+Framework
+   |
+   +-- MVC
+   |
+   +-- Observer
+   |
+   +-- Factory
+   |
+   +-- Dependency Injection
+   |
+   +-- Repository
+#+end_example
+
+Por eso algunas veces utilizamos patrones sin darnos cuenta.
+
+Comprender los patrones permite entender mejor por qué los frameworks
+están construidos de cierta manera.
+
+
+** 15. ¿Qué ocurre cuando la aplicación crece?
+
+Los patrones anteriores ayudan a organizar componentes dentro de una
+aplicación.
+
+Pero aparece otra pregunta:
+
+#+begin_quote
+¿Qué sucede cuando el sistema completo se vuelve demasiado grande?
+#+end_quote
+
+Por ejemplo, imaginemos una plataforma que contiene:
+
+- usuarios,
+- productos,
+- ventas,
+- pagos,
+- inventarios,
+- envíos,
+- notificaciones,
+- recomendaciones.
+
+Inicialmente podríamos desarrollar todo dentro de una sola aplicación.
+
+Esto nos lleva al concepto de *monolito*.
+
+
+** 16. Arquitectura monolítica
+
+En una aplicación monolítica todos los módulos forman parte de una
+misma aplicación.
+
+#+begin_example
+             Aplicación
+                 |
+     +-----------+-----------+
+     |           |           |
+     v           v           v
+ Usuarios     Ventas      Inventario
+     |           |           |
+     +-----------+-----------+
+                 |
+             Base de
+              datos
+#+end_example
+
+Todo puede estar dentro del mismo proyecto.
+
+
+*** 16.1 Ejemplo
+
+#+begin_example
+tienda/
+
+    usuarios/
+    productos/
+    inventario/
+    ventas/
+    pagos/
+    envios/
+    reportes/
+#+end_example
+
+Esta arquitectura no es necesariamente mala.
+
+De hecho, para muchos proyectos puede ser la opción más sencilla.
+
+
+** 17. ¿Qué son los microservicios?
+
+Los *microservicios* representan un estilo arquitectónico en el cual un
+sistema grande se divide en varios servicios pequeños e independientes.
+
+Cada servicio se especializa en una determinada responsabilidad.
+
+Por ejemplo:
+
+#+begin_example
+                       Aplicación
+
+                           |
+                           v
+                     API Gateway
+                           |
+        +------------------+------------------+
+        |                  |                  |
+        v                  v                  v
+ +-------------+    +-------------+    +-------------+
+ |  Usuarios   |    |   Ventas    |    | Inventario  |
+ +-------------+    +-------------+    +-------------+
+        |                  |                  |
+        v                  v                  v
+      BD                  BD                 BD
+#+end_example
+
+Cada microservicio puede evolucionar con cierta independencia.
+
+
+** 18. Microservicios NO es un patrón de diseño clásico
+
+Esta diferencia es muy importante.
+
+#+begin_quote
+Strategy, Observer, Factory Method y Adapter son patrones de diseño.
+
+Microservicios es un estilo de arquitectura de software.
+#+end_quote
+
+Podemos verlo de esta manera:
+
+#+begin_example
+Software
+   |
+   +-- Arquitectura
+   |      |
+   |      +-- Monolito
+   |      +-- Microservicios
+   |      +-- Arquitectura en capas
+   |      +-- Arquitectura orientada a eventos
+   |
+   +-- Patrones de diseño
+          |
+          +-- Strategy
+          +-- Observer
+          +-- Factory
+          +-- Adapter
+          +-- Facade
+#+end_example
+
+Además, dentro de cada microservicio pueden utilizarse patrones de
+diseño.
+
+
+** 19. Ejemplo de una tienda basada en microservicios
+
+Consideremos una tienda en línea.
+
+Podríamos dividirla en:
+
+#+begin_example
+             Sistema de comercio electrónico
+
+                         |
+                    API Gateway
+                         |
+    +---------+----------+----------+----------+
+    |         |          |          |          |
+    v         v          v          v          v
+
+ Usuarios  Productos  Inventario   Pagos    Envíos
+#+end_example
+
+Cada microservicio tiene una responsabilidad concreta.
+
+
+*** Microservicio de usuarios
+
+Puede encargarse de:
+
+- registro,
+- autenticación,
+- perfiles,
+- permisos.
+
+
+*** Microservicio de productos
+
+Puede encargarse de:
+
+- catálogo,
+- categorías,
+- información de productos.
+
+
+*** Microservicio de inventario
+
+Puede encargarse de:
+
+- existencias,
+- entradas,
+- salidas.
+
+
+*** Microservicio de pagos
+
+Puede encargarse de:
+
+- tarjetas,
+- transferencias,
+- plataformas de pago.
+
+
+*** Microservicio de envíos
+
+Puede encargarse de:
+
+- direcciones,
+- paqueterías,
+- seguimiento de pedidos.
+
+
+** 20. Comunicación entre microservicios
+
+Los microservicios necesitan comunicarse.
+
+Existen diferentes mecanismos.
+
+
+*** 20.1 APIs REST
+
+Un servicio puede realizar una petición HTTP.
+
+#+begin_example
+Servicio Ventas
+       |
+       | GET /productos/25
+       v
+Servicio Productos
+#+end_example
+
+Ejemplo:
+
+#+begin_src text
+GET /api/productos/25
+#+end_src
+
+Respuesta:
+
+#+begin_src json
+{
+    "id": 25,
+    "nombre": "Laptop",
+    "precio": 18000
+}
+#+end_src
+
+
+*** 20.2 Mensajes y eventos
+
+También pueden utilizar comunicación asíncrona.
+
+Por ejemplo:
+
+#+begin_example
+      Servicio Ventas
+
+            |
+            | publica
+            v
+
+      "Venta realizada"
+
+            |
+     +------+-------+
+     |              |
+     v              v
+
+ Inventario    Notificaciones
+#+end_example
+
+El servicio de ventas no necesita realizar directamente todas las
+acciones posteriores.
+
+Otros servicios reaccionan al evento.
+
+
+** 21. API Gateway
+
+Cuando existen muchos microservicios, normalmente no queremos que el
+cliente tenga que conocer la dirección de cada servicio.
+
+Puede utilizarse un *API Gateway*.
+
+#+begin_example
+      Aplicación móvil
+
+             |
+             v
+
+        API Gateway
+
+             |
+    +--------+--------+
+    |        |        |
+    v        v        v
+
+Usuarios  Ventas   Productos
+#+end_example
+
+El cliente solamente conoce una entrada al sistema.
+
+
+** 22. Base de datos por microservicio
+
+Una práctica común en microservicios es que cada servicio sea propietario
+de sus datos.
+
+#+begin_example
+Microservicio Usuarios
+        |
+        v
+      BD Usuarios
+
+
+Microservicio Ventas
+        |
+        v
+      BD Ventas
+
+
+Microservicio Productos
+        |
+        v
+     BD Productos
+#+end_example
+
+Esto evita que todos los servicios dependan directamente de la misma
+estructura de datos.
+
+Sin embargo, también genera nuevos problemas de coordinación y
+consistencia.
+
+
+** 23. Ventajas de los microservicios
+
+Entre sus posibles ventajas encontramos:
+
+- despliegue independiente,
+- escalamiento independiente,
+- separación de responsabilidades,
+- equipos trabajando en servicios diferentes,
+- posibilidad de utilizar diferentes tecnologías,
+- aislamiento parcial de fallos.
+
+Por ejemplo, si el servicio de imágenes recibe muchas peticiones,
+podemos escalar solamente ese servicio.
+
+#+begin_example
+             Imágenes
+
+                |
+       +--------+--------+
+       |        |        |
+       v        v        v
+
+   Instancia Instancia Instancia
+      1         2         3
+#+end_example
+
+
+** 24. Desventajas de los microservicios
+
+Los microservicios también introducen mucha complejidad.
+
+Por ejemplo:
+
+- comunicación por red,
+- autenticación entre servicios,
+- manejo de fallos,
+- despliegue de múltiples aplicaciones,
+- monitoreo,
+- logs distribuidos,
+- consistencia de datos,
+- pruebas más complejas,
+- administración de múltiples bases de datos.
+
+Por eso:
+
+#+begin_quote
+Dividir una aplicación en microservicios no significa automáticamente
+que su diseño sea mejor.
+#+end_quote
+
+
+** 25. Monolito vs microservicios
+
+| Característica | Monolito | Microservicios |
+|----------------+----------+----------------|
+| Aplicaciones | Una | Varias |
+| Despliegue | Generalmente conjunto | Independiente |
+| Comunicación | Dentro de la aplicación | Principalmente red |
+| Complejidad inicial | Menor | Mayor |
+| Infraestructura | Sencilla | Más compleja |
+| Escalamiento | Aplicación completa | Por servicio |
+| Datos | Frecuentemente compartidos | Generalmente separados |
+| Mantenimiento inicial | Más sencillo | Más complejo |
+
+
+** 26. ¿Siempre debemos utilizar microservicios?
+
+No.
+
+Este es uno de los errores más comunes.
+
+Una aplicación pequeña como:
+
+#+begin_example
+Sistema escolar
+   |
+   +-- alumnos
+   +-- maestros
+   +-- grupos
+   +-- calificaciones
+#+end_example
+
+podría funcionar perfectamente como un monolito bien organizado.
+
+Dividir inmediatamente todo en:
+
+#+begin_example
+microservicio-alumnos
+microservicio-maestros
+microservicio-grupos
+microservicio-calificaciones
+#+end_example
+
+podría aumentar innecesariamente la complejidad.
+
+
+** 27. ¿Cuándo pueden tener sentido los microservicios?
+
+Pueden resultar útiles cuando tenemos:
+
+- sistemas grandes,
+- múltiples equipos de desarrollo,
+- componentes con necesidades de escalamiento diferentes,
+- servicios que deben desplegarse independientemente,
+- sistemas que evolucionan a ritmos diferentes.
+
+Por ejemplo:
+
+#+begin_example
+                  Plataforma
+
+                      |
+     +----------------+----------------+
+     |                |                |
+     v                v                v
+
+ Video           Usuarios           Pagos
+100 000 req/s    10 000 req/s      1 000 req/s
+#+end_example
+
+El servicio de video podría necesitar mucha más infraestructura que el
+servicio de pagos.
+
+
+** 28. Patrones dentro de microservicios
+
+Los conceptos no son excluyentes.
+
+Un microservicio puede contener varios patrones de diseño.
+
+Por ejemplo:
+
+#+begin_example
+           Microservicio de pagos
+
+                    |
+              Controller
+                    |
+                    v
+                 Service
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+      Strategy            Repository
+          |                   |
+      métodos de            acceso
+        pago               a datos
+#+end_example
+
+Podríamos utilizar:
+
+- Strategy para diferentes métodos de pago,
+- Factory para crear procesadores de pago,
+- Adapter para conectar PayPal, Stripe u otro proveedor,
+- Repository para acceder a datos,
+- Observer para publicar eventos.
+
+
+** 29. Niveles de diseño
+
+Una forma sencilla de entender todos estos conceptos consiste en
+observar distintos niveles.
+
+#+begin_example
+              SISTEMA
+
+                 |
+                 v
+
+        Arquitectura general
+
+    Monolito / Microservicios
+
+                 |
+                 v
+
+          Aplicaciones
+
+                 |
+                 v
+
+       Patrones de diseño
+
+ Strategy / Factory / Observer
+ Adapter / Facade / Repository
+
+                 |
+                 v
+
+             Código
+
+ Java / Python / JavaScript /
+ Kotlin / Dart / TypeScript
+#+end_example
+
+
+** 30. Ejemplo completo
+
+Imaginemos una aplicación móvil para solicitar comida.
+
+#+begin_example
+                       APP MÓVIL
+                           |
+                           v
+                     API Gateway
+                           |
+          +----------------+----------------+
+          |                |                |
+          v                v                v
+       Usuarios          Pedidos          Pagos
+                                             |
+                              +--------------+-------------+
+                              |              |             |
+                              v              v             v
+                           Tarjeta         PayPal       Transferencia
+#+end_example
+
+Aquí tenemos diferentes conceptos.
+
+La división:
+
+#+begin_example
+Usuarios
+Pedidos
+Pagos
+#+end_example
+
+puede representar una arquitectura basada en *microservicios*.
+
+Mientras que:
+
+#+begin_example
+Tarjeta
+PayPal
+Transferencia
+#+end_example
+
+podría implementarse utilizando el patrón *Strategy*.
+
+Además, el servicio de pagos podría utilizar *Adapter* para comunicarse
+con APIs externas.
+
+#+begin_example
+                   Servicio Pagos
+
+                         |
+                      Adapter
+                         |
+           +-------------+-------------+
+           |                           |
+           v                           v
+       API PayPal                   API Banco
+#+end_example
+
+Y cuando el pago sea exitoso podría publicar un evento.
+
+#+begin_example
+                 Pago realizado
+
+                       |
+          +------------+------------+
+          |                         |
+          v                         v
+
+       Pedidos                 Notificaciones
+#+end_example
+
+Aquí podría aparecer nuevamente una idea relacionada con *Observer* o
+arquitecturas orientadas a eventos.
+
+
+** 31. Idea fundamental
+
+Los patrones de diseño y los microservicios solucionan problemas en
+niveles diferentes.
+
+#+begin_example
+Patrón de diseño
+     |
+     v
+¿Cómo organizo una solución dentro del software?
+
+
+Arquitectura
+     |
+     v
+¿Cómo organizo las grandes partes del sistema?
+#+end_example
+
+Por lo tanto:
+
+#+begin_quote
+Los patrones de diseño ayudan a organizar responsabilidades y
+colaboraciones dentro del software.
+
+Los microservicios ayudan a dividir un sistema grande en servicios
+independientes que colaboran entre sí.
+#+end_quote
+
+
+** 32. Preguntas para discutir en clase
+
+1. ¿Qué problema intenta resolver un patrón de diseño?
+
+2. ¿Por qué un patrón no debe considerarse simplemente código para
+   copiar?
+
+3. ¿Qué diferencia existe entre Strategy y Factory Method?
+
+4. ¿En qué situación utilizaríamos Adapter?
+
+5. ¿Para qué podría utilizarse Observer en una aplicación móvil?
+
+6. ¿Qué responsabilidad tiene Repository?
+
+7. ¿Cuál es la diferencia entre un monolito y una arquitectura basada
+   en microservicios?
+
+8. ¿Microservicios es un patrón de diseño? Explique.
+
+9. ¿Por qué no todos los sistemas necesitan microservicios?
+
+10. ¿Puede un microservicio utilizar Strategy, Factory, Adapter y otros
+    patrones internamente?
+
+11. Considere una aplicación como Uber, Netflix, Amazon o Spotify.
+    ¿Qué posibles servicios podrían existir?
+
+12. Considere una aplicación móvil de pedidos de comida.
+    ¿Dónde podrían utilizarse Strategy, Observer, Factory y Adapter?
+
+
+** 33. Resumen
+
+Los patrones de diseño proporcionan soluciones generales a problemas
+recurrentes del desarrollo de software.
+
+Ejemplos:
+
+#+begin_example
+Strategy
+    -> intercambiar algoritmos
+
+Observer
+    -> reaccionar ante cambios
+
+Factory
+    -> crear objetos
+
+Adapter
+    -> conectar interfaces incompatibles
+
+Facade
+    -> simplificar sistemas complejos
+
+Repository
+    -> separar el acceso a datos
+#+end_example
+
+Los microservicios pertenecen a otro nivel.
+
+#+begin_example
+Microservicios
+      |
+      v
+Dividir un sistema grande
+en servicios independientes.
+#+end_example
+
+Por tanto:
+
+#+begin_quote
+Strategy, Factory, Observer y Adapter son patrones de diseño.
+
+Microservicios es un estilo arquitectónico.
+
+Ambos conceptos pueden trabajar juntos dentro de un mismo sistema.
+#+end_quote
+
+
 
 * Cómo analizar, elegir y no usar
 
@@ -3434,3 +4394,2165 @@ de más.
 Si la respuesta es «demasiadas cosas», hay un problema de diseño.
 #+end_quote
 
+
+
+
+
+
+
+* De una Aplicación Django + Flutter a una Arquitectura de Microservicios
+
+
+** Introducción
+
+Cuando comenzamos el desarrollo de una aplicación web o móvil es
+frecuente encontrar recomendaciones como:
+
+- utilizar microservicios,
+- separar completamente frontend y backend,
+- utilizar contenedores,
+- implementar API Gateway,
+- utilizar colas de mensajes,
+- dividir la base de datos.
+
+Sin embargo, utilizar todas estas tecnologías desde el inicio no
+necesariamente produce una mejor aplicación.
+
+En muchos proyectos resulta más conveniente comenzar con una
+arquitectura sencilla, bien organizada y que pueda evolucionar.
+
+Una combinación muy utilizada es:
+
+#+begin_example
+                 Flutter
+            Web / Android / iOS
+                    |
+                    |
+                 HTTP/JSON
+                    |
+                    v
+              Django REST API
+                    |
+                    v
+                PostgreSQL
+#+end_example
+
+En esta arquitectura:
+
+- Flutter se encarga de la interfaz.
+- Django se encarga del backend.
+- PostgreSQL almacena los datos.
+- Django y Flutter se comunican mediante una API.
+
+Esta separación constituye una buena base antes de considerar una
+arquitectura de microservicios.
+
+
+** 1. Una idea importante: separar no significa utilizar microservicios
+
+Es importante distinguir dos conceptos.
+
+Podemos tener:
+
+#+begin_example
+Flutter
+   |
+   v
+API Django
+   |
+   v
+PostgreSQL
+#+end_example
+
+y continuar teniendo una sola aplicación backend.
+
+A esto podemos considerarlo una arquitectura:
+
+#+begin_quote
+Frontend separado + backend monolítico.
+#+end_quote
+
+Esto NO significa que tengamos microservicios.
+
+
+*** 1.1 ¿Entonces cuál es la ventaja?
+
+Aunque Django siga siendo una sola aplicación, ya hemos separado dos
+responsabilidades importantes:
+
+#+begin_example
+        PRESENTACIÓN
+             |
+             v
+          Flutter
+
+
+        LÓGICA
+             |
+             v
+          Django
+
+
+          DATOS
+             |
+             v
+        PostgreSQL
+#+end_example
+
+Esta separación facilita posteriormente la evolución del sistema.
+
+
+** 2. ¿Por qué Flutter y Django combinan bien?
+
+Flutter se especializa principalmente en construir interfaces para:
+
+- Android,
+- iOS,
+- Web,
+- escritorio.
+
+Mientras que Django se especializa en resolver problemas del servidor.
+
+Por ejemplo:
+
+#+begin_example
+                    SISTEMA
+
+          +-----------------------+
+          |                       |
+          v                       v
+
+       Flutter                  Django
+
+    Interfaz                 Backend
+    Pantallas                Usuarios
+    Formularios              Permisos
+    Navegación               Validaciones
+    Widgets                  Reglas de negocio
+    Estado                   Base de datos
+#+end_example
+
+Cada tecnología realiza aquello para lo que está mejor preparada.
+
+
+** 3. Responsabilidades de Flutter
+
+Flutter debería encargarse principalmente de:
+
+- mostrar información,
+- capturar datos,
+- navegación,
+- manejo de pantallas,
+- componentes visuales,
+- interacción con el usuario,
+- consumir la API.
+
+
+Por ejemplo:
+
+#+begin_src dart
+final response = await http.get(
+  Uri.parse(
+    'https://servidor.com/api/alumnos/'
+  ),
+);
+#+end_src
+
+Flutter solicita información.
+
+No debería acceder directamente a PostgreSQL.
+
+
+** 4. Responsabilidades de Django
+
+Django puede encargarse de:
+
+- autenticación,
+- autorización,
+- usuarios,
+- permisos,
+- reglas de negocio,
+- validación,
+- modelos,
+- acceso a la base de datos,
+- transacciones,
+- generación de reportes,
+- comunicación con servicios externos,
+- exposición de APIs.
+
+
+Por ejemplo:
+
+#+begin_example
+Flutter
+   |
+   |
+POST /api/inscripciones/
+   |
+   v
+Django
+   |
+   +-- validar alumno
+   |
+   +-- validar periodo
+   |
+   +-- verificar grupo
+   |
+   +-- verificar cupo
+   |
+   +-- guardar inscripción
+   |
+   v
+PostgreSQL
+#+end_example
+
+
+** 5. ¿Por qué no poner la lógica de negocio en Flutter?
+
+Supongamos que tenemos una regla:
+
+#+begin_quote
+Un alumno solamente puede inscribirse si existe un periodo escolar
+activo.
+#+end_quote
+
+No sería conveniente que esta regla existiera únicamente dentro de
+Flutter.
+
+¿Por qué?
+
+Porque posteriormente podríamos tener:
+
+#+begin_example
+                Django API
+                    |
+       +------------+------------+
+       |            |            |
+       v            v            v
+
+    Flutter       React      Otro sistema
+    móvil          Web
+#+end_example
+
+Si la regla solamente estuviera implementada en Flutter, los otros
+clientes podrían ignorarla.
+
+Por eso las reglas importantes deben permanecer en el backend.
+
+
+** 6. Django como punto central del sistema
+
+Django puede convertirse en la fuente principal de las reglas de
+negocio.
+
+#+begin_example
+                Clientes
+
+        +----------+----------+
+        |          |          |
+        v          v          v
+
+     Flutter      Web        Otro
+                            sistema
+        |          |          |
+        +----------+----------+
+                   |
+                   v
+              Django API
+                   |
+             Reglas de negocio
+                   |
+                   v
+              PostgreSQL
+#+end_example
+
+Esto permite que todos los clientes respeten las mismas reglas.
+
+
+** 7. Ventaja de Django: desarrollo rápido
+
+Una de las grandes ventajas de Django es que proporciona muchas
+herramientas desde el inicio.
+
+Django incluye o facilita:
+
+- ORM,
+- autenticación,
+- usuarios,
+- permisos,
+- sesiones,
+- validación,
+- migraciones,
+- seguridad,
+- panel administrativo,
+- middleware,
+- manejo de URLs,
+- pruebas.
+
+
+Sin un framework completo tendríamos que desarrollar o integrar muchas
+de estas características manualmente.
+
+
+** 8. El ORM de Django
+
+Django proporciona un ORM que permite trabajar con la base de datos
+utilizando objetos de Python.
+
+Por ejemplo:
+
+#+begin_src python
+class Alumno(models.Model):
+
+    nombre = models.CharField(
+        max_length=150
+    )
+
+    matricula = models.CharField(
+        max_length=20
+    )
+#+end_src
+
+Después podemos consultar:
+
+#+begin_src python
+alumnos = Alumno.objects.all()
+#+end_src
+
+en lugar de escribir directamente:
+
+#+begin_src sql
+SELECT *
+FROM alumno;
+#+end_src
+
+
+*** 8.1 ¿Por qué es importante arquitectónicamente?
+
+Porque centraliza gran parte del acceso a los datos.
+
+#+begin_example
+Django
+   |
+   v
+ORM
+   |
+   v
+PostgreSQL
+#+end_example
+
+Esto facilita:
+
+- validación,
+- mantenimiento,
+- migraciones,
+- pruebas,
+- evolución del modelo.
+
+
+** 9. Django REST Framework
+
+Cuando Django trabaja con Flutter es común utilizar:
+
+#+begin_quote
+Django REST Framework
+#+end_quote
+
+conocido como:
+
+#+begin_example
+DRF
+#+end_example
+
+Django REST Framework permite convertir Django en una API.
+
+
+*** 9.1 Ejemplo
+
+Podemos tener:
+
+#+begin_src python
+class AlumnoSerializer(
+        serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Alumno
+
+        fields = "__all__"
+#+end_src
+
+
+Y posteriormente:
+
+#+begin_src python
+class AlumnoViewSet(
+        ModelViewSet):
+
+    queryset = Alumno.objects.all()
+
+    serializer_class = AlumnoSerializer
+#+end_src
+
+
+Podemos obtener automáticamente operaciones como:
+
+#+begin_example
+GET    /api/alumnos/
+
+GET    /api/alumnos/25/
+
+POST   /api/alumnos/
+
+PUT    /api/alumnos/25/
+
+PATCH  /api/alumnos/25/
+
+DELETE /api/alumnos/25/
+#+end_example
+
+
+** 10. Django permite comenzar sencillo
+
+Supongamos que estamos desarrollando un sistema escolar.
+
+Podemos comenzar con:
+
+#+begin_example
+                   Django
+
+                     |
+     +---------------+---------------+
+     |               |               |
+     v               v               v
+
+  Usuarios        Alumnos      Calificaciones
+     |
+     v
+PostgreSQL
+#+end_example
+
+Una sola aplicación puede contener varias funcionalidades.
+
+Esto tiene una ventaja importante:
+
+#+begin_quote
+No necesitamos resolver problemas distribuidos que todavía no
+tenemos.
+#+end_quote
+
+
+** 11. Aplicación monolítica
+
+Un monolito significa que gran parte del backend se despliega como una
+sola aplicación.
+
+Por ejemplo:
+
+#+begin_example
+proyecto/
+|
++-- usuarios/
+|
++-- alumnos/
+|
++-- maestros/
+|
++-- grupos/
+|
++-- calificaciones/
+|
++-- reportes/
+|
++-- inscripciones/
+#+end_example
+
+Todo pertenece al mismo proyecto Django.
+
+
+** 12. Monolito no significa código desorganizado
+
+Existe una confusión frecuente:
+
+#+begin_quote
+Monolito = aplicación mal diseñada.
+#+end_quote
+
+Esto es falso.
+
+Una aplicación monolítica puede estar perfectamente organizada.
+
+Django incluso favorece dividir el sistema en aplicaciones internas.
+
+Por ejemplo:
+
+#+begin_example
+proyecto_escolar/
+
+    usuarios/
+
+    alumnos/
+
+    docentes/
+
+    grupos/
+
+    inscripciones/
+
+    calificaciones/
+
+    reportes/
+#+end_example
+
+Cada módulo tiene responsabilidades específicas.
+
+
+** 13. Monolito modular
+
+Este concepto es especialmente importante antes de hablar de
+microservicios.
+
+Podemos construir lo que se conoce como un:
+
+#+begin_quote
+Monolito modular.
+#+end_quote
+
+La aplicación sigue siendo una sola aplicación desplegable, pero
+internamente está organizada en módulos.
+
+
+*** 13.1 Ejemplo
+
+#+begin_example
+                DJANGO
+
+       +----------+----------+
+       |          |          |
+       v          v          v
+
+    Usuarios    Ventas    Inventario
+
+       |          |          |
+       +----------+----------+
+                  |
+                  v
+             PostgreSQL
+#+end_example
+
+
+Los módulos tienen responsabilidades diferentes.
+
+Pero todavía pertenecen a la misma aplicación.
+
+
+** 14. ¿Por qué comenzar con un monolito modular?
+
+Porque resulta mucho más sencillo aprender y controlar:
+
+- las reglas de negocio,
+- las relaciones entre datos,
+- las transacciones,
+- las responsabilidades,
+- los límites de cada módulo.
+
+
+Antes de distribuir físicamente una aplicación, conviene comprender
+cómo dividirla lógicamente.
+
+
+#+begin_quote
+Primero separar responsabilidades.
+
+Después, solamente si existe una necesidad real, separar procesos.
+#+end_quote
+
+
+** 15. Evolución natural de una aplicación
+
+Una aplicación podría evolucionar de esta manera.
+
+
+*** Etapa 1: Django tradicional
+
+#+begin_example
+Usuario
+   |
+   v
+Django
+   |
+   +-- lógica
+   +-- templates
+   +-- datos
+#+end_example
+
+
+*** Etapa 2: frontend separado
+
+#+begin_example
+Flutter
+   |
+   v
+Django REST API
+   |
+   v
+PostgreSQL
+#+end_example
+
+
+*** Etapa 3: monolito modular
+
+#+begin_example
+Flutter
+   |
+   v
+Django REST API
+   |
+   +-- Usuarios
+   +-- Productos
+   +-- Ventas
+   +-- Inventario
+   +-- Pagos
+   |
+   v
+PostgreSQL
+#+end_example
+
+
+*** Etapa 4: algunos servicios independientes
+
+Posteriormente podemos descubrir que alguna parte necesita separarse.
+
+#+begin_example
+                    Flutter
+                       |
+                       v
+                   Backend
+                       |
+            +----------+----------+
+            |                     |
+            v                     v
+
+       Django Core          Notificaciones
+                              Servicio
+#+end_example
+
+
+*** Etapa 5: microservicios
+
+Si el sistema realmente lo requiere:
+
+#+begin_example
+                     Flutter
+                        |
+                        v
+                   API Gateway
+                        |
+       +----------------+----------------+
+       |                |                |
+       v                v                v
+
+    Usuarios          Pagos          Inventario
+       |                |                |
+       v                v                v
+      BD               BD               BD
+#+end_example
+
+
+** 16. Ventaja de Django: modularidad mediante aplicaciones
+
+Django permite crear aplicaciones independientes dentro de un proyecto.
+
+Por ejemplo:
+
+#+begin_src shell
+python manage.py startapp usuarios
+
+python manage.py startapp alumnos
+
+python manage.py startapp grupos
+
+python manage.py startapp calificaciones
+#+end_src
+
+Podemos obtener:
+
+#+begin_example
+sistema/
+
+    usuarios/
+
+        models.py
+        views.py
+        urls.py
+
+    alumnos/
+
+        models.py
+        views.py
+        urls.py
+
+    grupos/
+
+        models.py
+        views.py
+        urls.py
+
+    calificaciones/
+
+        models.py
+        views.py
+        urls.py
+#+end_example
+
+Esta modularidad puede ser un excelente paso previo a los
+microservicios.
+
+
+** 17. Django ayuda a encontrar los límites del sistema
+
+Supongamos que tenemos:
+
+#+begin_example
+usuarios/
+productos/
+ventas/
+inventario/
+pagos/
+notificaciones/
+#+end_example
+
+Después de varios años podemos descubrir que:
+
+- pagos cambia frecuentemente,
+- notificaciones procesa miles de eventos,
+- inventario necesita escalar independientemente.
+
+Entonces tenemos evidencia para considerar la separación.
+
+
+#+begin_example
+                 Django Core
+
+       usuarios
+       productos
+       ventas
+       inventario
+       pagos
+       notificaciones
+#+end_example
+
+Podríamos evolucionar a:
+
+#+begin_example
+              Sistema
+
+                 |
+        +--------+--------+
+        |        |        |
+        v        v        v
+
+      Core     Pagos   Notificaciones
+     Django   Servicio    Servicio
+#+end_example
+
+No necesitamos dividir todo al mismo tiempo.
+
+
+** 18. Django también puede utilizarse para microservicios
+
+Es importante aclarar algo:
+
+#+begin_quote
+Django no está limitado a aplicaciones monolíticas.
+#+end_quote
+
+También podemos crear microservicios con Django.
+
+Por ejemplo:
+
+#+begin_example
+Servicio usuarios
+    Django
+
+Servicio alumnos
+    Django
+
+Servicio pagos
+    Django
+
+Servicio inventario
+    Django
+#+end_example
+
+
+Sin embargo, esto no significa que cada servicio necesariamente deba
+utilizar Django.
+
+Podrían coexistir distintas tecnologías.
+
+#+begin_example
+                 API Gateway
+
+                      |
+      +---------------+---------------+
+      |               |               |
+      v               v               v
+
+   Usuarios         Pagos        Inteligencia
+    Django          Java            Python
+                                     FastAPI
+#+end_example
+
+
+** 19. ¿Qué ventajas tiene Django para construir servicios?
+
+Django ofrece varias ventajas importantes.
+
+
+*** 19.1 Autenticación
+
+Django cuenta con un sistema maduro de autenticación.
+
+
+*** 19.2 Permisos
+
+Podemos administrar:
+
+- usuarios,
+- grupos,
+- roles,
+- permisos.
+
+
+*** 19.3 ORM
+
+Facilita trabajar con bases de datos relacionales.
+
+
+*** 19.4 Migraciones
+
+Permite evolucionar la estructura de la base de datos.
+
+
+*** 19.5 Django REST Framework
+
+Permite crear APIs rápidamente.
+
+
+*** 19.6 Panel administrativo
+
+Django Admin permite construir interfaces administrativas con muy poco
+código.
+
+
+*** 19.7 Seguridad
+
+Django proporciona mecanismos para ayudar a evitar problemas comunes
+como:
+
+- CSRF,
+- XSS,
+- inyección SQL,
+- manejo inseguro de sesiones.
+
+
+** 20. Django Admin como ventaja importante
+
+Una de las características más útiles de Django es:
+
+#+begin_quote
+Django Admin
+#+end_quote
+
+Por ejemplo:
+
+#+begin_src python
+@admin.register(Alumno)
+class AlumnoAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "matricula",
+        "nombre",
+    )
+#+end_src
+
+Con muy poco código podemos obtener una interfaz administrativa.
+
+Esto es especialmente útil para:
+
+- sistemas escolares,
+- sistemas administrativos,
+- prototipos,
+- aplicaciones empresariales,
+- catálogos,
+- mantenimiento de información.
+
+
+** 21. ¿Por qué Django puede ser conveniente antes de microservicios?
+
+Porque permite concentrarnos primero en el problema real.
+
+Por ejemplo:
+
+#+begin_example
+¿Qué necesita el sistema?
+
+¿Qué entidades existen?
+
+¿Cómo se relacionan?
+
+¿Qué reglas existen?
+
+¿Qué permisos necesitamos?
+
+¿Qué módulos existen?
+#+end_example
+
+Antes de preocuparnos por:
+
+#+begin_example
+¿Cómo se comunican los servicios?
+
+¿Qué broker utilizaremos?
+
+¿Cómo distribuimos transacciones?
+
+¿Cómo sincronizamos datos?
+
+¿Cómo hacemos observabilidad?
+
+¿Cómo implementamos API Gateway?
+#+end_example
+
+
+** 22. Problemas que aparecen con los microservicios
+
+Cuando dividimos una aplicación aparecen nuevos problemas.
+
+
+*** 22.1 Comunicación por red
+
+Antes:
+
+#+begin_src python
+usuario = obtener_usuario(id)
+#+end_src
+
+Después podría convertirse en:
+
+#+begin_example
+Servicio A
+
+   |
+   | HTTP
+   v
+
+Servicio Usuarios
+#+end_example
+
+Ahora pueden existir:
+
+- latencia,
+- timeout,
+- desconexiones,
+- errores HTTP.
+
+
+** 23. Fallos parciales
+
+En un monolito:
+
+#+begin_example
+Django
+|
++-- ventas
++-- inventario
++-- usuarios
+#+end_example
+
+todo se ejecuta dentro del mismo proceso o infraestructura principal.
+
+En microservicios:
+
+#+begin_example
+Ventas --------> Inventario
+   |
+   +-----------> Pagos
+   |
+   +-----------> Notificaciones
+#+end_example
+
+puede suceder que:
+
+#+begin_example
+Ventas             OK
+
+Inventario         OK
+
+Pagos              ERROR
+
+Notificaciones     OK
+#+end_example
+
+Entonces debemos decidir:
+
+#+begin_quote
+¿Qué hacemos si solamente una parte de la operación falla?
+#+end_quote
+
+Este problema no es trivial.
+
+
+** 24. Transacciones distribuidas
+
+Supongamos que realizamos una compra.
+
+Necesitamos:
+
+1. crear pedido,
+2. descontar inventario,
+3. realizar pago,
+4. generar envío.
+
+
+En un sistema monolítico podría existir una transacción:
+
+#+begin_example
+BEGIN
+
+crear pedido
+
+descontar inventario
+
+registrar pago
+
+COMMIT
+#+end_example
+
+Si algo falla:
+
+#+begin_example
+ROLLBACK
+#+end_example
+
+Con microservicios:
+
+#+begin_example
+Pedidos
+   |
+   v
+Inventario
+   |
+   v
+Pagos
+   |
+   v
+Envíos
+#+end_example
+
+cada servicio podría utilizar una base de datos distinta.
+
+Ya no tenemos una única transacción sencilla.
+
+
+** 25. Consistencia eventual
+
+Los sistemas distribuidos frecuentemente necesitan trabajar con
+consistencia eventual.
+
+Por ejemplo:
+
+#+begin_example
+Venta realizada
+      |
+      v
+Mensaje
+      |
+      v
+Inventario actualizado
+#+end_example
+
+Durante algunos instantes dos servicios podrían tener información
+diferente.
+
+Esto requiere diseños más avanzados.
+
+
+** 26. Los microservicios necesitan infraestructura adicional
+
+Una arquitectura basada en microservicios puede requerir:
+
+- Docker,
+- Kubernetes,
+- API Gateway,
+- balanceadores,
+- service discovery,
+- RabbitMQ,
+- Kafka,
+- Redis,
+- monitoreo,
+- métricas,
+- tracing,
+- centralización de logs.
+
+
+Por ejemplo:
+
+#+begin_example
+                    Cliente
+                      |
+                      v
+                  Gateway
+                      |
+        +-------------+-------------+
+        |             |             |
+        v             v             v
+     Servicio       Servicio       Servicio
+        |             |             |
+        +-------------+-------------+
+                      |
+                 Message Broker
+                      |
+                 RabbitMQ/Kafka
+#+end_example
+
+
+** 27. Microservicios aumentan el costo operacional
+
+En un monolito podríamos desplegar:
+
+#+begin_example
+Django
+PostgreSQL
+#+end_example
+
+En microservicios podríamos terminar administrando:
+
+#+begin_example
+usuarios
+productos
+ventas
+inventario
+pagos
+envios
+notificaciones
+gateway
+broker
+redis
+bases de datos
+monitorización
+#+end_example
+
+Cada componente necesita:
+
+- configuración,
+- despliegue,
+- seguridad,
+- monitoreo,
+- actualización.
+
+
+** 28. Por eso no conviene comenzar necesariamente con microservicios
+
+Una arquitectura podría parecer más moderna:
+
+#+begin_example
+               Microservicios
+#+end_example
+
+pero esto no significa automáticamente:
+
+#+begin_example
+               Mejor arquitectura
+#+end_example
+
+La arquitectura debe responder a las necesidades del sistema.
+
+
+#+begin_quote
+La complejidad arquitectónica debe justificarse mediante una necesidad
+real.
+#+end_quote
+
+
+** 29. Ventajas de comenzar con Django + Flutter
+
+Podemos resumir varias ventajas.
+
+
+*** 29.1 Menor complejidad inicial
+
+#+begin_example
+Flutter
+   |
+Django
+   |
+PostgreSQL
+#+end_example
+
+es relativamente sencillo de comprender.
+
+
+*** 29.2 Separación clara
+
+Flutter:
+
+#+begin_example
+Interfaz
+#+end_example
+
+Django:
+
+#+begin_example
+Lógica y API
+#+end_example
+
+PostgreSQL:
+
+#+begin_example
+Datos
+#+end_example
+
+
+*** 29.3 Desarrollo rápido
+
+Django ya incorpora muchas herramientas.
+
+
+*** 29.4 Menor infraestructura
+
+No necesitamos inicialmente:
+
+- múltiples servidores,
+- brokers,
+- gateways,
+- service discovery.
+
+
+*** 29.5 Pruebas más sencillas
+
+Podemos probar el sistema dentro de un mismo proyecto.
+
+
+*** 29.6 Refactorización más sencilla
+
+Mover código dentro del mismo proyecto suele ser más sencillo que mover
+funcionalidad entre servicios distribuidos.
+
+
+*** 29.7 Permite descubrir los límites reales
+
+Conforme crece el sistema descubrimos qué módulos realmente necesitan
+separarse.
+
+
+** 30. ¿Cuándo comenzar a considerar microservicios?
+
+Los microservicios comienzan a resultar interesantes cuando aparecen
+necesidades concretas.
+
+
+*** Caso 1: escalamiento independiente
+
+Supongamos:
+
+#+begin_example
+Usuarios
+
+1 000 peticiones/minuto
+
+
+Procesamiento de imágenes
+
+100 000 peticiones/minuto
+#+end_example
+
+Quizá no tenga sentido escalar toda la aplicación.
+
+Podríamos separar procesamiento de imágenes.
+
+
+** 31. Caso 2: equipos diferentes
+
+Supongamos que tenemos:
+
+#+begin_example
+Equipo A
+Usuarios
+
+Equipo B
+Pagos
+
+Equipo C
+Inventario
+
+Equipo D
+Logística
+#+end_example
+
+Si los equipos necesitan desplegar independientemente, los
+microservicios pueden aportar ventajas.
+
+
+** 32. Caso 3: tecnologías diferentes
+
+Tal vez una parte del sistema requiera:
+
+#+begin_example
+Django
+#+end_example
+
+pero otra requiera:
+
+#+begin_example
+Python + IA
+#+end_example
+
+y otra:
+
+#+begin_example
+Java
+#+end_example
+
+Una arquitectura distribuida permite cierta independencia tecnológica.
+
+
+** 33. Caso 4: procesos muy especializados
+
+Supongamos una aplicación médica.
+
+#+begin_example
+             Plataforma
+
+                 |
+     +-----------+-----------+
+     |           |           |
+     v           v           v
+
+ Pacientes   Imágenes     Reportes
+               |
+               v
+              IA
+#+end_example
+
+El procesamiento de imágenes podría necesitar:
+
+- GPU,
+- Python,
+- OpenCV,
+- PyTorch,
+- servidores especializados.
+
+Ese módulo podría tener sentido como servicio independiente.
+
+
+** 34. ¿Todo debe convertirse en microservicio?
+
+No.
+
+Podemos tener una arquitectura híbrida.
+
+#+begin_example
+                   Flutter
+                      |
+                      v
+                  Django
+                      |
+       +--------------+--------------+
+       |              |              |
+       v              v              v
+
+    Usuarios        Grupos      Calificaciones
+
+                      |
+                      |
+                      +----------+
+                                 |
+                                 v
+
+                        Servicio especializado
+                          procesamiento IA
+#+end_example
+
+La mayor parte de la aplicación puede permanecer en Django.
+
+Solamente se extraen las partes que realmente lo necesitan.
+
+
+** 35. De módulo Django a microservicio
+
+Supongamos que inicialmente tenemos:
+
+#+begin_example
+proyecto/
+
+    usuarios/
+
+    inventario/
+
+    ventas/
+
+    notificaciones/
+#+end_example
+
+Después descubrimos que notificaciones necesita escalar mucho.
+
+Podemos extraer:
+
+#+begin_example
+Django Principal
+   |
+   +-- usuarios
+   +-- inventario
+   +-- ventas
+
+
+Servicio Notificaciones
+#+end_example
+
+Ahora ambos pueden comunicarse mediante:
+
+#+begin_example
+HTTP
+#+end_example
+
+o:
+
+#+begin_example
+RabbitMQ
+#+end_example
+
+
+** 36. Aquí aparece otra ventaja del diseño modular
+
+Si desde el inicio tenemos:
+
+#+begin_example
+ventas/
+notificaciones/
+inventario/
+#+end_example
+
+bien separados, posteriormente es más sencillo extraer un módulo.
+
+Pero si tenemos:
+
+#+begin_example
+views.py
+    15 000 líneas
+
+models.py
+    8 000 líneas
+
+utils.py
+    todo mezclado
+#+end_example
+
+convertirlo en microservicios será mucho más difícil.
+
+Por eso:
+
+#+begin_quote
+Un buen monolito modular puede ser una excelente preparación para una
+arquitectura de microservicios.
+#+end_quote
+
+
+** 37. Patrones de diseño dentro de Django
+
+Antes de estudiar microservicios podemos aplicar patrones dentro del
+propio backend.
+
+Por ejemplo:
+
+#+begin_example
+                 Django
+
+                    |
+             Controller/API
+                    |
+                 Service
+                    |
+        +-----------+-----------+
+        |           |           |
+        v           v           v
+
+    Strategy     Adapter     Repository
+#+end_example
+
+
+** 38. Strategy en Django
+
+Supongamos diferentes formas de calcular una calificación.
+
+#+begin_example
+           EstrategiaEvaluacion
+                   |
+       +-----------+-----------+
+       |           |           |
+       v           v           v
+
+   Promedio     Ponderado    Competencias
+#+end_example
+
+No necesitamos microservicios.
+
+Es un problema de diseño interno.
+
+
+** 39. Adapter en Django
+
+Supongamos que integramos:
+
+#+begin_example
+PayPal
+
+Stripe
+
+Mercado Pago
+#+end_example
+
+Podemos crear adaptadores:
+
+#+begin_example
+            PagoAdapter
+                 |
+      +----------+----------+
+      |          |          |
+      v          v          v
+
+   PayPal      Stripe    MercadoPago
+#+end_example
+
+Nuevamente:
+
+#+begin_quote
+No necesitamos crear tres microservicios solamente porque tenemos tres
+proveedores.
+#+end_quote
+
+
+** 40. Service Layer
+
+También podemos separar la lógica de negocio de las vistas.
+
+Por ejemplo, en lugar de:
+
+#+begin_src python
+class InscripcionView(APIView):
+
+    def post(self, request):
+
+        # 100 líneas de reglas
+        # validaciones
+        # consultas
+        # cálculos
+        # guardar datos
+#+end_src
+
+podemos utilizar:
+
+#+begin_src python
+class InscripcionService:
+
+    def inscribir(
+        self,
+        alumno,
+        grupo
+    ):
+
+        # reglas de negocio
+
+        pass
+#+end_src
+
+y la vista simplemente:
+
+#+begin_src python
+service = InscripcionService()
+
+service.inscribir(
+    alumno,
+    grupo
+)
+#+end_src
+
+
+** 41. Esto prepara mejor el camino hacia microservicios
+
+Ahora tenemos:
+
+#+begin_example
+API
+ |
+ v
+Service
+ |
+ v
+Repository
+ |
+ v
+Datos
+#+end_example
+
+Si algún día queremos extraer esa funcionalidad, sus responsabilidades
+ya están mejor definidas.
+
+
+** 42. Arquitectura recomendada inicialmente
+
+Para una aplicación web/móvil de tamaño pequeño o mediano podríamos
+tener:
+
+#+begin_example
+                       FLUTTER
+
+                   Presentación
+                        |
+                        |
+                     HTTPS
+                        |
+                        v
+               DJANGO REST API
+
+             +----------+----------+
+             |          |          |
+             v          v          v
+
+         Usuarios     Escuela    Reportes
+             |          |          |
+             +----------+----------+
+                        |
+                        v
+
+                    Servicios
+
+                        |
+                        v
+
+                      ORM
+
+                        |
+                        v
+
+                   PostgreSQL
+#+end_example
+
+
+** 43. Evolución posterior
+
+Si existe una necesidad real:
+
+#+begin_example
+                        Flutter
+
+                           |
+                           v
+
+                       Gateway
+
+                           |
+        +------------------+------------------+
+        |                  |                  |
+        v                  v                  v
+
+    Django Core         Reportes          IA
+                        Servicio        Servicio
+                           |               |
+                           v               v
+                      PostgreSQL          GPU
+#+end_example
+
+No fue necesario convertir cada módulo en microservicio.
+
+
+** 44. Una ruta de aprendizaje recomendable
+
+Para comprender correctamente estas arquitecturas podemos estudiar en
+este orden:
+
+
+*** Nivel 1
+
+#+begin_example
+Aplicación Django sencilla
+#+end_example
+
+Aprender:
+
+- modelos,
+- vistas,
+- URLs,
+- ORM,
+- autenticación.
+
+
+*** Nivel 2
+
+#+begin_example
+Django REST Framework
+#+end_example
+
+Aprender:
+
+- REST,
+- HTTP,
+- JSON,
+- serializers,
+- API,
+- autenticación por tokens.
+
+
+*** Nivel 3
+
+#+begin_example
+Flutter + Django
+#+end_example
+
+Aprender:
+
+- frontend/backend,
+- consumo de APIs,
+- separación de responsabilidades.
+
+
+*** Nivel 4
+
+#+begin_example
+Monolito modular
+#+end_example
+
+Aprender:
+
+- módulos,
+- capas,
+- servicios,
+- dependencias,
+- patrones de diseño.
+
+
+*** Nivel 5
+
+#+begin_example
+Docker
+#+end_example
+
+Aprender:
+
+- contenerización,
+- despliegue,
+- variables de entorno.
+
+
+*** Nivel 6
+
+#+begin_example
+Servicios independientes
+#+end_example
+
+Aprender:
+
+- comunicación entre procesos,
+- APIs internas,
+- autenticación entre servicios.
+
+
+*** Nivel 7
+
+#+begin_example
+Microservicios
+#+end_example
+
+Aprender:
+
+- API Gateway,
+- mensajería,
+- eventos,
+- observabilidad,
+- consistencia distribuida,
+- escalamiento.
+
+
+** 45. Comparación
+
+| Aspecto | Django monolítico modular | Microservicios |
+|---------+----------------------------+----------------|
+| Inicio | Sencillo | Complejo |
+| Despliegue | Uno | Varios |
+| Comunicación | Interna | Red |
+| Base de datos | Puede ser única | Normalmente distribuidas |
+| Debug | Más sencillo | Más complejo |
+| Transacciones | Sencillas | Más complejas |
+| Infraestructura | Menor | Mayor |
+| Escalamiento | Aplicación completa | Servicio individual |
+| Equipos pequeños | Adecuado | Puede ser excesivo |
+| Equipos grandes | Puede complicarse | Puede aportar independencia |
+| Desarrollo inicial | Rápido | Más lento |
+| Operación | Sencilla | Compleja |
+
+
+** 46. Django frente a los microservicios
+
+No debemos formular la comparación como:
+
+#+begin_example
+Django VS Microservicios
+#+end_example
+
+porque pertenecen a conceptos diferentes.
+
+Django es:
+
+#+begin_quote
+Un framework de desarrollo web.
+#+end_quote
+
+Microservicios es:
+
+#+begin_quote
+Un estilo arquitectónico.
+#+end_quote
+
+Por lo tanto podemos tener:
+
+#+begin_example
+Django monolítico
+#+end_example
+
+o:
+
+#+begin_example
+Django dentro de microservicios
+#+end_example
+
+
+** 47. La comparación correcta
+
+Podemos comparar:
+
+#+begin_example
+Monolito modular
+
+VS
+
+Microservicios
+#+end_example
+
+mientras que Django puede utilizarse en ambos.
+
+
+#+begin_example
+                    Django
+
+                 /          \
+
+                /            \
+
+       Monolito modular    Microservicio
+#+end_example
+
+
+** 48. ¿Qué ventaja tiene Django antes de migrar a microservicios?
+
+La principal ventaja es que permite:
+
+1. construir rápidamente el sistema,
+2. descubrir las reglas reales del negocio,
+3. identificar módulos,
+4. encontrar dependencias,
+5. descubrir qué componentes realmente necesitan escalar,
+6. probar la arquitectura,
+7. evitar complejidad prematura.
+
+
+Podemos resumirlo así:
+
+#+begin_example
+Primero:
+
+    resolver el problema
+
+Después:
+
+    organizar correctamente
+
+Después:
+
+    medir
+
+Después:
+
+    detectar problemas reales
+
+Finalmente, si es necesario:
+
+    distribuir
+#+end_example
+
+
+** 49. Error frecuente
+
+Un error frecuente consiste en pensar:
+
+#+begin_quote
+Voy a utilizar microservicios porque mi aplicación algún día podría
+tener millones de usuarios.
+#+end_quote
+
+Esto puede llevar a construir una infraestructura compleja antes de
+tener usuarios.
+
+Sería parecido a construir:
+
+#+begin_example
+10 edificios
+
+10 estacionamientos
+
+10 recepciones
+
+10 sistemas eléctricos
+#+end_example
+
+para una organización que todavía utiliza solamente una oficina.
+
+
+** 50. Otro error: microservicio por tabla
+
+Esto sería una mala interpretación:
+
+#+begin_example
+Tabla Alumno
+    =
+Microservicio Alumno
+
+Tabla Maestro
+    =
+Microservicio Maestro
+
+Tabla Grupo
+    =
+Microservicio Grupo
+#+end_example
+
+Los microservicios no deberían dividirse simplemente por tablas.
+
+Normalmente representan capacidades del negocio.
+
+
+** 51. Dividir por responsabilidad del negocio
+
+Por ejemplo:
+
+#+begin_example
+Gestión académica
+
+    alumnos
+    grupos
+    materias
+    calificaciones
+
+
+Identidad
+
+    usuarios
+    autenticación
+    permisos
+
+
+Facturación
+
+    pagos
+    facturas
+    movimientos
+#+end_example
+
+Estos límites tienen más sentido que crear un servicio por cada tabla.
+
+
+** 52. Ejemplo con un sistema escolar
+
+Inicialmente:
+
+#+begin_example
+                     Flutter
+                        |
+                        v
+                      Django
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+
+      Usuarios        Escolar      Reportes
+
+                        |
+                        v
+                   PostgreSQL
+#+end_example
+
+
+Posteriormente el sistema podría crecer.
+
+#+begin_example
+                    Flutter
+                       |
+                       v
+                   Gateway
+                       |
+      +----------------+----------------+
+      |                |                |
+      v                v                v
+
+ Identidad        Académico        Reportes
+   Django           Django        Servicio
+      |                |                |
+      v                v                v
+     BD               BD               BD
+#+end_example
+
+Pero esta división aparece después de identificar necesidades reales.
+
+
+** 53. Principio importante
+
+Una idea útil para arquitectura de software es:
+
+#+begin_quote
+No distribuir prematuramente aquello que todavía no sabemos organizar
+dentro de una sola aplicación.
+#+end_quote
+
+Si los módulos están fuertemente mezclados dentro de Django, convertirlos
+en microservicios no resolverá automáticamente el problema.
+
+Podría convertir:
+
+#+begin_example
+código desorganizado
+#+end_example
+
+en:
+
+#+begin_example
+código desorganizado distribuido por la red
+#+end_example
+
+lo cual generalmente es todavía más difícil de mantener.
+
+
+** 54. Conclusión
+
+Una arquitectura:
+
+#+begin_example
+Flutter
+   |
+   v
+Django REST Framework
+   |
+   v
+PostgreSQL
+#+end_example
+
+es una excelente opción para comenzar muchos proyectos web y móviles.
+
+Permite:
+
+- separar frontend y backend,
+- centralizar reglas de negocio,
+- reutilizar la API,
+- aprovechar Django ORM,
+- utilizar autenticación y permisos,
+- desarrollar rápidamente,
+- mantener una infraestructura relativamente sencilla.
+
+
+Antes de utilizar microservicios resulta conveniente aprender a
+construir un:
+
+#+begin_quote
+Monolito modular bien diseñado.
+#+end_quote
+
+Posteriormente, si aparecen necesidades reales de:
+
+- escalamiento,
+- independencia,
+- diferentes equipos,
+- tecnologías especializadas,
+- despliegues independientes,
+
+podemos extraer determinados módulos y convertirlos en servicios.
+
+
+La evolución recomendable puede visualizarse así:
+
+#+begin_example
+       Aplicación sencilla
+               |
+               v
+         Django organizado
+               |
+               v
+      Django REST Framework
+               |
+               v
+        Flutter + Django
+               |
+               v
+        Monolito modular
+               |
+               v
+       Identificar límites
+               |
+               v
+      Extraer algún servicio
+               |
+               v
+         Microservicios
+        si son necesarios
+#+end_example
+
+
+#+begin_quote
+La meta no es construir microservicios.
+
+La meta es construir un sistema mantenible.
+
+Los microservicios son solamente una posible herramienta para conseguirlo
+cuando las necesidades del sistema justifican su complejidad.
+#+end_quote
+
+
+** 55. Preguntas para discusión
+
+1. ¿Separar Flutter y Django significa utilizar microservicios?
+
+2. ¿Qué responsabilidades deberían permanecer en Django?
+
+3. ¿Por qué Flutter no debería conectarse directamente a PostgreSQL?
+
+4. ¿Qué es un monolito modular?
+
+5. ¿Por qué un monolito no necesariamente representa una mala
+   arquitectura?
+
+6. ¿Qué ventajas proporciona Django antes de considerar
+   microservicios?
+
+7. ¿Qué nuevos problemas aparecen cuando distribuimos una aplicación?
+
+8. ¿Qué diferencia existe entre un módulo Django y un microservicio?
+
+9. ¿Cuándo tendría sentido extraer un módulo de Django y convertirlo
+   en servicio?
+
+10. ¿Por qué no sería conveniente crear un microservicio por cada tabla
+    de la base de datos?
+
+11. ¿Django puede utilizarse para desarrollar un microservicio?
+
+12. ¿Por qué deberíamos identificar primero los límites del negocio
+    antes de dividir físicamente el sistema?
