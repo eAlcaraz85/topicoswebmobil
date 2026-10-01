@@ -4216,6 +4216,645 @@ Al final de =index.php=, tras pintar, el servidor hace una serie de =file_get_co
 | Diez o más =file_get_contents= al pintar el inicio | =index.php=, =index1.php= | 6 | Agregación (BFF o un =GET= de pantalla). No Factory |
 | Diagrama =Estudiantes_V2= y XML; el SQL y el PHP usan =perfiles= / =usuarios_sys= / =historial_academico= | =documentacion/=, =bd/=, login y kardex | — | El modelo del papel no es el del programa; lava flow, no un patrón de pago |
 
+** Arrancar Django para la plataforma de entregas
+
+En este apartado vamos a preparar el proyecto en Django desde cero y a
+mostrar un primer mensaje en el navegador. Todavía no vamos a
+registrar pedidos ni a conectar la inteligencia artificial: eso se hace
+en los cinco días de trabajo que vienen después. Aquí el objetivo es
+más modesto y más importante: entender qué crea cada comando y qué
+papel tiene cada archivo, antes de escribir la lógica de la empresa.
+
+Usamos Django porque ya resuelve varias de las cosas que estudiamos en
+los apuntes. Tiene una entrada única para todas las peticiones, un
+archivo de rutas, middleware para la sesión y la seguridad, y
+plantillas para generar el HTML. No hace falta programar esas piezas a
+mano; hay que aprender a usarlas bien.
+
+*** Entorno virtual y contenedor
+
+Antes de instalar nada conviene separar dos ideas que suelen
+mezclarse: el entorno virtual y el contenedor. Son cosas distintas y
+no se necesitan al mismo tiempo.
+
+Un *entorno virtual* es una carpeta que contiene una copia de Python y
+las bibliotecas de un solo proyecto. Si instalamos Django sin él, se
+instala en el Python del sistema y puede chocar con las versiones que
+usa otra materia u otro proyecto. Con un entorno virtual, cada
+proyecto tiene sus propias versiones y cualquier compañero puede
+reproducir la misma instalación. En este curso lo vamos a usar desde
+el primer comando. No tiene nada que ver con la arquitectura del
+sistema: solo sirve para que todos trabajen con lo mismo.
+
+Para entender por qué hace falta, piensen en este caso. En otra
+materia instalaron Django 4 para un proyecto viejo. Ahora, en esta
+materia, necesitan Django 5. Si los dos se instalan en el mismo
+Python, solo puede quedar una versión: al instalar la nueva, el
+proyecto viejo deja de funcionar. Con un entorno virtual por proyecto,
+cada uno tiene su propia caja de herramientas y no se estorban.
+
+Por dentro, un entorno virtual no tiene nada mágico. Es una carpeta
+con tres cosas:
+
+- Un ejecutable de Python y otro de =pip= propios del proyecto (en
+  =.venv/bin/= en Linux y macOS, en =.venv\Scripts\= en Windows).
+- Una carpeta donde se guardan las bibliotecas que instalen (en
+  =site-packages=). Ahí queda Django.
+- Un archivo pequeño, =pyvenv.cfg=, que indica a partir de qué Python
+  se creó el entorno.
+
+/Activar/ el entorno solo cambia la terminal en la que están
+trabajando: hace que, al escribir =python= o =pip=, se usen los de la
+carpeta =.venv= y no los del sistema. No instala nada ni cambia la
+computadora. Por eso, cada vez que abran una terminal nueva hay que
+volver a activarlo, y para salir basta con escribir =deactivate=. Si
+algo se descompone, se puede borrar la carpeta =.venv= y crearla otra
+vez a partir de =requirements.txt= sin perder el código.
+
+Un *contenedor* (por ejemplo, con Docker) empaqueta la aplicación
+junto con el sistema operativo base y las bibliotecas que necesita.
+Así se ejecuta igual en cualquier computadora, aunque esa computadora
+no tenga instalada la versión correcta de Python. Es útil, pero no
+cambia el diseño: si dentro del contenedor corre un solo proyecto de
+Django, seguimos teniendo una sola aplicación.
+
+El contenedor cobra más importancia cuando la aplicación crece. Si la
+plataforma de entregas pasa de unos cuantos usuarios a miles de
+personas consultando el estado de su pedido al mismo tiempo, un solo
+proceso ya no alcanza. Con una imagen de contenedor se pueden
+arrancar varias copias idénticas de la misma aplicación y repartir
+las peticiones entre ellas. Eso se explica con detalle en el paso 4.
+
+Por eso el orden recomendado es este:
+
+1. Ahora: entorno virtual, un proyecto Django, una aplicación llamada
+   =entregas= y un mensaje de prueba en el navegador.
+2. Después, cuando eso ya funcione y si el equipo lo necesita: un
+   contenedor que ejecute ese mismo proyecto.
+
+Una comparación sencilla: primero se aprende a cocinar en una sola
+cocina. Después esa cocina se puede montar en un camión para llevarla
+a otro lugar, y la receta sigue siendo la misma.
+
+*** Qué partes de Django corresponden a lo que vimos en los apuntes
+
+No vamos a implementar los patrones del libro desde cero. Vamos a
+reconocer cuáles ya vienen incluidos en Django para no duplicarlos.
+
+| Parte de Django | A qué corresponde en los apuntes | Lo que no es |
+|-----------------+----------------------------------+--------------|
+| El archivo =urls.py= del proyecto, junto con =wsgi.py= | Front Controller: todas las peticiones entran por un mismo lugar | Un archivo PHP distinto para cada trámite |
+| Una vista en =entregas/views.py= | Page Controller: atiende un trámite concreto | El lugar para poner el =switch= de los medios de entrega |
+| El middleware configurado en =settings.py= | La cadena de responsabilidades: sesión, seguridad, bitácora | Strategy: el middleware no decide si va la moto o el dron |
+| Las plantillas =.html= | Template View: muestran datos que ya vienen preparados | Un lugar para hacer consultas a la base de datos |
+| Una aplicación creada con =startapp= | Un módulo del sistema con una responsabilidad | Un programa aparte: sigue dentro del mismo proyecto |
+| El ORM en =models.py= | El acceso a datos (en Django suele ser Active Record) | Un Repository obligatorio; no hace falta fingirlo |
+| =transaction.atomic= | Unit of Work: varias operaciones se guardan juntas o ninguna | Observer |
+
+El mensaje de prueba que vamos a hacer usa solo las dos primeras
+filas: la entrada única y una vista. El resto se irá agregando cuando
+el problema de la empresa lo pida.
+
+*** Paso 1 — Crear la carpeta del proyecto y el entorno virtual
+
+Los comandos cambian un poco según el sistema operativo. Sigan solo la
+parte que corresponde a su computadora; a partir de la instalación de
+Django los pasos son iguales para todos.
+
+**** En Linux y macOS
+
+Abran una terminal y colóquense en la carpeta donde el equipo va a
+guardar su trabajo. Luego ejecuten:
+
+#+begin_src shell
+mkdir -p plataforma-entregas
+cd plataforma-entregas
+python3 -m venv .venv
+source .venv/bin/activate
+#+end_src
+
+El primer comando crea la carpeta del proyecto y el segundo entra en
+ella. El tercero crea el entorno virtual dentro de una carpeta oculta
+llamada =.venv=. El cuarto lo activa: a partir de ese momento, los
+comandos =python= y =pip= usan el Python del proyecto y no el del
+sistema.
+
+**** En Windows
+
+Primero hay que tener Python instalado correctamente:
+
+1. Descarguen el instalador desde [[https://www.python.org/downloads/][python.org]] (versión 3.12 o más
+   reciente).
+2. En la primera pantalla del instalador marquen la casilla /Add
+   python.exe to PATH/. Si no la marcan, la terminal no va a encontrar
+   Python.
+3. Al terminar, abran una terminal nueva y comprueben la instalación:
+
+#+begin_src powershell
+py --version
+#+end_src
+
+En Windows, además de =python=, se instala un lanzador llamado =py=,
+que es la forma más segura de llamar a Python. Si al escribir =python=
+se abre la Microsoft Store, es porque Windows tiene un acceso directo
+que la reemplaza. Se desactiva en /Configuración → Aplicaciones →
+Configuración avanzada de aplicaciones → Alias de ejecución de
+aplicaciones/, apagando las opciones de =python.exe= y =python3.exe=.
+Mientras tanto, pueden usar =py= sin problema.
+
+Con Python listo, abran *PowerShell* (es la terminal que trae Windows
+y la que usa Visual Studio Code por defecto) y ejecuten:
+
+#+begin_src powershell
+mkdir plataforma-entregas
+cd plataforma-entregas
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+#+end_src
+
+Los comandos hacen lo mismo que en Linux: crear la carpeta, entrar en
+ella, crear el entorno virtual y activarlo. La diferencia es que en
+Windows los ejecutables del entorno quedan en =.venv\Scripts\= en
+lugar de =.venv/bin/=.
+
+La primera vez es común que PowerShell muestre un error parecido a
+/«la ejecución de scripts está deshabilitada en este sistema»/. Es una
+protección de Windows que impide ejecutar archivos =.ps1=, y el
+activador del entorno es uno de ellos. Se soluciona una sola vez, para
+su usuario, con este comando:
+
+#+begin_src powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+#+end_src
+
+Después de eso, vuelvan a ejecutar =.venv\Scripts\Activate.ps1=.
+
+Si usan otra terminal, el activador cambia:
+
+| Terminal en Windows | Comando para activar |
+|---------------------+----------------------|
+| PowerShell | =.venv\Scripts\Activate.ps1= |
+| Símbolo del sistema (=cmd=) | =.venv\Scripts\activate.bat= |
+| Git Bash | =source .venv/Scripts/activate= |
+
+En Visual Studio Code conviene indicarle al editor qué Python usar:
+abran la paleta de comandos con =Ctrl+Shift+P=, busquen /Python:
+Select Interpreter/ y elijan el que aparece dentro de =.venv=. Así el
+editor y la terminal integrada usan el mismo entorno.
+
+**** Comprobar que el entorno está activo
+
+En cualquier sistema, la terminal muestra =(.venv)= al inicio de la
+línea cuando el entorno está activo. Para estar seguros pueden
+preguntar qué Python se está usando:
+
+#+begin_src shell
+python -c "import sys; print(sys.prefix)"
+#+end_src
+
+La ruta que aparece debe terminar en =plataforma-entregas/.venv= (o
+=plataforma-entregas\.venv= en Windows). Si muestra la ruta del Python
+del sistema, el entorno no está activo y lo que instalen irá al lugar
+equivocado.
+
+**** Instalar Django y guardar las dependencias
+
+Con el entorno activo, instalen Django. Estos comandos son iguales en
+Linux, macOS y Windows:
+
+#+begin_src shell
+python -m pip install --upgrade pip
+pip install "django>=5.0,<6"
+#+end_src
+
+El primer comando actualiza el instalador de paquetes. El segundo
+instala Django en una versión de la serie 5.
+
+Cuando el equipo esté de acuerdo con las versiones, guarden la lista
+de dependencias:
+
+#+begin_src shell
+pip freeze > requirements.txt
+#+end_src
+
+En Windows PowerShell 5 (el que viene instalado en Windows 10 y 11),
+el símbolo =>= guarda el archivo con una codificación distinta a la
+habitual, y a veces otras herramientas no lo leen bien. Para evitarlo,
+en PowerShell usen esta forma:
+
+#+begin_src powershell
+pip freeze | Out-File -Encoding utf8 requirements.txt
+#+end_src
+
+El archivo =requirements.txt= sí se sube al repositorio. La carpeta
+=.venv= no se sube, porque cada persona la crea en su computadora y
+además contiene rutas que solo funcionan en esa máquina. Agreguen una
+línea con =.venv/= al archivo =.gitignore=. Un compañero que clone el
+proyecto solo tiene que crear su propio entorno, activarlo y ejecutar
+=pip install -r requirements.txt= para tener exactamente las mismas
+versiones, sin importar si usa Windows, Linux o macOS.
+
+*** Paso 2 — Crear el proyecto y la aplicación
+
+Django distingue entre *proyecto* y *aplicación*, y conviene tener
+clara la diferencia desde el principio.
+
+El proyecto es el contenedor general: guarda la configuración, la
+tabla de rutas principal y la lista de aplicaciones que forman el
+sistema. Se crea una sola vez.
+
+Una aplicación es un módulo con una responsabilidad concreta. En
+nuestra empresa la primera responsabilidad es la de las entregas:
+pedidos, medios de transporte y seguimiento. Más adelante podría haber
+otras aplicaciones, como =pagos= o =cuentas=, pero todas siguen
+formando parte del mismo proyecto y se ejecutan en el mismo programa.
+A esto se le llama un monolito modular.
+
+#+begin_src shell
+django-admin startproject plataforma .
+python manage.py startapp entregas
+#+end_src
+
+El primer comando crea el proyecto llamado =plataforma=. El punto al
+final indica que se cree en la carpeta actual, para que el archivo
+=manage.py= quede en la raíz y no dentro de otra subcarpeta. El
+segundo comando crea la aplicación =entregas=.
+
+La estructura queda así:
+
+#+begin_example
+plataforma-entregas/
+  .venv/
+  manage.py          ← comandos de administración (servidor, migraciones)
+  plataforma/
+    settings.py      ← configuración general del proyecto
+    urls.py          ← tabla principal de rutas
+    wsgi.py          ← punto de entrada para el servidor web
+  entregas/
+    views.py         ← funciones que responden a cada petición
+    models.py        ← definición de los datos (más adelante)
+    apps.py
+#+end_example
+
+Todavía no hay nada de la empresa: ni camionetas ni inteligencia
+artificial. Solo la estructura vacía.
+
+Para que Django reconozca la aplicación hay que registrarla. Abran
+=plataforma/settings.py= y agreguen ="entregas"= a la lista
+=INSTALLED_APPS=:
+
+#+begin_src python
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "entregas",
+]
+#+end_src
+
+Las aplicaciones que empiezan con =django.contrib= ya vienen con el
+marco. Entre ellas están el panel de administración, el manejo de
+usuarios y las sesiones. Esto es importante para el primer
+inconveniente del enunciado: en la versión antigua cada archivo PHP
+comprobaba por su cuenta si había sesión. En Django esa comprobación
+ya existe y se configura en un solo lugar.
+
+*** Paso 3 — Un primer mensaje en el navegador
+
+Ahora vamos a hacer que una dirección muestre un texto. Para eso hacen
+falta tres cosas: una vista que genere la respuesta, una ruta dentro
+de la aplicación y una ruta en el proyecto que apunte a esa
+aplicación.
+
+Primero, la vista. En =entregas/views.py= escriban:
+
+#+begin_src python
+from django.http import HttpResponse
+
+
+def hola(request):
+    return HttpResponse("Hola. Plataforma de entregas (aún sin pedidos).")
+#+end_src
+
+Una vista es una función que recibe la petición del navegador y
+devuelve una respuesta. El parámetro =request= representa esa petición
+en particular: si dos personas abren la página al mismo tiempo, cada
+una tiene su propio =request=. Por eso no hace falta, ni conviene,
+guardar al usuario en una variable global.
+
+Segundo, la ruta de la aplicación. Creen el archivo =entregas/urls.py=:
+
+#+begin_src python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("hola/", views.hola, name="hola"),
+]
+#+end_src
+
+Esta lista indica que la dirección =hola/= la atiende la función
+=hola=.
+
+Tercero, la ruta del proyecto. En =plataforma/urls.py= dejen el
+contenido así:
+
+#+begin_src python
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("entregas/", include("entregas.urls")),
+]
+#+end_src
+
+=include= le dice a Django que todas las direcciones que empiecen con
+=entregas/= se busquen en las rutas de la aplicación =entregas=. Así,
+la dirección completa queda como =/entregas/hola/=. La ruta =admin/=
+ya viene configurada y da acceso al panel de administración.
+
+Por último, preparen la base de datos interna de Django y arranquen el
+servidor de desarrollo:
+
+#+begin_src shell
+python manage.py migrate
+python manage.py runserver
+#+end_src
+
+=migrate= crea las tablas que Django necesita para funcionar, como las
+de usuarios y sesiones. Todavía no crea ninguna tabla de pedidos.
+=runserver= levanta un servidor local pensado solo para desarrollo.
+
+Abran en el navegador =http://127.0.0.1:8000/entregas/hola/=. Si
+aparece el mensaje, ya tienen funcionando la entrada única del sistema
+y su primera vista. Con eso, el problema de los cuarenta archivos PHP
+que copiaban la sesión empieza a quedar resuelto, simplemente porque
+están usando lo que el marco ya ofrece.
+
+#+begin_quote
+Para pensar: ¿dónde debería ir el =switch= que elige entre camioneta,
+moto, bicicleta y dron? No en la vista =hola=, ni en ninguna vista:
+la vista solo recibe la petición y entrega la respuesta. ¿Debería esta
+vista consultar la base de datos? Por ahora no, porque todavía no
+existe ningún pedido.
+#+end_quote
+
+*** El backend entrega datos; el frontend se puede cambiar
+
+El enunciado pide que la plataforma tenga un cliente web y un cliente
+móvil. Eso obliga a pensar desde ahora en una idea muy importante: si
+el backend está bien hecho, el frontend se puede quitar y poner sin
+tocar las reglas del negocio.
+
+El *backend* es la parte que corre en el servidor. Ahí viven las
+reglas de la empresa: qué medio de entrega conviene, cómo se registra
+un pedido, quién puede verlo y qué se guarda en la base de datos. El
+*frontend* es lo que ve la persona: una página web, una aplicación
+para Android o iPhone, o incluso un panel interno para el personal de
+la empresa. Su trabajo es mostrar información y recoger lo que la
+persona escribe o elige.
+
+Al final de cuentas, el backend solo entrega datos. No le importa si
+quien los pide es una página hecha con plantillas de Django, una
+aplicación hecha con React, una app móvil hecha con Flutter o Kotlin,
+o un programa de otra empresa. Todos hacen la misma petición y
+reciben la misma respuesta, normalmente en formato JSON.
+
+Para verlo en el proyecto, agreguen una segunda vista en
+=entregas/views.py=. Esta vez no devuelve texto para una persona, sino
+datos para otro programa:
+
+#+begin_src python
+from django.http import HttpResponse, JsonResponse
+
+
+def hola(request):
+    return HttpResponse("Hola. Plataforma de entregas (aún sin pedidos).")
+
+
+def estado(request):
+    return JsonResponse({
+        "servicio": "entregas",
+        "version": 1,
+        "medios_disponibles": ["camioneta", "moto", "bicicleta", "dron"],
+    })
+#+end_src
+
+Y su ruta en =entregas/urls.py=:
+
+#+begin_src python
+urlpatterns = [
+    path("hola/", views.hola, name="hola"),
+    path("estado/", views.estado, name="estado"),
+]
+#+end_src
+
+Si abren =http://127.0.0.1:8000/entregas/estado/= verán los datos en
+JSON. Esa misma dirección la puede consumir la página web con
+JavaScript y la aplicación móvil con su propio código. Si mañana la
+empresa decide rehacer la página con otra tecnología, o lanzar una
+segunda aplicación móvil, el backend no cambia: los nuevos clientes
+solo tienen que pedir los mismos datos.
+
+Lo contrario también ayuda a entenderlo. Supongan que la regla para
+elegir entre moto y dron se programa en el JavaScript de la página
+web. Cuando llegue la aplicación móvil, habría que escribir esa misma
+regla otra vez en Kotlin o en Swift, y cada cambio de la regla habría
+que hacerlo en dos o tres lugares. Tarde o temprano la web y el móvil
+darían respuestas distintas para el mismo pedido. Por eso Strategy,
+Adapter y Factory Method, que estudiamos en los apuntes, se
+implementan en el backend: así se programan una sola vez y todos los
+clientes se benefician.
+
+Para que el frontend realmente se pueda cambiar hay que cuidar tres
+cosas:
+
+- *Un contrato estable.* Las direcciones y la forma del JSON son un
+  acuerdo con los clientes. Si el backend cambia el nombre de un campo
+  sin avisar, la aplicación móvil que ya está instalada en los
+  teléfonos deja de funcionar. Por eso las respuestas suelen llevar
+  una versión, como el campo ="version"= del ejemplo.
+- *Las validaciones siempre en el backend.* El frontend puede revisar
+  los datos para ayudar a la persona (por ejemplo, avisar que falta la
+  dirección), pero el backend tiene que volver a revisarlos. Cualquiera
+  puede enviar una petición directamente al servidor sin pasar por la
+  página, así que el backend nunca debe confiar en lo que llega.
+- *El frontend no decide reglas del negocio.* Puede decidir cómo se
+  ve un botón o en qué orden se muestran los datos, pero no qué medio
+  de entrega se usa ni cuánto cuesta el envío.
+
+A veces la web y el móvil necesitan los datos con formas un poco
+distintas: el móvil quiere respuestas más pequeñas porque la conexión
+es lenta, y la web quiere más detalle. En ese caso se puede agregar
+una capa delgada para cada cliente, el patrón /Backend for Frontend/
+que vimos en los patrones web y móvil. Aun así, las reglas siguen
+viviendo en un solo lugar.
+
+Las plantillas de Django siguen siendo útiles, sobre todo para
+paneles internos o páginas sencillas. La idea no es dejar de usarlas,
+sino entender que son un cliente más del backend, igual que la app
+móvil.
+
+*** Paso 4 — (Opcional) Ejecutar el mismo proyecto en un contenedor
+
+Este paso solo tiene sentido si el mensaje ya aparece en el navegador
+usando el entorno virtual. El contenedor no es obligatorio. Su ventaja
+es que cualquier persona puede ejecutar el proyecto sin instalar
+Python ni configurar nada más.
+
+Necesitan tener el archivo =requirements.txt= del paso 1. En la raíz
+del proyecto creen un archivo llamado =Dockerfile=:
+
+#+begin_src docker
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+#+end_src
+
+Cada línea hace lo siguiente. =FROM= parte de una imagen que ya trae
+Python 3.12. =WORKDIR= define la carpeta de trabajo dentro del
+contenedor. Las dos líneas siguientes copian la lista de dependencias
+y las instalan. =COPY . .= copia el resto del proyecto. =EXPOSE=
+indica el puerto que usa la aplicación. =CMD= es el comando que se
+ejecuta al arrancar el contenedor; la dirección =0.0.0.0= permite
+recibir conexiones desde fuera del contenedor.
+
+Antes de crear la imagen, agreguen un archivo =.dockerignore= en la
+raíz con esta línea:
+
+#+begin_example
+.venv/
+#+end_example
+
+Así Docker no copia el entorno virtual dentro de la imagen. El
+contenedor instala sus propias dependencias a partir de
+=requirements.txt=, y el =.venv= de Windows, además, no funcionaría
+dentro de un contenedor Linux.
+
+En Windows, Docker se instala con /Docker Desktop/, que a su vez usa
+WSL 2 (un Linux ligero integrado en Windows). El instalador lo
+configura casi todo; solo hay que aceptar cuando pida activar WSL y
+reiniciar. Después, los comandos de Docker se escriben igual en
+PowerShell que en Linux.
+
+Para construir la imagen y ejecutarla:
+
+#+begin_src shell
+docker build -t plataforma-entregas .
+docker run --rm -p 8000:8000 plataforma-entregas
+#+end_src
+
+El navegador se usa igual que antes: =http://127.0.0.1:8000/entregas/hola/=.
+Sigue habiendo un solo programa y una sola base de datos de
+desarrollo.
+
+**** Cuando la aplicación crece: varias copias del mismo contenedor
+
+Hasta aquí el contenedor solo sirve para que el proyecto se ejecute
+igual en todas las computadoras. Pero tiene una segunda ventaja que
+se vuelve importante cuando la plataforma crece.
+
+Imaginen que la empresa tiene éxito. A la hora de la comida miles de
+personas abren la app móvil y la página web para ver dónde viene su
+pedido. Un solo proceso de Django atiende las peticiones de una en
+una (o unas pocas a la vez), así que empieza a tardar y algunas
+peticiones fallan. Hay dos formas de responder a eso:
+
+- *Escalar verticalmente:* poner la aplicación en un servidor más
+  grande, con más procesador y más memoria. Es lo más sencillo, pero
+  tiene un límite y, si ese único servidor se cae, se cae todo.
+- *Escalar horizontalmente:* ejecutar varias copias de la misma
+  aplicación, en uno o varios servidores, y repartir las peticiones
+  entre ellas. Si llega más gente se agregan copias; si una copia
+  falla, las demás siguen atendiendo.
+
+El contenedor hace muy fácil la segunda opción. La imagen que
+construyeron es como un molde: de ella se pueden sacar una, tres o
+veinte copias idénticas, y todas se comportan igual porque tienen el
+mismo código y las mismas dependencias. Delante de las copias se pone
+un *balanceador de carga* (por ejemplo, nginx o el que ofrece el
+proveedor de la nube), que recibe todas las peticiones y las reparte.
+
+#+begin_example
+  Navegador ──┐                  ┌──► copia 1 de Django ──┐
+              │                  │                        │
+  App móvil ──┼──► Balanceador ──┼──► copia 2 de Django ──┼──► Base de datos
+              │                  │                        │
+  Panel     ──┘                  └──► copia 3 de Django ──┘
+#+end_example
+
+Fíjense en algo importante: las tres copias son la misma aplicación,
+con el mismo código. No se dividió el sistema en partes; solo se
+ejecuta varias veces el mismo proyecto.
+
+Para que una aplicación se pueda copiar así, tiene que cumplir algunas
+condiciones. Conviene conocerlas desde ahora, aunque todavía no las
+necesiten:
+
+- *Ninguna copia guarda información solo para ella.* Si la copia 1
+  guarda en su memoria quién inició sesión, y la siguiente petición de
+  esa persona llega a la copia 2, la copia 2 no sabrá quién es. Por
+  eso la sesión se guarda en la base de datos o en un servicio
+  compartido como Redis. Django, por defecto, ya guarda las sesiones
+  en la base de datos.
+- *Los archivos subidos van a un almacenamiento compartido.* Si una
+  persona sube la foto de su paquete y se guarda en el disco de la
+  copia 3, las otras copias no la encuentran. En producción se usa un
+  almacenamiento externo para eso.
+- *La base de datos es compartida.* Todas las copias leen y escriben
+  en la misma base. Con mucho tráfico, la base se vuelve el siguiente
+  cuello de botella, y entonces se agregan técnicas como la caché.
+  Aquí se nota por qué SQLite sirve para clase pero no para
+  producción: en producción se usa PostgreSQL o MySQL.
+- *Se cambia el servidor de desarrollo.* =runserver= está pensado solo
+  para programar. En producción cada contenedor ejecuta un servidor
+  preparado para muchas peticiones, como Gunicorn, que además arranca
+  varios procesos dentro del mismo contenedor.
+
+Como referencia, en producción la última línea del =Dockerfile= se
+parecería a esta (antes hay que agregar =gunicorn= a
+=requirements.txt=):
+
+#+begin_src docker
+CMD ["gunicorn", "plataforma.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+#+end_src
+
+Todo esto conecta con la sección anterior. Como el backend solo
+entrega datos y no depende de ningún frontend, se pueden agregar
+copias del backend sin tocar la página web ni la aplicación móvil:
+los clientes siguen llamando a la misma dirección y el balanceador se
+encarga del resto.
+
+Para esta etapa del curso no hace falta montar nada de esto. Tampoco
+hace falta armar un =docker-compose= con PostgreSQL, Redis y nginx. La
+inteligencia artificial del enunciado puede empezar como un módulo de
+Python dentro de la aplicación =entregas=. Lo importante ahora es
+escribir el proyecto de forma que, el día que haga falta escalarlo,
+se pueda: sin guardar datos en variables globales, sin reglas del
+negocio en el frontend y sin depender de archivos en el disco local.
+
+*** Qué ya pueden hacer y qué viene después
+
+| Al terminar este apartado pueden | Esto se hace más adelante |
+|----------------------------------+---------------------------|
+| Explicar qué hacen la ruta del proyecto, la ruta de la aplicación y la vista | Implementar Strategy para los cuatro medios de entrega |
+| Crear y activar un entorno virtual en Linux, macOS o Windows, e instalar dependencias desde =requirements.txt= | Implementar el Adapter que traduce la respuesta de la IA |
+| Explicar por qué el backend entrega datos y el frontend web o móvil se puede cambiar | Construir la aplicación móvil |
+| Explicar para qué sirve un contenedor y cómo varias copias permiten escalar | Montar el balanceador, Gunicorn y PostgreSQL en producción |
+| Crear otra aplicación cuando aparezca una responsabilidad distinta, como =pagos= | Crear muchas aplicaciones sin una razón clara |
+
+Los cinco días de trabajo que siguen suponen que este mensaje ya
+aparece en el navegador. El segundo día empieza directamente con el
+registro de pedidos.
+
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
 Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
@@ -4251,9 +4890,11 @@ Lectura obligatoria, en este orden:
 
 1. *La empresa de entregas* y *Cosas a tomar en cuenta*.
 2. *Patrones de software para aplicaciones web*, hasta *Ejemplo de
-   análisis: registrar un pedido (y cobrar)*.
-3. En Django, qué pieza ya es Front Controller, middleware, plantilla
-   y vista (la documentación corta del propio marco basta).
+   análisis: registrar un pedido (y cobrar)* — o el capítulo web que
+   usen en estos apuntes.
+3. *Arrancar Django para la plataforma de entregas* (venv, proyecto,
+   app, hola mundo). Si aún no abre =/entregas/hola/=, el Día 2 no
+   tiene sentido.
 
 Por escrito, una tabla. No pongan «MVC» como respuesta de un renglón.
 
@@ -4272,11 +4913,11 @@ puede hacer =SELECT=? ¿Por qué sí o por qué no?
 Objetivo: que exista el proyecto y *una* petición, todavía sin los
 cuatro medios ni la IA.
 
-1. Crear el proyecto Django. Una app, por ejemplo =entregas=.
-2. Recursos: =POST /pedidos= da de alta (aunque sea a mano, sin IA);
+1. Si todavía no hay hola mundo, terminen *Arrancar Django*. Luego:
+   =POST /pedidos= da de alta (aunque sea a mano, sin IA);
    =GET /pedidos/<id>= muestra seguimiento. Tras el POST, *redirigir*
    al GET (PRG). Recargar no debe crear otro folio.
-3. La vista (Page Controller) queda delgada: llama a algo con nombre
+2. La vista (Page Controller) queda delgada: llama a algo con nombre
    de trámite, p. ej. =registrar_pedido(...)=. No pongan el
    =switch= de camioneta en la vista. No pongan SQL en la plantilla:
    el contexto llega *ya listo* (folio, estado, un ETA de mentira
