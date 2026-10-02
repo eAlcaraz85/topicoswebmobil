@@ -4218,11 +4218,12 @@ Al final de =index.php=, tras pintar, el servidor hace una serie de =file_get_co
 
 ** Arrancar Django para la plataforma de entregas
 
-En este apartado vamos a preparar el proyecto en Django desde cero y a
-mostrar un primer mensaje en el navegador. Todavía no vamos a
-registrar pedidos ni a conectar la inteligencia artificial: eso se hace
-en los cinco días de trabajo que vienen después. Aquí el objetivo es
-más modesto y más importante: entender qué crea cada comando y qué
+En este apartado vamos a construir, paso a paso, la base del proyecto
+de la empresa de entregas: desde instalar Python hasta tener varias
+copias de la aplicación funcionando detrás de un balanceador. Todavía
+no vamos a registrar pedidos ni a conectar la inteligencia
+artificial: eso se hace en los cinco días de trabajo que vienen
+después. Aquí el objetivo es entender qué crea cada comando y qué
 papel tiene cada archivo, antes de escribir la lógica de la empresa.
 
 Usamos Django porque ya resuelve varias de las cosas que estudiamos en
@@ -4231,20 +4232,40 @@ archivo de rutas, middleware para la sesión y la seguridad, y
 plantillas para generar el HTML. No hace falta programar esas piezas a
 mano; hay que aprender a usarlas bien.
 
-*** Entorno virtual y contenedor
+*** La ruta completa
 
-Antes de instalar nada conviene separar dos ideas que suelen
-mezclarse: el entorno virtual y el contenedor. Son cosas distintas y
-no se necesitan al mismo tiempo.
+Los pasos están agrupados en cinco etapas. Cada etapa deja algo que
+funciona, y la siguiente se construye encima. Hagan los pasos en
+orden: cada uno supone que el anterior ya funcionó.
+
+| Etapa | Pasos | Al terminar tendrán | ¿Obligatoria? |
+|-------+-------+---------------------+---------------|
+| 1. Preparar la computadora | 1 a 3 | Python, un entorno virtual y Django instalado | Sí |
+| 2. Crear el proyecto | 4 a 7 | Un proyecto Django que muestra un mensaje en el navegador | Sí |
+| 3. Entregar datos | 8 | Una dirección que entrega datos en JSON para la web y el móvil | Sí |
+| 4. Empaquetar en un contenedor | 9 a 11 | El mismo proyecto corriendo dentro de Docker | Opcional |
+| 5. Escalar con varias copias | 12 a 19 | Tres o más copias del proyecto detrás de un balanceador | Opcional, muy recomendable |
+
+Para los cinco días de trabajo basta con las etapas 1, 2 y 3. Las
+etapas 4 y 5 muestran cómo se prepara el mismo proyecto para cuando
+la empresa crezca; si el equipo tiene Docker, vale la pena hacerlas al
+menos una vez.
+
+Antes de empezar hay dos ideas que conviene tener claras.
+
+*** Antes de empezar: entorno virtual y contenedor
+
+Son dos herramientas que suelen confundirse. Son cosas distintas y no
+se necesitan al mismo tiempo.
 
 Un *entorno virtual* es una carpeta que contiene una copia de Python y
 las bibliotecas de un solo proyecto. Si instalamos Django sin él, se
 instala en el Python del sistema y puede chocar con las versiones que
 usa otra materia u otro proyecto. Con un entorno virtual, cada
 proyecto tiene sus propias versiones y cualquier compañero puede
-reproducir la misma instalación. En este curso lo vamos a usar desde
-el primer comando. No tiene nada que ver con la arquitectura del
-sistema: solo sirve para que todos trabajen con lo mismo.
+reproducir la misma instalación. No tiene nada que ver con la
+arquitectura del sistema: solo sirve para que todos trabajen con lo
+mismo.
 
 Para entender por qué hace falta, piensen en este caso. En otra
 materia instalaron Django 4 para un proyecto viejo. Ahora, en esta
@@ -4274,29 +4295,29 @@ vez a partir de =requirements.txt= sin perder el código.
 Un *contenedor* (por ejemplo, con Docker) empaqueta la aplicación
 junto con el sistema operativo base y las bibliotecas que necesita.
 Así se ejecuta igual en cualquier computadora, aunque esa computadora
-no tenga instalada la versión correcta de Python. Es útil, pero no
-cambia el diseño: si dentro del contenedor corre un solo proyecto de
-Django, seguimos teniendo una sola aplicación.
+no tenga instalada la versión correcta de Python. Además, de una misma
+imagen de contenedor se pueden arrancar varias copias idénticas, lo
+que permite atender a más personas cuando la aplicación crece. Eso lo
+veremos en la etapa 5.
 
-El contenedor cobra más importancia cuando la aplicación crece. Si la
-plataforma de entregas pasa de unos cuantos usuarios a miles de
-personas consultando el estado de su pedido al mismo tiempo, un solo
-proceso ya no alcanza. Con una imagen de contenedor se pueden
-arrancar varias copias idénticas de la misma aplicación y repartir
-las peticiones entre ellas. Eso se explica con detalle en el paso 4.
+Esta tabla resume la diferencia en la práctica:
 
-Por eso el orden recomendado es este:
+|                                   | Entorno virtual                                   | Contenedor (Docker)                                                                      |
+|-----------------------------------+---------------------------------------------------+------------------------------------------------------------------------------------------|
+| Qué aísla                         | Solo las bibliotecas de Python del proyecto       | Python, las bibliotecas, el sistema operativo base y otros programas (PostgreSQL, nginx) |
+| Qué necesita la computadora       | Tener Python instalado                            | Tener Docker instalado; Python ya viene dentro de la imagen                              |
+| Dónde corre la aplicación         | Directamente en su Windows, Linux o macOS         | Dentro de un Linux ligero, igual en todas las computadoras                               |
+| Cómo se arranca                   | Activar el entorno y =python manage.py runserver= | =docker compose up=                                                                      |
+| Cuántas copias se pueden ejecutar | Una por terminal, configurando todo a mano        | Las que se indiquen con un número en un archivo                                          |
+| Para qué lo usamos en el curso    | Programar y probar día a día                      | Ejecutar el proyecto como en un servidor real, compartirlo y escalarlo                   |
 
-1. Ahora: entorno virtual, un proyecto Django, una aplicación llamada
-   =entregas= y un mensaje de prueba en el navegador.
-2. Después, cuando eso ya funcione y si el equipo lo necesita: un
-   contenedor que ejecute ese mismo proyecto.
+No se trata de elegir uno u otro. Lo normal es programar con el
+entorno virtual y usar el contenedor para ejecutar el proyecto como lo
+haría un servidor. Una comparación sencilla: primero se aprende a
+cocinar en una sola cocina. Después esa cocina se puede montar en un
+camión para llevarla a otro lugar, y la receta sigue siendo la misma.
 
-Una comparación sencilla: primero se aprende a cocinar en una sola
-cocina. Después esa cocina se puede montar en un camión para llevarla
-a otro lugar, y la receta sigue siendo la misma.
-
-*** Qué partes de Django corresponden a lo que vimos en los apuntes
+*** Antes de empezar: qué partes de Django ya son patrones
 
 No vamos a implementar los patrones del libro desde cero. Vamos a
 reconocer cuáles ya vienen incluidos en Django para no duplicarlos.
@@ -4311,20 +4332,61 @@ reconocer cuáles ya vienen incluidos en Django para no duplicarlos.
 | El ORM en =models.py= | El acceso a datos (en Django suele ser Active Record) | Un Repository obligatorio; no hace falta fingirlo |
 | =transaction.atomic= | Unit of Work: varias operaciones se guardan juntas o ninguna | Observer |
 
-El mensaje de prueba que vamos a hacer usa solo las dos primeras
-filas: la entrada única y una vista. El resto se irá agregando cuando
-el problema de la empresa lo pida.
+En las etapas 2 y 3 usaremos las dos primeras filas: la entrada única
+y las vistas. El resto se irá agregando cuando el problema de la
+empresa lo pida.
 
-*** Paso 1 — Crear la carpeta del proyecto y el entorno virtual
+*** Etapa 1 — Preparar la computadora
 
-Los comandos cambian un poco según el sistema operativo. Sigan solo la
-parte que corresponde a su computadora; a partir de la instalación de
-Django los pasos son iguales para todos.
+En esta etapa todavía no hay nada de Django. Solo dejamos lista la
+computadora para que todos los integrantes del equipo trabajen con las
+mismas versiones.
 
-**** En Linux y macOS
+**** Paso 1 — Instalar Python y comprobar que funciona
 
-Abran una terminal y colóquense en la carpeta donde el equipo va a
-guardar su trabajo. Luego ejecuten:
+Necesitan Python 3.12 o más reciente.
+
+*En Linux y macOS* normalmente ya viene instalado. Abran una terminal
+y comprueben la versión:
+
+#+begin_src shell
+python3 --version
+#+end_src
+
+Si la versión es menor a 3.12, o el comando no existe, instálenlo con
+el gestor de paquetes de su sistema (por ejemplo, =sudo apt install
+python3 python3-venv= en Debian o Ubuntu) o desde [[https://www.python.org/downloads/][python.org]].
+
+*En Windows* hay que instalarlo:
+
+1. Descarguen el instalador desde [[https://www.python.org/downloads/][python.org]].
+2. En la primera pantalla del instalador marquen la casilla /Add
+   python.exe to PATH/. Si no la marcan, la terminal no va a encontrar
+   Python.
+3. Al terminar, abran una terminal nueva (PowerShell) y comprueben la
+   instalación:
+
+#+begin_src powershell
+py --version
+#+end_src
+
+En Windows, además de =python=, se instala un lanzador llamado =py=,
+que es la forma más segura de llamar a Python. Si al escribir =python=
+se abre la Microsoft Store, es porque Windows tiene un acceso directo
+que la reemplaza. Se desactiva en /Configuración → Aplicaciones →
+Configuración avanzada de aplicaciones → Alias de ejecución de
+aplicaciones/, apagando las opciones de =python.exe= y =python3.exe=.
+Mientras tanto, pueden usar =py= sin problema.
+
+*Para comprobar:* el comando muestra algo como =Python 3.12.4=.
+
+**** Paso 2 — Crear la carpeta del proyecto y el entorno virtual
+
+Ahora creamos la carpeta donde vivirá todo el proyecto y, dentro de
+ella, el entorno virtual.
+
+*En Linux y macOS*, desde la carpeta donde el equipo guarda su
+trabajo:
 
 #+begin_src shell
 mkdir -p plataforma-entregas
@@ -4339,31 +4401,8 @@ llamada =.venv=. El cuarto lo activa: a partir de ese momento, los
 comandos =python= y =pip= usan el Python del proyecto y no el del
 sistema.
 
-**** En Windows
-
-Primero hay que tener Python instalado correctamente:
-
-1. Descarguen el instalador desde [[https://www.python.org/downloads/][python.org]] (versión 3.12 o más
-   reciente).
-2. En la primera pantalla del instalador marquen la casilla /Add
-   python.exe to PATH/. Si no la marcan, la terminal no va a encontrar
-   Python.
-3. Al terminar, abran una terminal nueva y comprueben la instalación:
-
-#+begin_src powershell
-py --version
-#+end_src
-
-En Windows, además de =python=, se instala un lanzador llamado =py=,
-que es la forma más segura de llamar a Python. Si al escribir =python=
-se abre la Microsoft Store, es porque Windows tiene un acceso directo
-que la reemplaza. Se desactiva en /Configuración → Aplicaciones →
-Configuración avanzada de aplicaciones → Alias de ejecución de
-aplicaciones/, apagando las opciones de =python.exe= y =python3.exe=.
-Mientras tanto, pueden usar =py= sin problema.
-
-Con Python listo, abran *PowerShell* (es la terminal que trae Windows
-y la que usa Visual Studio Code por defecto) y ejecuten:
+*En Windows*, abran PowerShell (es la terminal que trae Windows y la
+que usa Visual Studio Code por defecto) y ejecuten:
 
 #+begin_src powershell
 mkdir plataforma-entregas
@@ -4372,8 +4411,7 @@ py -m venv .venv
 .venv\Scripts\Activate.ps1
 #+end_src
 
-Los comandos hacen lo mismo que en Linux: crear la carpeta, entrar en
-ella, crear el entorno virtual y activarlo. La diferencia es que en
+Los comandos hacen lo mismo que en Linux. La diferencia es que en
 Windows los ejecutables del entorno quedan en =.venv\Scripts\= en
 lugar de =.venv/bin/=.
 
@@ -4387,9 +4425,8 @@ su usuario, con este comando:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 #+end_src
 
-Después de eso, vuelvan a ejecutar =.venv\Scripts\Activate.ps1=.
-
-Si usan otra terminal, el activador cambia:
+Después de eso, vuelvan a ejecutar =.venv\Scripts\Activate.ps1=. Si
+usan otra terminal de Windows, el activador cambia:
 
 | Terminal en Windows | Comando para activar |
 |---------------------+----------------------|
@@ -4402,11 +4439,8 @@ abran la paleta de comandos con =Ctrl+Shift+P=, busquen /Python:
 Select Interpreter/ y elijan el que aparece dentro de =.venv=. Así el
 editor y la terminal integrada usan el mismo entorno.
 
-**** Comprobar que el entorno está activo
-
-En cualquier sistema, la terminal muestra =(.venv)= al inicio de la
-línea cuando el entorno está activo. Para estar seguros pueden
-preguntar qué Python se está usando:
+*Para comprobar:* la terminal muestra =(.venv)= al inicio de la
+línea. Para estar seguros, pregunten qué Python se está usando:
 
 #+begin_src shell
 python -c "import sys; print(sys.prefix)"
@@ -4417,10 +4451,10 @@ La ruta que aparece debe terminar en =plataforma-entregas/.venv= (o
 del sistema, el entorno no está activo y lo que instalen irá al lugar
 equivocado.
 
-**** Instalar Django y guardar las dependencias
+**** Paso 3 — Instalar Django y guardar las dependencias
 
-Con el entorno activo, instalen Django. Estos comandos son iguales en
-Linux, macOS y Windows:
+Con el entorno activo, instalen Django. Desde aquí los comandos son
+iguales en Linux, macOS y Windows:
 
 #+begin_src shell
 python -m pip install --upgrade pip
@@ -4428,10 +4462,9 @@ pip install "django>=5.0,<6"
 #+end_src
 
 El primer comando actualiza el instalador de paquetes. El segundo
-instala Django en una versión de la serie 5.
+instala Django en una versión de la serie 5, dentro de =.venv=.
 
-Cuando el equipo esté de acuerdo con las versiones, guarden la lista
-de dependencias:
+Después guarden la lista de lo que instalaron:
 
 #+begin_src shell
 pip freeze > requirements.txt
@@ -4448,13 +4481,22 @@ pip freeze | Out-File -Encoding utf8 requirements.txt
 
 El archivo =requirements.txt= sí se sube al repositorio. La carpeta
 =.venv= no se sube, porque cada persona la crea en su computadora y
-además contiene rutas que solo funcionan en esa máquina. Agreguen una
-línea con =.venv/= al archivo =.gitignore=. Un compañero que clone el
-proyecto solo tiene que crear su propio entorno, activarlo y ejecutar
-=pip install -r requirements.txt= para tener exactamente las mismas
-versiones, sin importar si usa Windows, Linux o macOS.
+además contiene rutas que solo funcionan en esa máquina. Creen un
+archivo =.gitignore= con una línea que diga =.venv/=. Un compañero que
+clone el proyecto solo tiene que crear su propio entorno (paso 2),
+activarlo y ejecutar =pip install -r requirements.txt= para tener
+exactamente las mismas versiones, sin importar su sistema operativo.
 
-*** Paso 2 — Crear el proyecto y la aplicación
+*Para comprobar:* =python -m django --version= muestra un número que
+empieza con 5.
+
+*** Etapa 2 — Crear el proyecto
+
+En esta etapa creamos el proyecto Django y hacemos que una dirección
+muestre un mensaje en el navegador. Todavía no hay nada de la
+empresa, pero ya estará funcionando la entrada única del sistema.
+
+**** Paso 4 — Crear el proyecto y la aplicación
 
 Django distingue entre *proyecto* y *aplicación*, y conviene tener
 clara la diferencia desde el principio.
@@ -4470,6 +4512,8 @@ otras aplicaciones, como =pagos= o =cuentas=, pero todas siguen
 formando parte del mismo proyecto y se ejecutan en el mismo programa.
 A esto se le llama un monolito modular.
 
+Con el entorno activo, dentro de =plataforma-entregas=:
+
 #+begin_src shell
 django-admin startproject plataforma .
 python manage.py startapp entregas
@@ -4480,11 +4524,13 @@ final indica que se cree en la carpeta actual, para que el archivo
 =manage.py= quede en la raíz y no dentro de otra subcarpeta. El
 segundo comando crea la aplicación =entregas=.
 
-La estructura queda así:
+*Para comprobar:* la carpeta queda así.
 
 #+begin_example
 plataforma-entregas/
   .venv/
+  .gitignore
+  requirements.txt
   manage.py          ← comandos de administración (servidor, migraciones)
   plataforma/
     settings.py      ← configuración general del proyecto
@@ -4496,12 +4542,12 @@ plataforma-entregas/
     apps.py
 #+end_example
 
-Todavía no hay nada de la empresa: ni camionetas ni inteligencia
-artificial. Solo la estructura vacía.
+**** Paso 5 — Registrar la aplicación en la configuración
 
-Para que Django reconozca la aplicación hay que registrarla. Abran
-=plataforma/settings.py= y agreguen ="entregas"= a la lista
-=INSTALLED_APPS=:
+Crear la carpeta =entregas= no basta: Django todavía no sabe que
+existe. Hay que agregarla a la lista de aplicaciones instaladas.
+Abran =plataforma/settings.py=, busquen =INSTALLED_APPS= y agreguen
+="entregas"= al final:
 
 #+begin_src python
 INSTALLED_APPS = [
@@ -4522,7 +4568,10 @@ inconveniente del enunciado: en la versión antigua cada archivo PHP
 comprobaba por su cuenta si había sesión. En Django esa comprobación
 ya existe y se configura en un solo lugar.
 
-*** Paso 3 — Un primer mensaje en el navegador
+*Para comprobar:* =python manage.py check= responde /System check
+identified no issues/.
+
+**** Paso 6 — Escribir la primera vista y sus rutas
 
 Ahora vamos a hacer que una dirección muestre un texto. Para eso hacen
 falta tres cosas: una vista que genere la respuesta, una ruta dentro
@@ -4545,7 +4594,8 @@ en particular: si dos personas abren la página al mismo tiempo, cada
 una tiene su propio =request=. Por eso no hace falta, ni conviene,
 guardar al usuario en una variable global.
 
-Segundo, la ruta de la aplicación. Creen el archivo =entregas/urls.py=:
+Segundo, la ruta de la aplicación. Creen el archivo =entregas/urls.py=
+(no existe; hay que crearlo):
 
 #+begin_src python
 from django.urls import path
@@ -4577,8 +4627,10 @@ urlpatterns = [
 la dirección completa queda como =/entregas/hola/=. La ruta =admin/=
 ya viene configurada y da acceso al panel de administración.
 
-Por último, preparen la base de datos interna de Django y arranquen el
-servidor de desarrollo:
+*Para comprobar:* =python manage.py check= sigue sin mostrar errores.
+El resultado en el navegador lo veremos en el siguiente paso.
+
+**** Paso 7 — Preparar la base de datos y arrancar el servidor
 
 #+begin_src shell
 python manage.py migrate
@@ -4586,14 +4638,19 @@ python manage.py runserver
 #+end_src
 
 =migrate= crea las tablas que Django necesita para funcionar, como las
-de usuarios y sesiones. Todavía no crea ninguna tabla de pedidos.
-=runserver= levanta un servidor local pensado solo para desarrollo.
+de usuarios y sesiones. Todavía no crea ninguna tabla de pedidos. Por
+ahora la base de datos es un archivo llamado =db.sqlite3= en la raíz
+del proyecto; agréguenlo también al =.gitignore=. =runserver= levanta
+un servidor local pensado solo para programar. Se detiene con
+=Ctrl+C=.
 
-Abran en el navegador =http://127.0.0.1:8000/entregas/hola/=. Si
-aparece el mensaje, ya tienen funcionando la entrada única del sistema
-y su primera vista. Con eso, el problema de los cuarenta archivos PHP
-que copiaban la sesión empieza a quedar resuelto, simplemente porque
-están usando lo que el marco ya ofrece.
+*Para comprobar:* abran en el navegador
+=http://127.0.0.1:8000/entregas/hola/= y debe aparecer el mensaje.
+
+Con eso ya tienen funcionando la entrada única del sistema y su
+primera vista. El problema de los cuarenta archivos PHP que copiaban
+la sesión empieza a quedar resuelto, simplemente porque están usando
+lo que el marco ya ofrece.
 
 #+begin_quote
 Para pensar: ¿dónde debería ir el =switch= que elige entre camioneta,
@@ -4603,30 +4660,33 @@ vista consultar la base de datos? Por ahora no, porque todavía no
 existe ningún pedido.
 #+end_quote
 
-*** El backend entrega datos; el frontend se puede cambiar
+*** Etapa 3 — Entregar datos para la web y el móvil
 
 El enunciado pide que la plataforma tenga un cliente web y un cliente
-móvil. Eso obliga a pensar desde ahora en una idea muy importante: si
-el backend está bien hecho, el frontend se puede quitar y poner sin
-tocar las reglas del negocio.
+móvil. Esta etapa tiene un solo paso, pero contiene una idea muy
+importante para todo el semestre.
 
-El *backend* es la parte que corre en el servidor. Ahí viven las
-reglas de la empresa: qué medio de entrega conviene, cómo se registra
-un pedido, quién puede verlo y qué se guarda en la base de datos. El
-*frontend* es lo que ve la persona: una página web, una aplicación
-para Android o iPhone, o incluso un panel interno para el personal de
-la empresa. Su trabajo es mostrar información y recoger lo que la
-persona escribe o elige.
+**** Paso 8 — Agregar una vista que entrega datos en JSON
+
+Primero, la idea. El *backend* es la parte que corre en el servidor.
+Ahí viven las reglas de la empresa: qué medio de entrega conviene,
+cómo se registra un pedido, quién puede verlo y qué se guarda en la
+base de datos. El *frontend* es lo que ve la persona: una página web,
+una aplicación para Android o iPhone, o incluso un panel interno para
+el personal de la empresa. Su trabajo es mostrar información y recoger
+lo que la persona escribe o elige.
 
 Al final de cuentas, el backend solo entrega datos. No le importa si
 quien los pide es una página hecha con plantillas de Django, una
 aplicación hecha con React, una app móvil hecha con Flutter o Kotlin,
 o un programa de otra empresa. Todos hacen la misma petición y
-reciben la misma respuesta, normalmente en formato JSON.
+reciben la misma respuesta, normalmente en formato JSON. Por eso, si
+el backend está bien hecho, el frontend se puede quitar y poner sin
+tocar las reglas del negocio.
 
-Para verlo en el proyecto, agreguen una segunda vista en
-=entregas/views.py=. Esta vez no devuelve texto para una persona, sino
-datos para otro programa:
+Ahora, el código. Agreguen una segunda vista en =entregas/views.py=.
+Esta vez no devuelve texto para una persona, sino datos para otro
+programa:
 
 #+begin_src python
 from django.http import HttpResponse, JsonResponse
@@ -4653,12 +4713,14 @@ urlpatterns = [
 ]
 #+end_src
 
-Si abren =http://127.0.0.1:8000/entregas/estado/= verán los datos en
-JSON. Esa misma dirección la puede consumir la página web con
-JavaScript y la aplicación móvil con su propio código. Si mañana la
-empresa decide rehacer la página con otra tecnología, o lanzar una
-segunda aplicación móvil, el backend no cambia: los nuevos clientes
-solo tienen que pedir los mismos datos.
+*Para comprobar:* con el servidor corriendo, abran
+=http://127.0.0.1:8000/entregas/estado/= y verán los datos en JSON.
+
+Esa misma dirección la puede consumir la página web con JavaScript y
+la aplicación móvil con su propio código. Si mañana la empresa decide
+rehacer la página con otra tecnología, o lanzar una segunda aplicación
+móvil, el backend no cambia: los nuevos clientes solo tienen que pedir
+los mismos datos.
 
 Lo contrario también ayuda a entenderlo. Supongan que la regla para
 elegir entre moto y dron se programa en el JavaScript de la página
@@ -4699,15 +4761,47 @@ paneles internos o páginas sencillas. La idea no es dejar de usarlas,
 sino entender que son un cliente más del backend, igual que la app
 móvil.
 
-*** Paso 4 — (Opcional) Ejecutar el mismo proyecto en un contenedor
+Con este paso termina la parte obligatoria. Los cinco días de trabajo
+parten de aquí.
 
-Este paso solo tiene sentido si el mensaje ya aparece en el navegador
-usando el entorno virtual. El contenedor no es obligatorio. Su ventaja
-es que cualquier persona puede ejecutar el proyecto sin instalar
-Python ni configurar nada más.
+*** Etapa 4 — Empaquetar el proyecto en un contenedor (opcional)
 
-Necesitan tener el archivo =requirements.txt= del paso 1. En la raíz
-del proyecto creen un archivo llamado =Dockerfile=:
+Esta etapa solo tiene sentido si el paso 8 ya funciona con el entorno
+virtual. Vamos a ejecutar exactamente el mismo proyecto, pero dentro
+de un contenedor. La ventaja es que cualquier persona puede ejecutarlo
+sin instalar Python ni configurar nada más.
+
+**** Paso 9 — Instalar Docker
+
+*En Windows y macOS* se instala /Docker Desktop/ desde
+[[https://www.docker.com/products/docker-desktop/][docker.com]]. En Windows usa WSL 2 (un Linux ligero integrado en
+Windows); el instalador lo configura casi todo, solo hay que aceptar
+cuando pida activar WSL y reiniciar. Docker Desktop tiene que estar
+abierto cada vez que quieran usar Docker.
+
+*En Linux* se instala el paquete de Docker de su distribución
+siguiendo la guía oficial, junto con el complemento =docker compose=.
+
+Desde aquí los comandos de Docker se escriben igual en PowerShell que
+en Linux o macOS.
+
+*Para comprobar:*
+
+#+begin_src shell
+docker --version
+docker compose version
+docker run --rm hello-world
+#+end_src
+
+El último comando descarga una imagen de prueba y muestra un mensaje
+que empieza con /Hello from Docker!/.
+
+**** Paso 10 — Escribir el =Dockerfile= y el =.dockerignore=
+
+Un =Dockerfile= es la receta para construir la imagen: dice de qué
+sistema se parte, qué se instala y qué comando se ejecuta al
+arrancar. En la raíz del proyecto creen un archivo llamado
+=Dockerfile= (sin extensión):
 
 #+begin_src docker
 FROM python:3.12-slim
@@ -4722,46 +4816,58 @@ CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 Cada línea hace lo siguiente. =FROM= parte de una imagen que ya trae
 Python 3.12. =WORKDIR= define la carpeta de trabajo dentro del
 contenedor. Las dos líneas siguientes copian la lista de dependencias
-y las instalan. =COPY . .= copia el resto del proyecto. =EXPOSE=
-indica el puerto que usa la aplicación. =CMD= es el comando que se
-ejecuta al arrancar el contenedor; la dirección =0.0.0.0= permite
-recibir conexiones desde fuera del contenedor.
+y las instalan; por eso era importante tener =requirements.txt= desde
+el paso 3. =COPY . .= copia el resto del proyecto. =EXPOSE= indica el
+puerto que usa la aplicación. =CMD= es el comando que se ejecuta al
+arrancar el contenedor; la dirección =0.0.0.0= permite recibir
+conexiones desde fuera del contenedor.
 
-Antes de crear la imagen, agreguen un archivo =.dockerignore= en la
-raíz con esta línea:
+En la misma carpeta creen un archivo =.dockerignore=:
 
 #+begin_example
 .venv/
+db.sqlite3
 #+end_example
 
-Así Docker no copia el entorno virtual dentro de la imagen. El
-contenedor instala sus propias dependencias a partir de
-=requirements.txt=, y el =.venv= de Windows, además, no funcionaría
-dentro de un contenedor Linux.
+Así Docker no copia el entorno virtual ni la base de datos de su
+computadora dentro de la imagen. El contenedor instala sus propias
+dependencias a partir de =requirements.txt=, y el =.venv= de Windows,
+además, no funcionaría dentro de un contenedor Linux.
 
-En Windows, Docker se instala con /Docker Desktop/, que a su vez usa
-WSL 2 (un Linux ligero integrado en Windows). El instalador lo
-configura casi todo; solo hay que aceptar cuando pida activar WSL y
-reiniciar. Después, los comandos de Docker se escriben igual en
-PowerShell que en Linux.
+*Para comprobar:* en la raíz del proyecto están =Dockerfile= y
+=.dockerignore= junto a =manage.py=.
 
-Para construir la imagen y ejecutarla:
+**** Paso 11 — Construir la imagen y ejecutar el contenedor
 
 #+begin_src shell
 docker build -t plataforma-entregas .
 docker run --rm -p 8000:8000 plataforma-entregas
 #+end_src
 
-El navegador se usa igual que antes: =http://127.0.0.1:8000/entregas/hola/=.
-Sigue habiendo un solo programa y una sola base de datos de
-desarrollo.
+=docker build= sigue la receta del =Dockerfile= y crea una imagen
+llamada =plataforma-entregas=. La primera vez tarda porque descarga
+la imagen de Python. =docker run= arranca un contenedor a partir de
+esa imagen; =-p 8000:8000= conecta el puerto 8000 de su computadora
+con el puerto 8000 del contenedor, y =--rm= borra el contenedor cuando
+se detiene. Para detenerlo, =Ctrl+C=.
 
-**** Cuando la aplicación crece: varias copias del mismo contenedor
+Si el servidor del entorno virtual sigue corriendo en otra terminal,
+deténganlo antes, porque los dos intentarían usar el puerto 8000.
 
-Hasta aquí el contenedor solo sirve para que el proyecto se ejecute
-igual en todas las computadoras. Pero tiene una segunda ventaja que
-se vuelve importante cuando la plataforma crece.
+*Para comprobar:* =http://127.0.0.1:8000/entregas/hola/= muestra el
+mismo mensaje que en el paso 7, pero ahora lo está sirviendo el
+contenedor. Sigue habiendo un solo programa y una sola base de datos.
 
+*** Etapa 5 — Escalar con varias copias (opcional)
+
+En esta etapa vamos a ejecutar varias copias de la plataforma detrás
+de un balanceador, y a ver qué hay que cuidar para que funcione bien.
+Es donde mejor se nota la diferencia entre el entorno virtual y
+Docker.
+
+**** Paso 12 — Entender qué significa escalar
+
+Antes de escribir más archivos, conviene entender el problema.
 Imaginen que la empresa tiene éxito. A la hora de la comida miles de
 personas abren la app móvil y la página web para ver dónde viene su
 pedido. Un solo proceso de Django atiende las peticiones de una en
@@ -4777,11 +4883,12 @@ peticiones fallan. Hay dos formas de responder a eso:
   falla, las demás siguen atendiendo.
 
 El contenedor hace muy fácil la segunda opción. La imagen que
-construyeron es como un molde: de ella se pueden sacar una, tres o
-veinte copias idénticas, y todas se comportan igual porque tienen el
-mismo código y las mismas dependencias. Delante de las copias se pone
-un *balanceador de carga* (por ejemplo, nginx o el que ofrece el
-proveedor de la nube), que recibe todas las peticiones y las reparte.
+construyeron en el paso 11 es como un molde: de ella se pueden sacar
+una, tres o veinte copias idénticas, y todas se comportan igual
+porque tienen el mismo código y las mismas dependencias. Delante de
+las copias se pone un *balanceador de carga* (por ejemplo, nginx o el
+que ofrece el proveedor de la nube), que recibe todas las peticiones
+y las reparte.
 
 #+begin_example
   Navegador ──┐                  ┌──► copia 1 de Django ──┐
@@ -4795,65 +4902,743 @@ Fíjense en algo importante: las tres copias son la misma aplicación,
 con el mismo código. No se dividió el sistema en partes; solo se
 ejecuta varias veces el mismo proyecto.
 
-Para que una aplicación se pueda copiar así, tiene que cumplir algunas
-condiciones. Conviene conocerlas desde ahora, aunque todavía no las
-necesiten:
+¿Y si lo intentáramos solo con el entorno virtual? Se podría abrir
+tres terminales, activar el entorno en cada una y arrancar un servidor
+en un puerto distinto:
 
-- *Ninguna copia guarda información solo para ella.* Si la copia 1
-  guarda en su memoria quién inició sesión, y la siguiente petición de
-  esa persona llega a la copia 2, la copia 2 no sabrá quién es. Por
-  eso la sesión se guarda en la base de datos o en un servicio
-  compartido como Redis. Django, por defecto, ya guarda las sesiones
-  en la base de datos.
-- *Los archivos subidos van a un almacenamiento compartido.* Si una
-  persona sube la foto de su paquete y se guarda en el disco de la
-  copia 3, las otras copias no la encuentran. En producción se usa un
-  almacenamiento externo para eso.
-- *La base de datos es compartida.* Todas las copias leen y escriben
-  en la misma base. Con mucho tráfico, la base se vuelve el siguiente
-  cuello de botella, y entonces se agregan técnicas como la caché.
-  Aquí se nota por qué SQLite sirve para clase pero no para
-  producción: en producción se usa PostgreSQL o MySQL.
-- *Se cambia el servidor de desarrollo.* =runserver= está pensado solo
-  para programar. En producción cada contenedor ejecuta un servidor
-  preparado para muchas peticiones, como Gunicorn, que además arranca
-  varios procesos dentro del mismo contenedor.
-
-Como referencia, en producción la última línea del =Dockerfile= se
-parecería a esta (antes hay que agregar =gunicorn= a
-=requirements.txt=):
-
-#+begin_src docker
-CMD ["gunicorn", "plataforma.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+#+begin_src shell
+python manage.py runserver 8001   # terminal 1
+python manage.py runserver 8002   # terminal 2
+python manage.py runserver 8003   # terminal 3
 #+end_src
 
-Todo esto conecta con la sección anterior. Como el backend solo
-entrega datos y no depende de ningún frontend, se pueden agregar
-copias del backend sin tocar la página web ni la aplicación móvil:
-los clientes siguen llamando a la misma dirección y el balanceador se
-encarga del resto.
+Funciona, pero enseguida aparecen los problemas. Habría que instalar
+nginx en su sistema operativo y configurarlo a mano para que reparta
+entre los tres puertos. Las tres copias comparten el archivo
+=db.sqlite3=, y SQLite no está pensado para muchas escrituras al mismo
+tiempo. Si una terminal se cierra, esa copia se pierde y nadie la
+vuelve a arrancar. Y si un compañero usa otro sistema operativo, tiene
+que repetir toda la instalación a su manera.
 
-Para esta etapa del curso no hace falta montar nada de esto. Tampoco
-hace falta armar un =docker-compose= con PostgreSQL, Redis y nginx. La
-inteligencia artificial del enunciado puede empezar como un módulo de
-Python dentro de la aplicación =entregas=. Lo importante ahora es
-escribir el proyecto de forma que, el día que haga falta escalarlo,
-se pueda: sin guardar datos en variables globales, sin reglas del
-negocio en el frontend y sin depender de archivos en el disco local.
+La razón es que el entorno virtual solo aísla las bibliotecas de
+Python. Todo lo demás (nginx, la base de datos, cuántas copias hay y
+cómo se arrancan) queda en manos de cada persona. Por eso es la
+herramienta adecuada para programar, pero no para replicar. En los
+siguientes pasos haremos lo mismo con Docker, y todo quedará escrito
+en archivos dentro del repositorio.
+
+*Para comprobar:* antes de seguir, el equipo debería poder explicar
+con sus palabras la diferencia entre escalar verticalmente y escalar
+horizontalmente, y qué hace el balanceador.
+
+**** Paso 13 — Leer la configuración desde variables de entorno
+
+Cada copia tiene que recibir su configuración desde fuera, en lugar de
+tenerla escrita en el código. Así la misma imagen sirve en su
+computadora, con el entorno virtual, y en el servidor, con varias
+copias y una base de datos PostgreSQL.
+
+En =plataforma/settings.py= agreguen =import os= al inicio y cambien
+estas partes:
+
+#+begin_src python
+import os
+from pathlib import Path
+
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "solo-para-desarrollo")
+DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# ...
+
+if os.environ.get("POSTGRES_HOST"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": os.environ["POSTGRES_HOST"],
+            "NAME": os.environ["POSTGRES_DB"],
+            "USER": os.environ["POSTGRES_USER"],
+            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+#+end_src
+
+=os.environ.get("NOMBRE", "valor")= lee una variable de entorno y, si
+no existe, usa el valor que va después de la coma. Por eso, en su
+computadora, donde no hay ninguna de estas variables, todo sigue
+funcionando como antes: =DEBUG= queda activo y se usa SQLite. Dentro
+de Docker le pasaremos las variables y se usará PostgreSQL.
+
+*Para comprobar:* con el entorno virtual activo,
+=python manage.py runserver= sigue funcionando y
+=/entregas/hola/= muestra el mensaje de siempre.
+
+**** Paso 14 — Agregar vistas para ver qué copia responde
+
+Para ver el reparto entre copias, cada respuesta va a decir qué copia
+la atendió. Dejen =entregas/views.py= así:
+
+#+begin_src python
+import socket
+
+from django.http import HttpResponse, JsonResponse
+
+COPIA = socket.gethostname()
+
+visitas_en_memoria = 0
+
+
+def hola(request):
+    return HttpResponse("Hola. Plataforma de entregas (aún sin pedidos).")
+
+
+def estado(request):
+    return JsonResponse({
+        "servicio": "entregas",
+        "version": 1,
+        "medios_disponibles": ["camioneta", "moto", "bicicleta", "dron"],
+        "atendido_por": COPIA,
+    })
+
+
+def visitas(request):
+    request.session["visitas"] = request.session.get("visitas", 0) + 1
+    return JsonResponse({
+        "atendido_por": COPIA,
+        "visitas": request.session["visitas"],
+    })
+
+
+def visitas_mal(request):
+    global visitas_en_memoria
+    visitas_en_memoria += 1
+    return JsonResponse({
+        "atendido_por": COPIA,
+        "visitas": visitas_en_memoria,
+    })
+#+end_src
+
+Y agreguen las rutas nuevas en =entregas/urls.py=:
+
+#+begin_src python
+urlpatterns = [
+    path("hola/", views.hola, name="hola"),
+    path("estado/", views.estado, name="estado"),
+    path("visitas/", views.visitas, name="visitas"),
+    path("visitas-mal/", views.visitas_mal, name="visitas_mal"),
+]
+#+end_src
+
+Cada contenedor tiene un nombre de máquina distinto, así que =COPIA=
+nos dice cuál de las copias atendió la petición. La vista =visitas=
+cuenta las visitas en la sesión, que Django guarda en la base de
+datos. La vista =visitas_mal= las cuenta en una variable global, que
+vive en la memoria de cada copia. Está ahí a propósito, para ver en
+el paso 18 qué pasa cuando se hace mal.
+
+*Para comprobar:* con el entorno virtual, abran
+=http://127.0.0.1:8000/entregas/visitas/= y recarguen varias veces.
+El número sube y =atendido_por= muestra siempre el nombre de su
+computadora, porque solo hay una copia.
+
+**** Paso 15 — Cambiar a un servidor de producción
+
+=runserver= está pensado solo para programar. Para atender muchas
+peticiones se usa Gunicorn. Además, para conectarse a PostgreSQL,
+Django necesita el conector =psycopg=. Instálenlos con el entorno
+virtual activo y vuelvan a guardar la lista de dependencias, igual que
+en el paso 3:
+
+#+begin_src shell
+pip install gunicorn "psycopg[binary]"
+pip freeze > requirements.txt
+#+end_src
+
+(En PowerShell, la segunda línea es
+=pip freeze | Out-File -Encoding utf8 requirements.txt=.) Ahora
+=requirements.txt= incluye =gunicorn= y =psycopg=. En Windows Gunicorn
+se instala pero no se puede ejecutar; no importa, porque solo se usa
+dentro del contenedor, que es Linux.
+
+Y cambien el =Dockerfile= del paso 10 para que quede así:
+
+#+begin_src docker
+FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["gunicorn", "plataforma.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
+#+end_src
+
+Hay dos cambios. =ENV PYTHONUNBUFFERED=1= hace que los mensajes de
+Python se muestren al momento, en lugar de quedarse guardados; así se
+pueden leer los registros de cada copia. La última línea arranca
+Gunicorn en lugar de =runserver=. =plataforma.wsgi:application= es el
+punto de entrada que Django creó en el paso 4, y =--workers 2= indica
+que cada contenedor arranca dos procesos de Django.
+
+En su computadora siguen usando =runserver= con el entorno virtual.
+
+*Para comprobar:* =docker build -t plataforma-entregas .= termina sin
+errores.
+
+**** Paso 16 — Configurar el balanceador
+
+Creen la carpeta =nginx= y dentro el archivo =nginx/default.conf=:
+
+#+begin_src conf
+upstream django {
+    server web:8000;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://django;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+#+end_src
+
+El bloque =upstream= define el grupo de servidores a los que nginx
+reparte las peticiones. =web= es el nombre que le daremos a las copias
+de Django en el siguiente paso; Docker se encarga de que ese nombre
+apunte a todas ellas. nginx las atiende por turnos: una petición a la
+primera copia, otra a la segunda, otra a la tercera y vuelta a
+empezar. El bloque =server= dice que nginx escucha en el puerto 80 y
+que todo lo que llegue lo pase a ese grupo. Las dos líneas
+=proxy_set_header= le avisan a Django cuál era la dirección original
+y quién hizo la petición, porque si no Django vería todas las
+peticiones como si vinieran de nginx.
+
+*Para comprobar:* existe el archivo =nginx/default.conf= en la raíz
+del proyecto.
+
+**** Paso 17 — Describir el sistema completo en =docker-compose.yml=
+
+Hasta ahora usábamos =docker run= para un solo contenedor. Con varios
+contenedores que dependen unos de otros es más cómodo describirlos
+todos en un archivo y arrancarlos juntos. Eso hace Docker Compose. En
+la raíz del proyecto creen =docker-compose.yml=:
+
+#+begin_src yaml
+x-django: &django
+  build: .
+  image: plataforma-entregas
+  environment:
+    DJANGO_DEBUG: "0"
+    DJANGO_SECRET_KEY: cambiar-en-produccion
+    DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    POSTGRES_HOST: db
+    POSTGRES_DB: entregas
+    POSTGRES_USER: entregas
+    POSTGRES_PASSWORD: entregas
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: entregas
+      POSTGRES_USER: entregas
+      POSTGRES_PASSWORD: entregas
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U entregas"]
+      interval: 2s
+      retries: 30
+
+  migrar:
+    <<: *django
+    command: python manage.py migrate --noinput
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    <<: *django
+    deploy:
+      replicas: 3
+    depends_on:
+      migrar:
+        condition: service_completed_successfully
+
+  balanceador:
+    image: nginx:1.27-alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+
+volumes:
+  datos:
+#+end_src
+
+El archivo define cuatro servicios, y vale la pena leerlo despacio:
+
+- =db= es la base de datos PostgreSQL. Sus datos se guardan en un
+  volumen llamado =datos=, para que no se pierdan cuando el contenedor
+  se apaga. El =healthcheck= le permite a Docker saber cuándo la base
+  ya está lista para recibir conexiones.
+- =migrar= usa la misma imagen de Django, pero solo ejecuta
+  =migrate= y termina. Arranca cuando la base está lista. Las
+  migraciones se ejecutan aquí, una sola vez, y no en cada copia: si
+  las tres copias intentaran crear las mismas tablas al mismo tiempo,
+  chocarían entre ellas.
+- =web= son las copias de Django. La línea =replicas: 3= es la que
+  pide tres copias idénticas. Arrancan cuando =migrar= terminó bien.
+  Aquí reciben las variables de entorno que preparamos en el paso 13:
+  =DEBUG= apagado y la conexión a PostgreSQL.
+- =balanceador= es nginx con la configuración del paso 16. Es el
+  único servicio que se abre hacia afuera, en el puerto 8000 de su
+  computadora. Las copias de Django no se exponen directamente: todo
+  entra por el balanceador.
+
+La parte de arriba, =x-django: &django=, es solo una forma de no
+repetir la configuración de Django en =migrar= y en =web=. La línea
+=<<: *django= copia esa configuración en cada servicio.
+
+*Para comprobar:* la carpeta del proyecto queda así.
+
+#+begin_example
+plataforma-entregas/
+  .venv/                ← solo para programar; Docker lo ignora
+  .dockerignore
+  .gitignore
+  Dockerfile
+  docker-compose.yml
+  requirements.txt
+  manage.py
+  nginx/
+    default.conf
+  plataforma/
+  entregas/
+#+end_example
+
+**** Paso 18 — Levantar las copias y probar la sesión
+
+Detengan cualquier servidor que esté usando el puerto 8000 y, desde
+la carpeta del proyecto (en Windows, con Docker Desktop abierto),
+ejecuten:
+
+#+begin_src shell
+docker compose up --build
+#+end_src
+
+La primera vez tarda porque descarga las imágenes de PostgreSQL y
+nginx. En la terminal verán aparecer los contenedores en orden:
+primero la base de datos, luego =migrar=, que termina, luego las tres
+copias de =web= y al final el balanceador. Esperen unos segundos a que
+todas las copias terminen de arrancar.
+
+La forma más sencilla de verlo es con el navegador. Abran
+=http://localhost:8000/entregas/visitas/= y recarguen la página
+varias veces. El valor de =atendido_por= va cambiando, porque cada
+petición la atiende una copia distinta, y aun así el número de visitas
+sigue subiendo de uno en uno. Esto pasa porque la sesión no vive en
+ninguna copia: vive en la base de datos que todas comparten.
+
+Para ver muchas peticiones seguidas se puede usar =curl= desde otra
+terminal. En Linux y macOS:
+
+#+begin_src shell
+for i in 1 2 3 4 5 6; do curl -s -b galleta.txt -c galleta.txt http://localhost:8000/entregas/visitas/; echo; done
+#+end_src
+
+En PowerShell hay que escribir =curl.exe= (en Windows PowerShell 5,
+=curl= a secas es otro comando):
+
+#+begin_src powershell
+1..6 | ForEach-Object { curl.exe -s -b galleta.txt -c galleta.txt http://localhost:8000/entregas/visitas/; "" }
+#+end_src
+
+Las opciones =-b= y =-c= hacen que =curl= guarde y reenvíe la cookie
+de sesión, como lo haría un navegador. El resultado se parece a esto:
+
+#+begin_example
+{"atendido_por": "9ed9e6646b1e", "visitas": 1}
+{"atendido_por": "f5c21b07a204", "visitas": 2}
+{"atendido_por": "2cb94889e6cb", "visitas": 3}
+{"atendido_por": "9ed9e6646b1e", "visitas": 4}
+{"atendido_por": "f5c21b07a204", "visitas": 5}
+{"atendido_por": "2cb94889e6cb", "visitas": 6}
+#+end_example
+
+Se ven las tres copias atendiendo por turnos, y la cuenta es correcta.
+Si justo después de arrancar todas las respuestas vienen de una sola
+copia, esperen unos segundos y repitan: las otras todavía no estaban
+listas y nginx las apartó un momento.
+
+Ahora prueben la versión mal hecha, =/entregas/visitas-mal/=:
+
+#+begin_example
+{"atendido_por": "9ed9e6646b1e", "visitas": 3}
+{"atendido_por": "f5c21b07a204", "visitas": 2}
+{"atendido_por": "f5c21b07a204", "visitas": 3}
+{"atendido_por": "2cb94889e6cb", "visitas": 1}
+{"atendido_por": "9ed9e6646b1e", "visitas": 4}
+#+end_example
+
+Los números saltan sin orden. Cada copia tiene su propia variable
+=visitas_en_memoria=, y como cada contenedor arranca dos procesos de
+Gunicorn, en realidad hay seis contadores distintos. Ninguno conoce a
+los demás. Con una sola copia y =runserver= este error no se nota (lo
+vieron en el paso 14); en cuanto la aplicación se replica, aparece. Lo
+mismo le pasaría a cualquier dato que se guarde en una variable
+global: el usuario actual, un carrito de compras o los pedidos
+pendientes.
+
+*Para comprobar:* =/entregas/visitas/= muestra distintos valores de
+=atendido_por= y un número que sube de uno en uno; =/entregas/visitas-mal/=
+muestra números desordenados.
+
+**** Paso 19 — Escalar, apagar copias y limpiar
+
+Si llega más gente, se piden más copias sin tocar el código. En otra
+terminal:
+
+#+begin_src shell
+docker compose up -d --scale web=5
+docker compose exec balanceador nginx -s reload
+docker compose ps
+#+end_src
+
+El primer comando sube las copias de tres a cinco. El segundo le pide
+a nginx que vuelva a buscar las copias, porque solo las busca al
+arrancar. El tercero muestra los contenedores que están corriendo.
+Después de unos segundos, las peticiones se reparten entre las cinco.
+
+También pueden comprobar qué pasa si una copia falla. Busquen su
+nombre con =docker compose ps= y apáguenla (el nombre empieza con el
+de la carpeta del proyecto):
+
+#+begin_src shell
+docker stop plataforma-entregas-web-2
+#+end_src
+
+La plataforma sigue respondiendo. nginx nota que esa copia no
+contesta, la aparta unos segundos y manda las peticiones a las demás.
+
+Para ver lo que escriben todas las copias en un solo lugar:
+
+#+begin_src shell
+docker compose logs -f web
+#+end_src
+
+Y para apagar todo:
+
+#+begin_src shell
+docker compose down      # apaga y borra los contenedores; los datos se conservan
+docker compose down -v   # además borra el volumen con la base de datos
+#+end_src
+
+*Para comprobar:* con cinco copias, =atendido_por= muestra cinco
+nombres distintos, y con una copia apagada la página sigue
+respondiendo.
+
+Comparen el esfuerzo con el intento del entorno virtual del paso 12.
+Allá eran tres terminales, nginx instalado a mano y nada que se
+recuperara solo. Aquí el sistema completo está descrito en archivos
+dentro del repositorio, cualquier compañero lo levanta con un comando
+y el número de copias es un parámetro.
+
+*** Qué hay que tener pensado si el sistema crece
+
+El ejemplo de la etapa 5 funciona porque la aplicación cumple ciertas
+condiciones. Cuando el sistema crece, estas son las cosas que conviene
+tener pensadas desde el principio, aunque todavía no se necesiten:
+
+1. *Nada importante vive en la memoria de una copia.* Ya lo vieron
+   con =visitas_mal=. La sesión, los carritos, los pedidos pendientes
+   y cualquier dato que deba sobrevivir a la siguiente petición van
+   en la base de datos o en un servicio compartido como Redis.
+
+2. *La configuración llega por variables de entorno.* La misma imagen
+   tiene que servir en la computadora del alumno, en pruebas y en
+   producción. Lo que cambia (contraseñas, la dirección de la base,
+   =DEBUG=) llega desde fuera, como en el paso 13. Las contraseñas
+   nunca se escriben en el código ni se suben al repositorio; en un
+   proyecto real van en un archivo =.env= que no se sube, o en el
+   gestor de secretos del proveedor.
+
+3. *Las migraciones se ejecutan una sola vez.* Por eso existe el
+   servicio =migrar= aparte. Con veinte copias, veinte migraciones al
+   mismo tiempo serían un problema.
+
+4. *Los archivos van a un almacenamiento compartido.* Si alguien sube
+   la foto de su paquete y se guarda en el disco de la copia 3, las
+   demás no la encuentran, y además se pierde cuando esa copia se
+   reemplaza. Los archivos subidos se guardan en un almacenamiento
+   externo, y los archivos estáticos (CSS, JavaScript) se sirven desde
+   nginx o desde una CDN.
+
+5. *La base de datos se vuelve el siguiente cuello de botella.* Agregar
+   copias de Django es fácil, pero todas usan la misma base. Hay que
+   cuidar varias cosas. Cada proceso abre su propia conexión, así que
+   con veinte copias y cuatro procesos por copia ya son ochenta
+   conexiones, y PostgreSQL acepta cien por defecto. Las consultas
+   frecuentes necesitan índices. Lo que se consulta mucho y cambia
+   poco puede guardarse en una caché. Y si las lecturas son muchas,
+   se agregan copias de solo lectura de la base. También por esto
+   SQLite deja de servir en cuanto hay varias copias.
+
+6. *Se usa un servidor de producción.* =runserver= es solo para
+   programar. Cada contenedor ejecuta Gunicorn, como en el paso 15.
+
+7. *Las tareas que deben ocurrir una sola vez no van en las copias.*
+   Si cada copia tiene programado un aviso diario a las 8:00, con cinco
+   copias el cliente recibe cinco avisos. Del mismo modo, el trabajo
+   lento (llamar a la inteligencia artificial, enviar correos, generar
+   reportes) no debería hacer esperar a la petición. Se deja en una
+   cola de tareas, y unos procesos trabajadores aparte lo van
+   resolviendo. En Django se usan herramientas como Celery o RQ, y los
+   trabajadores también se pueden escalar con =--scale=.
+
+8. *Las peticiones pueden repetirse.* Si una copia falla a mitad de
+   una petición, la app móvil puede volver a intentarlo, y una persona
+   impaciente puede tocar dos veces el botón de pagar. Con varias
+   copias es todavía más probable que dos peticiones iguales lleguen a
+   copias distintas al mismo tiempo. Por eso las operaciones
+   importantes, como registrar un pedido o cobrar, tienen que ser
+   idempotentes, como vimos en «Dos clics, un cobro».
+
+9. *Los registros y el monitoreo están en un solo lugar.* Con cinco
+   copias no se puede entrar a cada una a leer qué pasó. Las copias
+   escriben sus registros en la salida estándar (por eso funciona
+   =docker compose logs=) y en producción se juntan en un sistema
+   central. También conviene tener una dirección como
+   =/entregas/estado/= que el balanceador pueda consultar para saber
+   si una copia está sana.
+
+10. *Las actualizaciones se hacen sin apagar el servicio.* Para subir
+    una versión nueva, las copias se reemplazan de una en una mientras
+    las demás siguen atendiendo. Eso obliga a que, durante unos
+    minutos, la versión vieja y la nueva convivan con la misma base de
+    datos. Las migraciones se escriben de forma que no rompan la
+    versión anterior: por ejemplo, primero se agrega una columna nueva
+    y solo en una versión posterior se borra la vieja.
+
+11. *El escalado se puede automatizar.* En el ejemplo, ustedes
+    decidieron cuántas copias poner. En producción, herramientas como
+    Kubernetes o los servicios de contenedores de los proveedores de
+    la nube hacen lo mismo que =--scale=, pero solas: agregan copias
+    cuando sube la carga a la hora de la comida y las quitan en la
+    madrugada.
+
+Todo esto conecta con el paso 8. Como el backend solo entrega datos y
+no depende de ningún frontend, se pueden agregar copias sin tocar la
+página web ni la aplicación móvil: los clientes siguen llamando a la
+misma dirección y el balanceador se encarga del resto.
+
+Aunque el equipo no haga la etapa 5, desde ya conviene escribir el
+proyecto de forma que algún día se pueda escalar: sin datos en
+variables globales, sin reglas del negocio en el frontend y sin
+depender de archivos en el disco de una copia.
 
 *** Qué ya pueden hacer y qué viene después
 
 | Al terminar este apartado pueden | Esto se hace más adelante |
 |----------------------------------+---------------------------|
-| Explicar qué hacen la ruta del proyecto, la ruta de la aplicación y la vista | Implementar Strategy para los cuatro medios de entrega |
-| Crear y activar un entorno virtual en Linux, macOS o Windows, e instalar dependencias desde =requirements.txt= | Implementar el Adapter que traduce la respuesta de la IA |
+| Crear y activar un entorno virtual en Linux, macOS o Windows, e instalar dependencias desde =requirements.txt= | Implementar Strategy para los cuatro medios de entrega |
+| Explicar qué hacen la ruta del proyecto, la ruta de la aplicación y la vista | Implementar el Adapter que traduce la respuesta de la IA |
 | Explicar por qué el backend entrega datos y el frontend web o móvil se puede cambiar | Construir la aplicación móvil |
-| Explicar para qué sirve un contenedor y cómo varias copias permiten escalar | Montar el balanceador, Gunicorn y PostgreSQL en producción |
+| Ejecutar el proyecto en un contenedor y explicar en qué se diferencia del entorno virtual | Montar la plataforma en un servidor real |
+| Levantar varias copias detrás de un balanceador y explicar qué condiciones hacen falta para escalar | Automatizar el escalado según la carga |
 | Crear otra aplicación cuando aparezca una responsabilidad distinta, como =pagos= | Crear muchas aplicaciones sin una razón clara |
 
-Los cinco días de trabajo que siguen suponen que este mensaje ya
-aparece en el navegador. El segundo día empieza directamente con el
-registro de pedidos.
+Los cinco días de trabajo que siguen suponen que el paso 8 ya
+funciona. El segundo día empieza directamente con el registro de
+pedidos.
+
+*** Actividad  — Retos sobre la ruta de Django
+
+ Se trabaja en los
+mismos equipos de cinco personas. Son cinco retos que van de lo más
+sencillo a lo más completo; pueden hacer los que alcancen, en el orden
+que prefieran, aunque conviene empezar por el primero porque los demás
+se apoyan en él.
+
+
+**** Qué se entrega
+
+En la raíz del repositorio del equipo, un archivo =EXTRA.md= con:
+
+- Los nombres de los cinco integrantes.
+- Para cada reto que hayan hecho: las evidencias que se piden (capturas
+  de pantalla o la salida de la terminal copiada como texto) y las
+  respuestas escritas.
+- Si algún reto quedó a medias, escriban hasta dónde llegaron y qué
+  error les salió. Un intento bien explicado también cuenta.
+  
+**** Reto 1 — La ruta en todas las computadoras (1 punto)
+
+Cada integrante del equipo sigue los pasos 1 a 8 en su propia
+computadora, a partir del repositorio del equipo: clona el proyecto,
+crea su entorno virtual e instala las dependencias con
+=pip install -r requirements.txt=. No se vale que una sola persona lo
+haga y los demás miren.
+
+Evidencias:
+
+- De cada integrante, la salida de
+  =python -c "import sys; print(sys.prefix)"= con el entorno activo.
+- De cada integrante, una captura de =/entregas/estado/= en su
+  navegador.
+- Si en el equipo hay alguien con Windows y alguien con Linux o macOS,
+  escriban en dos o tres renglones qué comandos fueron distintos para
+  cada uno.
+
+**** Reto 2 — Una cotización que entrega datos (2 puntos)
+
+Agreguen una dirección nueva, =/entregas/cotizar/=, que reciba la
+distancia y el peso del paquete en la dirección misma, por ejemplo
+=/entregas/cotizar/?km=5&kg=2=, y responda en JSON qué medio de
+entrega conviene y por qué:
+
+#+begin_example
+{"km": 5.0, "kg": 2.0, "medio": "moto", "motivo": "distancia media y paquete ligero"}
+#+end_example
+
+La regla para elegir el medio la deciden ustedes (por ejemplo: más de
+20 kg, camioneta; hasta 3 km, bicicleta; y así). Lo que se evalúa es
+dónde la ponen y cómo la protegen:
+
+- La regla va en una función aparte, por ejemplo =elegir_medio(km, kg)=
+  dentro de un archivo =entregas/reglas.py=. La vista solo lee los
+  datos de la petición, llama a esa función y devuelve el JSON.
+- La vista valida los datos. Si falta =km=, o si alguien escribe
+  =km=abc= o un número negativo, la respuesta es un JSON con un
+  mensaje de error y el código 400:
+  =JsonResponse({"error": "..."}, status=400)=.
+
+Pista: los datos de la dirección se leen con =request.GET.get("km")=,
+y llegan como texto.
+
+Evidencias: el código de =reglas.py= y de la vista, y la salida de
+tres pruebas: una correcta, una sin =km= y una con =km=abc=.
+
+Preguntas, por escrito:
+
+1. ¿Por qué la validación tiene que estar en el backend, aunque la app
+   móvil ya revise que el campo no esté vacío?
+2. Su función probablemente tiene una cadena de =if=. ¿Qué patrón de
+   los apuntes la reemplazaría cuando haya que agregar el dron o un
+   quinto medio, y qué ganarían con eso?
+
+**** Reto 3 — Dos clientes, un solo backend (2 puntos)
+
+La idea es comprobar con sus propios ojos que el frontend se puede
+cambiar sin tocar el backend. Van a hacer dos clientes distintos que
+usen exactamente la misma dirección del reto 2 (o =/entregas/estado/=
+si no hicieron el reto 2).
+
+*Cliente web.* Una página sencilla, servida por Django, con un
+formulario de distancia y peso y un botón. Al presionarlo, la página
+llama a =/entregas/cotizar/= con =fetch= desde JavaScript y muestra el
+medio y el motivo sin recargar la página.
+
+*Cliente «móvil» simulado.* Un programa de Python aparte, que se
+ejecuta desde la terminal y hace la misma petición. Pueden partir de
+esto:
+
+#+begin_src python
+import json
+import urllib.request
+
+url = "http://127.0.0.1:8000/entregas/cotizar/?km=5&kg=2"
+with urllib.request.urlopen(url) as respuesta:
+    datos = json.load(respuesta)
+
+print("Medio sugerido:", datos["medio"])
+print("Motivo:", datos["motivo"])
+#+end_src
+
+Después, cambien la regla en =reglas.py= (por ejemplo, el límite de
+kilómetros para la bicicleta) sin tocar ninguno de los dos clientes.
+
+Evidencias: una captura de la página web y la salida del programa de
+Python, antes y después de cambiar la regla.
+
+Pregunta, por escrito: si la regla hubiera estado en el JavaScript de
+la página, ¿qué habría pasado con el cliente de Python al cambiarla?
+
+**** Reto 4 — Réplicas: hacerlo fallar y arreglarlo (3 puntos)
+
+Este reto necesita Docker. Hagan las etapas 4 y 5 completas (pasos 9 a
+19) y luego vayan un paso más allá.
+
+1. Levanten las tres copias y guarden la salida de seis peticiones a
+   =/entregas/visitas/= y seis a =/entregas/visitas-mal/=.
+2. Agreguen una vista =/entregas/ultimo/?folio=ABC123= que guarde el
+   último folio consultado en una variable global y otra vista
+   =/entregas/ultimo/ver/= que lo muestre. Con las tres copias
+   corriendo, consulten un folio y luego pidan verlo varias veces.
+   Anoten qué pasa.
+3. Arréglenlo para que funcione con cualquier número de copias, sin
+   usar variables globales. Pueden guardar el folio en la sesión o en
+   un modelo de la base de datos.
+4. Suban a cinco copias con =--scale= y comprueben que su arreglo
+   sigue funcionando.
+
+Evidencias: la salida de cada uno de los cuatro puntos y el código de
+la versión arreglada.
+
+Pregunta, por escrito: con una sola copia y =runserver=, la versión
+con la variable global parecía funcionar bien. ¿Por qué?
+
+**** Reto 5 — Casos para pensar, sin código (2 puntos)
+
+Respondan cada caso en un párrafo corto. No hay una única respuesta
+correcta; se evalúa que el razonamiento use lo que vieron en este
+apartado.
+
+1. La app móvil ya está instalada en miles de teléfonos y lee el campo
+   ="medios_disponibles"=. Un integrante propone cambiarle el nombre a
+   ="medios"= porque es más corto. ¿Qué le responderían y cómo harían
+   el cambio sin romper la app?
+2. La empresa quiere enviar a cada repartidor un mensaje a las 7:00
+   con sus entregas del día. El código se agrega en Django y la
+   plataforma corre con cinco copias. ¿Qué va a pasar y dónde debería
+   ir ese trabajo?
+3. Un cliente sube la foto de su paquete y la aplicación la guarda en
+   la carpeta =fotos/= del contenedor. A veces la foto aparece y a
+   veces no. Expliquen por qué.
+4. Alguien del equipo dice: «Ya tenemos Docker, así que podemos borrar
+   el entorno virtual y programar directamente con
+   =docker compose up=». ¿Están de acuerdo? ¿Para qué sirve cada uno
+   en el trabajo diario?
+5. Con tres copias detrás del balanceador, una persona toca dos veces
+   seguidas el botón de «Pagar» en la app. ¿Qué podría salir mal y
+   qué tema de los apuntes lo resuelve?
+
+**** Cómo se asignan los puntos
+
+| Reto | Puntos | Se otorgan completos si… |
+|------+--------+--------------------------|
+| 1. La ruta en todas las computadoras | 1 | Están las evidencias de los cinco integrantes |
+| 2. Una cotización que entrega datos | 2 | La regla está fuera de la vista, los errores devuelven 400 y las dos preguntas están respondidas |
+| 3. Dos clientes, un solo backend | 2 | Los dos clientes usan la misma dirección y el cambio de regla se refleja en ambos sin tocarlos |
+| 4. Réplicas: hacerlo fallar y arreglarlo | 3 | Se ve el error con la variable global y el arreglo funciona con tres y con cinco copias |
+| 5. Casos para pensar | 2 | Los cinco casos están respondidos con razones, no solo con un «sí» o un «no» |
+| Total | 10 | |
+
+Si un reto quedó a medias pero está bien explicado en =EXTRA.md=
+(hasta dónde llegaron, qué error salió y qué intentaron), se otorga
+parte de los puntos.
 
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
@@ -4892,9 +5677,9 @@ Lectura obligatoria, en este orden:
 2. *Patrones de software para aplicaciones web*, hasta *Ejemplo de
    análisis: registrar un pedido (y cobrar)* — o el capítulo web que
    usen en estos apuntes.
-3. *Arrancar Django para la plataforma de entregas* (venv, proyecto,
-   app, hola mundo). Si aún no abre =/entregas/hola/=, el Día 2 no
-   tiene sentido.
+3. *Arrancar Django para la plataforma de entregas*, pasos 1 a 8
+   (entorno virtual, proyecto, aplicación, primer mensaje y vista en
+   JSON). Si aún no abre =/entregas/hola/=, el Día 2 no tiene sentido.
 
 Por escrito, una tabla. No pongan «MVC» como respuesta de un renglón.
 
