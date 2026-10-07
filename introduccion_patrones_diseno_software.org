@@ -5792,6 +5792,1154 @@ Si un reto quedó a medias pero está bien explicado en =EXTRA.md=
 (hasta dónde llegaron, qué error salió y qué intentaron), se otorga
 parte de los puntos.
 
+** La IA dentro de la plataforma: un modelo que recomienda el medio de transporte
+
+*** Qué vamos a construir
+
+En la plataforma de entregas, alguien tiene que decidir si un paquete
+va en bicicleta, en moto, en camioneta o en dron. En la parte de
+patrones esa decisión venía de un proveedor externo de inteligencia
+artificial que respondía con su propio formato (=route_hint=). En esta
+sección vamos a entrenar nuestro propio modelo con un dataset de
+10 000 envíos y a conectarlo al proyecto que crearon en
+[[*Arrancar Django para la plataforma de entregas][Arrancar Django para la plataforma de entregas]].
+
+Al final de la sección veremos algo importante: aunque ahora una
+inteligencia artificial toma una decisión que antes tomaba una persona
+o un =if=, los patrones de diseño no desaparecen. Al contrario, son lo
+que permite meter el modelo a la plataforma sin desordenarla.
+
+La ruta tiene cuatro etapas:
+
+| Etapa | Pasos | Al terminar tendrán |
+|-------+-------+---------------------|
+| 1. Preparar | 1 y 2 | Las bibliotecas instaladas y una idea clara de qué hay en los datos |
+| 2. Entrenar | 3 a 10 | Un árbol de decisión entrenado, evaluado y guardado en un archivo |
+| 3. Usar el modelo | 11 y 12 | Una función que recibe un paquete y devuelve el medio recomendado |
+| 4. Conectarlo a la plataforma | 13 a 19 | Una dirección =/entregas/recomendar/= en Django que recomienda el medio y planea la entrega |
+
+Los pasos de esta sección tienen su propia numeración; cuando se
+mencione un paso de Django se dirá «de la ruta de Django».
+
+Los archivos están en el repositorio, en la carpeta
+=proyectos/dataset-medios/=:
+
+| Archivo | Qué contiene |
+|---------+--------------|
+| [[file:proyectos/dataset-medios/envios_medios.csv][=envios_medios.csv=]] | El dataset: 10 000 envíos con el medio recomendado |
+| [[file:proyectos/dataset-medios/entrenar_arbol.py][=entrenar_arbol.py=]] | El script completo de la etapa 2 |
+| [[file:proyectos/dataset-medios/usar_modelo.py][=usar_modelo.py=]] | El script completo de la etapa 3 |
+| [[file:proyectos/dataset-medios/entrenar_modelo.py][=entrenar_modelo.py=]] | Un Random Forest para comparar |
+| [[file:proyectos/dataset-medios/generar_dataset.py][=generar_dataset.py=]] | El programa que generó el dataset |
+| [[file:proyectos/dataset-medios/README.md][=README.md=]] | El diccionario de datos y cómo se generó el dataset |
+
+*** Antes de empezar: qué es un árbol de decisión
+
+Imaginen a un despachador con años de experiencia en la empresa. Cuando
+le llega un paquete no hace cálculos complicados: se hace preguntas, una
+tras otra. «¿Va a más de 7 kilómetros? No. ¿Llueve? No. ¿Pesa menos de
+8 kilos? Sí. Entonces, bicicleta». Cada respuesta lo lleva a la
+siguiente pregunta, hasta que llega a una decisión.
+
+Un árbol de decisión es exactamente eso, pero las preguntas no las
+inventa una persona: el algoritmo las descubre a partir de los
+ejemplos. Revisa los 8 000 envíos de entrenamiento y busca la pregunta
+que mejor separa los medios entre sí. Después repite lo mismo dentro de
+cada grupo, y así sucesivamente.
+
+Elegimos el árbol de decisión porque es el más fácil de entender: al
+terminar de entrenarlo se pueden imprimir sus preguntas y leerlas como
+reglas. Más adelante verán que cambiarlo por un Random Forest es una
+sola línea.
+
+|                             | Árbol de decisión                      | Random Forest                |
+|-----------------------------+----------------------------------------+------------------------------|
+| Qué es                      | Un solo árbol de preguntas             | Cientos de árboles que votan |
+| Exactitud con este dataset  | 92.1 %                                 | 93.1 %                       |
+| ¿Se pueden leer sus reglas? | Sí                                     | No en la práctica            |
+| Tamaño del archivo guardado | Unos 14 KB                             | Unos 60 MB (con 300 árboles) |
+| Para qué lo usamos aquí     | Aprender, explicar y ponerlo en Django | Comparar al final            |
+
+*** Etapa 1 — Preparar
+
+**** Paso 1 — Instalar las bibliotecas
+
+Pueden usar el mismo entorno virtual del proyecto de Django (paso 2 de
+la ruta de Django). Con el entorno activo:
+
+#+begin_src shell
+pip install pandas scikit-learn joblib
+#+end_src
+
+=pandas= sirve para leer y manejar tablas, como el CSV. =scikit-learn=
+tiene los algoritmos de aprendizaje automático, entre ellos el árbol
+de decisión. =joblib= guarda el modelo entrenado en un archivo para
+usarlo después.
+
+*Para comprobar:*
+
+#+begin_src shell
+python -c "import pandas, sklearn, joblib; print(sklearn.__version__)"
+#+end_src
+
+Anoten la versión de scikit-learn que aparece. La van a necesitar en
+el paso 13.
+
+**** Paso 2 — Conocer los datos
+
+Antes de entrenar nada, hay que mirar los datos. En una terminal de
+Python (o en un cuaderno de Jupyter), desde la carpeta
+=proyectos/dataset-medios/= o desde donde hayan copiado el CSV:
+
+#+begin_src python
+import pandas as pd
+
+datos = pd.read_csv("envios_medios.csv")
+
+print(datos.shape)
+print(datos.head())
+print(datos["medio_recomendado"].value_counts())
+#+end_src
+
+=datos.shape= dice cuántas filas y columnas hay: =(10000, 16)=.
+=head()= muestra las primeras cinco filas. =value_counts()= cuenta
+cuántos envíos hay de cada medio:
+
+#+begin_example
+medio_recomendado
+moto         4578
+bicicleta    2796
+camioneta    1678
+dron          948
+#+end_example
+
+Fíjense en que el dron tiene muchos menos ejemplos que la moto. Eso
+pasa en la realidad: el dron solo se puede usar en pocas condiciones.
+También significa que al modelo le va a costar más aprender a
+reconocerlo.
+
+Cada fila tiene catorce columnas que describen el paquete (distancia,
+peso, medidas, si es frágil, clima, hora, tráfico, etc.) y una columna
+=medio_recomendado=, que es lo que el modelo debe aprender a predecir.
+El significado de cada columna está en el =README.md= de la carpeta.
+
+*Para comprobar:* pueden responder sin mirar el código cuántos envíos
+hay, cuántos son de dron y qué columna es la que se va a predecir.
+
+*** Etapa 2 — Entrenar
+
+Los fragmentos de código de esta etapa forman, en orden, el script
+=entrenar_arbol.py=. Pueden escribirlo ustedes paso a paso o abrir el
+archivo y leerlo junto con los apuntes.
+
+**** Paso 3 — Separar lo que el modelo ve de lo que debe adivinar
+
+#+begin_src python
+NUMERICAS = [
+    "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm", "volumen_l",
+    "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
+]
+CATEGORICAS = ["prioridad", "zona_destino", "clima", "trafico"]
+OBJETIVO = "medio_recomendado"
+
+x = datos[NUMERICAS + CATEGORICAS]
+y = datos[OBJETIVO]
+#+end_src
+
+Por costumbre, a los datos de entrada se les llama =x= y a la
+respuesta =y=. =x= son las catorce columnas que describen cada
+paquete; =y= es el medio recomendado. La columna =id_envio= no se usa:
+es solo un nombre y no dice nada sobre el paquete.
+
+Separamos las columnas en dos listas porque se tratan distinto: las
+numéricas ya son números, y las categóricas son texto (por ejemplo,
+="lluvia"=), que hay que convertir antes de entrenar.
+
+**** Paso 4 — Apartar datos para la prueba
+
+#+begin_src python
+from sklearn.model_selection import train_test_split
+
+x_entreno, x_prueba, y_entreno, y_prueba = train_test_split(
+    x, y, test_size=0.2, stratify=y, random_state=42
+)
+#+end_src
+
+Si evaluáramos el modelo con los mismos envíos con los que aprendió,
+sería como hacer un examen con las mismas preguntas que se repasaron:
+la calificación saldría muy alta y no diría nada. Por eso se aparta el
+20 % de los envíos (=test_size=0.2=), unos 2 000, y el modelo nunca los
+ve durante el entrenamiento. Con ellos se evalúa al final.
+
+=stratify=y= hace que los dos grupos tengan la misma proporción de
+cada medio. Sin eso, por azar, podrían quedar muy pocos drones en la
+prueba. =random_state=42= fija el azar para que todos obtengan la
+misma separación y los mismos resultados.
+
+**** Paso 5 — Convertir las categorías en números
+
+El árbol solo entiende números. La columna =clima= tiene tres valores
+de texto, así que se convierte en tres columnas de ceros y unos:
+
+| clima         | clima_despejado | clima_lluvia | clima_viento_fuerte |
+|---------------+-----------------+--------------+---------------------|
+| despejado     | 1               | 0            | 0                   |
+| lluvia        | 0               | 1            | 0                   |
+| viento_fuerte | 0               | 0            | 1                   |
+
+A esto se le llama /one-hot encoding/. En código:
+
+#+begin_src python
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+preparacion = ColumnTransformer([
+    ("numericas", "passthrough", NUMERICAS),
+    ("categoricas", OneHotEncoder(handle_unknown="ignore"), CATEGORICAS),
+])
+#+end_src
+
+=ColumnTransformer= aplica un tratamiento distinto a cada grupo de
+columnas. Las numéricas pasan tal cual (="passthrough"=) y las
+categóricas pasan por el =OneHotEncoder=. =handle_unknown="ignore"=
+evita un error si algún día llega un valor que no estaba en el
+entrenamiento, por ejemplo un clima ="granizo"=.
+
+**** Paso 6 — Entrenar el árbol
+
+#+begin_src python
+from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
+
+modelo = Pipeline([
+    ("preparacion", preparacion),
+    ("arbol", DecisionTreeClassifier(max_depth=8, min_samples_leaf=5, random_state=42)),
+])
+
+modelo.fit(x_entreno, y_entreno)
+#+end_src
+
+Un =Pipeline= une la preparación y el árbol en un solo objeto. Es
+importante por una razón práctica: cuando usemos el modelo con un
+paquete nuevo, no tendremos que acordarnos de convertir las categorías
+a mano. Le damos los datos tal como vienen y el pipeline hace la
+preparación y la predicción.
+
+Los dos parámetros del árbol limitan cuánto puede crecer:
+
+- =max_depth=8=: como máximo, ocho preguntas seguidas antes de decidir.
+- =min_samples_leaf=5=: cada decisión final tiene que estar respaldada
+  por al menos cinco envíos. Así el árbol no inventa una regla para un
+  solo caso raro.
+
+En el paso 9 veremos por qué conviene limitarlo.
+
+=fit= es el entrenamiento. Con 8 000 envíos tarda menos de un segundo.
+
+**** Paso 7 — Evaluar con los envíos apartados
+
+#+begin_src python
+from sklearn.metrics import classification_report, confusion_matrix
+
+prediccion = modelo.predict(x_prueba)
+print(f"Exactitud: {(prediccion == y_prueba).mean():.1%}")
+print(classification_report(y_prueba, prediccion, digits=3))
+#+end_src
+
+El resultado:
+
+#+begin_example
+Exactitud con datos de prueba: 92.1%
+
+              precision    recall  f1-score   support
+
+   bicicleta      0.881     0.964     0.921       559
+   camioneta      1.000     0.866     0.928       336
+        dron      0.839     0.905     0.871       190
+        moto      0.942     0.918     0.930       915
+#+end_example
+
+La *exactitud* es la proporción de envíos en los que acertó: 92 de
+cada 100. Pero la exactitud sola esconde cosas, así que conviene leer
+también las otras columnas:
+
+- *precision*: de las veces que el modelo dijo «dron», ¿cuántas eran
+  dron de verdad? 83.9 %. Las demás eran envíos que debían ir en otro
+  medio.
+- *recall*: de todos los envíos que eran dron de verdad, ¿cuántos
+  reconoció? 90.5 %.
+- *f1-score*: un promedio de las dos anteriores.
+- *support*: cuántos envíos de cada medio había en la prueba.
+
+La *matriz de confusión* muestra exactamente en qué se equivoca:
+
+#+begin_src python
+etiquetas = sorted(y.unique())
+print(pd.DataFrame(
+    confusion_matrix(y_prueba, prediccion, labels=etiquetas),
+    index=etiquetas, columns=etiquetas,
+))
+#+end_src
+
+#+begin_example
+           bicicleta  camioneta  dron  moto
+bicicleta        539          0     0    20
+camioneta          9        291     4    32
+dron              18          0   172     0
+moto              46          0    29   840
+#+end_example
+
+Las filas son el medio real y las columnas lo que predijo el modelo. La
+diagonal son los aciertos. Por ejemplo, de los 915 envíos que debían ir
+en moto, acertó 840, mandó 46 a bicicleta y 29 a dron. Casi todos los
+errores son entre medios parecidos (moto y bicicleta, moto y dron),
+que son justo los casos dudosos también para una persona.
+
+¿Por qué no llega al 100 %? Porque el dataset tiene ruido a propósito:
+igual que en la vida real, dos despachadores con la misma información
+no siempre deciden lo mismo. El =README.md= explica cómo se agregó.
+
+**** Paso 8 — Leer las reglas que aprendió
+
+Esta es la gran ventaja del árbol: se pueden ver sus preguntas.
+
+#+begin_src python
+from sklearn.tree import export_text
+
+nombres = [n.split("__", 1)[1] for n in modelo.named_steps["preparacion"].get_feature_names_out()]
+print(export_text(modelo.named_steps["arbol"], feature_names=nombres, max_depth=3))
+#+end_src
+
+=get_feature_names_out()= da el nombre de cada columna después de la
+preparación (por ejemplo =categoricas__clima_lluvia=); el =split= le
+quita el prefijo para que se lea mejor. =max_depth=3= imprime solo los
+tres primeros niveles; el resto aparece como =truncated branch=.
+
+#+begin_example
+|--- distancia_km <= 7.01
+|   |--- volumen_l <= 90.10
+|   |   |--- clima_lluvia <= 0.50
+|   |   |   |--- peso_kg <= 7.85
+|   |   |   |   |--- truncated branch of depth 5
+|   |   |   |--- peso_kg >  7.85
+|   |   |   |   |--- truncated branch of depth 5
+|   |   |--- clima_lluvia >  0.50
+|   |   |   |--- fragil <= 0.50
+|   |   |   |   |--- truncated branch of depth 5
+|   |   |   |--- fragil >  0.50
+|   |   |   |   |--- truncated branch of depth 5
+|   |--- volumen_l >  90.10
+|   |   |--- class: camioneta
+|--- distancia_km >  7.01
+|   |--- distancia_km <= 39.91
+|   |   |--- volumen_l <= 90.16
+|   |   |   |--- refrigerado <= 0.50
+|   |   |   |   |--- truncated branch of depth 5
+|   |   |   |--- refrigerado >  0.50
+|   |   |   |   |--- class: camioneta
+|   |   |--- volumen_l >  90.16
+|   |   |   |--- class: camioneta
+|   |--- distancia_km >  39.91
+|   |   |--- class: camioneta
+#+end_example
+
+Lean los números con calma. La primera pregunta del árbol es si la
+distancia es menor a 7 km, que es justo el límite de la bicicleta.
+Después pregunta por 90 litros y por 40 km, que son los límites de la
+moto, y por el peso de 8 kg, que es otra vez la bicicleta. Y si el
+paquete es refrigerado, decide camioneta sin más preguntas. Nadie le
+dio esos límites al árbol: los descubrió solo, mirando los ejemplos.
+
+=clima_lluvia <= 0.50= es la forma en que el árbol pregunta «¿no
+llueve?», porque esa columna solo vale 0 o 1.
+
+**** Paso 9 — Elegir la profundidad
+
+¿Por qué ocho preguntas y no más? Esta tabla muestra qué pasa con
+distintas profundidades, siempre evaluando con los mismos envíos de
+prueba:
+
+| Profundidad máxima | Exactitud en la prueba | Decisiones finales (hojas) |
+|--------------------+------------------------+----------------------------|
+| 3                  | 74.8 %                 | 6                          |
+| 4                  | 79.0 %                 | 9                          |
+| 5                  | 81.3 %                 | 14                         |
+| 6                  | 84.2 %                 | 20                         |
+| 8                  | 92.1 %                 | 47                         |
+| 10                 | 92.4 %                 | 92                         |
+| Sin límite         | 91.8 %                 | 346                        |
+
+Con pocas preguntas el árbol es demasiado simple y se equivoca mucho.
+Con ocho llega a 92 %. A partir de ahí casi no mejora, pero el árbol
+se vuelve mucho más grande. Sin límite, con 346 decisiones finales,
+incluso empeora: empieza a memorizar los casos raros y el ruido de
+los datos de entrenamiento en lugar de aprender las reglas generales.
+A eso se le llama /sobreajuste/. Ocho es un buen equilibrio entre
+acertar y seguir siendo un árbol que se puede leer.
+
+El script acepta la profundidad como parámetro para que lo prueben
+ustedes:
+
+#+begin_src shell
+python entrenar_arbol.py --profundidad 4
+#+end_src
+
+**** Paso 10 — Guardar el modelo
+
+#+begin_src python
+import joblib
+
+joblib.dump(modelo, "modelo_medios.joblib")
+#+end_src
+
+Entrenar cada vez que se necesita una predicción sería un desperdicio.
+Se entrena una vez y el modelo se guarda en un archivo; después
+cualquier programa lo carga y lo usa. Como guardamos el =Pipeline=
+completo, el archivo incluye la preparación de las columnas y el árbol.
+
+*Para comprobar la etapa completa:*
+
+#+begin_src shell
+python entrenar_arbol.py
+#+end_src
+
+Debe mostrar la exactitud de 92.1 %, el reporte, la matriz de
+confusión, las reglas y terminar con =Modelo guardado en
+modelo_medios.joblib=. El archivo pesa unos 14 KB.
+
+*** Etapa 3 — Usar el modelo
+
+**** Paso 11 — Cargar el modelo y predecir un paquete nuevo
+
+#+begin_src python
+import joblib
+import pandas as pd
+
+modelo = joblib.load("modelo_medios.joblib")
+
+paquete = {
+    "distancia_km": 8.95, "peso_kg": 0.54, "largo_cm": 17.3, "ancho_cm": 10.7,
+    "alto_cm": 15.0, "volumen_l": 2.78, "fragil": 0, "refrigerado": 0,
+    "valor_declarado_mxn": 789, "prioridad": "normal", "zona_destino": "periferia",
+    "clima": "despejado", "hora_salida": 16, "trafico": "medio",
+}
+
+datos = pd.DataFrame([paquete])
+print(modelo.predict(datos))
+probabilidades = modelo.predict_proba(datos)[0]
+print({medio: round(float(p), 3) for medio, p in zip(modelo.classes_, probabilidades)})
+#+end_src
+
+#+begin_example
+['dron']
+{'bicicleta': 0.0, 'camioneta': 0.028, 'dron': 0.841, 'moto': 0.131}
+#+end_example
+
+El modelo espera una tabla, aunque sea de una sola fila; por eso el
+paquete se convierte en un =DataFrame= de una fila. =predict= devuelve
+el medio más probable. =predict_proba= devuelve la probabilidad de
+cada medio: el modelo está bastante seguro del dron (84 %) y la
+segunda opción sería la moto (13 %).
+
+**** Paso 12 — El modelo sugiere, las reglas deciden
+
+Si le pedimos al modelo una recomendación para cada uno de los 10 000
+envíos del dataset, en 121 casos (1.2 %) sugiere un medio que en
+realidad es imposible. Casi siempre es un dron de madrugada: el árbol
+no terminó de aprender que el dron no vuela de noche, porque la hora
+es un número y «de noche» significa «antes de las 6 o después de las
+21», una condición que le cuesta representar con preguntas de «menor
+o mayor que».
+
+Esto no es un defecto de este modelo en particular. Todos los modelos
+aprenden de ejemplos y todos se equivocan alguna vez. Por eso hay
+reglas que no se le dejan al modelo: si el paquete pesa 30 kg, ningún
+modelo puede mandarlo en bicicleta, por más seguro que esté. Esas
+reglas vienen del negocio y se escriben a mano:
+
+#+begin_src python
+LIMITES = {
+    "bicicleta": {"peso_kg": 8, "volumen_l": 40, "distancia_km": 7},
+    "moto": {"peso_kg": 25, "volumen_l": 90, "distancia_km": 40},
+    "camioneta": {"peso_kg": 1000, "volumen_l": 3000, "distancia_km": 1000},
+    "dron": {"peso_kg": 2.5, "volumen_l": 12, "distancia_km": 15},
+}
+
+
+def es_posible(medio, paquete):
+    limite = LIMITES[medio]
+    if paquete["peso_kg"] > limite["peso_kg"]:
+        return False
+    if paquete["volumen_l"] > limite["volumen_l"]:
+        return False
+    if paquete["distancia_km"] > limite["distancia_km"]:
+        return False
+    if paquete["refrigerado"] and medio != "camioneta":
+        return False
+    noche = paquete["hora_salida"] >= 21 or paquete["hora_salida"] < 6
+    if medio == "dron" and (paquete["clima"] != "despejado" or noche
+                            or paquete["zona_destino"] == "centro"):
+        return False
+    if medio == "bicicleta" and paquete["zona_destino"] == "rural":
+        return False
+    return True
+#+end_src
+
+La recomendación final combina las dos cosas. Se ordenan los medios de
+más probable a menos probable según el modelo, y se elige el primero
+que las reglas permiten:
+
+#+begin_src python
+def recomendar_medio(paquete):
+    datos = pd.DataFrame([paquete])
+    probabilidades = modelo.predict_proba(datos)[0]
+    ranking = sorted(zip(modelo.classes_, probabilidades), key=lambda par: -par[1])
+
+    for medio, confianza in ranking:
+        if es_posible(medio, paquete):
+            return {
+                "medio": medio,
+                "confianza": round(float(confianza), 3),
+                "corregido": medio != ranking[0][0],
+                "ranking": [(m, round(float(p), 3)) for m, p in ranking],
+            }
+    return {"medio": "camioneta", "confianza": 0.0, "corregido": True,
+            "ranking": [(m, round(float(p), 3)) for m, p in ranking]}
+#+end_src
+
+=sorted(..., key=lambda par: -par[1])= ordena los pares (medio,
+probabilidad) de mayor a menor probabilidad. El ciclo recorre ese
+orden y devuelve el primer medio posible. =corregido= avisa si hubo
+que descartar la primera opción del modelo. Si ningún medio fuera
+posible, la camioneta es la opción de respaldo.
+
+*Para comprobar:*
+
+#+begin_src shell
+python usar_modelo.py
+#+end_src
+
+#+begin_example
+Libro a 2 km en el centro, hora pico
+  Medio recomendado: bicicleta (confianza 89%)
+
+Medicamento ligero a 9 km, periferia, tarde despejada
+  Medio recomendado: dron (confianza 84%)
+
+Paquete ligero a 13 km, a las 3:00 de la madrugada
+  Medio recomendado: moto (confianza 13%)
+  Nota: el modelo prefería dron, pero no es posible para este paquete.
+
+Microondas a 18 km con lluvia
+  Medio recomendado: moto (confianza 98%)
+
+Vacunas refrigeradas a 30 km
+  Medio recomendado: camioneta (confianza 100%)
+#+end_example
+
+Fíjense en el tercer caso. El modelo prefería el dron con 84 % de
+confianza, porque ese paquete se parece mucho al del segundo caso.
+Pero a las 3:00 el dron no puede volar, así que las reglas lo
+descartan y se elige la moto, que era su segunda opción.
+
+*** Etapa 4 — Conectarlo a la plataforma
+
+Ahora el modelo va a vivir dentro del proyecto de Django, en la
+aplicación =entregas=. Para la app móvil o la página web no cambia
+nada: hacen una petición y reciben un JSON. Que detrás haya un árbol
+de decisión, un proveedor externo o reglas escritas a mano es un
+detalle interno del backend.
+
+**** Paso 13 — Copiar el modelo al proyecto y agregar las dependencias
+
+Dentro de la aplicación =entregas= creen una carpeta =modelo= y copien
+ahí el archivo entrenado:
+
+#+begin_example
+plataforma-entregas/
+  entregas/
+    modelo/
+      modelo_medios.joblib
+    models.py
+    views.py
+    urls.py
+#+end_example
+
+El archivo pesa unos 14 KB, así que se puede subir al repositorio sin
+problema.
+
+Con el entorno virtual del proyecto activo, instalen las bibliotecas
+con la *misma versión de scikit-learn* con la que entrenaron (la que
+anotaron en el paso 1) y actualicen =requirements.txt=:
+
+#+begin_src shell
+pip install "scikit-learn==1.9.0" pandas joblib
+pip freeze > requirements.txt
+#+end_src
+
+(Cambien =1.9.0= por su versión. En PowerShell, la segunda línea es
+=pip freeze | Out-File -Encoding utf8 requirements.txt=.)
+
+La versión importa porque el archivo =.joblib= guarda el modelo tal
+como lo dejó esa versión de scikit-learn. Si en el proyecto se instala
+otra, el modelo puede cargar con advertencias o no cargar. Al quedar
+fija en =requirements.txt=, el contenedor de Docker instalará también
+la misma.
+
+*Para comprobar:*
+=python -c "import joblib; joblib.load('entregas/modelo/modelo_medios.joblib')"=
+termina sin errores.
+
+**** Paso 14 — Las reglas del negocio en su propio archivo
+
+Creen =entregas/reglas.py= con =LIMITES= y =es_posible=, exactamente
+como en el paso 12. Van en un archivo aparte porque no pertenecen al
+modelo: si mañana se cambia el árbol por otro modelo o por un
+proveedor externo, las reglas siguen siendo las mismas.
+
+**** Paso 15 — El adaptador: el modelo habla de probabilidades, la plataforma habla de Sugerencia
+
+En la parte de patrones vimos que la plataforma no debe hablar el
+idioma de cada proveedor de IA. El proveedor responde =route_hint= y
+=reason_code=, pero el despacho solo entiende una =Sugerencia= con
+=medio= y =motivo=. El traductor entre los dos es un Adapter.
+
+Nuestro modelo es un proveedor más, con su propio idioma: una lista de
+clases y una lista de probabilidades. Así que lo envolvemos en un
+adaptador con la misma interfaz. Creen =entregas/recomendador.py=:
+
+#+begin_src python
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
+
+import joblib
+import pandas as pd
+
+from .reglas import es_posible
+
+RUTA_MODELO = Path(__file__).resolve().parent / "modelo" / "modelo_medios.joblib"
+
+CAMPOS_NUMERICOS = [
+    "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm", "volumen_l",
+    "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
+]
+CAMPOS_TEXTO = ["prioridad", "zona_destino", "clima", "trafico"]
+CAMPOS = CAMPOS_NUMERICOS + CAMPOS_TEXTO
+
+
+@dataclass(frozen=True)
+class Sugerencia:
+    medio: str
+    motivo: str
+
+
+class RecomendadorIA(ABC):
+    @abstractmethod
+    def sugerir(self, paquete: dict) -> Sugerencia:
+        pass
+
+
+class RecomendadorArbol(RecomendadorIA):
+    """El modelo responde probabilidades; la plataforma solo entiende Sugerencia."""
+
+    def __init__(self, ruta=RUTA_MODELO):
+        self._modelo = joblib.load(ruta)
+
+    def sugerir(self, paquete):
+        datos = pd.DataFrame([paquete], columns=CAMPOS)
+        probabilidades = self._modelo.predict_proba(datos)[0]
+        ranking = sorted(zip(self._modelo.classes_, probabilidades), key=lambda par: -par[1])
+        preferido = ranking[0][0]
+
+        for medio, confianza in ranking:
+            if es_posible(medio, paquete):
+                motivo = f"árbol de decisión, confianza {confianza:.0%}"
+                if medio != preferido:
+                    motivo += f"; se descartó {preferido} por las reglas del negocio"
+                return Sugerencia(medio, motivo)
+        return Sugerencia("camioneta", "ningún medio sugerido era posible")
+
+
+@lru_cache(maxsize=1)
+def obtener_recomendador() -> RecomendadorIA:
+    return RecomendadorArbol()
+#+end_src
+
+Lo importante de este archivo:
+
+- =RecomendadorIA= es la interfaz: cualquier recomendador tiene un
+  método =sugerir= que recibe un paquete y devuelve una =Sugerencia=.
+  Si ya tienen en su proyecto un =RecomendadorIA= y una =Sugerencia=
+  de la parte de patrones (por ejemplo, para el proveedor que responde
+  =route_hint=), usen esos en lugar de definirlos otra vez.
+- =RecomendadorArbol= es el adaptador. Por dentro usa =predict_proba=
+  y las reglas; por fuera entrega una =Sugerencia=. El resto de la
+  plataforma nunca ve probabilidades, ni =pandas=, ni scikit-learn.
+- =RUTA_MODELO= construye la ruta al archivo a partir de la ubicación
+  de =recomendador.py=. Así funciona igual en su computadora que en
+  =/app= dentro del contenedor.
+- =pd.DataFrame([paquete], columns=CAMPOS)= garantiza que las columnas
+  lleguen en el orden y con los nombres que espera el modelo, aunque
+  el JSON las mande en otro orden.
+- =obtener_recomendador= carga el modelo la primera vez que se pide y
+  después reutiliza el mismo objeto. =@lru_cache(maxsize=1)= es lo que
+  hace eso: recuerda el resultado de la función. Cargar el archivo en
+  cada petición sería lento.
+
+¿No habíamos dicho, en la etapa 5 de la ruta de Django, que no se
+guardan cosas en la memoria del programa? Lo que no se debe guardar
+son los datos que cambian con cada cliente, como los pedidos, porque
+cada copia tendría una versión distinta. El modelo es otra cosa: es
+igual en todas las copias, porque todas lo cargan del mismo archivo, y
+nadie lo modifica mientras el programa corre. Es como el código: cada
+copia tiene el suyo y todos son idénticos.
+
+Si el día de mañana la empresa contrata un proveedor externo, se
+escribe otro adaptador (por ejemplo =RecomendadorProveedor=), se cambia
+la línea de =obtener_recomendador= y ni la vista ni el despacho se
+enteran.
+
+**** Paso 16 — La vista =/entregas/recomendar/=
+
+En =entregas/views.py= agreguen al inicio:
+
+#+begin_src python
+import json
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+from .recomendador import CAMPOS, CAMPOS_NUMERICOS, obtener_recomendador
+#+end_src
+
+(Si alguno de esos =import= ya estaba, no lo repitan.) Y la vista:
+
+#+begin_src python
+@csrf_exempt
+@require_POST
+def recomendar(request):
+    try:
+        paquete = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "el cuerpo debe ser JSON"}, status=400)
+
+    faltantes = [campo for campo in CAMPOS if campo not in paquete]
+    if faltantes:
+        return JsonResponse({"error": "faltan campos", "campos": faltantes}, status=400)
+
+    try:
+        for campo in CAMPOS_NUMERICOS:
+            paquete[campo] = float(paquete[campo])
+    except (TypeError, ValueError):
+        return JsonResponse({"error": f"el campo {campo} debe ser un número"}, status=400)
+
+    sugerencia = obtener_recomendador().sugerir(paquete)
+    return JsonResponse(
+        {"medio": sugerencia.medio, "motivo": sugerencia.motivo},
+        json_dumps_params={"ensure_ascii": False},
+    )
+#+end_src
+
+En =entregas/urls.py=:
+
+#+begin_src python
+path("recomendar/", views.recomendar, name="recomendar"),
+#+end_src
+
+La vista es delgada, como debe ser una vista. Solo hace tres cosas:
+lee el JSON, valida que estén todos los campos y que los numéricos
+sean números, y le pide la sugerencia al recomendador. No sabe nada
+de árboles ni de probabilidades. Las validaciones están aquí, en el
+backend, porque cualquiera puede mandar una petición sin pasar por la
+app. =ensure_ascii=False= hace que los acentos del motivo se vean
+normales en lugar de aparecer como =\u00e1=.
+
+Recibe un POST con JSON porque el paquete tiene catorce campos, que
+serían demasiados para ponerlos en la dirección. =@csrf_exempt= está
+por la misma razón que en =registrar_pedido= (paso 14 de la ruta de
+Django): la app móvil no manda el token de los formularios web.
+
+**** Paso 17 — Probarlo
+
+Guarden este paquete en un archivo =paquete.json=:
+
+#+begin_src json
+{
+  "distancia_km": 12.64, "peso_kg": 0.31, "largo_cm": 11.7, "ancho_cm": 7.6,
+  "alto_cm": 10.6, "volumen_l": 0.94, "fragil": 0, "refrigerado": 0,
+  "valor_declarado_mxn": 4603, "prioridad": "mismo_dia", "zona_destino": "periferia",
+  "clima": "despejado", "hora_salida": 3, "trafico": "medio"
+}
+#+end_src
+
+Con =python manage.py runserver= corriendo, en otra terminal. En Linux
+y macOS:
+
+#+begin_src shell
+curl -s -X POST -H "Content-Type: application/json" -d @paquete.json http://127.0.0.1:8000/entregas/recomendar/
+#+end_src
+
+En PowerShell (las comillas en ="@paquete.json"= son necesarias, porque
+sin ellas PowerShell interpreta la arroba de otra forma):
+
+#+begin_src powershell
+curl.exe -s -X POST -H "Content-Type: application/json" -d "@paquete.json" http://127.0.0.1:8000/entregas/recomendar/
+#+end_src
+
+La respuesta:
+
+#+begin_example
+{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio"}
+#+end_example
+
+Cambien =hora_salida= a =16= en el archivo y repitan:
+
+#+begin_example
+{"medio": "dron", "motivo": "árbol de decisión, confianza 84%"}
+#+end_example
+
+Prueben también que la vista se defiende de datos incorrectos. Un
+paquete incompleto:
+
+#+begin_src shell
+curl -s -X POST -H "Content-Type: application/json" -d '{"distancia_km": 3}' http://127.0.0.1:8000/entregas/recomendar/
+#+end_src
+
+#+begin_example
+{"error": "faltan campos", "campos": ["peso_kg", "largo_cm", "ancho_cm", ...]}
+#+end_example
+
+Y un texto donde va un número (cambien ="peso_kg": 0.31= por
+="peso_kg": "abc"= en el archivo):
+
+#+begin_example
+{"error": "el campo peso_kg debe ser un número"}
+#+end_example
+
+*Para comprobar:* las cuatro respuestas coinciden con las de arriba.
+
+**** Paso 18 — Con varias copias
+
+Si hicieron la etapa 5 de la ruta de Django, no hace falta nada más.
+Como =modelo_medios.joblib= está dentro del proyecto, =COPY . .= lo
+mete en la imagen, y como scikit-learn está en =requirements.txt=, se
+instala dentro del contenedor. Cada copia carga el mismo modelo, así
+que todas recomiendan lo mismo para el mismo paquete.
+
+#+begin_src shell
+docker compose up --build
+#+end_src
+
+Y prueben con la misma petición, ahora contra el balanceador en
+=http://localhost:8000/entregas/recomendar/=.
+
+Fíjense en lo que significa esto para el futuro: si entrenan un
+modelo mejor, basta con reemplazar el archivo, construir la imagen
+otra vez y reemplazar las copias. El código de la plataforma no
+cambia.
+
+**** Paso 19 — Del medio sugerido al plan de entrega
+
+La recomendación termina en un nombre: ="dron"=. Un nombre no entrega
+paquetes. Falta lo que vimos en la parte de patrones: cada medio
+planea la entrega a su manera (Strategy), y alguien tiene que
+convertir el nombre en el objeto correcto (una fábrica simple, como
+=MedioFactory.crear= en [[*Quién hace el =new=][Quién hace el =new=]]).
+
+Creen =entregas/medios.py=:
+
+#+begin_src python
+from abc import ABC, abstractmethod
+
+
+class MedioDeEntrega(ABC):
+    @abstractmethod
+    def planear(self, paquete: dict) -> dict:
+        pass
+
+
+class EntregaBicicleta(MedioDeEntrega):
+    def planear(self, paquete):
+        minutos = paquete["distancia_km"] / 15 * 60
+        return {"medio": "bicicleta", "minutos": round(minutos), "indicacion": "ruta por ciclovías"}
+
+
+class EntregaMotocicleta(MedioDeEntrega):
+    def planear(self, paquete):
+        minutos = paquete["distancia_km"] / 35 * 60
+        return {"medio": "moto", "minutos": round(minutos), "indicacion": "ruta por avenidas"}
+
+
+class EntregaCamioneta(MedioDeEntrega):
+    def planear(self, paquete):
+        minutos = paquete["distancia_km"] / 30 * 60
+        indicacion = "unidad refrigerada" if paquete["refrigerado"] else "ruta de reparto"
+        return {"medio": "camioneta", "minutos": round(minutos), "indicacion": indicacion}
+
+
+class EntregaDron(MedioDeEntrega):
+    def planear(self, paquete):
+        minutos = paquete["distancia_km"] * 0.75 / 70 * 60
+        return {"medio": "dron", "minutos": round(minutos), "indicacion": "vuelo en línea recta"}
+
+
+MEDIOS = {
+    "bicicleta": EntregaBicicleta,
+    "moto": EntregaMotocicleta,
+    "camioneta": EntregaCamioneta,
+    "dron": EntregaDron,
+}
+
+
+def crear_medio(nombre: str) -> MedioDeEntrega:
+    return MEDIOS[nombre]()
+#+end_src
+
+Cada clase es una estrategia: todas responden =planear(paquete)=,
+cada una a su manera. Aquí el plan es sencillo (un tiempo estimado y
+una indicación); en un sistema real cada estrategia calcularía la ruta
+con su propio servicio de mapas. El dron, por ejemplo, vuela en línea
+recta, así que su distancia real es más corta que la de la calle.
+
+=crear_medio= es la fábrica: el único lugar que conoce las clases
+concretas. El diccionario =MEDIOS= hace el papel del =switch=.
+Cuando aparezca un medio nuevo, se agrega una clase y una línea al
+diccionario.
+
+En la vista =recomendar= solo cambian dos cosas. Agreguen el =import=:
+
+#+begin_src python
+from .medios import crear_medio
+#+end_src
+
+Y al final de la vista, pidan el plan al medio sugerido:
+
+#+begin_src python
+    sugerencia = obtener_recomendador().sugerir(paquete)
+    plan = crear_medio(sugerencia.medio).planear(paquete)
+    return JsonResponse(
+        {"medio": sugerencia.medio, "motivo": sugerencia.motivo, "plan": plan},
+        json_dumps_params={"ensure_ascii": False},
+    )
+#+end_src
+
+*Para comprobar:* con el =paquete.json= del paso 17 (a las 3:00):
+
+#+begin_example
+{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio", "plan": {"medio": "moto", "minutos": 22, "indicacion": "ruta por avenidas"}}
+#+end_example
+
+Con =hora_salida= en =16=:
+
+#+begin_example
+{"medio": "dron", "motivo": "árbol de decisión, confianza 84%", "plan": {"medio": "dron", "minutos": 8, "indicacion": "vuelo en línea recta"}}
+#+end_example
+
+Y si además cambian =refrigerado= a =1=, el modelo elige camioneta y
+la estrategia de la camioneta pide la unidad refrigerada:
+
+#+begin_example
+{"medio": "camioneta", "motivo": "árbol de decisión, confianza 100%", "plan": {"medio": "camioneta", "minutos": 25, "indicacion": "unidad refrigerada"}}
+#+end_example
+
+*** Por qué la IA no hace desaparecer los patrones de diseño
+
+Es fácil pensar que, si ahora un modelo decide qué medio usar, ya no
+hacen falta Strategy, Adapter ni fábricas: «la IA lo resuelve». Con lo
+que acaban de construir se puede ver por qué eso no es cierto.
+
+**** El modelo responde una sola pregunta
+
+Sigan lo que pasa con un paquete desde que llega hasta que sale la
+respuesta:
+
+#+begin_example
+App o página web
+   │  POST /entregas/recomendar/
+   ▼
+Vista recomendar ............ lee y valida; no decide nada
+   │
+   ├── obtener_recomendador().sugerir(paquete) ... Adapter
+   │       └── RecomendadorArbol: el modelo propone, las reglas descartan
+   │                     │
+   │                     ▼
+   │               Sugerencia(medio, motivo)
+   │
+   └── crear_medio(sugerencia.medio) ............... fábrica simple
+           └── .planear(paquete) ................... Strategy
+                     │
+                     ▼
+               plan de entrega
+#+end_example
+
+| Qué hay que hacer                          | Quién lo hace                  | Qué lo hace posible                  |
+|--------------------------------------------+--------------------------------+--------------------------------------|
+| Recibir la petición y validar los datos    | La vista =recomendar=          | Una vista delgada                    |
+| Elegir el medio más conveniente            | *El modelo*                    | El entrenamiento                     |
+| Traducir probabilidades a una =Sugerencia= | =RecomendadorArbol=            | Adapter                              |
+| Descartar lo imposible                     | =reglas.py=                    | Reglas del negocio escritas a mano   |
+| Convertir ="dron"= en un objeto            | =crear_medio=                  | Fábrica simple                       |
+| Planear la entrega                         | =EntregaDron=, =EntregaMotocicleta=... | Strategy                     |
+| Cargar el modelo una sola vez              | =obtener_recomendador=         | Una instancia compartida por proceso |
+
+El modelo ocupa una sola fila de esta tabla. Reemplazó la parte que
+antes era un =if= largo para elegir el medio, pero todo lo demás sigue
+siendo software, y sigue necesitando estar ordenado. El modelo dice
+«dron»; no sabe planear un vuelo, ni validar un JSON, ni guardar un
+pedido.
+
+**** El modelo es un proveedor más, y los proveedores cambian
+
+En esta misma materia el recomendador ya cambió varias veces: primero
+fue un proveedor externo que respondía =route_hint=, luego un árbol de
+decisión, y se puede cambiar por un Random Forest o, en el ejercicio
+5, por unas reglas sencillas. Mañana podría ser un modelo de lenguaje
+contratado por internet.
+
+Gracias a la interfaz =RecomendadorIA=, cada uno de esos cambios toca
+una línea: la de =obtener_recomendador=. Comparen con lo que pasa si
+el modelo se usa directamente en la vista:
+
+#+begin_src python
+def recomendar(request):
+    paquete = json.loads(request.body)
+    modelo = joblib.load("entregas/modelo/modelo_medios.joblib")
+    probabilidades = modelo.predict_proba(pd.DataFrame([paquete]))[0]
+    medio = modelo.classes_[probabilidades.argmax()]
+    if medio == "dron" and (paquete["hora_salida"] < 6 or paquete["clima"] != "despejado"):
+        medio = "moto"
+    if medio == "dron":
+        minutos = paquete["distancia_km"] * 0.75 / 70 * 60
+    elif medio == "moto":
+        ...
+#+end_src
+
+Funciona, y una IA que escribe código probablemente propondría algo
+así si se le pide «hazme la recomendación». Pero:
+
+- La vista carga el archivo en cada petición, así que es lenta.
+- =pandas= y scikit-learn quedan metidos en la vista. El día que se
+  use un proveedor externo, hay que reescribirla.
+- Las reglas del negocio quedan mezcladas con la predicción, y
+  repetidas en cada lugar que necesite recomendar: el panel, la app,
+  las pruebas.
+- El =if= de los medios vuelve a aparecer, que es justo el =switch=
+  de 200 líneas del que partió la sección de Strategy.
+
+Es el mismo problema de siempre, con un modelo en medio.
+
+**** El modelo se equivoca y se cae
+
+En el paso 12 vimos que el modelo propone algo imposible en 1.2 % de
+los casos. Además, un modelo envejece, y si es un servicio externo se
+puede caer o tardar en responder. Ninguna de esas cosas se arregla
+con un modelo mejor; se arregla con diseño:
+
+- Las reglas del negocio viven aparte del modelo (=reglas.py=), para
+  que ninguna recomendación imposible llegue al despacho.
+- Como todos los recomendadores cumplen la misma interfaz, se puede
+  escribir uno que envuelva a otro y, si el principal falla, use un
+  respaldo (ejercicio 6). Es lo que se discutió en
+  [[*La IA se cae y el pedido sigue vivo][La IA se cae y el pedido sigue vivo]]: el pedido no puede depender de
+  que la IA conteste.
+
+**** La IA que escribe código tampoco los elimina
+
+Lo mismo pasa con las herramientas de IA que generan código. Escriben
+rápido, pero el costo de un sistema no está en escribirlo la primera
+vez, sino en cambiarlo durante años. Los patrones existen para ese
+segundo costo. Además, son el vocabulario para pedirle bien las cosas
+a una IA («escribe un adaptador que cumpla =RecomendadorIA=») y para
+revisar lo que propone (como en [[*Uso de IA en el diseño de software][Uso de IA en el diseño de software]]).
+
+#+begin_quote
+La IA cambia *quién* toma una decisión. No cambia *cuánto cuesta*
+cambiar el código cuando esa decisión, o quien la toma, cambia. Los
+patrones de diseño atienden lo segundo.
+#+end_quote
+
+*** Random Forest: cambiar una línea
+
+Si quieren comparar, en el paso 6 cambien el árbol por un bosque:
+
+#+begin_src python
+from sklearn.ensemble import RandomForestClassifier
+
+modelo = Pipeline([
+    ("preparacion", preparacion),
+    ("arbol", RandomForestClassifier(n_estimators=300, random_state=42, n_jobs=-1)),
+])
+#+end_src
+
+Todo lo demás (entrenar, evaluar, guardar, usar y el adaptador de
+Django) funciona igual, porque los dos tienen =fit=, =predict= y
+=predict_proba=. Solo dejarán de funcionar =export_text= y la lectura
+de reglas del paso 8, porque un bosque son 300 árboles votando. El
+script =entrenar_modelo.py= de la carpeta ya entrena un Random Forest;
+con este dataset llega a 93.1 %.
+
+¿Cuál conviene? El bosque acierta un punto más, pero no se puede
+explicar y el archivo guardado pesa unos 60 MB, demasiado para subirlo
+al repositorio como hicimos con el árbol. Para la plataforma de esta
+materia, el árbol es suficiente: un punto de diferencia lo cubren de
+todos modos las reglas del paso 12, y poder explicarle al jefe de
+logística por qué se eligió la moto vale mucho.
+
+*** Qué hay que tener en cuenta
+
+- *Los datos son sintéticos.* El modelo aprendió reglas que alguien
+  inventó para generar el dataset. En una empresa real se entrenaría
+  con el historial de envíos, y habría que revisar que ese historial
+  refleje buenas decisiones y no los errores de siempre.
+- *El modelo envejece.* Si la empresa compra drones con más
+  autonomía o cambia sus tarifas, el modelo sigue recomendando como
+  antes. Hay que volver a entrenarlo con datos nuevos de vez en cuando.
+- *Las reglas del negocio no se le dejan al modelo.* Lo que es
+  imposible o prohibido se valida siempre con código escrito a mano.
+- *La versión de las bibliotecas importa.* El modelo se entrena y se
+  usa con la misma versión de scikit-learn.
+
+*** Ejercicios
+
+1. *Una pregunta nueva para el árbol.* Agreguen al dataset una columna
+   =es_de_noche= (1 si la hora es menor a 6 o mayor o igual a 21, 0 si
+   no), agréguenla a =NUMERICAS=, entrenen otra vez y cuenten cuántas
+   veces el modelo sugiere un medio imposible. ¿Bajó de 121? ¿Por qué
+   le ayuda esa columna al árbol?
+2. *Las clases desbalanceadas.* Entrenen con
+   =DecisionTreeClassifier(..., class_weight="balanced")=. ¿Qué pasa
+   con el =recall= del dron? ¿Y con su =precision=? ¿Qué preferiría la
+   empresa, y por qué?
+3. *Menos preguntas.* Entrenen con =--profundidad 4= e impriman el
+   árbol completo con =export_text= sin =max_depth=. ¿Lo podrían
+   escribir como una cadena de =if= en Python? ¿Qué se pierde?
+4. *Datos sucios.* Generen el dataset con
+   =python generar_dataset.py --faltantes 0.05 --salida sucio.csv=,
+   que deja un 5 % de celdas vacías, y entrenen con
+   =python entrenar_arbol.py --datos sucio.csv=. Las versiones
+   recientes de scikit-learn aceptan huecos en los árboles, así que
+   va a entrenar, pero con menos exactitud. Agreguen un
+   =SimpleImputer= a la preparación para llenar los huecos (con la
+   mediana en las numéricas y el valor más frecuente en las
+   categóricas) y comparen. Después piensen en la plataforma: si la
+   app móvil manda un paquete sin peso, ¿la vista debería rellenarlo
+   o rechazarlo? ¿Por qué?
+5. *Otro proveedor detrás de la misma interfaz.* Escriban un
+   =RecomendadorReglas= que no use ningún modelo, solo un par de =if=,
+   y cámbienlo en =obtener_recomendador=. Comprueben que la vista
+   funciona sin tocarla. ¿Qué patrón hace posible ese cambio?
+6. *Un recomendador con respaldo.* Escriban un
+   =RecomendadorConRespaldo(principal, respaldo)= que también cumpla
+   =RecomendadorIA=: llama al principal y, si lanza una excepción,
+   usa el respaldo y lo dice en el =motivo=. Úsenlo con el árbol como
+   principal y el =RecomendadorReglas= del ejercicio 5 como respaldo.
+   Para simular la falla, hagan que =RecomendadorArbol.sugerir= lance
+   una excepción. ¿Qué patrón del catálogo se parece a un objeto que
+   envuelve a otro con la misma interfaz y le agrega algo?
+
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
 Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
@@ -5952,1154 +7100,6 @@ implementar lo que no hacía falta.
 |   3 | Strategy + Adapter + =new= fuera de la vista                                 |
 |   4 | Plantilla sin SQL; transacción; pedido guardado si la IA falla             |
 |   5 | JSON del mismo folio; README; saber decir que no al PDF con Event Sourcing |
-
-* La IA dentro de la plataforma: un modelo que recomienda el medio de transporte
-
-** Qué vamos a construir
-
-En la plataforma de entregas, alguien tiene que decidir si un paquete
-va en bicicleta, en moto, en camioneta o en dron. En la parte de
-patrones esa decisión venía de un proveedor externo de inteligencia
-artificial que respondía con su propio formato (=route_hint=). En esta
-sección vamos a entrenar nuestro propio modelo con un dataset de
-10 000 envíos y a conectarlo al proyecto que crearon en
-[[*Arrancar Django para la plataforma de entregas][Arrancar Django para la plataforma de entregas]].
-
-Al final de la sección veremos algo importante: aunque ahora una
-inteligencia artificial toma una decisión que antes tomaba una persona
-o un =if=, los patrones de diseño no desaparecen. Al contrario, son lo
-que permite meter el modelo a la plataforma sin desordenarla.
-
-La ruta tiene cuatro etapas:
-
-| Etapa | Pasos | Al terminar tendrán |
-|-------+-------+---------------------|
-| 1. Preparar | 1 y 2 | Las bibliotecas instaladas y una idea clara de qué hay en los datos |
-| 2. Entrenar | 3 a 10 | Un árbol de decisión entrenado, evaluado y guardado en un archivo |
-| 3. Usar el modelo | 11 y 12 | Una función que recibe un paquete y devuelve el medio recomendado |
-| 4. Conectarlo a la plataforma | 13 a 19 | Una dirección =/entregas/recomendar/= en Django que recomienda el medio y planea la entrega |
-
-Los pasos de esta sección tienen su propia numeración; cuando se
-mencione un paso de Django se dirá «de la ruta de Django».
-
-Los archivos están en el repositorio, en la carpeta
-=proyectos/dataset-medios/=:
-
-| Archivo | Qué contiene |
-|---------+--------------|
-| [[file:proyectos/dataset-medios/envios_medios.csv][=envios_medios.csv=]] | El dataset: 10 000 envíos con el medio recomendado |
-| [[file:proyectos/dataset-medios/entrenar_arbol.py][=entrenar_arbol.py=]] | El script completo de la etapa 2 |
-| [[file:proyectos/dataset-medios/usar_modelo.py][=usar_modelo.py=]] | El script completo de la etapa 3 |
-| [[file:proyectos/dataset-medios/entrenar_modelo.py][=entrenar_modelo.py=]] | Un Random Forest para comparar |
-| [[file:proyectos/dataset-medios/generar_dataset.py][=generar_dataset.py=]] | El programa que generó el dataset |
-| [[file:proyectos/dataset-medios/README.md][=README.md=]] | El diccionario de datos y cómo se generó el dataset |
-
-** Antes de empezar: qué es un árbol de decisión
-
-Imaginen a un despachador con años de experiencia en la empresa. Cuando
-le llega un paquete no hace cálculos complicados: se hace preguntas, una
-tras otra. «¿Va a más de 7 kilómetros? No. ¿Llueve? No. ¿Pesa menos de
-8 kilos? Sí. Entonces, bicicleta». Cada respuesta lo lleva a la
-siguiente pregunta, hasta que llega a una decisión.
-
-Un árbol de decisión es exactamente eso, pero las preguntas no las
-inventa una persona: el algoritmo las descubre a partir de los
-ejemplos. Revisa los 8 000 envíos de entrenamiento y busca la pregunta
-que mejor separa los medios entre sí. Después repite lo mismo dentro de
-cada grupo, y así sucesivamente.
-
-Elegimos el árbol de decisión porque es el más fácil de entender: al
-terminar de entrenarlo se pueden imprimir sus preguntas y leerlas como
-reglas. Más adelante verán que cambiarlo por un Random Forest es una
-sola línea.
-
-|                             | Árbol de decisión                      | Random Forest                |
-|-----------------------------+----------------------------------------+------------------------------|
-| Qué es                      | Un solo árbol de preguntas             | Cientos de árboles que votan |
-| Exactitud con este dataset  | 92.1 %                                 | 93.1 %                       |
-| ¿Se pueden leer sus reglas? | Sí                                     | No en la práctica            |
-| Tamaño del archivo guardado | Unos 14 KB                             | Unos 60 MB (con 300 árboles) |
-| Para qué lo usamos aquí     | Aprender, explicar y ponerlo en Django | Comparar al final            |
-
-** Etapa 1 — Preparar
-
-*** Paso 1 — Instalar las bibliotecas
-
-Pueden usar el mismo entorno virtual del proyecto de Django (paso 2 de
-la ruta de Django). Con el entorno activo:
-
-#+begin_src shell
-pip install pandas scikit-learn joblib
-#+end_src
-
-=pandas= sirve para leer y manejar tablas, como el CSV. =scikit-learn=
-tiene los algoritmos de aprendizaje automático, entre ellos el árbol
-de decisión. =joblib= guarda el modelo entrenado en un archivo para
-usarlo después.
-
-*Para comprobar:*
-
-#+begin_src shell
-python -c "import pandas, sklearn, joblib; print(sklearn.__version__)"
-#+end_src
-
-Anoten la versión de scikit-learn que aparece. La van a necesitar en
-el paso 13.
-
-*** Paso 2 — Conocer los datos
-
-Antes de entrenar nada, hay que mirar los datos. En una terminal de
-Python (o en un cuaderno de Jupyter), desde la carpeta
-=proyectos/dataset-medios/= o desde donde hayan copiado el CSV:
-
-#+begin_src python
-import pandas as pd
-
-datos = pd.read_csv("envios_medios.csv")
-
-print(datos.shape)
-print(datos.head())
-print(datos["medio_recomendado"].value_counts())
-#+end_src
-
-=datos.shape= dice cuántas filas y columnas hay: =(10000, 16)=.
-=head()= muestra las primeras cinco filas. =value_counts()= cuenta
-cuántos envíos hay de cada medio:
-
-#+begin_example
-medio_recomendado
-moto         4578
-bicicleta    2796
-camioneta    1678
-dron          948
-#+end_example
-
-Fíjense en que el dron tiene muchos menos ejemplos que la moto. Eso
-pasa en la realidad: el dron solo se puede usar en pocas condiciones.
-También significa que al modelo le va a costar más aprender a
-reconocerlo.
-
-Cada fila tiene catorce columnas que describen el paquete (distancia,
-peso, medidas, si es frágil, clima, hora, tráfico, etc.) y una columna
-=medio_recomendado=, que es lo que el modelo debe aprender a predecir.
-El significado de cada columna está en el =README.md= de la carpeta.
-
-*Para comprobar:* pueden responder sin mirar el código cuántos envíos
-hay, cuántos son de dron y qué columna es la que se va a predecir.
-
-** Etapa 2 — Entrenar
-
-Los fragmentos de código de esta etapa forman, en orden, el script
-=entrenar_arbol.py=. Pueden escribirlo ustedes paso a paso o abrir el
-archivo y leerlo junto con los apuntes.
-
-*** Paso 3 — Separar lo que el modelo ve de lo que debe adivinar
-
-#+begin_src python
-NUMERICAS = [
-    "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm", "volumen_l",
-    "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
-]
-CATEGORICAS = ["prioridad", "zona_destino", "clima", "trafico"]
-OBJETIVO = "medio_recomendado"
-
-x = datos[NUMERICAS + CATEGORICAS]
-y = datos[OBJETIVO]
-#+end_src
-
-Por costumbre, a los datos de entrada se les llama =x= y a la
-respuesta =y=. =x= son las catorce columnas que describen cada
-paquete; =y= es el medio recomendado. La columna =id_envio= no se usa:
-es solo un nombre y no dice nada sobre el paquete.
-
-Separamos las columnas en dos listas porque se tratan distinto: las
-numéricas ya son números, y las categóricas son texto (por ejemplo,
-="lluvia"=), que hay que convertir antes de entrenar.
-
-*** Paso 4 — Apartar datos para la prueba
-
-#+begin_src python
-from sklearn.model_selection import train_test_split
-
-x_entreno, x_prueba, y_entreno, y_prueba = train_test_split(
-    x, y, test_size=0.2, stratify=y, random_state=42
-)
-#+end_src
-
-Si evaluáramos el modelo con los mismos envíos con los que aprendió,
-sería como hacer un examen con las mismas preguntas que se repasaron:
-la calificación saldría muy alta y no diría nada. Por eso se aparta el
-20 % de los envíos (=test_size=0.2=), unos 2 000, y el modelo nunca los
-ve durante el entrenamiento. Con ellos se evalúa al final.
-
-=stratify=y= hace que los dos grupos tengan la misma proporción de
-cada medio. Sin eso, por azar, podrían quedar muy pocos drones en la
-prueba. =random_state=42= fija el azar para que todos obtengan la
-misma separación y los mismos resultados.
-
-*** Paso 5 — Convertir las categorías en números
-
-El árbol solo entiende números. La columna =clima= tiene tres valores
-de texto, así que se convierte en tres columnas de ceros y unos:
-
-| clima         | clima_despejado | clima_lluvia | clima_viento_fuerte |
-|---------------+-----------------+--------------+---------------------|
-| despejado     | 1               | 0            | 0                   |
-| lluvia        | 0               | 1            | 0                   |
-| viento_fuerte | 0               | 0            | 1                   |
-
-A esto se le llama /one-hot encoding/. En código:
-
-#+begin_src python
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-
-preparacion = ColumnTransformer([
-    ("numericas", "passthrough", NUMERICAS),
-    ("categoricas", OneHotEncoder(handle_unknown="ignore"), CATEGORICAS),
-])
-#+end_src
-
-=ColumnTransformer= aplica un tratamiento distinto a cada grupo de
-columnas. Las numéricas pasan tal cual (="passthrough"=) y las
-categóricas pasan por el =OneHotEncoder=. =handle_unknown="ignore"=
-evita un error si algún día llega un valor que no estaba en el
-entrenamiento, por ejemplo un clima ="granizo"=.
-
-*** Paso 6 — Entrenar el árbol
-
-#+begin_src python
-from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeClassifier
-
-modelo = Pipeline([
-    ("preparacion", preparacion),
-    ("arbol", DecisionTreeClassifier(max_depth=8, min_samples_leaf=5, random_state=42)),
-])
-
-modelo.fit(x_entreno, y_entreno)
-#+end_src
-
-Un =Pipeline= une la preparación y el árbol en un solo objeto. Es
-importante por una razón práctica: cuando usemos el modelo con un
-paquete nuevo, no tendremos que acordarnos de convertir las categorías
-a mano. Le damos los datos tal como vienen y el pipeline hace la
-preparación y la predicción.
-
-Los dos parámetros del árbol limitan cuánto puede crecer:
-
-- =max_depth=8=: como máximo, ocho preguntas seguidas antes de decidir.
-- =min_samples_leaf=5=: cada decisión final tiene que estar respaldada
-  por al menos cinco envíos. Así el árbol no inventa una regla para un
-  solo caso raro.
-
-En el paso 9 veremos por qué conviene limitarlo.
-
-=fit= es el entrenamiento. Con 8 000 envíos tarda menos de un segundo.
-
-*** Paso 7 — Evaluar con los envíos apartados
-
-#+begin_src python
-from sklearn.metrics import classification_report, confusion_matrix
-
-prediccion = modelo.predict(x_prueba)
-print(f"Exactitud: {(prediccion == y_prueba).mean():.1%}")
-print(classification_report(y_prueba, prediccion, digits=3))
-#+end_src
-
-El resultado:
-
-#+begin_example
-Exactitud con datos de prueba: 92.1%
-
-              precision    recall  f1-score   support
-
-   bicicleta      0.881     0.964     0.921       559
-   camioneta      1.000     0.866     0.928       336
-        dron      0.839     0.905     0.871       190
-        moto      0.942     0.918     0.930       915
-#+end_example
-
-La *exactitud* es la proporción de envíos en los que acertó: 92 de
-cada 100. Pero la exactitud sola esconde cosas, así que conviene leer
-también las otras columnas:
-
-- *precision*: de las veces que el modelo dijo «dron», ¿cuántas eran
-  dron de verdad? 83.9 %. Las demás eran envíos que debían ir en otro
-  medio.
-- *recall*: de todos los envíos que eran dron de verdad, ¿cuántos
-  reconoció? 90.5 %.
-- *f1-score*: un promedio de las dos anteriores.
-- *support*: cuántos envíos de cada medio había en la prueba.
-
-La *matriz de confusión* muestra exactamente en qué se equivoca:
-
-#+begin_src python
-etiquetas = sorted(y.unique())
-print(pd.DataFrame(
-    confusion_matrix(y_prueba, prediccion, labels=etiquetas),
-    index=etiquetas, columns=etiquetas,
-))
-#+end_src
-
-#+begin_example
-           bicicleta  camioneta  dron  moto
-bicicleta        539          0     0    20
-camioneta          9        291     4    32
-dron              18          0   172     0
-moto              46          0    29   840
-#+end_example
-
-Las filas son el medio real y las columnas lo que predijo el modelo. La
-diagonal son los aciertos. Por ejemplo, de los 915 envíos que debían ir
-en moto, acertó 840, mandó 46 a bicicleta y 29 a dron. Casi todos los
-errores son entre medios parecidos (moto y bicicleta, moto y dron),
-que son justo los casos dudosos también para una persona.
-
-¿Por qué no llega al 100 %? Porque el dataset tiene ruido a propósito:
-igual que en la vida real, dos despachadores con la misma información
-no siempre deciden lo mismo. El =README.md= explica cómo se agregó.
-
-*** Paso 8 — Leer las reglas que aprendió
-
-Esta es la gran ventaja del árbol: se pueden ver sus preguntas.
-
-#+begin_src python
-from sklearn.tree import export_text
-
-nombres = [n.split("__", 1)[1] for n in modelo.named_steps["preparacion"].get_feature_names_out()]
-print(export_text(modelo.named_steps["arbol"], feature_names=nombres, max_depth=3))
-#+end_src
-
-=get_feature_names_out()= da el nombre de cada columna después de la
-preparación (por ejemplo =categoricas__clima_lluvia=); el =split= le
-quita el prefijo para que se lea mejor. =max_depth=3= imprime solo los
-tres primeros niveles; el resto aparece como =truncated branch=.
-
-#+begin_example
-|--- distancia_km <= 7.01
-|   |--- volumen_l <= 90.10
-|   |   |--- clima_lluvia <= 0.50
-|   |   |   |--- peso_kg <= 7.85
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |   |--- peso_kg >  7.85
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |--- clima_lluvia >  0.50
-|   |   |   |--- fragil <= 0.50
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |   |--- fragil >  0.50
-|   |   |   |   |--- truncated branch of depth 5
-|   |--- volumen_l >  90.10
-|   |   |--- class: camioneta
-|--- distancia_km >  7.01
-|   |--- distancia_km <= 39.91
-|   |   |--- volumen_l <= 90.16
-|   |   |   |--- refrigerado <= 0.50
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |   |--- refrigerado >  0.50
-|   |   |   |   |--- class: camioneta
-|   |   |--- volumen_l >  90.16
-|   |   |   |--- class: camioneta
-|   |--- distancia_km >  39.91
-|   |   |--- class: camioneta
-#+end_example
-
-Lean los números con calma. La primera pregunta del árbol es si la
-distancia es menor a 7 km, que es justo el límite de la bicicleta.
-Después pregunta por 90 litros y por 40 km, que son los límites de la
-moto, y por el peso de 8 kg, que es otra vez la bicicleta. Y si el
-paquete es refrigerado, decide camioneta sin más preguntas. Nadie le
-dio esos límites al árbol: los descubrió solo, mirando los ejemplos.
-
-=clima_lluvia <= 0.50= es la forma en que el árbol pregunta «¿no
-llueve?», porque esa columna solo vale 0 o 1.
-
-*** Paso 9 — Elegir la profundidad
-
-¿Por qué ocho preguntas y no más? Esta tabla muestra qué pasa con
-distintas profundidades, siempre evaluando con los mismos envíos de
-prueba:
-
-| Profundidad máxima | Exactitud en la prueba | Decisiones finales (hojas) |
-|--------------------+------------------------+----------------------------|
-| 3                  | 74.8 %                 | 6                          |
-| 4                  | 79.0 %                 | 9                          |
-| 5                  | 81.3 %                 | 14                         |
-| 6                  | 84.2 %                 | 20                         |
-| 8                  | 92.1 %                 | 47                         |
-| 10                 | 92.4 %                 | 92                         |
-| Sin límite         | 91.8 %                 | 346                        |
-
-Con pocas preguntas el árbol es demasiado simple y se equivoca mucho.
-Con ocho llega a 92 %. A partir de ahí casi no mejora, pero el árbol
-se vuelve mucho más grande. Sin límite, con 346 decisiones finales,
-incluso empeora: empieza a memorizar los casos raros y el ruido de
-los datos de entrenamiento en lugar de aprender las reglas generales.
-A eso se le llama /sobreajuste/. Ocho es un buen equilibrio entre
-acertar y seguir siendo un árbol que se puede leer.
-
-El script acepta la profundidad como parámetro para que lo prueben
-ustedes:
-
-#+begin_src shell
-python entrenar_arbol.py --profundidad 4
-#+end_src
-
-*** Paso 10 — Guardar el modelo
-
-#+begin_src python
-import joblib
-
-joblib.dump(modelo, "modelo_medios.joblib")
-#+end_src
-
-Entrenar cada vez que se necesita una predicción sería un desperdicio.
-Se entrena una vez y el modelo se guarda en un archivo; después
-cualquier programa lo carga y lo usa. Como guardamos el =Pipeline=
-completo, el archivo incluye la preparación de las columnas y el árbol.
-
-*Para comprobar la etapa completa:*
-
-#+begin_src shell
-python entrenar_arbol.py
-#+end_src
-
-Debe mostrar la exactitud de 92.1 %, el reporte, la matriz de
-confusión, las reglas y terminar con =Modelo guardado en
-modelo_medios.joblib=. El archivo pesa unos 14 KB.
-
-** Etapa 3 — Usar el modelo
-
-*** Paso 11 — Cargar el modelo y predecir un paquete nuevo
-
-#+begin_src python
-import joblib
-import pandas as pd
-
-modelo = joblib.load("modelo_medios.joblib")
-
-paquete = {
-    "distancia_km": 8.95, "peso_kg": 0.54, "largo_cm": 17.3, "ancho_cm": 10.7,
-    "alto_cm": 15.0, "volumen_l": 2.78, "fragil": 0, "refrigerado": 0,
-    "valor_declarado_mxn": 789, "prioridad": "normal", "zona_destino": "periferia",
-    "clima": "despejado", "hora_salida": 16, "trafico": "medio",
-}
-
-datos = pd.DataFrame([paquete])
-print(modelo.predict(datos))
-probabilidades = modelo.predict_proba(datos)[0]
-print({medio: round(float(p), 3) for medio, p in zip(modelo.classes_, probabilidades)})
-#+end_src
-
-#+begin_example
-['dron']
-{'bicicleta': 0.0, 'camioneta': 0.028, 'dron': 0.841, 'moto': 0.131}
-#+end_example
-
-El modelo espera una tabla, aunque sea de una sola fila; por eso el
-paquete se convierte en un =DataFrame= de una fila. =predict= devuelve
-el medio más probable. =predict_proba= devuelve la probabilidad de
-cada medio: el modelo está bastante seguro del dron (84 %) y la
-segunda opción sería la moto (13 %).
-
-*** Paso 12 — El modelo sugiere, las reglas deciden
-
-Si le pedimos al modelo una recomendación para cada uno de los 10 000
-envíos del dataset, en 121 casos (1.2 %) sugiere un medio que en
-realidad es imposible. Casi siempre es un dron de madrugada: el árbol
-no terminó de aprender que el dron no vuela de noche, porque la hora
-es un número y «de noche» significa «antes de las 6 o después de las
-21», una condición que le cuesta representar con preguntas de «menor
-o mayor que».
-
-Esto no es un defecto de este modelo en particular. Todos los modelos
-aprenden de ejemplos y todos se equivocan alguna vez. Por eso hay
-reglas que no se le dejan al modelo: si el paquete pesa 30 kg, ningún
-modelo puede mandarlo en bicicleta, por más seguro que esté. Esas
-reglas vienen del negocio y se escriben a mano:
-
-#+begin_src python
-LIMITES = {
-    "bicicleta": {"peso_kg": 8, "volumen_l": 40, "distancia_km": 7},
-    "moto": {"peso_kg": 25, "volumen_l": 90, "distancia_km": 40},
-    "camioneta": {"peso_kg": 1000, "volumen_l": 3000, "distancia_km": 1000},
-    "dron": {"peso_kg": 2.5, "volumen_l": 12, "distancia_km": 15},
-}
-
-
-def es_posible(medio, paquete):
-    limite = LIMITES[medio]
-    if paquete["peso_kg"] > limite["peso_kg"]:
-        return False
-    if paquete["volumen_l"] > limite["volumen_l"]:
-        return False
-    if paquete["distancia_km"] > limite["distancia_km"]:
-        return False
-    if paquete["refrigerado"] and medio != "camioneta":
-        return False
-    noche = paquete["hora_salida"] >= 21 or paquete["hora_salida"] < 6
-    if medio == "dron" and (paquete["clima"] != "despejado" or noche
-                            or paquete["zona_destino"] == "centro"):
-        return False
-    if medio == "bicicleta" and paquete["zona_destino"] == "rural":
-        return False
-    return True
-#+end_src
-
-La recomendación final combina las dos cosas. Se ordenan los medios de
-más probable a menos probable según el modelo, y se elige el primero
-que las reglas permiten:
-
-#+begin_src python
-def recomendar_medio(paquete):
-    datos = pd.DataFrame([paquete])
-    probabilidades = modelo.predict_proba(datos)[0]
-    ranking = sorted(zip(modelo.classes_, probabilidades), key=lambda par: -par[1])
-
-    for medio, confianza in ranking:
-        if es_posible(medio, paquete):
-            return {
-                "medio": medio,
-                "confianza": round(float(confianza), 3),
-                "corregido": medio != ranking[0][0],
-                "ranking": [(m, round(float(p), 3)) for m, p in ranking],
-            }
-    return {"medio": "camioneta", "confianza": 0.0, "corregido": True,
-            "ranking": [(m, round(float(p), 3)) for m, p in ranking]}
-#+end_src
-
-=sorted(..., key=lambda par: -par[1])= ordena los pares (medio,
-probabilidad) de mayor a menor probabilidad. El ciclo recorre ese
-orden y devuelve el primer medio posible. =corregido= avisa si hubo
-que descartar la primera opción del modelo. Si ningún medio fuera
-posible, la camioneta es la opción de respaldo.
-
-*Para comprobar:*
-
-#+begin_src shell
-python usar_modelo.py
-#+end_src
-
-#+begin_example
-Libro a 2 km en el centro, hora pico
-  Medio recomendado: bicicleta (confianza 89%)
-
-Medicamento ligero a 9 km, periferia, tarde despejada
-  Medio recomendado: dron (confianza 84%)
-
-Paquete ligero a 13 km, a las 3:00 de la madrugada
-  Medio recomendado: moto (confianza 13%)
-  Nota: el modelo prefería dron, pero no es posible para este paquete.
-
-Microondas a 18 km con lluvia
-  Medio recomendado: moto (confianza 98%)
-
-Vacunas refrigeradas a 30 km
-  Medio recomendado: camioneta (confianza 100%)
-#+end_example
-
-Fíjense en el tercer caso. El modelo prefería el dron con 84 % de
-confianza, porque ese paquete se parece mucho al del segundo caso.
-Pero a las 3:00 el dron no puede volar, así que las reglas lo
-descartan y se elige la moto, que era su segunda opción.
-
-** Etapa 4 — Conectarlo a la plataforma
-
-Ahora el modelo va a vivir dentro del proyecto de Django, en la
-aplicación =entregas=. Para la app móvil o la página web no cambia
-nada: hacen una petición y reciben un JSON. Que detrás haya un árbol
-de decisión, un proveedor externo o reglas escritas a mano es un
-detalle interno del backend.
-
-*** Paso 13 — Copiar el modelo al proyecto y agregar las dependencias
-
-Dentro de la aplicación =entregas= creen una carpeta =modelo= y copien
-ahí el archivo entrenado:
-
-#+begin_example
-plataforma-entregas/
-  entregas/
-    modelo/
-      modelo_medios.joblib
-    models.py
-    views.py
-    urls.py
-#+end_example
-
-El archivo pesa unos 14 KB, así que se puede subir al repositorio sin
-problema.
-
-Con el entorno virtual del proyecto activo, instalen las bibliotecas
-con la *misma versión de scikit-learn* con la que entrenaron (la que
-anotaron en el paso 1) y actualicen =requirements.txt=:
-
-#+begin_src shell
-pip install "scikit-learn==1.9.0" pandas joblib
-pip freeze > requirements.txt
-#+end_src
-
-(Cambien =1.9.0= por su versión. En PowerShell, la segunda línea es
-=pip freeze | Out-File -Encoding utf8 requirements.txt=.)
-
-La versión importa porque el archivo =.joblib= guarda el modelo tal
-como lo dejó esa versión de scikit-learn. Si en el proyecto se instala
-otra, el modelo puede cargar con advertencias o no cargar. Al quedar
-fija en =requirements.txt=, el contenedor de Docker instalará también
-la misma.
-
-*Para comprobar:*
-=python -c "import joblib; joblib.load('entregas/modelo/modelo_medios.joblib')"=
-termina sin errores.
-
-*** Paso 14 — Las reglas del negocio en su propio archivo
-
-Creen =entregas/reglas.py= con =LIMITES= y =es_posible=, exactamente
-como en el paso 12. Van en un archivo aparte porque no pertenecen al
-modelo: si mañana se cambia el árbol por otro modelo o por un
-proveedor externo, las reglas siguen siendo las mismas.
-
-*** Paso 15 — El adaptador: el modelo habla de probabilidades, la plataforma habla de Sugerencia
-
-En la parte de patrones vimos que la plataforma no debe hablar el
-idioma de cada proveedor de IA. El proveedor responde =route_hint= y
-=reason_code=, pero el despacho solo entiende una =Sugerencia= con
-=medio= y =motivo=. El traductor entre los dos es un Adapter.
-
-Nuestro modelo es un proveedor más, con su propio idioma: una lista de
-clases y una lista de probabilidades. Así que lo envolvemos en un
-adaptador con la misma interfaz. Creen =entregas/recomendador.py=:
-
-#+begin_src python
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from functools import lru_cache
-from pathlib import Path
-
-import joblib
-import pandas as pd
-
-from .reglas import es_posible
-
-RUTA_MODELO = Path(__file__).resolve().parent / "modelo" / "modelo_medios.joblib"
-
-CAMPOS_NUMERICOS = [
-    "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm", "volumen_l",
-    "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
-]
-CAMPOS_TEXTO = ["prioridad", "zona_destino", "clima", "trafico"]
-CAMPOS = CAMPOS_NUMERICOS + CAMPOS_TEXTO
-
-
-@dataclass(frozen=True)
-class Sugerencia:
-    medio: str
-    motivo: str
-
-
-class RecomendadorIA(ABC):
-    @abstractmethod
-    def sugerir(self, paquete: dict) -> Sugerencia:
-        pass
-
-
-class RecomendadorArbol(RecomendadorIA):
-    """El modelo responde probabilidades; la plataforma solo entiende Sugerencia."""
-
-    def __init__(self, ruta=RUTA_MODELO):
-        self._modelo = joblib.load(ruta)
-
-    def sugerir(self, paquete):
-        datos = pd.DataFrame([paquete], columns=CAMPOS)
-        probabilidades = self._modelo.predict_proba(datos)[0]
-        ranking = sorted(zip(self._modelo.classes_, probabilidades), key=lambda par: -par[1])
-        preferido = ranking[0][0]
-
-        for medio, confianza in ranking:
-            if es_posible(medio, paquete):
-                motivo = f"árbol de decisión, confianza {confianza:.0%}"
-                if medio != preferido:
-                    motivo += f"; se descartó {preferido} por las reglas del negocio"
-                return Sugerencia(medio, motivo)
-        return Sugerencia("camioneta", "ningún medio sugerido era posible")
-
-
-@lru_cache(maxsize=1)
-def obtener_recomendador() -> RecomendadorIA:
-    return RecomendadorArbol()
-#+end_src
-
-Lo importante de este archivo:
-
-- =RecomendadorIA= es la interfaz: cualquier recomendador tiene un
-  método =sugerir= que recibe un paquete y devuelve una =Sugerencia=.
-  Si ya tienen en su proyecto un =RecomendadorIA= y una =Sugerencia=
-  de la parte de patrones (por ejemplo, para el proveedor que responde
-  =route_hint=), usen esos en lugar de definirlos otra vez.
-- =RecomendadorArbol= es el adaptador. Por dentro usa =predict_proba=
-  y las reglas; por fuera entrega una =Sugerencia=. El resto de la
-  plataforma nunca ve probabilidades, ni =pandas=, ni scikit-learn.
-- =RUTA_MODELO= construye la ruta al archivo a partir de la ubicación
-  de =recomendador.py=. Así funciona igual en su computadora que en
-  =/app= dentro del contenedor.
-- =pd.DataFrame([paquete], columns=CAMPOS)= garantiza que las columnas
-  lleguen en el orden y con los nombres que espera el modelo, aunque
-  el JSON las mande en otro orden.
-- =obtener_recomendador= carga el modelo la primera vez que se pide y
-  después reutiliza el mismo objeto. =@lru_cache(maxsize=1)= es lo que
-  hace eso: recuerda el resultado de la función. Cargar el archivo en
-  cada petición sería lento.
-
-¿No habíamos dicho, en la etapa 5 de la ruta de Django, que no se
-guardan cosas en la memoria del programa? Lo que no se debe guardar
-son los datos que cambian con cada cliente, como los pedidos, porque
-cada copia tendría una versión distinta. El modelo es otra cosa: es
-igual en todas las copias, porque todas lo cargan del mismo archivo, y
-nadie lo modifica mientras el programa corre. Es como el código: cada
-copia tiene el suyo y todos son idénticos.
-
-Si el día de mañana la empresa contrata un proveedor externo, se
-escribe otro adaptador (por ejemplo =RecomendadorProveedor=), se cambia
-la línea de =obtener_recomendador= y ni la vista ni el despacho se
-enteran.
-
-*** Paso 16 — La vista =/entregas/recomendar/=
-
-En =entregas/views.py= agreguen al inicio:
-
-#+begin_src python
-import json
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-
-from .recomendador import CAMPOS, CAMPOS_NUMERICOS, obtener_recomendador
-#+end_src
-
-(Si alguno de esos =import= ya estaba, no lo repitan.) Y la vista:
-
-#+begin_src python
-@csrf_exempt
-@require_POST
-def recomendar(request):
-    try:
-        paquete = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "el cuerpo debe ser JSON"}, status=400)
-
-    faltantes = [campo for campo in CAMPOS if campo not in paquete]
-    if faltantes:
-        return JsonResponse({"error": "faltan campos", "campos": faltantes}, status=400)
-
-    try:
-        for campo in CAMPOS_NUMERICOS:
-            paquete[campo] = float(paquete[campo])
-    except (TypeError, ValueError):
-        return JsonResponse({"error": f"el campo {campo} debe ser un número"}, status=400)
-
-    sugerencia = obtener_recomendador().sugerir(paquete)
-    return JsonResponse(
-        {"medio": sugerencia.medio, "motivo": sugerencia.motivo},
-        json_dumps_params={"ensure_ascii": False},
-    )
-#+end_src
-
-En =entregas/urls.py=:
-
-#+begin_src python
-path("recomendar/", views.recomendar, name="recomendar"),
-#+end_src
-
-La vista es delgada, como debe ser una vista. Solo hace tres cosas:
-lee el JSON, valida que estén todos los campos y que los numéricos
-sean números, y le pide la sugerencia al recomendador. No sabe nada
-de árboles ni de probabilidades. Las validaciones están aquí, en el
-backend, porque cualquiera puede mandar una petición sin pasar por la
-app. =ensure_ascii=False= hace que los acentos del motivo se vean
-normales en lugar de aparecer como =\u00e1=.
-
-Recibe un POST con JSON porque el paquete tiene catorce campos, que
-serían demasiados para ponerlos en la dirección. =@csrf_exempt= está
-por la misma razón que en =registrar_pedido= (paso 14 de la ruta de
-Django): la app móvil no manda el token de los formularios web.
-
-*** Paso 17 — Probarlo
-
-Guarden este paquete en un archivo =paquete.json=:
-
-#+begin_src json
-{
-  "distancia_km": 12.64, "peso_kg": 0.31, "largo_cm": 11.7, "ancho_cm": 7.6,
-  "alto_cm": 10.6, "volumen_l": 0.94, "fragil": 0, "refrigerado": 0,
-  "valor_declarado_mxn": 4603, "prioridad": "mismo_dia", "zona_destino": "periferia",
-  "clima": "despejado", "hora_salida": 3, "trafico": "medio"
-}
-#+end_src
-
-Con =python manage.py runserver= corriendo, en otra terminal. En Linux
-y macOS:
-
-#+begin_src shell
-curl -s -X POST -H "Content-Type: application/json" -d @paquete.json http://127.0.0.1:8000/entregas/recomendar/
-#+end_src
-
-En PowerShell (las comillas en ="@paquete.json"= son necesarias, porque
-sin ellas PowerShell interpreta la arroba de otra forma):
-
-#+begin_src powershell
-curl.exe -s -X POST -H "Content-Type: application/json" -d "@paquete.json" http://127.0.0.1:8000/entregas/recomendar/
-#+end_src
-
-La respuesta:
-
-#+begin_example
-{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio"}
-#+end_example
-
-Cambien =hora_salida= a =16= en el archivo y repitan:
-
-#+begin_example
-{"medio": "dron", "motivo": "árbol de decisión, confianza 84%"}
-#+end_example
-
-Prueben también que la vista se defiende de datos incorrectos. Un
-paquete incompleto:
-
-#+begin_src shell
-curl -s -X POST -H "Content-Type: application/json" -d '{"distancia_km": 3}' http://127.0.0.1:8000/entregas/recomendar/
-#+end_src
-
-#+begin_example
-{"error": "faltan campos", "campos": ["peso_kg", "largo_cm", "ancho_cm", ...]}
-#+end_example
-
-Y un texto donde va un número (cambien ="peso_kg": 0.31= por
-="peso_kg": "abc"= en el archivo):
-
-#+begin_example
-{"error": "el campo peso_kg debe ser un número"}
-#+end_example
-
-*Para comprobar:* las cuatro respuestas coinciden con las de arriba.
-
-*** Paso 18 — Con varias copias
-
-Si hicieron la etapa 5 de la ruta de Django, no hace falta nada más.
-Como =modelo_medios.joblib= está dentro del proyecto, =COPY . .= lo
-mete en la imagen, y como scikit-learn está en =requirements.txt=, se
-instala dentro del contenedor. Cada copia carga el mismo modelo, así
-que todas recomiendan lo mismo para el mismo paquete.
-
-#+begin_src shell
-docker compose up --build
-#+end_src
-
-Y prueben con la misma petición, ahora contra el balanceador en
-=http://localhost:8000/entregas/recomendar/=.
-
-Fíjense en lo que significa esto para el futuro: si entrenan un
-modelo mejor, basta con reemplazar el archivo, construir la imagen
-otra vez y reemplazar las copias. El código de la plataforma no
-cambia.
-
-*** Paso 19 — Del medio sugerido al plan de entrega
-
-La recomendación termina en un nombre: ="dron"=. Un nombre no entrega
-paquetes. Falta lo que vimos en la parte de patrones: cada medio
-planea la entrega a su manera (Strategy), y alguien tiene que
-convertir el nombre en el objeto correcto (una fábrica simple, como
-=MedioFactory.crear= en [[*Quién hace el =new=][Quién hace el =new=]]).
-
-Creen =entregas/medios.py=:
-
-#+begin_src python
-from abc import ABC, abstractmethod
-
-
-class MedioDeEntrega(ABC):
-    @abstractmethod
-    def planear(self, paquete: dict) -> dict:
-        pass
-
-
-class EntregaBicicleta(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] / 15 * 60
-        return {"medio": "bicicleta", "minutos": round(minutos), "indicacion": "ruta por ciclovías"}
-
-
-class EntregaMotocicleta(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] / 35 * 60
-        return {"medio": "moto", "minutos": round(minutos), "indicacion": "ruta por avenidas"}
-
-
-class EntregaCamioneta(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] / 30 * 60
-        indicacion = "unidad refrigerada" if paquete["refrigerado"] else "ruta de reparto"
-        return {"medio": "camioneta", "minutos": round(minutos), "indicacion": indicacion}
-
-
-class EntregaDron(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] * 0.75 / 70 * 60
-        return {"medio": "dron", "minutos": round(minutos), "indicacion": "vuelo en línea recta"}
-
-
-MEDIOS = {
-    "bicicleta": EntregaBicicleta,
-    "moto": EntregaMotocicleta,
-    "camioneta": EntregaCamioneta,
-    "dron": EntregaDron,
-}
-
-
-def crear_medio(nombre: str) -> MedioDeEntrega:
-    return MEDIOS[nombre]()
-#+end_src
-
-Cada clase es una estrategia: todas responden =planear(paquete)=,
-cada una a su manera. Aquí el plan es sencillo (un tiempo estimado y
-una indicación); en un sistema real cada estrategia calcularía la ruta
-con su propio servicio de mapas. El dron, por ejemplo, vuela en línea
-recta, así que su distancia real es más corta que la de la calle.
-
-=crear_medio= es la fábrica: el único lugar que conoce las clases
-concretas. El diccionario =MEDIOS= hace el papel del =switch=.
-Cuando aparezca un medio nuevo, se agrega una clase y una línea al
-diccionario.
-
-En la vista =recomendar= solo cambian dos cosas. Agreguen el =import=:
-
-#+begin_src python
-from .medios import crear_medio
-#+end_src
-
-Y al final de la vista, pidan el plan al medio sugerido:
-
-#+begin_src python
-    sugerencia = obtener_recomendador().sugerir(paquete)
-    plan = crear_medio(sugerencia.medio).planear(paquete)
-    return JsonResponse(
-        {"medio": sugerencia.medio, "motivo": sugerencia.motivo, "plan": plan},
-        json_dumps_params={"ensure_ascii": False},
-    )
-#+end_src
-
-*Para comprobar:* con el =paquete.json= del paso 17 (a las 3:00):
-
-#+begin_example
-{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio", "plan": {"medio": "moto", "minutos": 22, "indicacion": "ruta por avenidas"}}
-#+end_example
-
-Con =hora_salida= en =16=:
-
-#+begin_example
-{"medio": "dron", "motivo": "árbol de decisión, confianza 84%", "plan": {"medio": "dron", "minutos": 8, "indicacion": "vuelo en línea recta"}}
-#+end_example
-
-Y si además cambian =refrigerado= a =1=, el modelo elige camioneta y
-la estrategia de la camioneta pide la unidad refrigerada:
-
-#+begin_example
-{"medio": "camioneta", "motivo": "árbol de decisión, confianza 100%", "plan": {"medio": "camioneta", "minutos": 25, "indicacion": "unidad refrigerada"}}
-#+end_example
-
-** Por qué la IA no hace desaparecer los patrones de diseño
-
-Es fácil pensar que, si ahora un modelo decide qué medio usar, ya no
-hacen falta Strategy, Adapter ni fábricas: «la IA lo resuelve». Con lo
-que acaban de construir se puede ver por qué eso no es cierto.
-
-*** El modelo responde una sola pregunta
-
-Sigan lo que pasa con un paquete desde que llega hasta que sale la
-respuesta:
-
-#+begin_example
-App o página web
-   │  POST /entregas/recomendar/
-   ▼
-Vista recomendar ............ lee y valida; no decide nada
-   │
-   ├── obtener_recomendador().sugerir(paquete) ... Adapter
-   │       └── RecomendadorArbol: el modelo propone, las reglas descartan
-   │                     │
-   │                     ▼
-   │               Sugerencia(medio, motivo)
-   │
-   └── crear_medio(sugerencia.medio) ............... fábrica simple
-           └── .planear(paquete) ................... Strategy
-                     │
-                     ▼
-               plan de entrega
-#+end_example
-
-| Qué hay que hacer                          | Quién lo hace                  | Qué lo hace posible                  |
-|--------------------------------------------+--------------------------------+--------------------------------------|
-| Recibir la petición y validar los datos    | La vista =recomendar=          | Una vista delgada                    |
-| Elegir el medio más conveniente            | *El modelo*                    | El entrenamiento                     |
-| Traducir probabilidades a una =Sugerencia= | =RecomendadorArbol=            | Adapter                              |
-| Descartar lo imposible                     | =reglas.py=                    | Reglas del negocio escritas a mano   |
-| Convertir ="dron"= en un objeto            | =crear_medio=                  | Fábrica simple                       |
-| Planear la entrega                         | =EntregaDron=, =EntregaMotocicleta=... | Strategy                     |
-| Cargar el modelo una sola vez              | =obtener_recomendador=         | Una instancia compartida por proceso |
-
-El modelo ocupa una sola fila de esta tabla. Reemplazó la parte que
-antes era un =if= largo para elegir el medio, pero todo lo demás sigue
-siendo software, y sigue necesitando estar ordenado. El modelo dice
-«dron»; no sabe planear un vuelo, ni validar un JSON, ni guardar un
-pedido.
-
-*** El modelo es un proveedor más, y los proveedores cambian
-
-En esta misma materia el recomendador ya cambió varias veces: primero
-fue un proveedor externo que respondía =route_hint=, luego un árbol de
-decisión, y se puede cambiar por un Random Forest o, en el ejercicio
-5, por unas reglas sencillas. Mañana podría ser un modelo de lenguaje
-contratado por internet.
-
-Gracias a la interfaz =RecomendadorIA=, cada uno de esos cambios toca
-una línea: la de =obtener_recomendador=. Comparen con lo que pasa si
-el modelo se usa directamente en la vista:
-
-#+begin_src python
-def recomendar(request):
-    paquete = json.loads(request.body)
-    modelo = joblib.load("entregas/modelo/modelo_medios.joblib")
-    probabilidades = modelo.predict_proba(pd.DataFrame([paquete]))[0]
-    medio = modelo.classes_[probabilidades.argmax()]
-    if medio == "dron" and (paquete["hora_salida"] < 6 or paquete["clima"] != "despejado"):
-        medio = "moto"
-    if medio == "dron":
-        minutos = paquete["distancia_km"] * 0.75 / 70 * 60
-    elif medio == "moto":
-        ...
-#+end_src
-
-Funciona, y una IA que escribe código probablemente propondría algo
-así si se le pide «hazme la recomendación». Pero:
-
-- La vista carga el archivo en cada petición, así que es lenta.
-- =pandas= y scikit-learn quedan metidos en la vista. El día que se
-  use un proveedor externo, hay que reescribirla.
-- Las reglas del negocio quedan mezcladas con la predicción, y
-  repetidas en cada lugar que necesite recomendar: el panel, la app,
-  las pruebas.
-- El =if= de los medios vuelve a aparecer, que es justo el =switch=
-  de 200 líneas del que partió la sección de Strategy.
-
-Es el mismo problema de siempre, con un modelo en medio.
-
-*** El modelo se equivoca y se cae
-
-En el paso 12 vimos que el modelo propone algo imposible en 1.2 % de
-los casos. Además, un modelo envejece, y si es un servicio externo se
-puede caer o tardar en responder. Ninguna de esas cosas se arregla
-con un modelo mejor; se arregla con diseño:
-
-- Las reglas del negocio viven aparte del modelo (=reglas.py=), para
-  que ninguna recomendación imposible llegue al despacho.
-- Como todos los recomendadores cumplen la misma interfaz, se puede
-  escribir uno que envuelva a otro y, si el principal falla, use un
-  respaldo (ejercicio 6). Es lo que se discutió en
-  [[*La IA se cae y el pedido sigue vivo][La IA se cae y el pedido sigue vivo]]: el pedido no puede depender de
-  que la IA conteste.
-
-*** La IA que escribe código tampoco los elimina
-
-Lo mismo pasa con las herramientas de IA que generan código. Escriben
-rápido, pero el costo de un sistema no está en escribirlo la primera
-vez, sino en cambiarlo durante años. Los patrones existen para ese
-segundo costo. Además, son el vocabulario para pedirle bien las cosas
-a una IA («escribe un adaptador que cumpla =RecomendadorIA=») y para
-revisar lo que propone (como en [[*Uso de IA en el diseño de software][Uso de IA en el diseño de software]]).
-
-#+begin_quote
-La IA cambia *quién* toma una decisión. No cambia *cuánto cuesta*
-cambiar el código cuando esa decisión, o quien la toma, cambia. Los
-patrones de diseño atienden lo segundo.
-#+end_quote
-
-** Random Forest: cambiar una línea
-
-Si quieren comparar, en el paso 6 cambien el árbol por un bosque:
-
-#+begin_src python
-from sklearn.ensemble import RandomForestClassifier
-
-modelo = Pipeline([
-    ("preparacion", preparacion),
-    ("arbol", RandomForestClassifier(n_estimators=300, random_state=42, n_jobs=-1)),
-])
-#+end_src
-
-Todo lo demás (entrenar, evaluar, guardar, usar y el adaptador de
-Django) funciona igual, porque los dos tienen =fit=, =predict= y
-=predict_proba=. Solo dejarán de funcionar =export_text= y la lectura
-de reglas del paso 8, porque un bosque son 300 árboles votando. El
-script =entrenar_modelo.py= de la carpeta ya entrena un Random Forest;
-con este dataset llega a 93.1 %.
-
-¿Cuál conviene? El bosque acierta un punto más, pero no se puede
-explicar y el archivo guardado pesa unos 60 MB, demasiado para subirlo
-al repositorio como hicimos con el árbol. Para la plataforma de esta
-materia, el árbol es suficiente: un punto de diferencia lo cubren de
-todos modos las reglas del paso 12, y poder explicarle al jefe de
-logística por qué se eligió la moto vale mucho.
-
-** Qué hay que tener en cuenta
-
-- *Los datos son sintéticos.* El modelo aprendió reglas que alguien
-  inventó para generar el dataset. En una empresa real se entrenaría
-  con el historial de envíos, y habría que revisar que ese historial
-  refleje buenas decisiones y no los errores de siempre.
-- *El modelo envejece.* Si la empresa compra drones con más
-  autonomía o cambia sus tarifas, el modelo sigue recomendando como
-  antes. Hay que volver a entrenarlo con datos nuevos de vez en cuando.
-- *Las reglas del negocio no se le dejan al modelo.* Lo que es
-  imposible o prohibido se valida siempre con código escrito a mano.
-- *La versión de las bibliotecas importa.* El modelo se entrena y se
-  usa con la misma versión de scikit-learn.
-
-** Ejercicios
-
-1. *Una pregunta nueva para el árbol.* Agreguen al dataset una columna
-   =es_de_noche= (1 si la hora es menor a 6 o mayor o igual a 21, 0 si
-   no), agréguenla a =NUMERICAS=, entrenen otra vez y cuenten cuántas
-   veces el modelo sugiere un medio imposible. ¿Bajó de 121? ¿Por qué
-   le ayuda esa columna al árbol?
-2. *Las clases desbalanceadas.* Entrenen con
-   =DecisionTreeClassifier(..., class_weight="balanced")=. ¿Qué pasa
-   con el =recall= del dron? ¿Y con su =precision=? ¿Qué preferiría la
-   empresa, y por qué?
-3. *Menos preguntas.* Entrenen con =--profundidad 4= e impriman el
-   árbol completo con =export_text= sin =max_depth=. ¿Lo podrían
-   escribir como una cadena de =if= en Python? ¿Qué se pierde?
-4. *Datos sucios.* Generen el dataset con
-   =python generar_dataset.py --faltantes 0.05 --salida sucio.csv=,
-   que deja un 5 % de celdas vacías, y entrenen con
-   =python entrenar_arbol.py --datos sucio.csv=. Las versiones
-   recientes de scikit-learn aceptan huecos en los árboles, así que
-   va a entrenar, pero con menos exactitud. Agreguen un
-   =SimpleImputer= a la preparación para llenar los huecos (con la
-   mediana en las numéricas y el valor más frecuente en las
-   categóricas) y comparen. Después piensen en la plataforma: si la
-   app móvil manda un paquete sin peso, ¿la vista debería rellenarlo
-   o rechazarlo? ¿Por qué?
-5. *Otro proveedor detrás de la misma interfaz.* Escriban un
-   =RecomendadorReglas= que no use ningún modelo, solo un par de =if=,
-   y cámbienlo en =obtener_recomendador=. Comprueben que la vista
-   funciona sin tocarla. ¿Qué patrón hace posible ese cambio?
-6. *Un recomendador con respaldo.* Escriban un
-   =RecomendadorConRespaldo(principal, respaldo)= que también cumpla
-   =RecomendadorIA=: llama al principal y, si lanza una excepción,
-   usa el respaldo y lo dice en el =motivo=. Úsenlo con el árbol como
-   principal y el =RecomendadorReglas= del ejercicio 5 como respaldo.
-   Para simular la falla, hagan que =RecomendadorArbol.sugerir= lance
-   una excepción. ¿Qué patrón del catálogo se parece a un objeto que
-   envuelve a otro con la misma interfaz y le agrega algo?
 
 * Cierre
 
