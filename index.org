@@ -1,14 +1,15 @@
-#+TITLE: Introducción a los Patrones de Diseño de Software
-#+SUBTITLE: Tópicos Selectos de Tecnologías Web y Móvil
-#+AUTHOR: Eduardo Alcaraz
-#+LANGUAGE: es
-#+SETUPFILE: /home/likcos/Materias/Graficacion/theme-readtheorg-local.setup
-#+EXPORT_FILE_NAME: index.html
-#+OPTIONS: num:nil toc:3
-#+OPTIONS: tex:mathjax
-#+HTML_HEAD: <style>#content{max-width:1800px;} pre{border-radius:8px;} table{font-size:0.95em;}</style>
-#+PROPERTY: header-args :eval yes
-#+BIND: org-confirm-babel-evaluate nil
+# Created 2026-10-05 lun 08:04
+#+options: num:nil toc:3
+#+options: tex:mathjax
+#+title: Introducción a los Patrones de Diseño de Software
+#+author: Eduardo Alcaraz
+#+subtitle: Tópicos Selectos de Tecnologías Web y Móvil
+#+language: es
+#+setupfile: /home/likcos/Materias/Graficacion/theme-readtheorg-local.setup
+#+export_file_name: index.html
+#+html_head: <style>#content{max-width:1800px;} pre{border-radius:8px;} table{font-size:0.95em;}</style>
+#+property: header-args :eval yes
+#+bind: org-confirm-babel-evaluate nil
 
 #+begin_quote
 Materia: *Tópicos Selectos de Tecnologías Web y Móvil*
@@ -57,7 +58,6 @@ El estudiante debería poder recorrer esta escalera:
 «Puedo justificar por qué lo utilicé»
 #+end_example
 #+end_quote
-
 * Antes de los patrones: aprender a reconocer estructuras
 
 Un error frecuente es comenzar memorizando nombres:
@@ -73,13 +73,11 @@ Eso produce conocimiento de catálogo, no necesariamente de diseño.
 Un mejor punto de partida es observar un problema, descubrir qué parte
 se repite y preguntar si existe una solución que otras personas ya
 han estudiado.
-
 ** Tres acertijos para entrenar la mirada
 
 Antes de Observer o Strategy, *patrón* aquí es una *regularidad oculta*.
 La fuerza bruta funciona; *no escala*. Quien ve la estructura responde
 en un renglón.
-
 *** Acertijo 1 — Un millón de interruptores
 
 Hay *n* focos apagados e *n* pasadas. En la pasada *k* (k = 1 … n) se
@@ -93,7 +91,6 @@ Tres preguntas, sin armar la matriz n×n:
 
 Dos ciclos anidados para n = 10⁶ no caben en el cuaderno: por eso
 existe el acertijo.
-
 *** Acertijo 2 — El estacionamiento
 
 Un coche tapa un cajón:
@@ -106,7 +103,6 @@ Un coche tapa un cajón:
 
 No es sucesión aritmética, ni geométrica, ni Fibonacci. Si salió 89,
 96 o 108, esa es la trampa.
-
 *** Acertijo 3 — La mosca y los dos trenes
 
 Dos trenes salen al mismo tiempo uno hacia el otro. Distancia inicial:
@@ -118,7 +114,6 @@ primero, se da la vuelta… hasta que los trenes chocan y la aplastan.
 
 La fuerza bruta es sumar infinitos tramos cada vez más cortos. Hay
 forma de no escribir esa serie.
-
 ** Soluciones y moraleja
 
 *** Revelación del acertijo 1
@@ -140,7 +135,6 @@ consigo mismo) → toques *impares* → queda *encendido*.
 No siempre hay que simular todos los pasos.
 Primero hay que preguntar qué estructura se esconde detrás del problema.
 #+end_quote
-
 *** Revelación del acertijo 2
 
 Gira la hoja *180°*. Los dígitos 0, 1, 6, 8 y 9 siguen siendo dígitos
@@ -155,7 +149,6 @@ El patrón no era una fórmula: era *cambiar de marco*.
 A veces el avance no consiste en agregar más código,
 sino en cambiar la forma de representar el problema.
 #+end_quote
-
 *** Revelación del acertijo 3
 
 Los trenes cierran 120 km/h sobre 240 km → chocan a las *2 horas*. La
@@ -169,7 +162,6 @@ el *reloj*.
 El patrón consiste en identificar la variable que realmente controla
 el problema.
 #+end_quote
-
 *** Qué tiene esto que ver con el software
 
 Ninguno de los tres es Observer ni Factory. Los tres *sí* son patrones:
@@ -185,15 +177,14 @@ el sistema crece
 cada cambio rompe más cosas
 #+end_example
 
-| En el acertijo                         | En el software                                      |
-|----------------------------------------+-----------------------------------------------------|
-| n×n toques o serie infinita            | Doble =for=, =switch= de 40 casos, validación copiada |
-| ⌊√n⌋ / girar / tiempo×velocidad        | Adapter, Strategy, Observer                         |
-| Un renglón en vez de mil pasos         | Diseño corto, que otro reconoce                     |
+| En el acertijo                  | En el software                                        |
+|---------------------------------+-------------------------------------------------------|
+| n×n toques o serie infinita     | Doble =for=, =switch= de 40 casos, validación copiada |
+| ⌊√n⌋ / girar / tiempo×velocidad | Adapter, Strategy, Observer                           |
+| Un renglón en vez de mil pasos  | Diseño corto, que otro reconoce                       |
 
 El resto de estos apuntes pone *nombre* a esas perspectivas en web y
 móvil.
-
 * Qué es un patrón (y qué no)
 
 Un patrón no es un archivo para copiar. Es una forma *ya nombrada* de
@@ -232,7 +223,6 @@ trajo: no la reescribas al lado.
 El catálogo de los 23 viene *a continuación*, con analogía, problema
 e idea de cada uno. Después entra el enunciado de la empresa y, con
 él, Strategy.
-
 * Catálogo GoF
 
 GoF («Gang of Four») son Erich Gamma, Richard Helm, Ralph Johnson y
@@ -242,11 +232,11 @@ repiten, cada uno con un plano ya nombrado.
 
 Tres familias:
 
-| Familia | Pregunta que responden | Cuántos |
-|---------+------------------------+---------|
-| Creacionales | ¿De dónde nace el objeto? | 5 |
-| Estructurales | ¿Cómo se ensamblan las piezas? | 7 |
-| Comportamentales | ¿Cómo se hablan y se reparte el trabajo? | 11 |
+| Familia          | Pregunta que responden                   | Cuántos |
+|------------------+------------------------------------------+---------|
+| Creacionales     | ¿De dónde nace el objeto?                |       5 |
+| Estructurales    | ¿Cómo se ensamblan las piezas?           |       7 |
+| Comportamentales | ¿Cómo se hablan y se reparte el trabajo? |      11 |
 
 Algunos sitios (p. ej. Refactoring Guru) muestran *22* y dejan
 Interpreter fuera: no «falta uno»; casi nunca se necesita inventar un
@@ -261,7 +251,6 @@ proyecto se vea completo».
 El lenguaje y el marco ya realizan varios. Si Spring, Express o
 Android ya traen la portería, el middleware o el contenedor, *se usa
 eso*; no se pinta el diagrama de 1994 al lado.
-
 ** Creacionales: de dónde nace el objeto
 
 *** Factory Method — el trámite no nombra el vehículo
@@ -287,7 +276,6 @@ En las entregas: =Logistica.despachar= valida y planea;
 simple* (=MedioFactory.crear("dron")=), útil y más corta. Factory
 Method de verdad aparece cuando hay *familias de trámite* que redefinen
 el gancho. Un solo medio estable: un constructor normal.
-
 *** Abstract Factory — las piezas tienen que ser del mismo juego
 
 Un juego de té: taza, plato y tetera del mismo diseño. Si mezclas la
@@ -305,7 +293,6 @@ coherentes. El trámite pide el kit, no cada pieza suelta.
 *Cuándo no.* Si solo cambia el medio, Factory Method o la fábrica
 simple bastan. Tres =if= sueltos «por si acaso» no son Abstract
 Factory: son ceremonia.
-
 *** Builder — muchos opcionales, un solo «ya está»
 
 Un sándwich: pan, y luego «¿queso, jalapeño, doble carne?». Nadie
@@ -323,7 +310,6 @@ pedido ya válido. El objeto sale *completo*, no a medias.
 En las entregas: el alta con extras. *Cuándo no.* Tres campos
 obligatorios: el constructor. Otro constructor más «para el caso
 urgente» acaba en una familia de constructores que nadie distingue.
-
 *** Prototype — a veces copiar es más fiel que volver a llenar
 
 Fotocopiar una hoja ya llena suele ser más fiel que reescribirla de
@@ -339,7 +325,6 @@ al constructor con la receta completa.
 *Cuándo no.* Clonar el folio *ya cobrado* para «hacer otro pedido»
 copia el cobro. Prototype es para *configuración o plantilla*, no para
 duplicar un trámite con efectos.
-
 *** Singleton — una presidencia, no «el cliente de ahora»
 
 Hay un ayuntamiento, no un ayuntamiento por vecino. El error es
@@ -358,7 +343,6 @@ dos veces.
 
 *Cuándo no.* Casi todo lo que parece Singleton es «quiero llegar fácil
 a esto». Eso se llama servicio inyectado, no presidencia.
-
 ** Estructurales: cómo se ensamblan las piezas
 
 *** Adapter — el otro habla otro idioma
@@ -380,7 +364,6 @@ llama al extraño. En JavaScript a menudo basta una función
 *No es Facade:* Facade simplifica *lo nuestro*. *No es Proxy:* Proxy
 no cambia el idioma, controla el acceso. Si *tú* controlas ambos lados
 y puedes pactar el mismo JSON, no hace falta.
-
 *** Bridge — dos cosas varían a la vez, y no quieres el producto cartesiano
 
 El control remoto y el televisor pueden cambiar cada uno por su lado:
@@ -394,7 +377,6 @@ las combinaciones.
 
 En este curso casi no aparece. Un CRUD no lo pide. Si solo varía un
 lado, Strategy o Adapter bastan.
-
 *** Composite — el grupo se trata como la hoja
 
 Una caja de mudanza puede llevar un vaso o *otra caja*. El cargador no
@@ -407,7 +389,6 @@ lo de adentro. Quien despacha no pregunta «¿eres caja o sobre?».
 *Cuándo no.* Una lista plana de paquetes. Inventar Composite para un
 array es teatro. El DOM y los widgets de Flutter *ya son* árboles
 Composite.
-
 *** Decorator — se apila, no se sustituye
 
 En la cafetería el café es café; el extra (leche, jarabe) *se envuelve*
@@ -424,7 +405,6 @@ envuelve y suma la responsabilidad.
 Decorator *apila* capas sobre el mismo. *No es Proxy:* Proxy controla
 *acceso*; Decorator añade oficio. Un extra único y estable: un =if=.
 Middleware e interceptores OkHttp son esta idea en la práctica.
-
 *** Facade — una puerta al trámite nuestro
 
 En el restaurante no entras a la cocina a coordinar al asador, al
@@ -440,7 +420,6 @@ Service Layer *suele realizar* esta fachada.
 Controller:* eso es la portería HTTP. Las «Facades» de Laravel son
 otro uso de la palabra (atajos estáticos), no este patrón. Delegar a
 un solo método que ya era simple: no hace falta.
-
 *** Flyweight — lo compartido no se copia mil veces
 
 En un bosque dibujado, el *tipo* de pino (forma, textura) se comparte;
@@ -453,7 +432,6 @@ larga: la plantilla se reutiliza.
 *Cuándo no.* Pocas instancias. Optimizar la memoria de veinte pedidos
 es perder el tiempo. Las fuentes del sistema y las celdas de
 =RecyclerView= ya juegan a esto.
-
 *** Proxy — una política antes de llegar al objeto de verdad
 
 La recepcionista no *es* el director; decide si pasas, si hay cita, si
@@ -470,7 +448,6 @@ la política. CDN, carga perezosa del ORM, stub en pruebas.
 *No es Adapter:* no se traduce un idioma distinto. *No es Decorator:*
 no añades un extra de negocio; controlas *cuándo y cómo se toca* lo
 real. Si no hay política, llama directo.
-
 ** Comportamentales: cómo se hablan
 
 *** Chain of Responsibility — la fila del aeropuerto
@@ -489,7 +466,6 @@ Django, Laravel lo instancian.
 La cadena *no* elige camioneta o dron (eso es Strategy). Un solo
 chequeo en una sola ruta: un =if=, no una cadena. Autenticar *después*
 de cobrar cobra a quien no debería.
-
 *** Command — el recado escrito, no el grito
 
 Dejas un recado: «cobrar este folio cuando haya red». El papel viaja;
@@ -506,7 +482,6 @@ Redux *ya* son esto.
 *No es Strategy:* no eliges *cómo* planear; guardas *qué hay que
 hacer*. Un botón que solo llama un método en el mismo proceso: no hace
 falta.
-
 *** Interpreter — un idioma pequeño, solo si de verdad lo hay
 
 A veces las reglas se *escriben* (un mini lenguaje: «si peso < 2 y
@@ -515,7 +490,6 @@ zona = centro → bici»). Un intérprete recorre esa gramática.
 Casi nunca en este curso. Un =if= o un parser que ya existe ganan a
 inventar un DSL de rutas. No «falta» en el temario: se deja fuera
 porque el costo es enorme y el beneficio, en un CRUD, nulo.
-
 *** Iterator — recorrer sin abrir el cajón
 
 El mesero recita el menú sin que veas la receta ni el almacén. Tú
@@ -525,7 +499,6 @@ Recorrer pedidos, paradas o resultados de una consulta sin exponer si
 por detrás hay un arreglo, un árbol o un cursor de base. En Java y en
 JavaScript el =for= moderno *ya es* Iterator. No se escribe uno sobre
 un array.
-
 *** Mediator — la torre de control, no todos contra todos
 
 En un aeropuerto los aviones no se coordinan por radio cada uno con
@@ -539,7 +512,6 @@ tráfico *de ese círculo*.
 
 *Cuándo no.* Dos objetos que ya se conocen. El mediador que «hace de
 todo» es peor que el acoplamiento que querías evitar.
-
 *** Memento — una foto para poder volver
 
 El videojuego guarda la partida. No reescribes la historia: restauras
@@ -551,7 +523,6 @@ reaplicas.
 
 *Cuándo no.* Reasignar un campo (=pedido.eta = anterior=) basta. No
 es Observer (avisar) ni Command (la acción); es *la foto*.
-
 *** Observer — avisar sin conocer a todos
 
 En un grupo de WhatsApp escribes una vez; se enteran quienes están.
@@ -568,7 +539,6 @@ COMMIT*: si el cobro se deshace, no dispares el correo.
 =StateFlow=, eventos del DOM, BLoC, =LiveData= realizan Observer en la
 UI. Eso *no* sustituye avisar en el servidor, ni sustituye una
 transacción. Un solo llamador: una llamada directa.
-
 *** State — el mismo objeto, otra fase
 
 Un semáforo no es tres semáforos: es *uno* que a veces deja pasar y a
@@ -585,7 +555,6 @@ actual y, cuando corresponde, *cambia* de fase.
 *No es Strategy:* Strategy no depende de que el pedido «haya promovido».
 Dos fases estables: =if=. =UiState= en Android es primo de presentación,
 no el ciclo de vida del envío.
-
 *** Strategy — varias formas de hacer lo mismo
 
 En la cocina hay varias recetas de caldo. El mesero pide *un caldo*;
@@ -604,7 +573,6 @@ función.
 *Cuándo no.* Un solo algoritmo que no va a variar. Un =if= de dos
 casos estables. Strategy *sustituye* el algoritmo; no apila extras
 (eso es Decorator) ni traduce un JSON ajeno (eso es Adapter).
-
 *** Template Method — el esqueleto fijo, los pasos variables
 
 La receta del pastel: hornea, rellena, cubre. El relleno cambia; el
@@ -617,7 +585,6 @@ Android y =setUp= de JUnit son esqueletos del marco.
 
 *Cuándo no.* Una clase base de mil líneas que «ya trae todo». Si no
 hay esqueleto claro, composición (Strategy) duele menos que heredar.
-
 *** Visitor — una operación nueva sin abrir cada clase
 
 Un inspector recorre las habitaciones: cada cuarto *acepta* la visita
@@ -631,7 +598,6 @@ modificar cada clase. El visitante concentra la operación nueva.
 *Cuándo no.* Un =export= único. El CRUD de pedidos. Añadir tipos de
 paquete a cada rato: Visitor se vuelve pesado (hay que tocar todos los
 visitantes). En este curso casi no se implementa.
-
 ** Cómo no usar este catálogo
 
 El catálogo no es una lista de la compra. Un proyecto no «es»
@@ -651,7 +617,6 @@ Lo que casi nunca se implementa aquí: Bridge, Flyweight, Visitor,
 Memento, Interpreter.
 
 Las misiones caminan el enunciado de la empresa, no los 23 nombres.
-
 ** Referencias
 
 - Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides. /Design Patterns/.
@@ -673,7 +638,6 @@ Si la respuesta es «demasiadas cosas», hay un problema de diseño.
 Si además ese problema se repite, probablemente exista un patrón que
 ayude a enfrentarlo.
 #+end_quote
-
 * La empresa de entregas (el problema del semestre)
 
 Una empresa de mensajería quiere *una sola plataforma* para registrar
@@ -703,7 +667,6 @@ pinta en el teléfono o en el panel.
 Lo que *debe quedarse quieto*: registrar el pedido y asignar una
 entrega. Si para añadir un medio o un proveedor hay que tocar el
 HTML, el SQL y el cobro, el diseño no está haciendo su trabajo.
-
 ** Cosas a tomar en cuenta
 
 No es un solo «problema de la app». Son *varios* conflictos que
@@ -747,7 +710,6 @@ descrito nada.
    generar un PDF de guía. El trámite real es: autenticar, consultar
    un pedido existente y generar un archivo. Eso no es madurez: es
    ceremonia. Parte del semestre es *saber decir que no*.
-
 ** Actividad en clase — ¿Qué está pasando aquí?
 
 Trabajan en *equipos de cinco*. Hoy no se programa: se entiende el
@@ -760,7 +722,6 @@ hay *app móvil*. No eligen «web o móvil»: diseñan para *los dos*.
 Pueden mirar el *Catálogo GoF* cuando lleguen al paso 2. Antes, el
 trabajo es decir con sus palabras *cuál es el inconveniente principal*.
 Un nombre suelto no cuenta como análisis.
-
 *** Paso 1 — Cuenten el inconveniente con sus palabras
 
 Vuelvan a leer los siete puntos. Completen *los siete* renglones.
@@ -771,14 +732,14 @@ El punto 2 son dos inconvenientes juntos. Si lo ven así, úsenlo en dos
 renglones (2a y 2b).
 
 | # | Cuál es el inconveniente principal (una frase) | Qué está cambiando o va a cambiar | Qué *no* debería reescribirse cada vez | Qué se mezcló que no debía |
-|---+-----------------------------+-----------------------------------+----------------------------------------+----------------------------|
-| 1 |                             |                                   |                                        |                            |
-| 2 |                             |                                   |                                        |                            |
-| 3 |                             |                                   |                                        |                            |
-| 4 |                             |                                   |                                        |                            |
-| 5 |                             |                                   |                                        |                            |
-| 6 |                             |                                   |                                        |                            |
-| 7 |                             |                                   |                                        |                            |
+|---+------------------------------------------------+-----------------------------------+----------------------------------------+----------------------------|
+| 1 |                                                |                                   |                                        |                            |
+| 2 |                                                |                                   |                                        |                            |
+| 3 |                                                |                                   |                                        |                            |
+| 4 |                                                |                                   |                                        |                            |
+| 5 |                                                |                                   |                                        |                            |
+| 6 |                                                |                                   |                                        |                            |
+| 7 |                                                |                                   |                                        |                            |
 
 Cuando la tabla esté lista, respondan por escrito estas cuatro
 preguntas. Todavía *sin* nombres del catálogo. Sirven para
@@ -790,7 +751,6 @@ comprobar que el equipo entendió el mismo relato:
   también el panel? ¿Y la app?
 - Si el correo al cliente falla, ¿el cobro se deshace?
 - Si la IA está caída, ¿pueden ver un pedido que *ayer* sí se guardó?
-
 *** Paso 2 — Pongan un nombre del catálogo (o escriban «ninguno»)
 
 Arriba está el *Catálogo GoF*: los 23 patrones del libro (Factory,
@@ -806,7 +766,7 @@ Para *cada* punto de la lista (1 a 7) hagan *una* de estas dos cosas:
    expliquen por qué no conviene forzar un nombre.
 
 No todos los inconvenientes de la plataforma salen del libro de
-1994. Por ejemplo: que haya *panel web y app* a la vez, o que el
+1. Por ejemplo: que haya *panel web y app* a la vez, o que el
 mapa y la IA se caigan, a veces se resuelven con ideas de
 aplicaciones web o de servicios que fallan, no con un patrón GoF.
 En esos casos *ninguno* es una respuesta válida: lo que no vale es
@@ -817,16 +777,16 @@ En la tercera columna pongan un patrón que *se parece* pero *no* es
 *ninguno*, esa columna puede decir qué nombre estarían tentados a
 meter y por qué lo descartan.
 
-| # | Nombre del catálogo, o «ninguno» | ¿Por qué este? (con algo del relato) | Uno que se parece pero *no* es (y por qué) |
-|---+----------------------------------+--------------------------------------+--------------------------------------------|
-| 1 |                                  |                                      |                                            |
-| 2a |                                 |                                      |                                            |
-| 2b |                                 |                                      |                                            |
-| 3 |                                  |                                      |                                            |
-| 4 |                                  |                                      |                                            |
-| 5 |                                  |                                      |                                            |
-| 6 |                                  |                                      |                                            |
-| 7 |                                  |                                      |                                            |
+|  # | Nombre del catálogo, o «ninguno» | ¿Por qué este? (con algo del relato) | Uno que se parece pero *no* es (y por qué) |
+|----+----------------------------------+--------------------------------------+--------------------------------------------|
+|  1 |                                  |                                      |                                            |
+| 2a |                                  |                                      |                                            |
+| 2b |                                  |                                      |                                            |
+|  3 |                                  |                                      |                                            |
+|  4 |                                  |                                      |                                            |
+|  5 |                                  |                                      |                                            |
+|  6 |                                  |                                      |                                            |
+|  7 |                                  |                                      |                                            |
 
 Algunas pistas, sin dar la respuesta:
 
@@ -842,7 +802,6 @@ Algunas pistas, sin dar la respuesta:
 - No se busca que adivinen el nombre «oficial». Se busca que
   separen inconvenientes y que no pongan un patrón donde no hace
   falta.
-
 *** Paso 3 — Un conflicto y el cliente web + móvil
 
 El equipo elige *un* punto (el que más les haya costado) y escribe,
@@ -858,7 +817,6 @@ sin código:
 
 Con eso alcanza. No hay exposición oral: el documento del equipo es
 la entrega.
-
 ** Qué se pide, más allá del código
 
 El cliente *es* web y móvil: panel en el navegador y app en el
@@ -878,12 +836,10 @@ copie al lado un diagrama del libro.
 Lo que sigue empieza por el primero de esos conflictos: varias formas
 de entregar. Las misiones del final vuelven a este mismo relato: no
 es otro problema.
-
 * Los problemas de esta plataforma
 
 Empezamos por el =switch= de medios. Ahí aparece Strategy. El nombre
 llega cuando ya vimos el código que duele, no antes.
-
 ** Varias formas de entregar
 
 En una cocina hay varias recetas de caldo. El mesero no reescribe el
@@ -893,7 +849,6 @@ cambia el procedimiento.
 En la empresa, «planear cómo llega el paquete» es esa operación.
 Camioneta, moto, bici y dron responden la *misma* pregunta —¿cabe?
 ¿cuánto tarda? ¿cuánto cuesta?— de formas distintas.
-
 *** El código con el que suele empezar todo
 
 La primera versión es honesta y pequeña:
@@ -931,7 +886,6 @@ hecho de «asignar una entrega» no.
 No todo =if= pide esta solución. Tres ramas que nadie toca, o
 =if (peso > 2)= *dentro* del dron, son reglas del dron. Un =sumar(a,b)=
 no necesita =ISuma=.
-
 *** El movimiento
 
 Sacar cada forma a su sitio. El despacho habla de un contrato: «tú
@@ -947,7 +901,6 @@ sabes planear». No dice «ve en dron».
 
 *Cliente*, aquí, es el código que *usa* el contrato (=Despacho=). No
 es la persona que mandó el paquete.
-
 *** Cómo queda (después de entender el problema)
 
 #+begin_src java
@@ -997,7 +950,6 @@ No es Adapter (eso es traducir el JSON de la IA). No es Factory (eso
 es *quién hace* =new=). No es State (el pedido no cambia de *fase*;
 cambias de algoritmo). No es Command (no estás encolando «planear» como
 tarea).
-
 *** Prueba esto
 
 Hay un =switch= de 200 líneas para calcular el envío.
@@ -1014,7 +966,6 @@ solo* algoritmo. ¿Es diseño o ceremonia?
 #+begin_quote
 ¿Qué problema estoy resolviendo y qué complejidad acepto a cambio?
 #+end_quote
-
 ** La IA habla otro idioma (Adapter)
 
 Viajas y el enchufe del hotel no coincide con el cargador. No cambias
@@ -1070,7 +1021,6 @@ tiene el idioma ajeno en el corazón del trámite.
 #+begin_quote
 ¿Qué problema estoy resolviendo y qué complejidad acepto a cambio?
 #+end_quote
-
 ** Quién hace el =new=
 
 Strategy ya nos dio =MedioDeEntrega=: camioneta, moto, bici y dron
@@ -1091,7 +1041,6 @@ tampoco, si se puede evitar.
 Hay dos respuestas habituales. La más corta se llama *fábrica
 simple*. La del libro GoF se llama *Factory Method*. Las dos mueven
 el =new=. No son el mismo patrón.
-
 *** Una fábrica simple (casi siempre alcanza)
 
 Una fábrica simple es una clase o una función cuyo único trabajo es
@@ -1121,7 +1070,6 @@ En JavaScript basta una función =crearMedio(tipo)=. En muchas
 misiones de =POST /pedidos= esto es exactamente lo que hace falta. Es
 útil y es honesto. Todavía *no* es Factory Method: no hay una clase
 base con un trámite y subclases que redefinen la creación.
-
 *** Factory Method: qué es
 
 Factory Method es un patrón *creacional*. Sirve cuando una clase ya
@@ -1206,7 +1154,6 @@ dos veces.
 Para. ¿Strategy elige el algoritmo o construye el objeto? ¿Y Factory
 Method, entonces, qué pregunta responde?
 #+end_quote
-
 ** Una puerta al trámite (Facade)
 
 *** Intuición
@@ -1219,7 +1166,6 @@ Para. En =POST /pedidos=, ¿la ruta HTTP debería conocer el validador,
 el adaptador de IA, el =new= del dron y el =INSERT=? ¿O una sola
 operación =registrarPedido()=?
 #+end_quote
-
 *** El problema
 
 Simplificar el acceso a un *subsistema nuestro* que ya es complejo.
@@ -1233,7 +1179,6 @@ cliente arma la orquestación a su manera.
 
 Cambia la *forma de usar* el interior. El interior puede seguir siendo
 complejo; los clientes no deberían verlo.
-
 *** La idea
 
 Una operación de aplicación, =registrarPedido()=, que orquesta. El
@@ -1251,7 +1196,6 @@ HTTP / app / job
 
 La fachada *no* es el Front Controller (eso es la portería HTTP). No
 es el Adapter (el otro no es nuestro).
-
 *** Antes y después
 
 Antes, la ruta Spring o el =app.post= llama al repositorio, al cliente
@@ -1269,7 +1213,6 @@ nombre con el patrón GoF.
 Adapter vs Facade: ¿el otro es ajeno o nuestro? Strategy vs Facade:
 ¿intercambio algoritmos o escondo un módulo? Service Layer y Facade
 a menudo coinciden en la práctica: nombra el *trámite*.
-
 *** Ejercicio
 
 El proveedor habla de =route_hint=: ¿Facade? (No: Adapter.)
@@ -1280,7 +1223,6 @@ Layer? ¿Hace falta *además* un =PedidoFacade= vacío?
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** Avisar sin conocer a todos (Observer)
 
 *** Intuición
@@ -1288,7 +1230,6 @@ a introducir para resolverlo?
 Un grupo de WhatsApp: publicas un hecho. No tienes la lista de
 teléfonos de todos los parientes en la cabeza cada vez que escribes.
 Quien esté en el grupo se entera. Quien salga, deja de enterarse.
-
 *** El problema
 
 Cuando cambia el estado del pedido, cliente, repartidor, admin,
@@ -1316,7 +1257,6 @@ Cada oyente nuevo *abre* ese método. O al revés: el correo está
 
 Cambia *quién* necesita saber. No el algoritmo de entrega. No la
 atomicidad del cobro.
-
 *** La idea
 
 Publicar un evento de dominio *después* de que el hecho sea real
@@ -1331,11 +1271,11 @@ PedidoActualizado
   +--> estadísticas
 #+end_example
 
-| Quién | Responsabilidad |
-|-------+-----------------|
-| Sujeto / bus | Publica el hecho, no conoce las clases concretas |
-| Evento (=PedidoActualizado=) | Datos del hecho, no la lógica de cada canal |
-| Oyentes | Correo, push, stats: cada uno una razón de cambio |
+| Quién                        | Responsabilidad                                   |
+|------------------------------+---------------------------------------------------|
+| Sujeto / bus                 | Publica el hecho, no conoce las clases concretas  |
+| Evento (=PedidoActualizado=) | Datos del hecho, no la lógica de cada canal       |
+| Oyentes                      | Correo, push, stats: cada uno una razón de cambio |
 
 Antes: llamadas en línea dentro de =cambiarEstado= o del script de
 pago. Después: la transacción confirma pedido y cobro; *luego* se
@@ -1356,15 +1296,14 @@ Un solo llamador evidente: llama directo. Atomicidad de cobro y alta:
 *no* es Observer. Un =setInterval= que pega al servidor cada segundo
 no es este patrón.
 
-| Patrón | Pregunta |
-|--------+----------|
-| Observer | ¿Quién necesita saber que ocurrió algo? |
-| Command | ¿Encapsulo la solicitud para encolarla o deshacerla? |
-| Unit of Work | ¿Estas escrituras van juntas o ninguna? |
-| Mediator | ¿Evito que todos se conozcan entre todos? |
+| Patrón       | Pregunta                                             |
+|--------------+------------------------------------------------------|
+| Observer     | ¿Quién necesita saber que ocurrió algo?              |
+| Command      | ¿Encapsulo la solicitud para encolarla o deshacerla? |
+| Unit of Work | ¿Estas escrituras van juntas o ninguna?              |
+| Mediator     | ¿Evito que todos se conozcan entre todos?            |
 
 El Observer del DOM no es el de =PedidoActualizado=. Nombra *la capa*.
-
 *** Ejercicio
 
 Un alumno afirma: «Observer registra el envío cuando hay pago».
@@ -1381,14 +1320,12 @@ inconsistente. Dibuja el orden correcto con =COMMIT=.
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** Una portería HTTP (Front Controller)
 
 *** Intuición
 
 Un edificio con una *portería*: no entras por la ventana de cada
 oficina. Las reglas de visita se aplican *una* vez.
-
 *** El problema
 
 Cada archivo HTTP copia sesión, bitácora y encabezado. Cuando cambia
@@ -1400,7 +1337,6 @@ index.php     → sesión
 pedidos.php   → sesión
 pagos.php     → sesión
 #+end_example
-
 *** La idea
 
 Una portería. El frontal *dirige*. No decide si el dron puede volar.
@@ -1422,7 +1358,6 @@ marco ya lo trae, *no se construye otro* al lado.
 Un sitio de tres páginas estáticas no lo pide. No es Strategy. No es
 API Gateway: el Gateway es *borde* entre clientes y *varios*
 servicios; el Front Controller es la portería *de esta* aplicación.
-
 *** Ejercicio
 
 Conviven =index.php= e =index1.php=, cada uno con su sesión. ¿Hay
@@ -1432,20 +1367,17 @@ Front Controller? ¿Basta un Page Controller por archivo?
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** La fila del aeropuerto (middleware)
 
 *** Intuición
 
 En el aeropuerto: documentación → seguridad → puerta. Cada puesto
 deja pasar, modifica o detiene. El orden importa.
-
 *** El problema
 
 La misma política (sesión, CORS, bitácora) se copia o se aplica en
 el orden equivocado. Autenticar *después* de cobrar cobra a quien no
 debería.
-
 *** La idea
 
 #+begin_example
@@ -1465,7 +1397,6 @@ function autenticar(req, res, next) {
 La cadena *no* elige camioneta o motocicleta. Eso es el dominio
 (Strategy). Un solo chequeo en una sola ruta: un =if=, no una cadena.
 No reescribas el diagrama GoF *junto* a =app.use=.
-
 *** Ejercicio
 
 Un compañero pone el =switch= de medios *dentro* del middleware.
@@ -1475,20 +1406,17 @@ Un compañero pone el =switch= de medios *dentro* del middleware.
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** No le hables a la bodega (Repository)
 
 *** Intuición
 
 El bibliotecario. Pides «los pedidos de Ana». No entras al depósito
 ni hablas el idioma de las estanterías.
-
 *** El problema
 
 SQL en la plantilla del seguimiento o en el controlador. La vista
 conoce la bodega. Cambia *cómo* se persiste (SQL, memoria, otro
 motor), no el HTML.
-
 *** La idea
 
 #+begin_example
@@ -1509,7 +1437,6 @@ Un =SELECT= único en un script de migración no pide repositorio.
 Active Record (Laravel Eloquent) *no* es el mismo patrón: el modelo
 *es* la fila. Se puede vivir con ello; no se finja que ya hay
 Repository.
-
 *** Ejercicio
 
 La plantilla ejecuta =SELECT= y además manda correo si hay tres
@@ -1519,13 +1446,11 @@ reprobadas (el kardex legado). ¿Basta un repositorio? ¿Qué más falta?
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** El caso de uso tiene nombre (Service Layer)
 
 *** Intuición
 
 El mesero toma el pedido. No cocina y no baja a la bodega.
-
 *** El problema y la idea
 
 El Service Layer nombra el *caso de uso*: =registrarPedido()=,
@@ -1550,7 +1475,6 @@ IA, medio, persistir).
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** La plantilla no consulta (Template View)
 
 La vista presenta. No consulta, no cobra, no envía correo.
@@ -1563,7 +1487,6 @@ El seguimiento recibe =estado= y =eta=. No ejecuta =SELECT=.
 
 Transform View *construye* la representación (React en el servidor).
 No es el mismo mecanismo; la regla sí: la vista no habla SQL.
-
 *** Ejercicio
 
 =kardex1.php= pinta filas y, *dentro del =while=*, consulta materias,
@@ -1574,14 +1497,12 @@ harías?
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** Juntos o nada (Unit of Work)
 
 *** Intuición
 
 La cuenta del restaurante: toda, o ninguna. No pagas el segundo plato
 si el primero no salió y aun así te cobraron el vino.
-
 *** El problema
 
 Cobro y alta del envío: juntos o nada. Cada =mysqli_query= confirma
@@ -1597,7 +1518,6 @@ BEGIN → pedido → cobro → saldo → COMMIT
 
 Un =INSERT= único no pide unidad explícita. Observer *no* sustituye
 esto. Idempotencia es *otro* problema: el mismo cobro dos veces.
-
 *** Ejercicio
 
 «El Observer registra el envío cuando el pago se publica.» ¿Por qué
@@ -1607,7 +1527,6 @@ no basta? Dibuja =COMMIT= y *después* =PedidoActualizado=.
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** Dos clics, un cobro (idempotencia)
 
 No es un patrón GoF. Es de APIs y sistemas distribuidos.
@@ -1625,7 +1544,6 @@ cabinas. Retry ciego de un cobro *sin* clave duplica el efecto.
 
 Un =GET= de seguimiento ya es idempotente por naturaleza HTTP. No
 inventes clave donde no hay efecto.
-
 *** Ejercicio
 
 Un compañero reintenta el cobro ante un 400 de validación. ¿Estás de
@@ -1635,7 +1553,6 @@ acuerdo?
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** App y panel no tienen la misma hambre (BFF y Gateway)
 
 La app pide JSON mínimo (folio, estado, eta) y el panel pide HTML con
@@ -1658,7 +1575,6 @@ No son lo mismo. El Gateway sirve a *varios* clientes hacia *varios*
 servicios. El BFF se diseña alrededor de *un* tipo de cliente.
 Factory no alimenta la pantalla de inicio. Si solo hay un cliente y
 un recurso ya adecuado, BFF sobra.
-
 *** Ejercicio
 
 ¿BFF, Gateway, ambos o ninguno para un CRUD de un solo cliente y un
@@ -1668,7 +1584,6 @@ un recurso ya adecuado, BFF sobra.
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** La IA se cae y el pedido sigue vivo
 
 La IA y el mapa pueden fallar. El pedido *ya guardado* debe seguir
@@ -1689,7 +1604,6 @@ Normal → muchos errores → circuito abierto → no llamar un rato
 #+end_example
 
 Bulkhead: que la IA no ahogue el seguimiento.
-
 *** Ejercicio
 
 Mapa e IA caídos; el usuario no puede consultar un pedido *ya
@@ -1700,7 +1614,6 @@ se reintenta? ¿Event Sourcing para generar un PDF de guía?
 ¿Qué problema estoy resolviendo y qué complejidad estoy dispuesto
 a introducir para resolverlo?
 #+end_quote
-
 ** Cómo se combinan (sin Golden Hammer)
 
 #+begin_example
@@ -1726,7 +1639,6 @@ Observer (correo, app, estadísticas)
 Si cambia «cómo planea el dron», se toca Strategy. Si cambia el JSON
 de la IA, se toca Adapter. No se agrega una capa porque «se ve más
 profesional». Cada pieza tiene *una* pregunta.
-
 *** Cómo analizar antes de elegir
 
 1. ¿Qué está ocurriendo?
@@ -1747,7 +1659,6 @@ NO:  «Tengo que utilizar Strategy.»
 SÍ:  «Tengo varios comportamientos intercambiables
       y quiero cambiar uno sin modificar al cliente.»
 #+end_example
-
 * De dónde salen los objetos
 
 Ya vimos cómo *planea* cada medio (Strategy) y que alguien tiene que
@@ -1784,7 +1695,6 @@ Abajo vamos despacio, con analogías de la vida diaria y luego con la
 empresa de entregas. El nombre del patrón llega *después* de que el
 problema se entienda. Si en tu proyecto el =new= no duele, no tienes
 que usar ninguno.
-
 ** El restaurante sigue sirviendo; cambia lo que sale de la cocina
 
 Imagina un restaurante. El mesero toma la comanda y la cocina
@@ -1856,7 +1766,6 @@ Más adelante, cuando veamos *cómo* planea cada medio, ese objeto que
 acabamos de crear será el que intercambia el comportamiento. Por
 ahora basta con: **el trámite no debería conocer las clases
 concretas por su nombre**.
-
 ** El juego de té: las piezas tienen que ser del mismo juego
 
 Piensa en un juego de té. Taza, platito y tetera se venden *juntos*
@@ -1905,7 +1814,6 @@ del patrón habla de *familias*, no de la palabra clave de Java.
 
 Este patrón es fácil de sobreingenierizar. Si no tienes dos kits de
 verdad, no lo uses. En las misiones de este curso casi nunca se pide.
-
 ** El sándwich: muchos opcionales, un solo «ya está»
 
 En una sandwichera no gritas quince datos de un golpe al entrar
@@ -1955,7 +1863,6 @@ Cuándo *no*. Dos o tres campos: =new Pedido(origen, destino, peso)=
 es más claro. Android ya trae =NotificationCompat.Builder=; los ORM
 traen query builders. No inventes un Builder para un formulario de
 tres cajas «porque sale en el libro».
-
 ** La fotocopia: a veces copiar es más fiel que volver a llenar
 
 En una oficina hay un formulario de «visita al cliente» ya lleno: la
@@ -1990,7 +1897,6 @@ cobro.)
 En JavaScript, =structuredClone= resuelve muchos casos. Un objeto de
 dos campos no necesita este patrón. Un literal claro
 ={ origen, destino }= gana.
-
 ** Una presidencia, no «el cliente de ahora»
 
 En una ciudad hay *un* ayuntamiento. No hay un ayuntamiento por
@@ -2028,18 +1934,17 @@ del marco, es diseñar dos veces.
 Además junta dos oficios: «crearse una sola vez» y «ser el punto al
 que todo el mundo llama». Por eso cuesta probarlo y por eso el código
 empieza a conocerse demasiado.
-
 ** Cómo elegir, sin memorizar la lista
 
 Antes de seguir a *cómo se entrega* un paquete, quédate con esto:
 
-| Lo que te está pasando | Por dónde ir | Qué no hacer |
-|------------------------+--------------+--------------|
-| El trámite nombra =EntregaCamioneta= | Mover el =new= (fábrica simple o Factory Method) | Llenar el método de =if= de clases |
-| Nacional e internacional son *kits* | Abstract Factory | Tres =if= sueltos; o Abstract Factory «por si acaso» |
-| El constructor tiene quince parámetros | Builder | Otro constructor más |
-| Todos los días teclean la misma ruta | Prototype (plantilla) | Clonar el folio cobrado |
-| Hace falta un pool o una config | El Singleton *del marco* | =PedidoActual.getInstance()= |
+| Lo que te está pasando                 | Por dónde ir                                     | Qué no hacer                                         |
+|----------------------------------------+--------------------------------------------------+------------------------------------------------------|
+| El trámite nombra =EntregaCamioneta=   | Mover el =new= (fábrica simple o Factory Method) | Llenar el método de =if= de clases                   |
+| Nacional e internacional son *kits*    | Abstract Factory                                 | Tres =if= sueltos; o Abstract Factory «por si acaso» |
+| El constructor tiene quince parámetros | Builder                                          | Otro constructor más                                 |
+| Todos los días teclean la misma ruta   | Prototype (plantilla)                            | Clonar el folio cobrado                              |
+| Hace falta un pool o una config        | El Singleton *del marco*                         | =PedidoActual.getInstance()=                         |
 
 No se apilan los cinco. Empieza por el =new= que de verdad duele. Si
 no duele ninguno, un constructor normal es diseño adulto, no pobreza
@@ -2056,7 +1961,6 @@ Un =new Pedido(origen, destino, peso)=. Si acaso,
 En la plataforma ya apareció *quién hace el new*. Aquí se profundiza
 en los creacionales. El mapa de los 23 —con los estructurales y de
 comportamiento— está *arriba*, en *Catálogo GoF*.
-
 * Patrones de Diseño en Aplicaciones Web y Móviles
 
 ** Introducción
@@ -2085,8 +1989,6 @@ Un patrón de diseño no es código que simplemente copiamos.
 Es una forma conocida de organizar clases, objetos y responsabilidades
 para solucionar un problema recurrente.
 #+end_quote
-
-
 ** 1. ¿Qué es un patrón de diseño?
 
 Un patrón de diseño describe una solución general para un determinado
@@ -2106,8 +2008,6 @@ Podemos imaginar un patrón como una especie de *plantilla conceptual*.
 No nos indica exactamente qué código debemos escribir.
 
 Nos indica *cómo organizar una posible solución*.
-
-
 *** 1.1 Una analogía sencilla
 
 Supongamos que queremos construir una casa.
@@ -2133,8 +2033,6 @@ En programación sucede algo parecido.
 
 Un programador puede reconocer que determinado problema se parece a
 otros problemas conocidos y utilizar un patrón como punto de partida.
-
-
 ** 2. ¿Por qué utilizar patrones de diseño?
 
 Los patrones ayudan principalmente a construir software más fácil de:
@@ -2157,8 +2055,6 @@ Strategy."
 
 Un desarrollador que conoce el patrón puede comprender rápidamente
 la propuesta sin necesidad de explicar toda la implementación.
-
-
 ** 3. Los patrones no dependen de un lenguaje específico
 
 Los patrones representan *ideas de diseño*.
@@ -2205,8 +2101,6 @@ El concepto es el mismo:
 #+begin_quote
 El comportamiento puede cambiar sin modificar al código que lo utiliza.
 #+end_quote
-
-
 ** 4. Clasificación tradicional de los patrones
 
 Los patrones de diseño clásicos suelen dividirse en tres grupos.
@@ -2218,8 +2112,6 @@ Los patrones de diseño clásicos suelen dividirse en tres grupos.
         |              |              |
     Creacionales   Estructurales   Comportamiento
 #+end_example
-
-
 *** 4.1 Patrones creacionales
 
 Se concentran en la creación de objetos.
@@ -2231,8 +2123,6 @@ Algunos ejemplos son:
 - Builder
 - Prototype
 - Singleton
-
-
 *** 4.2 Patrones estructurales
 
 Se concentran en la forma en que diferentes objetos o componentes
@@ -2245,8 +2135,6 @@ Ejemplos:
 - Facade
 - Proxy
 - Composite
-
-
 *** 4.3 Patrones de comportamiento
 
 Se concentran en la comunicación y responsabilidades entre objetos.
@@ -2259,8 +2147,6 @@ Ejemplos:
 - State
 - Template Method
 - Iterator
-
-
 ** 5. Patrones en aplicaciones web y móviles
 
 Los patrones clásicos también aparecen constantemente en aplicaciones
@@ -2290,8 +2176,6 @@ Consideremos una aplicación moderna.
 
 Dentro de cada una de estas partes pueden utilizarse diferentes
 patrones.
-
-
 ** 6. MVC — Model View Controller
 
 Uno de los patrones arquitectónicos más conocidos en desarrollo web
@@ -2302,8 +2186,6 @@ MVC significa:
 - Model
 - View
 - Controller
-
-
 *** 6.1 Problema
 
 Supongamos que tenemos una aplicación que permite consultar estudiantes.
@@ -2317,8 +2199,6 @@ Una mala organización podría mezclar en un mismo archivo:
 - procesamiento de peticiones.
 
 Conforme el sistema crece, modificarlo se vuelve complicado.
-
-
 *** 6.2 Idea de MVC
 
 MVC divide las responsabilidades.
@@ -2341,8 +2221,6 @@ MVC divide las responsabilidades.
                 |   Model   |
                 +-----------+
 #+end_example
-
-
 **** Model
 
 Representa:
@@ -2350,8 +2228,6 @@ Representa:
 - información,
 - reglas de negocio,
 - acceso a los datos.
-
-
 **** View
 
 Representa lo que observa el usuario.
@@ -2363,13 +2239,9 @@ Por ejemplo:
 - formulario,
 - tabla,
 - pantalla.
-
-
 **** Controller
 
 Recibe las acciones del usuario y coordina la aplicación.
-
-
 *** 6.3 Ejemplo
 
 Un usuario solicita:
@@ -2400,14 +2272,10 @@ View
    v
 HTML
 #+end_example
-
-
 ** 7. Strategy
 
 El patrón *Strategy* permite intercambiar diferentes algoritmos que
 realizan una tarea similar.
-
-
 *** 7.1 Problema
 
 Supongamos una tienda en línea.
@@ -2440,8 +2308,6 @@ if (tipo === "normal") {
 #+end_src
 
 Conforme aparecen nuevas estrategias el código comienza a crecer.
-
-
 *** 7.2 Solución
 
 Cada algoritmo puede convertirse en una estrategia.
@@ -2453,8 +2319,6 @@ Cada algoritmo puede convertirse en una estrategia.
        |            |             |
      Normal     Estudiante     Frecuente
 #+end_example
-
-
 *** 7.3 Ejemplo JavaScript
 
 #+begin_src javascript
@@ -2478,8 +2342,6 @@ console.log(
 
 );
 #+end_src
-
-
 *** 7.4 Ejemplos web y móviles
 
 Strategy puede utilizarse para:
@@ -2491,14 +2353,10 @@ Strategy puede utilizarse para:
 - diferentes formas de ordenar información,
 - estrategias de sincronización,
 - algoritmos de compresión.
-
-
 ** 8. Observer
 
 Observer permite que diferentes componentes sean notificados cuando
 ocurre un cambio.
-
-
 *** 8.1 Analogía
 
 Podemos pensar en un canal de YouTube.
@@ -2517,8 +2375,6 @@ Podemos pensar en un canal de YouTube.
 Los usuarios están suscritos.
 
 Cuando aparece contenido nuevo reciben una notificación.
-
-
 *** 8.2 En aplicaciones web
 
 Este comportamiento aparece constantemente.
@@ -2538,8 +2394,6 @@ Contador       Precio total
 #+end_example
 
 Varios componentes reaccionan ante el mismo cambio.
-
-
 *** 8.3 Ejemplos
 
 Observer aparece en:
@@ -2551,14 +2405,10 @@ Observer aparece en:
 - programación reactiva,
 - manejo de estados,
 - eventos del navegador.
-
-
 ** 9. Factory Method
 
 Factory Method ayuda a separar la creación de objetos de las clases que
 los utilizan.
-
-
 *** 9.1 Problema
 
 Supongamos una aplicación móvil que puede enviar notificaciones mediante:
@@ -2587,8 +2437,6 @@ if (tipo.equals("email")) {
 
 Esto hace que el código que utiliza las notificaciones también tenga
 que conocer cómo se construyen.
-
-
 *** 9.2 Factory
 
 Podemos delegar la creación.
@@ -2607,14 +2455,10 @@ Podemos delegar la creación.
 Entonces el cliente solamente solicita una notificación.
 
 No necesita conocer todos los detalles de construcción.
-
-
 ** 10. Adapter
 
 Adapter permite que dos componentes con interfaces incompatibles
 puedan trabajar juntos.
-
-
 *** 10.1 Ejemplo web
 
 Supongamos que nuestra aplicación espera:
@@ -2648,8 +2492,6 @@ function adaptarUsuario(usuarioExterno) {
 
 }
 #+end_src
-
-
 *** 10.2 Aplicaciones
 
 Adapter es especialmente útil cuando utilizamos:
@@ -2660,14 +2502,10 @@ Adapter es especialmente útil cuando utilizamos:
 - diferentes proveedores de servicios,
 - plataformas de pago,
 - servicios de almacenamiento.
-
-
 ** 11. Facade
 
 Facade proporciona una interfaz sencilla para utilizar un sistema
 complejo.
-
-
 *** 11.1 Ejemplo
 
 Para realizar una compra tal vez sea necesario:
@@ -2704,16 +2542,12 @@ Internamente:
        v                v               v
    Inventario          Pago          Facturación
 #+end_example
-
-
 ** 12. Repository
 
 Repository es muy utilizado en aplicaciones web y móviles.
 
 Su objetivo es separar la lógica del sistema del mecanismo utilizado
 para obtener los datos.
-
-
 *** 12.1 Sin Repository
 
 Una clase podría ejecutar directamente:
@@ -2725,8 +2559,6 @@ WHERE id = 25;
 #+end_src
 
 La lógica del sistema estaría muy relacionada con PostgreSQL.
-
-
 *** 12.2 Utilizando Repository
 
 Podríamos tener:
@@ -2743,8 +2575,6 @@ El resto de la aplicación no necesita conocer si los datos vienen de:
 - una API REST,
 - Firebase,
 - almacenamiento local.
-
-
 *** 12.3 Estructura
 
 #+begin_example
@@ -2758,8 +2588,6 @@ El resto de la aplicación no necesita conocer si los datos vienen de:
        v             v
  PostgreSQL         API
 #+end_example
-
-
 ** 13. Patrones utilizados frecuentemente en aplicaciones web y móviles
 
 Podemos encontrar muchos patrones trabajando juntos.
@@ -2778,8 +2606,6 @@ Por ejemplo:
 | State      | Manejar diferentes estados          |
 | Command    | Representar acciones                |
 | Decorator  | Añadir comportamiento dinámicamente |
-
-
 ** 14. Patrones y frameworks
 
 Es importante comprender que muchos frameworks ya utilizan patrones.
@@ -2804,8 +2630,6 @@ Por eso algunas veces utilizamos patrones sin darnos cuenta.
 
 Comprender los patrones permite entender mejor por qué los frameworks
 están construidos de cierta manera.
-
-
 ** 15. ¿Qué ocurre cuando la aplicación crece?
 
 Los patrones anteriores ayudan a organizar componentes dentro de una
@@ -2831,8 +2655,6 @@ Por ejemplo, imaginemos una plataforma que contiene:
 Inicialmente podríamos desarrollar todo dentro de una sola aplicación.
 
 Esto nos lleva al concepto de *monolito*.
-
-
 ** 16. Arquitectura monolítica
 
 En una aplicación monolítica todos los módulos forman parte de una
@@ -2853,8 +2675,6 @@ misma aplicación.
 #+end_example
 
 Todo puede estar dentro del mismo proyecto.
-
-
 *** 16.1 Ejemplo
 
 #+begin_example
@@ -2872,8 +2692,6 @@ tienda/
 Esta arquitectura no es necesariamente mala.
 
 De hecho, para muchos proyectos puede ser la opción más sencilla.
-
-
 ** 17. ¿Qué son los microservicios?
 
 Los *microservicios* representan un estilo arquitectónico en el cual un
@@ -2902,8 +2720,6 @@ Por ejemplo:
 #+end_example
 
 Cada microservicio puede evolucionar con cierta independencia.
-
-
 ** 18. Microservicios NO es un patrón de diseño clásico
 
 Esta diferencia es muy importante.
@@ -2937,8 +2753,6 @@ Software
 
 Además, dentro de cada microservicio pueden utilizarse patrones de
 diseño.
-
-
 ** 19. Ejemplo de una tienda basada en microservicios
 
 Consideremos una tienda en línea.
@@ -2959,8 +2773,6 @@ Podríamos dividirla en:
 #+end_example
 
 Cada microservicio tiene una responsabilidad concreta.
-
-
 *** Microservicio de usuarios
 
 Puede encargarse de:
@@ -2969,8 +2781,6 @@ Puede encargarse de:
 - autenticación,
 - perfiles,
 - permisos.
-
-
 *** Microservicio de productos
 
 Puede encargarse de:
@@ -2978,8 +2788,6 @@ Puede encargarse de:
 - catálogo,
 - categorías,
 - información de productos.
-
-
 *** Microservicio de inventario
 
 Puede encargarse de:
@@ -2987,8 +2795,6 @@ Puede encargarse de:
 - existencias,
 - entradas,
 - salidas.
-
-
 *** Microservicio de pagos
 
 Puede encargarse de:
@@ -2996,8 +2802,6 @@ Puede encargarse de:
 - tarjetas,
 - transferencias,
 - plataformas de pago.
-
-
 *** Microservicio de envíos
 
 Puede encargarse de:
@@ -3005,15 +2809,11 @@ Puede encargarse de:
 - direcciones,
 - paqueterías,
 - seguimiento de pedidos.
-
-
 ** 20. Comunicación entre microservicios
 
 Los microservicios necesitan comunicarse.
 
 Existen diferentes mecanismos.
-
-
 *** 20.1 APIs REST
 
 Un servicio puede realizar una petición HTTP.
@@ -3041,8 +2841,6 @@ Respuesta:
     "precio": 18000
 }
 #+end_src
-
-
 *** 20.2 Mensajes y eventos
 
 También pueden utilizar comunicación asíncrona.
@@ -3070,8 +2868,6 @@ El servicio de ventas no necesita realizar directamente todas las
 acciones posteriores.
 
 Otros servicios reaccionan al evento.
-
-
 ** 21. API Gateway
 
 Cuando existen muchos microservicios, normalmente no queremos que el
@@ -3096,8 +2892,6 @@ Usuarios  Ventas   Productos
 #+end_example
 
 El cliente solamente conoce una entrada al sistema.
-
-
 ** 22. Base de datos por microservicio
 
 Una práctica común en microservicios es que cada servicio sea propietario
@@ -3127,8 +2921,6 @@ estructura de datos.
 
 Sin embargo, también genera nuevos problemas de coordinación y
 consistencia.
-
-
 ** 23. Ventajas de los microservicios
 
 Entre sus posibles ventajas encontramos:
@@ -3154,8 +2946,6 @@ podemos escalar solamente ese servicio.
    Instancia Instancia Instancia
       1         2         3
 #+end_example
-
-
 ** 24. Desventajas de los microservicios
 
 Los microservicios también introducen mucha complejidad.
@@ -3178,22 +2968,18 @@ Por eso:
 Dividir una aplicación en microservicios no significa automáticamente
 que su diseño sea mejor.
 #+end_quote
-
-
 ** 25. Monolito vs microservicios
 
-| Característica | Monolito | Microservicios |
-|----------------+----------+----------------|
-| Aplicaciones | Una | Varias |
-| Despliegue | Generalmente conjunto | Independiente |
-| Comunicación | Dentro de la aplicación | Principalmente red |
-| Complejidad inicial | Menor | Mayor |
-| Infraestructura | Sencilla | Más compleja |
-| Escalamiento | Aplicación completa | Por servicio |
-| Datos | Frecuentemente compartidos | Generalmente separados |
-| Mantenimiento inicial | Más sencillo | Más complejo |
-
-
+| Característica        | Monolito                   | Microservicios         |
+|-----------------------+----------------------------+------------------------|
+| Aplicaciones          | Una                        | Varias                 |
+| Despliegue            | Generalmente conjunto      | Independiente          |
+| Comunicación          | Dentro de la aplicación    | Principalmente red     |
+| Complejidad inicial   | Menor                      | Mayor                  |
+| Infraestructura       | Sencilla                   | Más compleja           |
+| Escalamiento          | Aplicación completa        | Por servicio           |
+| Datos                 | Frecuentemente compartidos | Generalmente separados |
+| Mantenimiento inicial | Más sencillo               | Más complejo           |
 ** 26. ¿Siempre debemos utilizar microservicios?
 
 No.
@@ -3223,8 +3009,6 @@ microservicio-calificaciones
 #+end_example
 
 podría aumentar innecesariamente la complejidad.
-
-
 ** 27. ¿Cuándo pueden tener sentido los microservicios?
 
 Pueden resultar útiles cuando tenemos:
@@ -3251,8 +3035,6 @@ Por ejemplo:
 
 El servicio de video podría necesitar mucha más infraestructura que el
 servicio de pagos.
-
-
 ** 28. Patrones dentro de microservicios
 
 Los conceptos no son excluyentes.
@@ -3286,8 +3068,6 @@ Podríamos utilizar:
 - Adapter para conectar PayPal, Stripe u otro proveedor,
 - Repository para acceder a datos,
 - Observer para publicar eventos.
-
-
 ** 29. Niveles de diseño
 
 Una forma sencilla de entender todos estos conceptos consiste en
@@ -3324,8 +3104,6 @@ observar distintos niveles.
  Java / Python / JavaScript /
  Kotlin / Dart / TypeScript
 #+end_example
-
-
 ** 30. Ejemplo completo
 
 Imaginemos una aplicación móvil para solicitar comida.
@@ -3399,8 +3177,6 @@ Y cuando el pago sea exitoso podría publicar un evento.
 
 Aquí podría aparecer nuevamente una idea relacionada con *Observer* o
 arquitecturas orientadas a eventos.
-
-
 ** 31. Idea fundamental
 
 Los patrones de diseño y los microservicios solucionan problemas en
@@ -3428,8 +3204,6 @@ colaboraciones dentro del software.
 Los microservicios ayudan a dividir un sistema grande en servicios
 independientes que colaboran entre sí.
 #+end_quote
-
-
 ** 32. Preguntas para discutir en clase
 
 1. ¿Qué problema intenta resolver un patrón de diseño?
@@ -3460,8 +3234,6 @@ independientes que colaboran entre sí.
 
 12. Considere una aplicación móvil de pedidos de comida.
     ¿Dónde podrían utilizarse Strategy, Observer, Factory y Adapter?
-
-
 ** 33. Resumen
 
 Los patrones de diseño proporcionan soluciones generales a problemas
@@ -3508,9 +3280,6 @@ Microservicios es un estilo arquitectónico.
 
 Ambos conceptos pueden trabajar juntos dentro de un mismo sistema.
 #+end_quote
-
-
-
 * Cómo analizar, elegir y no usar
 
 ** Método para un ejercicio
@@ -3523,42 +3292,39 @@ Ambos conceptos pueden trabajar juntos dentro de un mismo sistema.
 5. *Entonces* nombra el patrón.
 6. Di qué mejora, qué cuesta y cuándo dejaría de convenir.
 7. Pregunta si el lenguaje o el marco ya lo implementan.
-
 ** Diagnóstico de código espagueti
 
 No basta con «el =switch= está feo».
 
-| Síntoma                              | Problema                         | Posible solución              |
-|--------------------------------------+----------------------------------+-------------------------------|
-| Muchos =if/switch= de variantes      | Comportamientos mezclados        | Strategy                      |
-| =new= o decisión repetida            | Construcción dispersa            | Factory                       |
-| Códigos del banco en el dominio      | Contrato ajeno filtrándose       | Adapter                       |
-| SQL en la plantilla                  | Persistencia en la vista         | Repository + Template View    |
-| Cobro y alta del envío a medias      | Sin atomicidad                   | Unit of Work                  |
-| Correo dentro de la operación crítica | Aviso mezclado con el compromiso | Observer *después* del COMMIT |
-| Doble POST, doble cargo              | No idempotente                   | Clave de intento              |
-| Sesión copiada en cada PHP           | Políticas transversales          | Front Controller + middleware |
-| Doce peticiones para una pantalla    | Agregación por cliente           | BFF o un =GET= de pantalla    |
-| Lista de oyentes junto a =StateFlow= | Observer duplicado               | Usar el del marco             |
-| Servlet frontal *y* =@PostMapping=   | Dos Front Controller             | El del marco, borrar el otro  |
-| Recargar el POST cobra otra vez      | Vista + efecto no separados      | PRG *e* idempotencia          |
-| Lógica de red en la Activity         | Estado y ciclo de vida mezclados | ViewModel / BLoC + repositorio |
-| Pedido local desaparece sin red      | Un solo origen (solo API)        | Repositorio dual + cola        |
-
+| Síntoma                               | Problema                         | Posible solución               |
+|---------------------------------------+----------------------------------+--------------------------------|
+| Muchos =if/switch= de variantes       | Comportamientos mezclados        | Strategy                       |
+| =new= o decisión repetida             | Construcción dispersa            | Factory                        |
+| Códigos del banco en el dominio       | Contrato ajeno filtrándose       | Adapter                        |
+| SQL en la plantilla                   | Persistencia en la vista         | Repository + Template View     |
+| Cobro y alta del envío a medias       | Sin atomicidad                   | Unit of Work                   |
+| Correo dentro de la operación crítica | Aviso mezclado con el compromiso | Observer *después* del COMMIT  |
+| Doble POST, doble cargo               | No idempotente                   | Clave de intento               |
+| Sesión copiada en cada PHP            | Políticas transversales          | Front Controller + middleware  |
+| Doce peticiones para una pantalla     | Agregación por cliente           | BFF o un =GET= de pantalla     |
+| Lista de oyentes junto a =StateFlow=  | Observer duplicado               | Usar el del marco              |
+| Servlet frontal *y* =@PostMapping=    | Dos Front Controller             | El del marco, borrar el otro   |
+| Recargar el POST cobra otra vez       | Vista + efecto no separados      | PRG *e* idempotencia           |
+| Lógica de red en la Activity          | Estado y ciclo de vida mezclados | ViewModel / BLoC + repositorio |
+| Pedido local desaparece sin red       | Un solo origen (solo API)        | Repositorio dual + cola        |
 ** Antipatrones
 
-| Antipatrón            | Síntoma                                      |
-|-----------------------+----------------------------------------------|
-| God Object            | Una clase con auth, SQL, correo y HTML       |
-| Singleton de sesión   | =Sesion.getInstance()= como carrito global   |
-| Switch gigante        | Cada medio nuevo abre el mismo archivo       |
-| Lava flow             | Archivos v2 y «no borrar por si acaso»       |
-| Golden Hammer         | Event Sourcing para generar un PDF           |
-| Callback hell         | Pirámide de anidación asíncrona              |
+| Antipatrón          | Síntoma                                    |
+|---------------------+--------------------------------------------|
+| God Object          | Una clase con auth, SQL, correo y HTML     |
+| Singleton de sesión | =Sesion.getInstance()= como carrito global |
+| Switch gigante      | Cada medio nuevo abre el mismo archivo     |
+| Lava flow           | Archivos v2 y «no borrar por si acaso»     |
+| Golden Hammer       | Event Sourcing para generar un PDF         |
+| Callback hell       | Pirámide de anidación asíncrona            |
 
 Un =switch= de tres casos estables no es antipatrón. El problema es
 cuando cada variante obliga a tocar muchos sitios.
-
 ** Chuleta
 
 #+begin_example
@@ -3582,7 +3348,6 @@ cuando cada variante obliga a tocar muchos sitios.
 Los patrones no compiten. Factory puede crear una Strategy; Adapter
 habla con la IA (o con el banco al cobrar); la transacción
 confirma; Observer avisa.
-
 ** Autoevaluación breve
 
 1. ¿Qué es un patrón y qué no es?
@@ -3597,7 +3362,6 @@ confirma; Observer avisa.
 10. ¿Front Controller y Page Controller resuelven lo mismo?
 11. Tras =POST /pedidos=, ¿por qué redirigir a un =GET=?
 12. Al rotar el teléfono se pierde el pin del mapa: ¿qué falló?
-
 * IA, caso integrador y ejercicios de razonamiento
 
 ** Uso de IA en el diseño de software
@@ -3611,7 +3375,6 @@ patrón. No debe concluir:
 
 El estudiante proporciona el razonamiento. La IA propone candidatos,
 contraejemplos y revisiones.
-
 *** Diez usos (análisis, no solo código)
 
 1. Analizar código existente.
@@ -3624,7 +3387,6 @@ contraejemplos y revisiones.
 8. Generar una *primera* implementación (después del análisis).
 9. Revisar la implementación (sin reescribir de primeras).
 10. Ayudar a *justificar* técnicamente la decisión (el alumno firma).
-
 *** La IA como segundo diseñador
 
 #+begin_example
@@ -3652,7 +3414,6 @@ Estudiante justifica
 La IA es *revisor y contraparte técnica*. No sustituye el
 razonamiento. Si la IA y el alumno coinciden demasiado rápido, pide
 un contraejemplo.
-
 *** Prompts que los estudiantes pueden utilizar
 
 **** Identificación
@@ -3673,7 +3434,6 @@ Identifica:
 Después indica qué patrones podrían ser candidatos y por qué.
 No elijas por mí.
 #+end_quote
-
 **** Comparación
 
 #+begin_quote
@@ -3694,7 +3454,6 @@ Quiero tomar la decisión después del análisis.
 
 Variante para este curso: compara Strategy, Adapter y Factory sobre
 el =switch= de medios y el JSON =route_hint=.
-
 **** Detección de sobreingeniería
 
 #+begin_quote
@@ -3707,7 +3466,6 @@ para el problema actual.
 
 Propón una solución más sencilla si es posible.
 #+end_quote
-
 **** Revisión
 
 #+begin_quote
@@ -3726,7 +3484,6 @@ Primero indica:
 
 Después muestra una posible implementación mejorada.
 #+end_quote
-
 **** Contraejemplo (para no casarse con un nombre)
 
 #+begin_quote
@@ -3736,7 +3493,6 @@ Dame tres razones por las que NO convendría.
 Luego tres por las que sí.
 No concluyas.
 #+end_quote
-
 ** Caso integrador: POST /pedidos
 
 El estudiante justifica *cada* caja con un problema. Prohibido: «lo
@@ -3791,7 +3547,6 @@ Preguntas de defensa:
 3. ¿Qué pasaría si el middleware elige el medio?
 4. ¿Qué complejidad *no* introduces (Event Sourcing, Abstract Factory
    de temas, segundo Front Controller)?
-
 ** Ejercicios extra (razonar, no definir)
 
 *** Caso — el switch de envío
@@ -3803,7 +3558,6 @@ Analiza el problema. ¿Existe una responsabilidad que pueda cambiar?
 ¿Qué solución propones? ¿Qué patrón podría utilizarse? ¿Qué
 alternativa descartaste? Implementa. Explica qué ocurriría si mañana
 aparece un cuarto algoritmo.
-
 *** Contraargumentación
 
 Un alumno afirma: «Aquí debemos utilizar Strategy».
@@ -3814,7 +3568,6 @@ el relato, no el nombre del patrón como prueba.
 Variantes: «Observer registra el envío», «todo =if= es Strategy»,
 «MVC es el patrón de la plataforma», «hay que poner Abstract Factory
 por si acaso».
-
 *** Detección de errores (sobreingeniería)
 
 Una aplicación solamente tiene un algoritmo de cálculo. El estudiante
@@ -3836,26 +3589,15 @@ Service
 
 ¿Es un buen diseño? ¿Por qué podría ser sobreingeniería? Propón lo
 mínimo que resolvería el problema *actual*.
-
 * Actividades
-:PROPERTIES:
-:CUSTOM_ID: actividades
-:END:
-
 Las actividades se resuelven a partir de los apartados teóricos de la
 unidad. Las misiones de abajo son análisis escrito. El bloque *Cinco
 días* es trabajo autónomo: estudiar, pensar e *implementar* el
 enunciado en web (Django).
-
 ** Misiones: patrones de software para aplicaciones web
-:PROPERTIES:
-:CUSTOM_ID: misiones-web
-:END:
-
 Entrega escrita, individual o en pareja. Las respuestas de las
 misiones 1 a 3 aparecen al final de esta actividad. La pauta de
 revisión cubre el conjunto del relato.
-
 *** El problema
 
 El relato de la plataforma —páginas sueltas, Excel, tres APIs y las
@@ -3910,30 +3652,27 @@ código, pruebas y despliegue.
 El análisis de patrones no exige un marco. Sí exige, *si* se elige
 Spring, Laravel o Express, usar lo que ese marco ya trae y no copiar
 al lado un diagrama del libro.
-
 *** Qué se evalúa
 
-| Criterio         | Se espera                                                                                    |
-|------------------+----------------------------------------------------------------------------------------------|
-| Composición      | La plataforma no se etiqueta con un solo patrón. Cada conflicto tiene *una* estructura.      |
-| Cuándo y por qué | Se justifica con una fuerza del problema, no con «porque sale en el temario».                |
-| Vecino rechazado | Adapter no se confunde con Facade; Observer no sustituye a Unit of Work.                     |
-| Marco            | Se nombra qué *no* hay que reescribir si el equipo usa Spring, Laravel o Express.              |
-| Sobreingeniería  | Se rechaza el catálogo donde no hay problema.                                                |
-| Stack            | Cada decisión tecnológica tiene un *por qué* ligado a este dominio.                          |
-
+| Criterio         | Se espera                                                                               |
+|------------------+-----------------------------------------------------------------------------------------|
+| Composición      | La plataforma no se etiqueta con un solo patrón. Cada conflicto tiene *una* estructura. |
+| Cuándo y por qué | Se justifica con una fuerza del problema, no con «porque sale en el temario».           |
+| Vecino rechazado | Adapter no se confunde con Facade; Observer no sustituye a Unit of Work.                |
+| Marco            | Se nombra qué *no* hay que reescribir si el equipo usa Spring, Laravel o Express.       |
+| Sobreingeniería  | Se rechaza el catálogo donde no hay problema.                                           |
+| Stack            | Cada decisión tecnológica tiene un *por qué* ligado a este dominio.                     |
 *** Misión 1 — La plataforma no es un patrón
 
 Enuncie *seis* problemas distintos del relato. Para cada uno complete:
 
 | Problema | Capa | Patrón | ¿Por qué? | Vecino descartado | ¿Cuándo no aplicaría? |
-|----------+------+--------+-----------+-------------------+------------------------|
-|          |      |        |           |                   |                        |
+|----------+------+--------+-----------+-------------------+-----------------------|
+|          |      |        |           |                   |                       |
 
 La plataforma *no* puede describirse solo como «MVC» ni como
 «arquitectura hexagonal». El objetivo es problemas concretos y
 soluciones concretas.
-
 *** Misión 2 — Una petición, varios patrones
 
 Siga =POST /pedidos= desde que llega al servidor hasta persistir y
@@ -3959,7 +3698,6 @@ HTTP → Front Controller → Middleware → Controlador
 
 No agregue una capa porque «se ve más profesional». Cada componente
 tiene una responsabilidad.
-
 *** Misión 3 — Políticas transversales
 
 1. ¿Cuándo corresponde Front Controller y por qué?
@@ -3967,7 +3705,6 @@ tiene una responsabilidad.
 3. Orden de la cadena (autenticación, bitácora, caso de uso). ¿Por qué
    autenticar *después* de cobrar sería un error de diseño?
 4. ¿Qué *no* debe hacer esa cadena? (no elige el medio de entrega.)
-
 *** Misión 4 — Entrega e IA: Strategy, Adapter y Factory
 
 Tres hechos: varios *medios* (camioneta, moto, bici, dron); un
@@ -3981,7 +3718,6 @@ o la sugerencia.
 4. =MedioFactory.crear("dron")= con un =switch=: ¿fábrica simple o
    Factory Method? ¿Cuándo convendría pasar a Factory Method
    (=LogisticaTerrestre= / =LogisticaAerea=)?
-
 *** Misión 5 — Atomicidad frente a aviso
 
 El alta del envío *no* puede quedar a medias respecto del cobro. El
@@ -3991,7 +3727,6 @@ correo al cliente *sí* puede retrasarse.
 2. ¿Qué patrón cubre correo, app del repartidor y estadísticas?
 3. Doble clic, dos cargos: ¿qué patrón de integración, sobre qué
    recurso REST?
-
 *** Misión 6 — Varios clientes y un colaborador inestable
 
 1. App JSON mínimo y panel HTML con mapa: ¿BFF, Gateway, o ambos?
@@ -4001,18 +3736,16 @@ correo al cliente *sí* puede retrasarse.
    ¿Timeout, Retry o Circuit Breaker? ¿Qué *no* se reintenta?
 4. Event Sourcing y Redux para el PDF de la guía: ¿se acepta o se
    rechaza, y qué sí basta?
-
 *** Misión 7 — El marco ya lo trae
 
 Mitad Spring Boot, mitad Express. Sin código:
 
-| Intención | En Spring se usa… | En Express se usa… | Lo que *no* se reescribe |
-|-----------+-------------------+---------------------+-------------------------|
-| Punto único de entrada | | | |
-| Cadena de políticas | | | |
-| Unidad de trabajo | | | |
-| Observer en el navegador de la SPA | | | |
-
+| Intención                          | En Spring se usa… | En Express se usa… | Lo que *no* se reescribe |
+|------------------------------------+-------------------+--------------------+--------------------------|
+| Punto único de entrada             |                   |                    |                          |
+| Cadena de políticas                |                   |                    |                          |
+| Unidad de trabajo                  |                   |                    |                          |
+| Observer en el navegador de la SPA |                   |                    |                          |
 *** Misión 8 — El mismo pedido en el teléfono
 
 La app de seguimiento (Android, iOS o Flutter: elija uno) muestra el
@@ -4027,28 +3760,26 @@ mismo pedido que el panel web.
 4. ¿Se copia BLoC a Android (o ViewModel a Flutter) «para unificar»?
    Justifique con la tabla del marco.
 5. Doce =fetch= en el inicio de la app: ¿BFF o Factory?
-
 *** Pauta de revisión
 
-| Hecho | Capa | Patrón(es) | Vecino que no es |
-|-------+------+------------+------------------|
-| Sesión y bitácora copiadas | Políticas | Front Controller + middleware | Page Controller *solo* |
-| =switch= de medios de entrega | Aplicación | Strategy | Adapter (el Adapter traduce la IA, no elige el medio) |
-| JSON/XML de la IA (=route_hint=) | Integración | Adapter | Facade |
-| Elegir el medio concreto | Aplicación | Factory | =new= en la ruta HTTP |
-| SQL en la plantilla de seguimiento | Datos + vista | Repository + Template View | MVC degradado |
-| Cobro y alta del envío juntos | Datos | Unit of Work | Observer ingenuo |
-| Correo, repartidor, estadísticas | Aplicación | Observer (después del COMMIT) | SMTP en el controlador |
-| Doble clic, dos cargos | Integración | Idempotencia sobre =POST /pagos= | Reintento ciego |
-| App y panel con hambre distinta | Borde | BFF (y Gateway si hay varios servicios) | Factory «que falte» |
-| IA o mapa caídos; pedido vivo | Integración | Timeout + Circuit Breaker | =await= infinito |
-| PDF de guía | — | Autenticar + consultar + vista; *no* Event Sourcing | Golden Hammer |
+| Hecho                              | Capa          | Patrón(es)                                          | Vecino que no es                                      |
+|------------------------------------+---------------+-----------------------------------------------------+-------------------------------------------------------|
+| Sesión y bitácora copiadas         | Políticas     | Front Controller + middleware                       | Page Controller *solo*                                |
+| =switch= de medios de entrega      | Aplicación    | Strategy                                            | Adapter (el Adapter traduce la IA, no elige el medio) |
+| JSON/XML de la IA (=route_hint=)   | Integración   | Adapter                                             | Facade                                                |
+| Elegir el medio concreto           | Aplicación    | Factory                                             | =new= en la ruta HTTP                                 |
+| SQL en la plantilla de seguimiento | Datos + vista | Repository + Template View                          | MVC degradado                                         |
+| Cobro y alta del envío juntos      | Datos         | Unit of Work                                        | Observer ingenuo                                      |
+| Correo, repartidor, estadísticas   | Aplicación    | Observer (después del COMMIT)                       | SMTP en el controlador                                |
+| Doble clic, dos cargos             | Integración   | Idempotencia sobre =POST /pagos=                    | Reintento ciego                                       |
+| App y panel con hambre distinta    | Borde         | BFF (y Gateway si hay varios servicios)             | Factory «que falte»                                   |
+| IA o mapa caídos; pedido vivo      | Integración   | Timeout + Circuit Breaker                           | =await= infinito                                      |
+| PDF de guía                        | —             | Autenticar + consultar + vista; *no* Event Sourcing | Golden Hammer                                         |
 
 Orden razonable de =POST /pedidos=: Front Controller → middleware →
 controlador delgado → =registrarPedido= → Adapter de IA + Factory +
 Strategy del medio → Unit of Work (pedido + cobro) → Observer del
 estado.
-
 *** Respuestas: misiones 1 a 3
 
 **** Respuesta a la misión 1
@@ -4094,7 +3825,6 @@ Cobro + alta: *Unit of Work*. Correo y aviso al repartidor:
 App y panel: *BFF* si el hambre es distinta. Pedido ya guardado vivo
 con IA caída: *timeout* y *Circuit Breaker* hacia mapa e IA, no hacia
 la consulta local.
-
 **** Respuesta a la misión 2
 
 =POST /pedidos=: borde (si hay Gateway/BFF) → Front Controller del
@@ -4102,24 +3832,17 @@ marco → middleware (sesión, bitácora) → controlador delgado →
 =registrarPedido= → Adapter de IA → Factory del medio → Strategy
 =planear= → Unit of Work (pedido + cobro) → Observer
 (=PedidoActualizado=). Ningún paso es «la capa =util/=».
-
 **** Respuesta a la misión 3
 
 Front Controller cuando muchas URLs copiarían sesión y errores. El
 marco ya lo trae. Orden: autenticar → bitácora → caso de uso.
 Autenticar *después* de cobrar cobra a quien no debería. La cadena no
 elige dron ni camioneta.
-
 *** Análisis del código espagueti
-:PROPERTIES:
-:CUSTOM_ID: analisis-codigo-espagueti
-:END:
-
 El proyecto llega en dos linajes. Uno es ruidoso: =index.php=,
 =pagar.php=, =kardex.php=, =api.php=, =global/funciones.php=. Otro es más
 corto: =index1.php=, =pagar1.php=, =kardex1.php=, =login1.php=. Los problemas
 de diseño están en ambos.
-
 **** La documentación frente al esquema que el programa usa
 
 El único documento de diseño es
@@ -4139,13 +3862,11 @@ Hay, además, un desacuerdo de nombres de conexión. El diagrama no menciona arc
 El *modelo mental* del portal (quién es el estudiante, dónde está el pago, dónde está la calificación) no es el mismo en el papel y en la ejecución. Un repositorio no puede construirse sobre =Estudiantes_V2= si el programa nunca la toca. Un Adapter de calificaciones XML no aplica: el kardex ya lee tablas.
 
 La nota del arquitecto («el junior se equivocó») es parte del material: documentar una versión y programar otra es un síntoma de lava flow (código y esquemas que se dejan, se duplican y ya nadie sabe cuál manda). No es un patrón GoF. Sí explica por qué el portal no puede etiquetarse con un solo nombre de arquitectura.
-
 **** Dos portales, no uno
 
 Conviven =index.php= e =index1.php=, =pagar.php= y =pagar1.php=, =kardex.php= y =kardex1.php=, =config/= y =config1/=. El título en pantalla de =index1.php= dice «SISTEMA UNIVERSITARIO V4 FINAL». Ninguno de esos archivos es un controlador frontal: no hay un solo punto que reciba todas las URLs y despache. Cada script es una puerta HTTP.
 
 Eso es el punto 1 del relato, no un detalle de nomenclatura. Front Controller exige *un* punto de entrada. Aquí hay al menos dos linajes y, dentro de cada uno, un script por trámite. Page Controller por archivo, sin cadena común, es exactamente lo que el apartado web descarta como solución a la sesión copiada.
-
 **** Políticas transversales: no hay cadena porque no hay frontal
 
 =index.php= arranca sesión y, si no hay =$_SESSION['user_id']=, acepta la cookie =admin_bypass= y fabrica el usuario 1. Eso no es autenticar: es saltarse la política de acceso.
@@ -4163,7 +3884,6 @@ No hay bitácora común. =login1.php= actualiza =ultimo_acceso= en =perfiles=; e
 Autenticar *después* del cobro ni siquiera está planteado como orden: el cobro ocurre en un script que no autentica. El error de diseño es anterior al orden de un middleware: no existe la cadena. Un =include= de «¿hay sesión?» en algunos archivos y no en otros es la copia del relato, incompleta.
 
 La cookie =admin_bypass= y el =perfil_id= en la query ilustran, además, por qué la política no puede vivir en la página: una página «olvidada» (=kardex=) queda fuera; una excepción (=bypass=) se convierte en la regla.
-
 **** El pago: Strategy, Adapter, Factory, transacción y aviso, todo en el mismo script
 
 El camino real de «pagar la inscripción» no atraviesa enrutador, filtro, controlador delgado ni servicio. En =pagar1.php= el navegador hace =POST= al propio archivo. Un =if= distingue tarjeta, tres etiquetas SPEI y caja. Si el medio es tarjeta, el mismo bloque arma XML, llama al banco, interpreta la respuesta, descuenta saldo, inserta recibo, pasa =pre_alta= a =alta_materias=, envía =mail= y pinta un =alert=.
@@ -4179,7 +3899,6 @@ La petición no recorre una composición; se aplasta en un procedimiento.
 *Doble clic.* El botón cambia el texto a «NO ACTUALICE LA PAGINA». Eso es un rótulo, no una clave de idempotencia. Un segundo =POST= vuelve a cobrar. El SPEI inserta otra referencia con =rand=. No hay recurso =POST /pagos= con identificador de intento.
 
 *Monto.* El importe va fijo en 2500 dentro del script. No sale de un catálogo de cuotas. El caso de uso =registrarPago= no existe como función: el HTML del formulario está en el mismo archivo que el cobro.
-
 **** El kardex: SQL, reglamento y correo dentro de la vista
 
 =kardex1.php= abre la conexión, escribe el HTML del título, lanza =SELECT= sobre =kardex_historial= y, *dentro del =while= que pinta filas*, consulta =materias= y =profesores= (una consulta por materia: el clásico N+1). En el mismo bucle decide letra A/B/C/NA, escribe =alertas_academicas= si la materia no acredita, acumula promedio y, al final, si hay más de tres reprobadas, llama a =mail= hacia control escolar. La plantilla ejecuta el reglamento y el aviso.
@@ -4189,11 +3908,9 @@ La petición no recorre una composición; se aplasta en un procedimiento.
 El diagrama negaba tabla de calificaciones. El código las tiene, y además las consulta desde la vista. No hay repositorio («dame el historial de esta matrícula»). No hay Service Layer (=emitirKardex=). No hay Template View con datos ya listos. Duplicar este archivo para una constancia copiaría las consultas, que es el punto 3 del relato.
 
 =index1.php= comete el mismo pecado en el panel: SQL de materias en medio del HTML, otro =SELECT= por fila a =catalogo_materias=, y =file_get_contents= a una API de notas por cada materia. La vista orquesta datos, red y reglas (el tope de 40 créditos dispara =UPDATE= y un =alert= que recarga).
-
 **** Muchas peticiones para una pantalla
 
 Al final de =index.php=, tras pintar, el servidor hace una serie de =file_get_contents= a =api.php?modulo=0= … =modulo=19=, una por módulo de la pantalla. =index1.php= pide la nota materia a materia al host local. Eso es el hambre de la misión 6, aunque aquí el cliente «móvil» sea el propio PHP: el inicio no tiene un recurso agregado. No hay BFF; hay N viajes. Factory no arregla eso.
-
 **** Código muerto y fallos ajenos al catálogo
 
 =index.php= declara cientos de clases CSS =clase_basura_*=. =pagar.php= declara cientos de =$dummy_var_*= antes del =switch=. =global/funciones.php= expone miles de =formatear_string_vN=. =js1/utilerias1.js= define cientos de =accion_interfaz_N= que solo escriben en la consola. =kardex.php= calcula =md5= en un bucle vacío. Eso es código muerto. Puede llamarse God file o lava flow. No es Strategy.
@@ -4201,21 +3918,19 @@ Al final de =index.php=, tras pintar, el servidor hace una serie de =file_get_co
 =index1.php= mantiene un =setInterval= que, cada segundo, llama a =ping_sesion.php=. No hay cadena de caducidad de sesión: hay tráfico.
 
 =api.php= ejecuta código enviado por el cliente y lee archivos cuya ruta llega por parámetro. Las consultas concatenan =$_GET= y =$_POST= en el SQL; =login1.php= compara la contraseña en claro. Las claves de producción están en el árbol. El portal no es publicable. Eso no es el temario de patrones.
-
 **** Correspondencia con las misiones
 
-| Hecho en el proyecto | Dónde se ve | Misión | Patrón que falta (no el vecino) |
-|----------------------+------------+--------+----------------------------------|
-| Cada PHP es una puerta; sesión distinta o nula | =index.php= / =index1.php= / =kardex*= / =pagar*= | 1 y 3 | Front Controller + cadena (middleware). No basta Page Controller |
-| Cookie =admin_bypass=; kardex sin sesión; =id_alumno= por =GET= | esos mismos | 3 | La política va *antes* del trámite. Autenticar después de cobrar ni siquiera está planteado |
-| =if= de medios; =switch= =banco_0=…=banco_29= | =pagar1.php=, =pagar.php= | 1, 2, 4 | Strategy + Factory. No Adapter |
-| XML =00= / =credito=; =OK_N= por rama | =pagar1.php=, =pagar.php= | 1, 4 | Adapter (anticorrupción). No Facade |
-| SQL y letras A/B/C en el HTML del kardex | =kardex1.php=, =kardex.php=, =index1.php= | 1 | Repositorio + Template View + Service Layer. No «MVC» de carpetas |
-| Saldo, alta y =mail= seguidos, sin transacción | =pagar1.php= | 1, 2, 5 | Unit of Work para cobro+alta; Observer *después* del =COMMIT= |
-| El botón pide no recargar; no hay clave | =pagar1.php= | 5 | Idempotencia sobre el pago. No es GoF |
-| Diez o más =file_get_contents= al pintar el inicio | =index.php=, =index1.php= | 6 | Agregación (BFF o un =GET= de pantalla). No Factory |
-| Diagrama =Estudiantes_V2= y XML; el SQL y el PHP usan =perfiles= / =usuarios_sys= / =historial_academico= | =documentacion/=, =bd/=, login y kardex | — | El modelo del papel no es el del programa; lava flow, no un patrón de pago |
-
+| Hecho en el proyecto                                                                                      | Dónde se ve                                       | Misión  | Patrón que falta (no el vecino)                                                             |
+|-----------------------------------------------------------------------------------------------------------+---------------------------------------------------+---------+---------------------------------------------------------------------------------------------|
+| Cada PHP es una puerta; sesión distinta o nula                                                            | =index.php= / =index1.php= / =kardex*= / =pagar*= | 1 y 3   | Front Controller + cadena (middleware). No basta Page Controller                            |
+| Cookie =admin_bypass=; kardex sin sesión; =id_alumno= por =GET=                                           | esos mismos                                       | 3       | La política va *antes* del trámite. Autenticar después de cobrar ni siquiera está planteado |
+| =if= de medios; =switch= =banco_0=…=banco_29=                                                             | =pagar1.php=, =pagar.php=                         | 1, 2, 4 | Strategy + Factory. No Adapter                                                              |
+| XML =00= / =credito=; =OK_N= por rama                                                                     | =pagar1.php=, =pagar.php=                         | 1, 4    | Adapter (anticorrupción). No Facade                                                         |
+| SQL y letras A/B/C en el HTML del kardex                                                                  | =kardex1.php=, =kardex.php=, =index1.php=         | 1       | Repositorio + Template View + Service Layer. No «MVC» de carpetas                           |
+| Saldo, alta y =mail= seguidos, sin transacción                                                            | =pagar1.php=                                      | 1, 2, 5 | Unit of Work para cobro+alta; Observer *después* del =COMMIT=                               |
+| El botón pide no recargar; no hay clave                                                                   | =pagar1.php=                                      | 5       | Idempotencia sobre el pago. No es GoF                                                       |
+| Diez o más =file_get_contents= al pintar el inicio                                                        | =index.php=, =index1.php=                         | 6       | Agregación (BFF o un =GET= de pantalla). No Factory                                         |
+| Diagrama =Estudiantes_V2= y XML; el SQL y el PHP usan =perfiles= / =usuarios_sys= / =historial_academico= | =documentacion/=, =bd/=, login y kardex           | —       | El modelo del papel no es el del programa; lava flow, no un patrón de pago                  |
 ** Arrancar Django para la plataforma de entregas
 
 En este apartado vamos a construir, paso a paso, la base del proyecto
@@ -4231,20 +3946,19 @@ los apuntes. Tiene una entrada única para todas las peticiones, un
 archivo de rutas, middleware para la sesión y la seguridad, y
 plantillas para generar el HTML. No hace falta programar esas piezas a
 mano; hay que aprender a usarlas bien.
-
 *** La ruta completa
 
 Los pasos están agrupados en cinco etapas. Cada etapa deja algo que
 funciona, y la siguiente se construye encima. Hagan los pasos en
 orden: cada uno supone que el anterior ya funcionó.
 
-| Etapa | Pasos | Al terminar tendrán | ¿Obligatoria? |
-|-------+-------+---------------------+---------------|
-| 1. Preparar la computadora | 1 a 3 | Python, un entorno virtual y Django instalado | Sí |
-| 2. Crear el proyecto | 4 a 7 | Un proyecto Django que muestra un mensaje en el navegador | Sí |
-| 3. Entregar datos | 8 | Una dirección que entrega datos en JSON para la web y el móvil | Sí |
-| 4. Empaquetar en un contenedor | 9 a 11 | El mismo proyecto corriendo dentro de Docker | Opcional |
-| 5. Escalar con varias copias | 12 a 19 | Tres o más copias del proyecto detrás de un balanceador | Opcional, muy recomendable |
+| Etapa                          | Pasos   | Al terminar tendrán                                            | ¿Obligatoria?              |
+|--------------------------------+---------+----------------------------------------------------------------+----------------------------|
+| 1. Preparar la computadora     | 1 a 3   | Python, un entorno virtual y Django instalado                  | Sí                         |
+| 2. Crear el proyecto           | 4 a 7   | Un proyecto Django que muestra un mensaje en el navegador      | Sí                         |
+| 3. Entregar datos              | 8       | Una dirección que entrega datos en JSON para la web y el móvil | Sí                         |
+| 4. Empaquetar en un contenedor | 9 a 11  | El mismo proyecto corriendo dentro de Docker                   | Opcional                   |
+| 5. Escalar con varias copias   | 12 a 19 | Tres o más copias del proyecto detrás de un balanceador        | Opcional, muy recomendable |
 
 Para los cinco días de trabajo basta con las etapas 1, 2 y 3. Las
 etapas 4 y 5 muestran cómo se prepara el mismo proyecto para cuando
@@ -4252,7 +3966,6 @@ la empresa crezca; si el equipo tiene Docker, vale la pena hacerlas al
 menos una vez.
 
 Antes de empezar hay dos ideas que conviene tener claras.
-
 *** Antes de empezar: entorno virtual y contenedor
 
 Son dos herramientas que suelen confundirse. Son cosas distintas y no
@@ -4316,32 +4029,29 @@ entorno virtual y usar el contenedor para ejecutar el proyecto como lo
 haría un servidor. Una comparación sencilla: primero se aprende a
 cocinar en una sola cocina. Después esa cocina se puede montar en un
 camión para llevarla a otro lugar, y la receta sigue siendo la misma.
-
 *** Antes de empezar: qué partes de Django ya son patrones
 
 No vamos a implementar los patrones del libro desde cero. Vamos a
 reconocer cuáles ya vienen incluidos en Django para no duplicarlos.
 
-| Parte de Django | A qué corresponde en los apuntes | Lo que no es |
-|-----------------+----------------------------------+--------------|
-| El archivo =urls.py= del proyecto, junto con =wsgi.py= | Front Controller: todas las peticiones entran por un mismo lugar | Un archivo PHP distinto para cada trámite |
-| Una vista en =entregas/views.py= | Page Controller: atiende un trámite concreto | El lugar para poner el =switch= de los medios de entrega |
-| El middleware configurado en =settings.py= | La cadena de responsabilidades: sesión, seguridad, bitácora | Strategy: el middleware no decide si va la moto o el dron |
-| Las plantillas =.html= | Template View: muestran datos que ya vienen preparados | Un lugar para hacer consultas a la base de datos |
-| Una aplicación creada con =startapp= | Un módulo del sistema con una responsabilidad | Un programa aparte: sigue dentro del mismo proyecto |
-| El ORM en =models.py= | El acceso a datos (en Django suele ser Active Record) | Un Repository obligatorio; no hace falta fingirlo |
-| =transaction.atomic= | Unit of Work: varias operaciones se guardan juntas o ninguna | Observer |
+| Parte de Django                                        | A qué corresponde en los apuntes                                 | Lo que no es                                              |
+|--------------------------------------------------------+------------------------------------------------------------------+-----------------------------------------------------------|
+| El archivo =urls.py= del proyecto, junto con =wsgi.py= | Front Controller: todas las peticiones entran por un mismo lugar | Un archivo PHP distinto para cada trámite                 |
+| Una vista en =entregas/views.py=                       | Page Controller: atiende un trámite concreto                     | El lugar para poner el =switch= de los medios de entrega  |
+| El middleware configurado en =settings.py=             | La cadena de responsabilidades: sesión, seguridad, bitácora      | Strategy: el middleware no decide si va la moto o el dron |
+| Las plantillas =.html=                                 | Template View: muestran datos que ya vienen preparados           | Un lugar para hacer consultas a la base de datos          |
+| Una aplicación creada con =startapp=                   | Un módulo del sistema con una responsabilidad                    | Un programa aparte: sigue dentro del mismo proyecto       |
+| El ORM en =models.py=                                  | El acceso a datos (en Django suele ser Active Record)            | Un Repository obligatorio; no hace falta fingirlo         |
+| =transaction.atomic=                                   | Unit of Work: varias operaciones se guardan juntas o ninguna     | Observer                                                  |
 
 En las etapas 2 y 3 usaremos las dos primeras filas: la entrada única
 y las vistas. El resto se irá agregando cuando el problema de la
 empresa lo pida.
-
 *** Etapa 1 — Preparar la computadora
 
 En esta etapa todavía no hay nada de Django. Solo dejamos lista la
 computadora para que todos los integrantes del equipo trabajen con las
 mismas versiones.
-
 **** Paso 1 — Instalar Python y comprobar que funciona
 
 Necesitan Python 3.12 o más reciente.
@@ -4379,7 +4089,6 @@ aplicaciones/, apagando las opciones de =python.exe= y =python3.exe=.
 Mientras tanto, pueden usar =py= sin problema.
 
 *Para comprobar:* el comando muestra algo como =Python 3.12.4=.
-
 **** Paso 2 — Crear la carpeta del proyecto y el entorno virtual
 
 Ahora creamos la carpeta donde vivirá todo el proyecto y, dentro de
@@ -4428,11 +4137,11 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 Después de eso, vuelvan a ejecutar =.venv\Scripts\Activate.ps1=. Si
 usan otra terminal de Windows, el activador cambia:
 
-| Terminal en Windows | Comando para activar |
-|---------------------+----------------------|
-| PowerShell | =.venv\Scripts\Activate.ps1= |
-| Símbolo del sistema (=cmd=) | =.venv\Scripts\activate.bat= |
-| Git Bash | =source .venv/Scripts/activate= |
+| Terminal en Windows         | Comando para activar            |
+|-----------------------------+---------------------------------|
+| PowerShell                  | =.venv\Scripts\Activate.ps1=    |
+| Símbolo del sistema (=cmd=) | =.venv\Scripts\activate.bat=    |
+| Git Bash                    | =source .venv/Scripts/activate= |
 
 En Visual Studio Code conviene indicarle al editor qué Python usar:
 abran la paleta de comandos con =Ctrl+Shift+P=, busquen /Python:
@@ -4450,7 +4159,6 @@ La ruta que aparece debe terminar en =plataforma-entregas/.venv= (o
 =plataforma-entregas\.venv= en Windows). Si muestra la ruta del Python
 del sistema, el entorno no está activo y lo que instalen irá al lugar
 equivocado.
-
 **** Paso 3 — Instalar Django y guardar las dependencias
 
 Con el entorno activo, instalen Django. Desde aquí los comandos son
@@ -4489,13 +4197,11 @@ exactamente las mismas versiones, sin importar su sistema operativo.
 
 *Para comprobar:* =python -m django --version= muestra un número que
 empieza con 5.
-
 *** Etapa 2 — Crear el proyecto
 
 En esta etapa creamos el proyecto Django y hacemos que una dirección
 muestre un mensaje en el navegador. Todavía no hay nada de la
 empresa, pero ya estará funcionando la entrada única del sistema.
-
 **** Paso 4 — Crear el proyecto y la aplicación
 
 Django distingue entre *proyecto* y *aplicación*, y conviene tener
@@ -4541,7 +4247,6 @@ plataforma-entregas/
     models.py        ← definición de los datos (más adelante)
     apps.py
 #+end_example
-
 **** Paso 5 — Registrar la aplicación en la configuración
 
 Crear la carpeta =entregas= no basta: Django todavía no sabe que
@@ -4570,7 +4275,6 @@ ya existe y se configura en un solo lugar.
 
 *Para comprobar:* =python manage.py check= responde /System check
 identified no issues/.
-
 **** Paso 6 — Escribir la primera vista y sus rutas
 
 Ahora vamos a hacer que una dirección muestre un texto. Para eso hacen
@@ -4629,7 +4333,6 @@ ya viene configurada y da acceso al panel de administración.
 
 *Para comprobar:* =python manage.py check= sigue sin mostrar errores.
 El resultado en el navegador lo veremos en el siguiente paso.
-
 **** Paso 7 — Preparar la base de datos y arrancar el servidor
 
 #+begin_src shell
@@ -4659,13 +4362,11 @@ la vista solo recibe la petición y entrega la respuesta. ¿Debería esta
 vista consultar la base de datos? Por ahora no, porque todavía no
 existe ningún pedido.
 #+end_quote
-
 *** Etapa 3 — Entregar datos para la web y el móvil
 
 El enunciado pide que la plataforma tenga un cliente web y un cliente
 móvil. Esta etapa tiene un solo paso, pero contiene una idea muy
 importante para todo el semestre.
-
 **** Paso 8 — Agregar una vista que entrega datos en JSON
 
 Primero, la idea. El *backend* es la parte que corre en el servidor.
@@ -4763,14 +4464,12 @@ móvil.
 
 Con este paso termina la parte obligatoria. Los cinco días de trabajo
 parten de aquí.
-
 *** Etapa 4 — Empaquetar el proyecto en un contenedor (opcional)
 
 Esta etapa solo tiene sentido si el paso 8 ya funciona con el entorno
 virtual. Vamos a ejecutar exactamente el mismo proyecto, pero dentro
 de un contenedor. La ventaja es que cualquier persona puede ejecutarlo
 sin instalar Python ni configurar nada más.
-
 **** Paso 9 — Instalar Docker
 
 *En Windows y macOS* se instala /Docker Desktop/ desde
@@ -4795,7 +4494,6 @@ docker run --rm hello-world
 
 El último comando descarga una imagen de prueba y muestra un mensaje
 que empieza con /Hello from Docker!/.
-
 **** Paso 10 — Escribir el =Dockerfile= y el =.dockerignore=
 
 Un =Dockerfile= es la receta para construir la imagen: dice de qué
@@ -4836,7 +4534,6 @@ además, no funcionaría dentro de un contenedor Linux.
 
 *Para comprobar:* en la raíz del proyecto están =Dockerfile= y
 =.dockerignore= junto a =manage.py=.
-
 **** Paso 11 — Construir la imagen y ejecutar el contenedor
 
 #+begin_src shell
@@ -4857,14 +4554,12 @@ deténganlo antes, porque los dos intentarían usar el puerto 8000.
 *Para comprobar:* =http://127.0.0.1:8000/entregas/hola/= muestra el
 mismo mensaje que en el paso 7, pero ahora lo está sirviendo el
 contenedor. Sigue habiendo un solo programa y una sola base de datos.
-
 *** Etapa 5 — Escalar con varias copias (opcional)
 
 En esta etapa vamos a ejecutar varias copias de la plataforma detrás
 de un balanceador, y a ver qué hay que cuidar para que funcione bien.
 Es donde mejor se nota la diferencia entre el entorno virtual y
 Docker.
-
 **** Paso 12 — Entender qué significa escalar
 
 Antes de escribir más archivos, conviene entender el problema.
@@ -4930,7 +4625,6 @@ en archivos dentro del repositorio.
 *Para comprobar:* antes de seguir, el equipo debería poder explicar
 con sus palabras la diferencia entre escalar verticalmente y escalar
 horizontalmente, y qué hace el balanceador.
-
 **** Paso 13 — Leer la configuración desde variables de entorno
 
 Cada copia tiene que recibir su configuración desde fuera, en lugar de
@@ -4979,67 +4673,19 @@ de Docker le pasaremos las variables y se usará PostgreSQL.
 *Para comprobar:* con el entorno virtual activo,
 =python manage.py runserver= sigue funcionando y
 =/entregas/hola/= muestra el mensaje de siempre.
+**** Paso 14 — Agregar vistas para ver qué copia responde
 
-**** Paso 14 — Registrar pedidos y consultar su seguimiento
-
-Para probar las copias vamos a usar la operación más importante de la
-plataforma: un cliente registra un pedido y después consulta su
-seguimiento con el folio. Es justo lo que hará la app móvil: el
-registro puede caer en una copia y la consulta en otra, y el cliente
-tiene que encontrar su pedido de todos modos.
-
-Lo vamos a programar de dos formas. La buena guarda el pedido en la
-base de datos. La mala lo guarda en un diccionario en la memoria del
-programa. Con una sola copia las dos parecen funcionar; en el paso 18
-veremos qué pasa con tres.
-
-*Primero, el modelo.* En =entregas/models.py=:
-
-#+begin_src python
-from django.db import models
-
-
-class Pedido(models.Model):
-    folio = models.CharField(max_length=12, unique=True)
-    destino = models.CharField(max_length=200)
-    estado = models.CharField(max_length=20, default="registrado")
-    creado = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.folio} → {self.destino}"
-#+end_src
-
-Un modelo describe una tabla de la base de datos. Cada pedido tendrá
-un folio único, un destino, un estado (que por ahora siempre empieza
-en =registrado=) y la fecha en que se creó. Con el entorno virtual
-activo, creen la migración y aplíquenla:
-
-#+begin_src shell
-python manage.py makemigrations entregas
-python manage.py migrate
-#+end_src
-
-=makemigrations= escribe el archivo =entregas/migrations/0001_initial.py=,
-que describe cómo crear la tabla. Ese archivo sí se sube al
-repositorio: es el que usará el servicio =migrar= de Docker en el paso
-17 para crear la misma tabla en PostgreSQL. =migrate= crea la tabla en
-su =db.sqlite3= local.
-
-*Después, las vistas.* Dejen =entregas/views.py= así:
+Para ver el reparto entre copias, cada respuesta va a decir qué copia
+la atendió. Dejen =entregas/views.py= así:
 
 #+begin_src python
 import socket
-import uuid
 
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
-
-from .models import Pedido
 
 COPIA = socket.gethostname()
 
-pedidos_en_memoria = {}
+visitas_en_memoria = 0
 
 
 def hola(request):
@@ -5055,112 +4701,45 @@ def estado(request):
     })
 
 
-def nuevo_folio():
-    return uuid.uuid4().hex[:8].upper()
-
-
-@csrf_exempt
-@require_POST
-def registrar_pedido(request):
-    pedido = Pedido.objects.create(
-        folio=nuevo_folio(),
-        destino=request.POST.get("destino", "sin destino"),
-    )
-    return JsonResponse({"folio": pedido.folio, "registrado_por": COPIA}, status=201)
-
-
-@require_GET
-def seguimiento(request, folio):
-    pedido = Pedido.objects.filter(folio=folio).first()
-    if pedido is None:
-        return JsonResponse({"error": "pedido no encontrado", "atendido_por": COPIA}, status=404)
+def visitas(request):
+    request.session["visitas"] = request.session.get("visitas", 0) + 1
     return JsonResponse({
-        "folio": pedido.folio,
-        "destino": pedido.destino,
-        "estado": pedido.estado,
         "atendido_por": COPIA,
+        "visitas": request.session["visitas"],
     })
 
 
-@csrf_exempt
-@require_POST
-def registrar_pedido_mal(request):
-    folio = nuevo_folio()
-    pedidos_en_memoria[folio] = {
-        "destino": request.POST.get("destino", "sin destino"),
-        "estado": "registrado",
-    }
-    return JsonResponse({"folio": folio, "registrado_por": COPIA}, status=201)
-
-
-@require_GET
-def seguimiento_mal(request, folio):
-    pedido = pedidos_en_memoria.get(folio)
-    if pedido is None:
-        return JsonResponse({"error": "pedido no encontrado", "atendido_por": COPIA}, status=404)
-    return JsonResponse({"folio": folio, **pedido, "atendido_por": COPIA})
+def visitas_mal(request):
+    global visitas_en_memoria
+    visitas_en_memoria += 1
+    return JsonResponse({
+        "atendido_por": COPIA,
+        "visitas": visitas_en_memoria,
+    })
 #+end_src
 
-Vale la pena leerlo por partes:
-
-- =COPIA= guarda el nombre de la máquina. Cada contenedor tiene un
-  nombre distinto, así que cada respuesta dice qué copia la atendió.
-- =registrar_pedido= crea un pedido en la base de datos con un folio
-  nuevo de ocho caracteres y responde con ese folio y con el nombre de
-  la copia que lo registró. El código =201= significa «creado».
-- =seguimiento= busca el pedido por su folio en la base de datos. Si
-  no existe, responde con un error y el código =404=.
-- =registrar_pedido_mal= y =seguimiento_mal= hacen lo mismo, pero
-  guardan y buscan el pedido en el diccionario =pedidos_en_memoria=,
-  que vive dentro del programa. Están ahí a propósito, como ejemplo de
-  lo que no se debe hacer.
-- =@require_POST= y =@require_GET= hacen que cada vista solo acepte el
-  método correcto: registrar es un POST porque crea algo; consultar es
-  un GET porque solo lee.
-- =@csrf_exempt= desactiva la protección CSRF de Django en las vistas
-  de registro. Esa protección existe para formularios web y exige un
-  token que =curl= o una app móvil no tienen. La desactivamos solo
-  para poder probar desde la terminal; en la plataforma real, la app
-  móvil se identificaría con un token de acceso.
-
-*Por último, las rutas.* En =entregas/urls.py=:
+Y agreguen las rutas nuevas en =entregas/urls.py=:
 
 #+begin_src python
 urlpatterns = [
     path("hola/", views.hola, name="hola"),
     path("estado/", views.estado, name="estado"),
-    path("pedidos/", views.registrar_pedido, name="registrar_pedido"),
-    path("pedidos/<str:folio>/", views.seguimiento, name="seguimiento"),
-    path("pedidos-mal/", views.registrar_pedido_mal, name="registrar_pedido_mal"),
-    path("pedidos-mal/<str:folio>/", views.seguimiento_mal, name="seguimiento_mal"),
+    path("visitas/", views.visitas, name="visitas"),
+    path("visitas-mal/", views.visitas_mal, name="visitas_mal"),
 ]
 #+end_src
 
-=<str:folio>= indica que esa parte de la dirección es variable: Django
-la toma y se la pasa a la vista como el parámetro =folio=.
+Cada contenedor tiene un nombre de máquina distinto, así que =COPIA=
+nos dice cuál de las copias atendió la petición. La vista =visitas=
+cuenta las visitas en la sesión, que Django guarda en la base de
+datos. La vista =visitas_mal= las cuenta en una variable global, que
+vive en la memoria de cada copia. Está ahí a propósito, para ver en
+el paso 18 qué pasa cuando se hace mal.
 
-*Para comprobar:* arranquen =python manage.py runserver= y, en otra
-terminal, registren un pedido. En Linux y macOS:
-
-#+begin_src shell
-curl -s -X POST -d "destino=Calle Morelos 120" http://127.0.0.1:8000/entregas/pedidos/
-#+end_src
-
-En PowerShell:
-
-#+begin_src powershell
-curl.exe -s -X POST -d "destino=Calle Morelos 120" http://127.0.0.1:8000/entregas/pedidos/
-#+end_src
-
-La respuesta trae un folio, por ejemplo
-={"folio": "D2757CBE", "registrado_por": "mi-laptop"}=. Abran en el
-navegador =http://127.0.0.1:8000/entregas/pedidos/D2757CBE/= (con su
-folio) y recarguen varias veces: siempre aparece el pedido. Repitan lo
-mismo con =/entregas/pedidos-mal/=. También funciona siempre, y
-=atendido_por= muestra siempre el nombre de su computadora, porque
-=runserver= es un solo programa y el diccionario está ahí. Con una
-sola copia, la versión mala no se distingue de la buena.
-
+*Para comprobar:* con el entorno virtual, abran
+=http://127.0.0.1:8000/entregas/visitas/= y recarguen varias veces.
+El número sube y =atendido_por= muestra siempre el nombre de su
+computadora, porque solo hay una copia.
 **** Paso 15 — Cambiar a un servidor de producción
 
 =runserver= está pensado solo para programar. Para atender muchas
@@ -5204,7 +4783,6 @@ En su computadora siguen usando =runserver= con el entorno virtual.
 
 *Para comprobar:* =docker build -t plataforma-entregas .= termina sin
 errores.
-
 **** Paso 16 — Configurar el balanceador
 
 Creen la carpeta =nginx= y dentro el archivo =nginx/default.conf=:
@@ -5238,7 +4816,6 @@ peticiones como si vinieran de nginx.
 
 *Para comprobar:* existe el archivo =nginx/default.conf= en la raíz
 del proyecto.
-
 **** Paso 17 — Describir el sistema completo en =docker-compose.yml=
 
 Hasta ahora usábamos =docker run= para un solo contenedor. Con varios
@@ -5308,9 +4885,7 @@ El archivo define cuatro servicios, y vale la pena leerlo despacio:
   se apaga. El =healthcheck= le permite a Docker saber cuándo la base
   ya está lista para recibir conexiones.
 - =migrar= usa la misma imagen de Django, pero solo ejecuta
-  =migrate= y termina. Arranca cuando la base está lista y crea en
-  PostgreSQL las tablas de Django y la tabla de pedidos, a partir del
-  archivo de migración que generaron en el paso 14. Las
+  =migrate= y termina. Arranca cuando la base está lista. Las
   migraciones se ejecutan aquí, una sola vez, y no en cada copia: si
   las tres copias intentaran crear las mismas tablas al mismo tiempo,
   chocarían entre ellas.
@@ -5343,8 +4918,7 @@ plataforma-entregas/
   plataforma/
   entregas/
 #+end_example
-
-**** Paso 18 — Levantar las copias y seguir un pedido
+**** Paso 18 — Levantar las copias y probar la sesión
 
 Detengan cualquier servidor que esté usando el puerto 8000 y, desde
 la carpeta del proyecto (en Windows, con Docker Desktop abierto),
@@ -5356,92 +4930,70 @@ docker compose up --build
 
 La primera vez tarda porque descarga las imágenes de PostgreSQL y
 nginx. En la terminal verán aparecer los contenedores en orden:
-primero la base de datos; luego =migrar=, que crea las tablas de
-Django y la tabla de pedidos del paso 14, y termina; luego las tres
-copias de =web= y al final el balanceador. Esperen unos segundos a
-que todas las copias terminen de arrancar. Justo después de arrancar
-es normal que todas las respuestas vengan de una sola copia: las otras
-todavía no estaban listas y nginx las apartó un momento.
+primero la base de datos, luego =migrar=, que termina, luego las tres
+copias de =web= y al final el balanceador. Esperen unos segundos a que
+todas las copias terminen de arrancar.
 
-*Primero, la versión buena.* En otra terminal registren un pedido. Ahora
-la dirección es =localhost:8000=, que es el balanceador:
+La forma más sencilla de verlo es con el navegador. Abran
+=http://localhost:8000/entregas/visitas/= y recarguen la página
+varias veces. El valor de =atendido_por= va cambiando, porque cada
+petición la atiende una copia distinta, y aun así el número de visitas
+sigue subiendo de uno en uno. Esto pasa porque la sesión no vive en
+ninguna copia: vive en la base de datos que todas comparten.
 
-#+begin_src shell
-curl -s -X POST -d "destino=Calle Morelos 120" http://localhost:8000/entregas/pedidos/
-#+end_src
-
-En PowerShell es el mismo comando con =curl.exe=. La respuesta se
-parece a esta:
-
-#+begin_example
-{"folio": "E1B1F47A", "registrado_por": "e6c28e82ce8f"}
-#+end_example
-
-Ahora consulten el seguimiento varias veces, con su folio. Pueden
-abrir =http://localhost:8000/entregas/pedidos/E1B1F47A/= en el
-navegador y recargar, o usar un ciclo. En Linux y macOS:
+Para ver muchas peticiones seguidas se puede usar =curl= desde otra
+terminal. En Linux y macOS:
 
 #+begin_src shell
-for i in 1 2 3 4 5 6; do curl -s http://localhost:8000/entregas/pedidos/E1B1F47A/; echo; done
+for i in 1 2 3 4 5 6; do curl -s -b galleta.txt -c galleta.txt http://localhost:8000/entregas/visitas/; echo; done
 #+end_src
 
-En PowerShell:
+En PowerShell hay que escribir =curl.exe= (en Windows PowerShell 5,
+=curl= a secas es otro comando):
 
 #+begin_src powershell
-1..6 | ForEach-Object { curl.exe -s http://localhost:8000/entregas/pedidos/E1B1F47A/; "" }
+1..6 | ForEach-Object { curl.exe -s -b galleta.txt -c galleta.txt http://localhost:8000/entregas/visitas/; "" }
 #+end_src
 
-El resultado:
+Las opciones =-b= y =-c= hacen que =curl= guarde y reenvíe la cookie
+de sesión, como lo haría un navegador. El resultado se parece a esto:
 
 #+begin_example
-{"folio": "E1B1F47A", "destino": "Calle Morelos 120", "estado": "registrado", "atendido_por": "e6c28e82ce8f"}
-{"folio": "E1B1F47A", "destino": "Calle Morelos 120", "estado": "registrado", "atendido_por": "2f9984c34dd1"}
-{"folio": "E1B1F47A", "destino": "Calle Morelos 120", "estado": "registrado", "atendido_por": "13f2d8f64f76"}
-{"folio": "E1B1F47A", "destino": "Calle Morelos 120", "estado": "registrado", "atendido_por": "e6c28e82ce8f"}
-{"folio": "E1B1F47A", "destino": "Calle Morelos 120", "estado": "registrado", "atendido_por": "2f9984c34dd1"}
-{"folio": "E1B1F47A", "destino": "Calle Morelos 120", "estado": "registrado", "atendido_por": "13f2d8f64f76"}
+{"atendido_por": "9ed9e6646b1e", "visitas": 1}
+{"atendido_por": "f5c21b07a204", "visitas": 2}
+{"atendido_por": "2cb94889e6cb", "visitas": 3}
+{"atendido_por": "9ed9e6646b1e", "visitas": 4}
+{"atendido_por": "f5c21b07a204", "visitas": 5}
+{"atendido_por": "2cb94889e6cb", "visitas": 6}
 #+end_example
 
-El pedido lo registró la copia =e6c28e82ce8f=, pero las tres copias lo
-encuentran, porque todas leen la misma base de datos. Para el cliente
-no importa qué copia lo atienda.
+Se ven las tres copias atendiendo por turnos, y la cuenta es correcta.
+Si justo después de arrancar todas las respuestas vienen de una sola
+copia, esperen unos segundos y repitan: las otras todavía no estaban
+listas y nginx las apartó un momento.
 
-*Ahora, la versión mala.* Registren un pedido en =/entregas/pedidos-mal/=
-y consulten su seguimiento en =/entregas/pedidos-mal/<folio>/= de la
-misma forma:
+Ahora prueben la versión mal hecha, =/entregas/visitas-mal/=:
 
 #+begin_example
-{"folio": "99E50CCE", "registrado_por": "e6c28e82ce8f"}
-
-{"error": "pedido no encontrado", "atendido_por": "2f9984c34dd1"}
-{"error": "pedido no encontrado", "atendido_por": "13f2d8f64f76"}
-{"error": "pedido no encontrado", "atendido_por": "e6c28e82ce8f"}
-{"error": "pedido no encontrado", "atendido_por": "2f9984c34dd1"}
-{"error": "pedido no encontrado", "atendido_por": "13f2d8f64f76"}
-{"error": "pedido no encontrado", "atendido_por": "e6c28e82ce8f"}
+{"atendido_por": "9ed9e6646b1e", "visitas": 3}
+{"atendido_por": "f5c21b07a204", "visitas": 2}
+{"atendido_por": "f5c21b07a204", "visitas": 3}
+{"atendido_por": "2cb94889e6cb", "visitas": 1}
+{"atendido_por": "9ed9e6646b1e", "visitas": 4}
 #+end_example
 
-El cliente registró su pedido y la plataforma le responde que no
-existe. Las copias =2f99…= y =13f2…= no lo encuentran porque el
-diccionario =pedidos_en_memoria= de cada copia es distinto. Lo más
-interesante es que tampoco lo encontró =e6c2…=, que fue la que lo
-registró. Recuerden que cada contenedor arranca dos procesos de
-Gunicorn (=--workers 2=), y cada proceso tiene su propia memoria: el
-registro lo atendió uno y las consultas cayeron en el otro. En total
-hay seis diccionarios que no se conocen entre sí. Si repiten las
-consultas muchas veces, de vez en cuando alguna sí encuentra el
-pedido, lo cual es todavía peor: el error aparece y desaparece.
+Los números saltan sin orden. Cada copia tiene su propia variable
+=visitas_en_memoria=, y como cada contenedor arranca dos procesos de
+Gunicorn, en realidad hay seis contadores distintos. Ninguno conoce a
+los demás. Con una sola copia y =runserver= este error no se nota (lo
+vieron en el paso 14); en cuanto la aplicación se replica, aparece. Lo
+mismo le pasaría a cualquier dato que se guarde en una variable
+global: el usuario actual, un carrito de compras o los pedidos
+pendientes.
 
-En el paso 14, con =runserver=, esta versión parecía funcionar. El
-error no estaba en Docker: siempre estuvo en el código, y las copias
-solo lo hicieron visible. Lo mismo le pasaría a cualquier dato que se
-guarde en la memoria del programa: el usuario que inició sesión, un
-pedido a medio llenar o la lista de repartidores disponibles.
-
-*Para comprobar:* un pedido registrado en =/entregas/pedidos/= se
-encuentra desde las tres copias; uno registrado en =/entregas/pedidos-mal/=
-casi nunca se encuentra.
-
+*Para comprobar:* =/entregas/visitas/= muestra distintos valores de
+=atendido_por= y un número que sube de uno en uno; =/entregas/visitas-mal/=
+muestra números desordenados.
 **** Paso 19 — Escalar, apagar copias y limpiar
 
 Si llega más gente, se piden más copias sin tocar el código. En otra
@@ -5491,7 +5043,6 @@ Allá eran tres terminales, nginx instalado a mano y nada que se
 recuperara solo. Aquí el sistema completo está descrito en archivos
 dentro del repositorio, cualquier compañero lo levanta con un comando
 y el número de copias es un parámetro.
-
 *** Qué hay que tener pensado si el sistema crece
 
 El ejemplo de la etapa 5 funciona porque la aplicación cumple ciertas
@@ -5499,11 +5050,9 @@ condiciones. Cuando el sistema crece, estas son las cosas que conviene
 tener pensadas desde el principio, aunque todavía no se necesiten:
 
 1. *Nada importante vive en la memoria de una copia.* Ya lo vieron
-   con =pedidos_en_memoria= en el paso 18: el cliente registró su
-   pedido y la plataforma le respondió que no existía. La sesión, los
-   pedidos, los carritos y cualquier dato que deba sobrevivir a la
-   siguiente petición van en la base de datos o en un servicio
-   compartido como Redis.
+   con =visitas_mal=. La sesión, los carritos, los pedidos pendientes
+   y cualquier dato que deba sobrevivir a la siguiente petición van
+   en la base de datos o en un servicio compartido como Redis.
 
 2. *La configuración llega por variables de entorno.* La misma imagen
    tiene que servir en la computadora del alumno, en pruebas y en
@@ -5586,22 +5135,20 @@ Aunque el equipo no haga la etapa 5, desde ya conviene escribir el
 proyecto de forma que algún día se pueda escalar: sin datos en
 variables globales, sin reglas del negocio en el frontend y sin
 depender de archivos en el disco de una copia.
-
 *** Qué ya pueden hacer y qué viene después
 
-| Al terminar este apartado pueden | Esto se hace más adelante |
-|----------------------------------+---------------------------|
-| Crear y activar un entorno virtual en Linux, macOS o Windows, e instalar dependencias desde =requirements.txt= | Implementar Strategy para los cuatro medios de entrega |
-| Explicar qué hacen la ruta del proyecto, la ruta de la aplicación y la vista | Implementar el Adapter que traduce la respuesta de la IA |
-| Explicar por qué el backend entrega datos y el frontend web o móvil se puede cambiar | Construir la aplicación móvil |
-| Ejecutar el proyecto en un contenedor y explicar en qué se diferencia del entorno virtual | Montar la plataforma en un servidor real |
-| Levantar varias copias detrás de un balanceador y explicar qué condiciones hacen falta para escalar | Automatizar el escalado según la carga |
-| Crear otra aplicación cuando aparezca una responsabilidad distinta, como =pagos= | Crear muchas aplicaciones sin una razón clara |
+| Al terminar este apartado pueden                                                                               | Esto se hace más adelante                                |
+|----------------------------------------------------------------------------------------------------------------+----------------------------------------------------------|
+| Crear y activar un entorno virtual en Linux, macOS o Windows, e instalar dependencias desde =requirements.txt= | Implementar Strategy para los cuatro medios de entrega   |
+| Explicar qué hacen la ruta del proyecto, la ruta de la aplicación y la vista                                   | Implementar el Adapter que traduce la respuesta de la IA |
+| Explicar por qué el backend entrega datos y el frontend web o móvil se puede cambiar                           | Construir la aplicación móvil                            |
+| Ejecutar el proyecto en un contenedor y explicar en qué se diferencia del entorno virtual                      | Montar la plataforma en un servidor real                 |
+| Levantar varias copias detrás de un balanceador y explicar qué condiciones hacen falta para escalar            | Automatizar el escalado según la carga                   |
+| Crear otra aplicación cuando aparezca una responsabilidad distinta, como =pagos=                               | Crear muchas aplicaciones sin una razón clara            |
 
 Los cinco días de trabajo que siguen suponen que el paso 8 ya
 funciona. El segundo día empieza directamente con el registro de
 pedidos.
-
 *** Actividad  — Retos sobre la ruta de Django
 
  Se trabaja en los
@@ -5609,8 +5156,6 @@ mismos equipos de cinco personas. Son cinco retos que van de lo más
 sencillo a lo más completo; pueden hacer los que alcancen, en el orden
 que prefieran, aunque conviene empezar por el primero porque los demás
 se apoyan en él.
-
-
 **** Qué se entrega
 
 En la raíz del repositorio del equipo, un archivo =EXTRA.md= con:
@@ -5621,7 +5166,6 @@ En la raíz del repositorio del equipo, un archivo =EXTRA.md= con:
   respuestas escritas.
 - Si algún reto quedó a medias, escriban hasta dónde llegaron y qué
   error les salió. Un intento bien explicado también cuenta.
-  
 **** Reto 1 — La ruta en todas las computadoras (1 punto)
 
 Cada integrante del equipo sigue los pasos 1 a 8 en su propia
@@ -5639,7 +5183,6 @@ Evidencias:
 - Si en el equipo hay alguien con Windows y alguien con Linux o macOS,
   escriban en dos o tres renglones qué comandos fueron distintos para
   cada uno.
-
 **** Reto 2 — Una cotización que entrega datos (2 puntos)
 
 Agreguen una dirección nueva, =/entregas/cotizar/=, que reciba la
@@ -5676,7 +5219,6 @@ Preguntas, por escrito:
 2. Su función probablemente tiene una cadena de =if=. ¿Qué patrón de
    los apuntes la reemplazaría cuando haya que agregar el dron o un
    quinto medio, y qué ganarían con eso?
-
 **** Reto 3 — Dos clientes, un solo backend (2 puntos)
 
 La idea es comprobar con sus propios ojos que el frontend se puede
@@ -5713,45 +5255,29 @@ Python, antes y después de cambiar la regla.
 
 Pregunta, por escrito: si la regla hubiera estado en el JavaScript de
 la página, ¿qué habría pasado con el cliente de Python al cambiarla?
-
 **** Reto 4 — Réplicas: hacerlo fallar y arreglarlo (3 puntos)
 
 Este reto necesita Docker. Hagan las etapas 4 y 5 completas (pasos 9 a
-19) y luego vayan un paso más allá.
+1. y luego vayan un paso más allá.
 
-En la app, el cliente no registra su pedido de un solo golpe: primero
-elige el destino y, en otra pantalla, lo confirma. Entre una petición
-y otra, la plataforma tiene que recordar el destino elegido. Ese
-«pedido a medio llenar» es lo que van a programar.
-
-1. Levanten las tres copias y guarden la salida del paso 18: un
-   pedido seguido en =/entregas/pedidos/= y otro en
-   =/entregas/pedidos-mal/=.
-2. Agreguen dos vistas. =/entregas/borrador/destino/?destino=...=
-   guarda el destino elegido en una variable global.
-   =/entregas/borrador/confirmar/= toma ese destino, crea el =Pedido=
-   en la base de datos y responde con el folio; si no hay destino
-   guardado, responde con un error 400. Con las tres copias corriendo,
-   elijan un destino y confirmen varias veces. Anoten qué pasa.
-3. Arréglenlo para que funcione con cualquier número de copias, sin
-   variables globales. Guarden el destino en =request.session=, que
-   Django almacena en la base de datos. Para probarlo con =curl= usen
-   =-b galleta.txt -c galleta.txt=, que guarda y reenvía la cookie de
-   sesión como lo haría la app.
-4. Suban a cinco copias con =--scale= y comprueben que su arreglo
+2. Levanten las tres copias y guarden la salida de seis peticiones a
+   =/entregas/visitas/= y seis a =/entregas/visitas-mal/=.
+3. Agreguen una vista =/entregas/ultimo/?folio=ABC123= que guarde el
+   último folio consultado en una variable global y otra vista
+   =/entregas/ultimo/ver/= que lo muestre. Con las tres copias
+   corriendo, consulten un folio y luego pidan verlo varias veces.
+   Anoten qué pasa.
+4. Arréglenlo para que funcione con cualquier número de copias, sin
+   usar variables globales. Pueden guardar el folio en la sesión o en
+   un modelo de la base de datos.
+5. Suban a cinco copias con =--scale= y comprueben que su arreglo
    sigue funcionando.
 
 Evidencias: la salida de cada uno de los cuatro puntos y el código de
 la versión arreglada.
 
-Preguntas, por escrito:
-
-1. Con una sola copia y =runserver=, la versión con la variable
-   global parecía funcionar bien. ¿Por qué?
-2. Incluso con una sola copia, ¿qué pasaría con la variable global si
-   dos clientes eligen su destino casi al mismo tiempo? ¿Por qué la
-   sesión no tiene ese problema?
-
+Pregunta, por escrito: con una sola copia y =runserver=, la versión
+con la variable global parecía funcionar bien. ¿Por qué?
 **** Reto 5 — Casos para pensar, sin código (2 puntos)
 
 Respondan cada caso en un párrafo corto. No hay una única respuesta
@@ -5776,22 +5302,20 @@ apartado.
 5. Con tres copias detrás del balanceador, una persona toca dos veces
    seguidas el botón de «Pagar» en la app. ¿Qué podría salir mal y
    qué tema de los apuntes lo resuelve?
-
 **** Cómo se asignan los puntos
 
-| Reto | Puntos | Se otorgan completos si… |
-|------+--------+--------------------------|
-| 1. La ruta en todas las computadoras | 1 | Están las evidencias de los cinco integrantes |
-| 2. Una cotización que entrega datos | 2 | La regla está fuera de la vista, los errores devuelven 400 y las dos preguntas están respondidas |
-| 3. Dos clientes, un solo backend | 2 | Los dos clientes usan la misma dirección y el cambio de regla se refleja en ambos sin tocarlos |
-| 4. Réplicas: hacerlo fallar y arreglarlo | 3 | Se ve el error con la variable global y el arreglo funciona con tres y con cinco copias |
-| 5. Casos para pensar | 2 | Los cinco casos están respondidos con razones, no solo con un «sí» o un «no» |
-| Total | 10 | |
+| Reto                                     | Puntos | Se otorgan completos si…                                                                         |
+|------------------------------------------+--------+--------------------------------------------------------------------------------------------------|
+| 1. La ruta en todas las computadoras     |      1 | Están las evidencias de los cinco integrantes                                                    |
+| 2. Una cotización que entrega datos      |      2 | La regla está fuera de la vista, los errores devuelven 400 y las dos preguntas están respondidas |
+| 3. Dos clientes, un solo backend         |      2 | Los dos clientes usan la misma dirección y el cambio de regla se refleja en ambos sin tocarlos   |
+| 4. Réplicas: hacerlo fallar y arreglarlo |      3 | Se ve el error con la variable global y el arreglo funciona con tres y con cinco copias          |
+| 5. Casos para pensar                     |      2 | Los cinco casos están respondidos con razones, no solo con un «sí» o un «no»                     |
+| Total                                    |     10 |                                                                                                  |
 
 Si un reto quedó a medias pero está bien explicado en =EXTRA.md=
 (hasta dónde llegaron, qué error salió y qué intentaron), se otorga
 parte de los puntos.
-
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
 Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
@@ -5820,7 +5344,6 @@ Entrega al volver (un repo o una carpeta por equipo):
 - un =README= de una página (cómo correrlo y qué patrón cubre cada
   conflicto);
 - las notas escritas de cada día (pueden ir en =notas/=).
-
 *** Día 1 — Estudiar el caso web (sin código de dominio)
 
 Lectura obligatoria, en este orden:
@@ -5836,7 +5359,7 @@ Lectura obligatoria, en este orden:
 Por escrito, una tabla. No pongan «MVC» como respuesta de un renglón.
 
 | # | Inconveniente del enunciado | Qué *ya trae* Django | Qué tendremos que escribir nosotros | Qué *no* vamos a copiar del libro |
-|---+-----------------------------+----------------------+-------------------------------------|-----------------------------------|
+|---+-----------------------------+----------------------+-------------------------------------+-----------------------------------|
 | 1 |                             |                      |                                     |                                   |
 | … |                             |                      |                                     |                                   |
 | 7 |                             |                      |                                     |                                   |
@@ -5844,7 +5367,6 @@ Por escrito, una tabla. No pongan «MVC» como respuesta de un renglón.
 Al final del día: tres renglones. ¿=urls.py= es Front Controller, Page
 Controller, o el camino hacia los dos? ¿La plantilla Jinja/Django
 puede hacer =SELECT=? ¿Por qué sí o por qué no?
-
 *** Día 2 — Pensar el primer corte y arrancar Django
 
 Objetivo: que exista el proyecto y *una* petición, todavía sin los
@@ -5867,7 +5389,6 @@ porque el marco ya la instancia.
 
 Al final del día el servidor levanta y se ve un pedido. Feo vale;
 mezclar sesión, SQL y medios en la vista no.
-
 *** Día 3 — Strategy, Adapter y quién hace el =new=
 
 Objetivo: el inconveniente 2 del enunciado, con las definiciones de
@@ -5894,7 +5415,6 @@ vista sigue sin conocer =EntregaDron=.
 Por escrito: una frase por patrón (qué inconveniente, qué vecino no
 es). Si usaron Factory Method, justifiquen por qué no bastaba la
 fábrica simple.
-
 *** Día 4 — Plantilla limpia, transacción e IA caída
 
 Objetivo: inconvenientes 3, 4 y 6, con lo que ya dice el capítulo
@@ -5916,7 +5436,6 @@ web.
 Por escrito: qué harían si el cliente pulsa dos veces «crear» (PRG y,
    si hay dinero de mentira, idempotencia). No pidan Event Sourcing
    para esto.
-
 *** Día 5 — El mismo pedido en JSON y la defensa
 
 Objetivo: inconveniente 5 (el panel y la app no tienen la misma
@@ -5942,1165 +5461,15 @@ califica si el inconveniente del enunciado se ve en el código, si
 Django se usó como marco y no como disfraz, y si supieron no
 implementar lo que no hacía falta.
 #+end_quote
-
 *** Pauta mínima al volver
 
 | Día | Se espera ver                                                              |
 |-----+----------------------------------------------------------------------------|
 |   1 | Tabla de los siete inconvenientes atada a Django                           |
-|   2 | =POST /pedidos= + PRG + vista delgada                                        |
-|   3 | Strategy + Adapter + =new= fuera de la vista                                 |
+|   2 | =POST /pedidos= + PRG + vista delgada                                      |
+|   3 | Strategy + Adapter + =new= fuera de la vista                               |
 |   4 | Plantilla sin SQL; transacción; pedido guardado si la IA falla             |
 |   5 | JSON del mismo folio; README; saber decir que no al PDF con Event Sourcing |
-
-* La IA dentro de la plataforma: un modelo que recomienda el medio de transporte
-
-** Qué vamos a construir
-
-En la plataforma de entregas, alguien tiene que decidir si un paquete
-va en bicicleta, en moto, en camioneta o en dron. En la parte de
-patrones esa decisión venía de un proveedor externo de inteligencia
-artificial que respondía con su propio formato (=route_hint=). En esta
-sección vamos a entrenar nuestro propio modelo con un dataset de
-10 000 envíos y a conectarlo al proyecto que crearon en
-[[*Arrancar Django para la plataforma de entregas][Arrancar Django para la plataforma de entregas]].
-
-Al final de la sección veremos algo importante: aunque ahora una
-inteligencia artificial toma una decisión que antes tomaba una persona
-o un =if=, los patrones de diseño no desaparecen. Al contrario, son lo
-que permite meter el modelo a la plataforma sin desordenarla.
-
-La ruta tiene cuatro etapas:
-
-| Etapa | Pasos | Al terminar tendrán |
-|-------+-------+---------------------|
-| 1. Preparar | 1 y 2 | Las bibliotecas instaladas y una idea clara de qué hay en los datos |
-| 2. Entrenar | 3 a 10 | Un árbol de decisión entrenado, evaluado y guardado en un archivo |
-| 3. Usar el modelo | 11 y 12 | Una función que recibe un paquete y devuelve el medio recomendado |
-| 4. Conectarlo a la plataforma | 13 a 19 | Una dirección =/entregas/recomendar/= en Django que recomienda el medio y planea la entrega |
-
-Los pasos de esta sección tienen su propia numeración; cuando se
-mencione un paso de Django se dirá «de la ruta de Django».
-
-Los archivos están en el repositorio, en la carpeta
-=proyectos/dataset-medios/=:
-
-| Archivo | Qué contiene |
-|---------+--------------|
-| [[file:proyectos/dataset-medios/envios_medios.csv][=envios_medios.csv=]] | El dataset: 10 000 envíos con el medio recomendado |
-| [[file:proyectos/dataset-medios/entrenar_arbol.py][=entrenar_arbol.py=]] | El script completo de la etapa 2 |
-| [[file:proyectos/dataset-medios/usar_modelo.py][=usar_modelo.py=]] | El script completo de la etapa 3 |
-| [[file:proyectos/dataset-medios/entrenar_modelo.py][=entrenar_modelo.py=]] | Un Random Forest para comparar |
-| [[file:proyectos/dataset-medios/generar_dataset.py][=generar_dataset.py=]] | El programa que generó el dataset |
-| [[file:proyectos/dataset-medios/README.md][=README.md=]] | El diccionario de datos y cómo se generó el dataset |
-
-** Antes de empezar: qué es un árbol de decisión
-
-Imaginen a un despachador con años de experiencia en la empresa. Cuando
-le llega un paquete no hace cálculos complicados: se hace preguntas, una
-tras otra. «¿Va a más de 7 kilómetros? No. ¿Llueve? No. ¿Pesa menos de
-8 kilos? Sí. Entonces, bicicleta». Cada respuesta lo lleva a la
-siguiente pregunta, hasta que llega a una decisión.
-
-Un árbol de decisión es exactamente eso, pero las preguntas no las
-inventa una persona: el algoritmo las descubre a partir de los
-ejemplos. Revisa los 8 000 envíos de entrenamiento y busca la pregunta
-que mejor separa los medios entre sí. Después repite lo mismo dentro de
-cada grupo, y así sucesivamente.
-
-Elegimos el árbol de decisión porque es el más fácil de entender: al
-terminar de entrenarlo se pueden imprimir sus preguntas y leerlas como
-reglas. Más adelante verán que cambiarlo por un Random Forest es una
-sola línea.
-
-|                             | Árbol de decisión                      | Random Forest                |
-|-----------------------------+----------------------------------------+------------------------------|
-| Qué es                      | Un solo árbol de preguntas             | Cientos de árboles que votan |
-| Exactitud con este dataset  | 92.1 %                                 | 93.1 %                       |
-| ¿Se pueden leer sus reglas? | Sí                                     | No en la práctica            |
-| Tamaño del archivo guardado | Unos 14 KB                             | Unos 60 MB (con 300 árboles) |
-| Para qué lo usamos aquí     | Aprender, explicar y ponerlo en Django | Comparar al final            |
-
-** Etapa 1 — Preparar
-
-*** Paso 1 — Instalar las bibliotecas
-
-Pueden usar el mismo entorno virtual del proyecto de Django (paso 2 de
-la ruta de Django). Con el entorno activo:
-
-#+begin_src shell
-pip install pandas scikit-learn joblib
-#+end_src
-
-=pandas= sirve para leer y manejar tablas, como el CSV. =scikit-learn=
-tiene los algoritmos de aprendizaje automático, entre ellos el árbol
-de decisión. =joblib= guarda el modelo entrenado en un archivo para
-usarlo después.
-
-*Para comprobar:*
-
-#+begin_src shell
-python -c "import pandas, sklearn, joblib; print(sklearn.__version__)"
-#+end_src
-
-Anoten la versión de scikit-learn que aparece. La van a necesitar en
-el paso 13.
-
-*** Paso 2 — Conocer los datos
-
-Antes de entrenar nada, hay que mirar los datos. En una terminal de
-Python (o en un cuaderno de Jupyter), desde la carpeta
-=proyectos/dataset-medios/= o desde donde hayan copiado el CSV:
-
-#+begin_src python
-import pandas as pd
-
-datos = pd.read_csv("envios_medios.csv")
-
-print(datos.shape)
-print(datos.head())
-print(datos["medio_recomendado"].value_counts())
-#+end_src
-
-=datos.shape= dice cuántas filas y columnas hay: =(10000, 16)=.
-=head()= muestra las primeras cinco filas. =value_counts()= cuenta
-cuántos envíos hay de cada medio:
-
-#+begin_example
-medio_recomendado
-moto         4578
-bicicleta    2796
-camioneta    1678
-dron          948
-#+end_example
-
-Fíjense en que el dron tiene muchos menos ejemplos que la moto. Eso
-pasa en la realidad: el dron solo se puede usar en pocas condiciones.
-También significa que al modelo le va a costar más aprender a
-reconocerlo.
-
-Cada fila tiene catorce columnas que describen el paquete (distancia,
-peso, medidas, si es frágil, clima, hora, tráfico, etc.) y una columna
-=medio_recomendado=, que es lo que el modelo debe aprender a predecir.
-El significado de cada columna está en el =README.md= de la carpeta.
-
-*Para comprobar:* pueden responder sin mirar el código cuántos envíos
-hay, cuántos son de dron y qué columna es la que se va a predecir.
-
-** Etapa 2 — Entrenar
-
-Los fragmentos de código de esta etapa forman, en orden, el script
-=entrenar_arbol.py=. Pueden escribirlo ustedes paso a paso o abrir el
-archivo y leerlo junto con los apuntes.
-
-*** Paso 3 — Separar lo que el modelo ve de lo que debe adivinar
-
-#+begin_src python
-NUMERICAS = [
-    "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm", "volumen_l",
-    "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
-]
-CATEGORICAS = ["prioridad", "zona_destino", "clima", "trafico"]
-OBJETIVO = "medio_recomendado"
-
-x = datos[NUMERICAS + CATEGORICAS]
-y = datos[OBJETIVO]
-#+end_src
-
-Por costumbre, a los datos de entrada se les llama =x= y a la
-respuesta =y=. =x= son las catorce columnas que describen cada
-paquete; =y= es el medio recomendado. La columna =id_envio= no se usa:
-es solo un nombre y no dice nada sobre el paquete.
-
-Separamos las columnas en dos listas porque se tratan distinto: las
-numéricas ya son números, y las categóricas son texto (por ejemplo,
-="lluvia"=), que hay que convertir antes de entrenar.
-
-*** Paso 4 — Apartar datos para la prueba
-
-#+begin_src python
-from sklearn.model_selection import train_test_split
-
-x_entreno, x_prueba, y_entreno, y_prueba = train_test_split(
-    x, y, test_size=0.2, stratify=y, random_state=42
-)
-#+end_src
-
-Si evaluáramos el modelo con los mismos envíos con los que aprendió,
-sería como hacer un examen con las mismas preguntas que se repasaron:
-la calificación saldría muy alta y no diría nada. Por eso se aparta el
-20 % de los envíos (=test_size=0.2=), unos 2 000, y el modelo nunca los
-ve durante el entrenamiento. Con ellos se evalúa al final.
-
-=stratify=y= hace que los dos grupos tengan la misma proporción de
-cada medio. Sin eso, por azar, podrían quedar muy pocos drones en la
-prueba. =random_state=42= fija el azar para que todos obtengan la
-misma separación y los mismos resultados.
-
-*** Paso 5 — Convertir las categorías en números
-
-El árbol solo entiende números. La columna =clima= tiene tres valores
-de texto, así que se convierte en tres columnas de ceros y unos:
-
-| clima         | clima_despejado | clima_lluvia | clima_viento_fuerte |
-|---------------+-----------------+--------------+---------------------|
-| despejado     | 1               | 0            | 0                   |
-| lluvia        | 0               | 1            | 0                   |
-| viento_fuerte | 0               | 0            | 1                   |
-
-A esto se le llama /one-hot encoding/. En código:
-
-#+begin_src python
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-
-preparacion = ColumnTransformer([
-    ("numericas", "passthrough", NUMERICAS),
-    ("categoricas", OneHotEncoder(handle_unknown="ignore"), CATEGORICAS),
-])
-#+end_src
-
-=ColumnTransformer= aplica un tratamiento distinto a cada grupo de
-columnas. Las numéricas pasan tal cual (="passthrough"=) y las
-categóricas pasan por el =OneHotEncoder=. =handle_unknown="ignore"=
-evita un error si algún día llega un valor que no estaba en el
-entrenamiento, por ejemplo un clima ="granizo"=.
-
-*** Paso 6 — Entrenar el árbol
-
-#+begin_src python
-from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeClassifier
-
-modelo = Pipeline([
-    ("preparacion", preparacion),
-    ("arbol", DecisionTreeClassifier(max_depth=8, min_samples_leaf=5, random_state=42)),
-])
-
-modelo.fit(x_entreno, y_entreno)
-#+end_src
-
-Un =Pipeline= une la preparación y el árbol en un solo objeto. Es
-importante por una razón práctica: cuando usemos el modelo con un
-paquete nuevo, no tendremos que acordarnos de convertir las categorías
-a mano. Le damos los datos tal como vienen y el pipeline hace la
-preparación y la predicción.
-
-Los dos parámetros del árbol limitan cuánto puede crecer:
-
-- =max_depth=8=: como máximo, ocho preguntas seguidas antes de decidir.
-- =min_samples_leaf=5=: cada decisión final tiene que estar respaldada
-  por al menos cinco envíos. Así el árbol no inventa una regla para un
-  solo caso raro.
-
-En el paso 9 veremos por qué conviene limitarlo.
-
-=fit= es el entrenamiento. Con 8 000 envíos tarda menos de un segundo.
-
-*** Paso 7 — Evaluar con los envíos apartados
-
-#+begin_src python
-from sklearn.metrics import classification_report, confusion_matrix
-
-prediccion = modelo.predict(x_prueba)
-print(f"Exactitud: {(prediccion == y_prueba).mean():.1%}")
-print(classification_report(y_prueba, prediccion, digits=3))
-#+end_src
-
-El resultado:
-
-#+begin_example
-Exactitud con datos de prueba: 92.1%
-
-              precision    recall  f1-score   support
-
-   bicicleta      0.881     0.964     0.921       559
-   camioneta      1.000     0.866     0.928       336
-        dron      0.839     0.905     0.871       190
-        moto      0.942     0.918     0.930       915
-#+end_example
-
-La *exactitud* es la proporción de envíos en los que acertó: 92 de
-cada 100. Pero la exactitud sola esconde cosas, así que conviene leer
-también las otras columnas:
-
-- *precision*: de las veces que el modelo dijo «dron», ¿cuántas eran
-  dron de verdad? 83.9 %. Las demás eran envíos que debían ir en otro
-  medio.
-- *recall*: de todos los envíos que eran dron de verdad, ¿cuántos
-  reconoció? 90.5 %.
-- *f1-score*: un promedio de las dos anteriores.
-- *support*: cuántos envíos de cada medio había en la prueba.
-
-La *matriz de confusión* muestra exactamente en qué se equivoca:
-
-#+begin_src python
-etiquetas = sorted(y.unique())
-print(pd.DataFrame(
-    confusion_matrix(y_prueba, prediccion, labels=etiquetas),
-    index=etiquetas, columns=etiquetas,
-))
-#+end_src
-
-#+begin_example
-           bicicleta  camioneta  dron  moto
-bicicleta        539          0     0    20
-camioneta          9        291     4    32
-dron              18          0   172     0
-moto              46          0    29   840
-#+end_example
-
-Las filas son el medio real y las columnas lo que predijo el modelo. La
-diagonal son los aciertos. Por ejemplo, de los 915 envíos que debían ir
-en moto, acertó 840, mandó 46 a bicicleta y 29 a dron. Casi todos los
-errores son entre medios parecidos (moto y bicicleta, moto y dron),
-que son justo los casos dudosos también para una persona.
-
-¿Por qué no llega al 100 %? Porque el dataset tiene ruido a propósito:
-igual que en la vida real, dos despachadores con la misma información
-no siempre deciden lo mismo. El =README.md= explica cómo se agregó.
-
-*** Paso 8 — Leer las reglas que aprendió
-
-Esta es la gran ventaja del árbol: se pueden ver sus preguntas.
-
-#+begin_src python
-from sklearn.tree import export_text
-
-nombres = [n.split("__", 1)[1] for n in modelo.named_steps["preparacion"].get_feature_names_out()]
-print(export_text(modelo.named_steps["arbol"], feature_names=nombres, max_depth=3))
-#+end_src
-
-=get_feature_names_out()= da el nombre de cada columna después de la
-preparación (por ejemplo =categoricas__clima_lluvia=); el =split= le
-quita el prefijo para que se lea mejor. =max_depth=3= imprime solo los
-tres primeros niveles; el resto aparece como =truncated branch=.
-
-#+begin_example
-|--- distancia_km <= 7.01
-|   |--- volumen_l <= 90.10
-|   |   |--- clima_lluvia <= 0.50
-|   |   |   |--- peso_kg <= 7.85
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |   |--- peso_kg >  7.85
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |--- clima_lluvia >  0.50
-|   |   |   |--- fragil <= 0.50
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |   |--- fragil >  0.50
-|   |   |   |   |--- truncated branch of depth 5
-|   |--- volumen_l >  90.10
-|   |   |--- class: camioneta
-|--- distancia_km >  7.01
-|   |--- distancia_km <= 39.91
-|   |   |--- volumen_l <= 90.16
-|   |   |   |--- refrigerado <= 0.50
-|   |   |   |   |--- truncated branch of depth 5
-|   |   |   |--- refrigerado >  0.50
-|   |   |   |   |--- class: camioneta
-|   |   |--- volumen_l >  90.16
-|   |   |   |--- class: camioneta
-|   |--- distancia_km >  39.91
-|   |   |--- class: camioneta
-#+end_example
-
-Lean los números con calma. La primera pregunta del árbol es si la
-distancia es menor a 7 km, que es justo el límite de la bicicleta.
-Después pregunta por 90 litros y por 40 km, que son los límites de la
-moto, y por el peso de 8 kg, que es otra vez la bicicleta. Y si el
-paquete es refrigerado, decide camioneta sin más preguntas. Nadie le
-dio esos límites al árbol: los descubrió solo, mirando los ejemplos.
-
-=clima_lluvia <= 0.50= es la forma en que el árbol pregunta «¿no
-llueve?», porque esa columna solo vale 0 o 1.
-
-*** Paso 9 — Elegir la profundidad
-
-¿Por qué ocho preguntas y no más? Esta tabla muestra qué pasa con
-distintas profundidades, siempre evaluando con los mismos envíos de
-prueba:
-
-| Profundidad máxima | Exactitud en la prueba | Decisiones finales (hojas) |
-|--------------------+------------------------+----------------------------|
-| 3                  | 74.8 %                 | 6                          |
-| 4                  | 79.0 %                 | 9                          |
-| 5                  | 81.3 %                 | 14                         |
-| 6                  | 84.2 %                 | 20                         |
-| 8                  | 92.1 %                 | 47                         |
-| 10                 | 92.4 %                 | 92                         |
-| Sin límite         | 91.8 %                 | 346                        |
-
-Con pocas preguntas el árbol es demasiado simple y se equivoca mucho.
-Con ocho llega a 92 %. A partir de ahí casi no mejora, pero el árbol
-se vuelve mucho más grande. Sin límite, con 346 decisiones finales,
-incluso empeora: empieza a memorizar los casos raros y el ruido de
-los datos de entrenamiento en lugar de aprender las reglas generales.
-A eso se le llama /sobreajuste/. Ocho es un buen equilibrio entre
-acertar y seguir siendo un árbol que se puede leer.
-
-El script acepta la profundidad como parámetro para que lo prueben
-ustedes:
-
-#+begin_src shell
-python entrenar_arbol.py --profundidad 4
-#+end_src
-
-*** Paso 10 — Guardar el modelo
-
-#+begin_src python
-import joblib
-
-joblib.dump(modelo, "modelo_medios.joblib")
-#+end_src
-
-Entrenar cada vez que se necesita una predicción sería un desperdicio.
-Se entrena una vez y el modelo se guarda en un archivo; después
-cualquier programa lo carga y lo usa. Como guardamos el =Pipeline=
-completo, el archivo incluye la preparación de las columnas y el árbol.
-
-*Para comprobar la etapa completa:*
-
-#+begin_src shell
-python entrenar_arbol.py
-#+end_src
-
-Debe mostrar la exactitud de 92.1 %, el reporte, la matriz de
-confusión, las reglas y terminar con =Modelo guardado en
-modelo_medios.joblib=. El archivo pesa unos 14 KB.
-
-** Etapa 3 — Usar el modelo
-
-*** Paso 11 — Cargar el modelo y predecir un paquete nuevo
-
-#+begin_src python
-import joblib
-import pandas as pd
-
-modelo = joblib.load("modelo_medios.joblib")
-
-paquete = {
-    "distancia_km": 8.95, "peso_kg": 0.54, "largo_cm": 17.3, "ancho_cm": 10.7,
-    "alto_cm": 15.0, "volumen_l": 2.78, "fragil": 0, "refrigerado": 0,
-    "valor_declarado_mxn": 789, "prioridad": "normal", "zona_destino": "periferia",
-    "clima": "despejado", "hora_salida": 16, "trafico": "medio",
-}
-
-datos = pd.DataFrame([paquete])
-print(modelo.predict(datos))
-probabilidades = modelo.predict_proba(datos)[0]
-print({medio: round(float(p), 3) for medio, p in zip(modelo.classes_, probabilidades)})
-#+end_src
-
-#+begin_example
-['dron']
-{'bicicleta': 0.0, 'camioneta': 0.028, 'dron': 0.841, 'moto': 0.131}
-#+end_example
-
-El modelo espera una tabla, aunque sea de una sola fila; por eso el
-paquete se convierte en un =DataFrame= de una fila. =predict= devuelve
-el medio más probable. =predict_proba= devuelve la probabilidad de
-cada medio: el modelo está bastante seguro del dron (84 %) y la
-segunda opción sería la moto (13 %).
-
-*** Paso 12 — El modelo sugiere, las reglas deciden
-
-Si le pedimos al modelo una recomendación para cada uno de los 10 000
-envíos del dataset, en 121 casos (1.2 %) sugiere un medio que en
-realidad es imposible. Casi siempre es un dron de madrugada: el árbol
-no terminó de aprender que el dron no vuela de noche, porque la hora
-es un número y «de noche» significa «antes de las 6 o después de las
-21», una condición que le cuesta representar con preguntas de «menor
-o mayor que».
-
-Esto no es un defecto de este modelo en particular. Todos los modelos
-aprenden de ejemplos y todos se equivocan alguna vez. Por eso hay
-reglas que no se le dejan al modelo: si el paquete pesa 30 kg, ningún
-modelo puede mandarlo en bicicleta, por más seguro que esté. Esas
-reglas vienen del negocio y se escriben a mano:
-
-#+begin_src python
-LIMITES = {
-    "bicicleta": {"peso_kg": 8, "volumen_l": 40, "distancia_km": 7},
-    "moto": {"peso_kg": 25, "volumen_l": 90, "distancia_km": 40},
-    "camioneta": {"peso_kg": 1000, "volumen_l": 3000, "distancia_km": 1000},
-    "dron": {"peso_kg": 2.5, "volumen_l": 12, "distancia_km": 15},
-}
-
-
-def es_posible(medio, paquete):
-    limite = LIMITES[medio]
-    if paquete["peso_kg"] > limite["peso_kg"]:
-        return False
-    if paquete["volumen_l"] > limite["volumen_l"]:
-        return False
-    if paquete["distancia_km"] > limite["distancia_km"]:
-        return False
-    if paquete["refrigerado"] and medio != "camioneta":
-        return False
-    noche = paquete["hora_salida"] >= 21 or paquete["hora_salida"] < 6
-    if medio == "dron" and (paquete["clima"] != "despejado" or noche
-                            or paquete["zona_destino"] == "centro"):
-        return False
-    if medio == "bicicleta" and paquete["zona_destino"] == "rural":
-        return False
-    return True
-#+end_src
-
-La recomendación final combina las dos cosas. Se ordenan los medios de
-más probable a menos probable según el modelo, y se elige el primero
-que las reglas permiten:
-
-#+begin_src python
-def recomendar_medio(paquete):
-    datos = pd.DataFrame([paquete])
-    probabilidades = modelo.predict_proba(datos)[0]
-    ranking = sorted(zip(modelo.classes_, probabilidades), key=lambda par: -par[1])
-
-    for medio, confianza in ranking:
-        if es_posible(medio, paquete):
-            return {
-                "medio": medio,
-                "confianza": round(float(confianza), 3),
-                "corregido": medio != ranking[0][0],
-                "ranking": [(m, round(float(p), 3)) for m, p in ranking],
-            }
-    return {"medio": "camioneta", "confianza": 0.0, "corregido": True,
-            "ranking": [(m, round(float(p), 3)) for m, p in ranking]}
-#+end_src
-
-=sorted(..., key=lambda par: -par[1])= ordena los pares (medio,
-probabilidad) de mayor a menor probabilidad. El ciclo recorre ese
-orden y devuelve el primer medio posible. =corregido= avisa si hubo
-que descartar la primera opción del modelo. Si ningún medio fuera
-posible, la camioneta es la opción de respaldo.
-
-*Para comprobar:*
-
-#+begin_src shell
-python usar_modelo.py
-#+end_src
-
-#+begin_example
-Libro a 2 km en el centro, hora pico
-  Medio recomendado: bicicleta (confianza 89%)
-
-Medicamento ligero a 9 km, periferia, tarde despejada
-  Medio recomendado: dron (confianza 84%)
-
-Paquete ligero a 13 km, a las 3:00 de la madrugada
-  Medio recomendado: moto (confianza 13%)
-  Nota: el modelo prefería dron, pero no es posible para este paquete.
-
-Microondas a 18 km con lluvia
-  Medio recomendado: moto (confianza 98%)
-
-Vacunas refrigeradas a 30 km
-  Medio recomendado: camioneta (confianza 100%)
-#+end_example
-
-Fíjense en el tercer caso. El modelo prefería el dron con 84 % de
-confianza, porque ese paquete se parece mucho al del segundo caso.
-Pero a las 3:00 el dron no puede volar, así que las reglas lo
-descartan y se elige la moto, que era su segunda opción.
-
-** Etapa 4 — Conectarlo a la plataforma
-
-Ahora el modelo va a vivir dentro del proyecto de Django, en la
-aplicación =entregas=. Para la app móvil o la página web no cambia
-nada: hacen una petición y reciben un JSON. Que detrás haya un árbol
-de decisión, un proveedor externo o reglas escritas a mano es un
-detalle interno del backend.
-
-*** Paso 13 — Copiar el modelo al proyecto y agregar las dependencias
-
-Dentro de la aplicación =entregas= creen una carpeta =modelo= y copien
-ahí el archivo entrenado:
-
-#+begin_example
-plataforma-entregas/
-  entregas/
-    modelo/
-      modelo_medios.joblib
-    models.py
-    views.py
-    urls.py
-#+end_example
-
-El archivo pesa unos 14 KB, así que se puede subir al repositorio sin
-problema.
-
-Con el entorno virtual del proyecto activo, instalen las bibliotecas
-con la *misma versión de scikit-learn* con la que entrenaron (la que
-anotaron en el paso 1) y actualicen =requirements.txt=:
-
-#+begin_src shell
-pip install "scikit-learn==1.9.0" pandas joblib
-pip freeze > requirements.txt
-#+end_src
-
-(Cambien =1.9.0= por su versión. En PowerShell, la segunda línea es
-=pip freeze | Out-File -Encoding utf8 requirements.txt=.)
-
-La versión importa porque el archivo =.joblib= guarda el modelo tal
-como lo dejó esa versión de scikit-learn. Si en el proyecto se instala
-otra, el modelo puede cargar con advertencias o no cargar. Al quedar
-fija en =requirements.txt=, el contenedor de Docker instalará también
-la misma.
-
-*Para comprobar:*
-=python -c "import joblib; joblib.load('entregas/modelo/modelo_medios.joblib')"=
-termina sin errores.
-
-*** Paso 14 — Las reglas del negocio en su propio archivo
-
-Creen =entregas/reglas.py= con =LIMITES= y =es_posible=, exactamente
-como en el paso 12. Van en un archivo aparte porque no pertenecen al
-modelo: si mañana se cambia el árbol por otro modelo o por un
-proveedor externo, las reglas siguen siendo las mismas.
-
-*** Paso 15 — El adaptador: el modelo habla de probabilidades, la plataforma habla de Sugerencia
-
-En la parte de patrones vimos que la plataforma no debe hablar el
-idioma de cada proveedor de IA. El proveedor responde =route_hint= y
-=reason_code=, pero el despacho solo entiende una =Sugerencia= con
-=medio= y =motivo=. El traductor entre los dos es un Adapter.
-
-Nuestro modelo es un proveedor más, con su propio idioma: una lista de
-clases y una lista de probabilidades. Así que lo envolvemos en un
-adaptador con la misma interfaz. Creen =entregas/recomendador.py=:
-
-#+begin_src python
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from functools import lru_cache
-from pathlib import Path
-
-import joblib
-import pandas as pd
-
-from .reglas import es_posible
-
-RUTA_MODELO = Path(__file__).resolve().parent / "modelo" / "modelo_medios.joblib"
-
-CAMPOS_NUMERICOS = [
-    "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm", "volumen_l",
-    "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
-]
-CAMPOS_TEXTO = ["prioridad", "zona_destino", "clima", "trafico"]
-CAMPOS = CAMPOS_NUMERICOS + CAMPOS_TEXTO
-
-
-@dataclass(frozen=True)
-class Sugerencia:
-    medio: str
-    motivo: str
-
-
-class RecomendadorIA(ABC):
-    @abstractmethod
-    def sugerir(self, paquete: dict) -> Sugerencia:
-        pass
-
-
-class RecomendadorArbol(RecomendadorIA):
-    """El modelo responde probabilidades; la plataforma solo entiende Sugerencia."""
-
-    def __init__(self, ruta=RUTA_MODELO):
-        self._modelo = joblib.load(ruta)
-
-    def sugerir(self, paquete):
-        datos = pd.DataFrame([paquete], columns=CAMPOS)
-        probabilidades = self._modelo.predict_proba(datos)[0]
-        ranking = sorted(zip(self._modelo.classes_, probabilidades), key=lambda par: -par[1])
-        preferido = ranking[0][0]
-
-        for medio, confianza in ranking:
-            if es_posible(medio, paquete):
-                motivo = f"árbol de decisión, confianza {confianza:.0%}"
-                if medio != preferido:
-                    motivo += f"; se descartó {preferido} por las reglas del negocio"
-                return Sugerencia(medio, motivo)
-        return Sugerencia("camioneta", "ningún medio sugerido era posible")
-
-
-@lru_cache(maxsize=1)
-def obtener_recomendador() -> RecomendadorIA:
-    return RecomendadorArbol()
-#+end_src
-
-Lo importante de este archivo:
-
-- =RecomendadorIA= es la interfaz: cualquier recomendador tiene un
-  método =sugerir= que recibe un paquete y devuelve una =Sugerencia=.
-  Si ya tienen en su proyecto un =RecomendadorIA= y una =Sugerencia=
-  de la parte de patrones (por ejemplo, para el proveedor que responde
-  =route_hint=), usen esos en lugar de definirlos otra vez.
-- =RecomendadorArbol= es el adaptador. Por dentro usa =predict_proba=
-  y las reglas; por fuera entrega una =Sugerencia=. El resto de la
-  plataforma nunca ve probabilidades, ni =pandas=, ni scikit-learn.
-- =RUTA_MODELO= construye la ruta al archivo a partir de la ubicación
-  de =recomendador.py=. Así funciona igual en su computadora que en
-  =/app= dentro del contenedor.
-- =pd.DataFrame([paquete], columns=CAMPOS)= garantiza que las columnas
-  lleguen en el orden y con los nombres que espera el modelo, aunque
-  el JSON las mande en otro orden.
-- =obtener_recomendador= carga el modelo la primera vez que se pide y
-  después reutiliza el mismo objeto. =@lru_cache(maxsize=1)= es lo que
-  hace eso: recuerda el resultado de la función. Cargar el archivo en
-  cada petición sería lento.
-
-¿No habíamos dicho, en la etapa 5 de la ruta de Django, que no se
-guardan cosas en la memoria del programa? Lo que no se debe guardar
-son los datos que cambian con cada cliente, como los pedidos, porque
-cada copia tendría una versión distinta. El modelo es otra cosa: es
-igual en todas las copias, porque todas lo cargan del mismo archivo, y
-nadie lo modifica mientras el programa corre. Es como el código: cada
-copia tiene el suyo y todos son idénticos.
-
-Si el día de mañana la empresa contrata un proveedor externo, se
-escribe otro adaptador (por ejemplo =RecomendadorProveedor=), se cambia
-la línea de =obtener_recomendador= y ni la vista ni el despacho se
-enteran.
-
-*** Paso 16 — La vista =/entregas/recomendar/=
-
-En =entregas/views.py= agreguen al inicio:
-
-#+begin_src python
-import json
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-
-from .recomendador import CAMPOS, CAMPOS_NUMERICOS, obtener_recomendador
-#+end_src
-
-(Si alguno de esos =import= ya estaba, no lo repitan.) Y la vista:
-
-#+begin_src python
-@csrf_exempt
-@require_POST
-def recomendar(request):
-    try:
-        paquete = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "el cuerpo debe ser JSON"}, status=400)
-
-    faltantes = [campo for campo in CAMPOS if campo not in paquete]
-    if faltantes:
-        return JsonResponse({"error": "faltan campos", "campos": faltantes}, status=400)
-
-    try:
-        for campo in CAMPOS_NUMERICOS:
-            paquete[campo] = float(paquete[campo])
-    except (TypeError, ValueError):
-        return JsonResponse({"error": f"el campo {campo} debe ser un número"}, status=400)
-
-    sugerencia = obtener_recomendador().sugerir(paquete)
-    return JsonResponse(
-        {"medio": sugerencia.medio, "motivo": sugerencia.motivo},
-        json_dumps_params={"ensure_ascii": False},
-    )
-#+end_src
-
-En =entregas/urls.py=:
-
-#+begin_src python
-path("recomendar/", views.recomendar, name="recomendar"),
-#+end_src
-
-La vista es delgada, como debe ser una vista. Solo hace tres cosas:
-lee el JSON, valida que estén todos los campos y que los numéricos
-sean números, y le pide la sugerencia al recomendador. No sabe nada
-de árboles ni de probabilidades. Las validaciones están aquí, en el
-backend, porque cualquiera puede mandar una petición sin pasar por la
-app. =ensure_ascii=False= hace que los acentos del motivo se vean
-normales en lugar de aparecer como =\u00e1=.
-
-Recibe un POST con JSON porque el paquete tiene catorce campos, que
-serían demasiados para ponerlos en la dirección. =@csrf_exempt= está
-por la misma razón que en =registrar_pedido= (paso 14 de la ruta de
-Django): la app móvil no manda el token de los formularios web.
-
-*** Paso 17 — Probarlo
-
-Guarden este paquete en un archivo =paquete.json=:
-
-#+begin_src json
-{
-  "distancia_km": 12.64, "peso_kg": 0.31, "largo_cm": 11.7, "ancho_cm": 7.6,
-  "alto_cm": 10.6, "volumen_l": 0.94, "fragil": 0, "refrigerado": 0,
-  "valor_declarado_mxn": 4603, "prioridad": "mismo_dia", "zona_destino": "periferia",
-  "clima": "despejado", "hora_salida": 3, "trafico": "medio"
-}
-#+end_src
-
-Con =python manage.py runserver= corriendo, en otra terminal. En Linux
-y macOS:
-
-#+begin_src shell
-curl -s -X POST -H "Content-Type: application/json" -d @paquete.json http://127.0.0.1:8000/entregas/recomendar/
-#+end_src
-
-En PowerShell (las comillas en ="@paquete.json"= son necesarias, porque
-sin ellas PowerShell interpreta la arroba de otra forma):
-
-#+begin_src powershell
-curl.exe -s -X POST -H "Content-Type: application/json" -d "@paquete.json" http://127.0.0.1:8000/entregas/recomendar/
-#+end_src
-
-La respuesta:
-
-#+begin_example
-{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio"}
-#+end_example
-
-Cambien =hora_salida= a =16= en el archivo y repitan:
-
-#+begin_example
-{"medio": "dron", "motivo": "árbol de decisión, confianza 84%"}
-#+end_example
-
-Prueben también que la vista se defiende de datos incorrectos. Un
-paquete incompleto:
-
-#+begin_src shell
-curl -s -X POST -H "Content-Type: application/json" -d '{"distancia_km": 3}' http://127.0.0.1:8000/entregas/recomendar/
-#+end_src
-
-#+begin_example
-{"error": "faltan campos", "campos": ["peso_kg", "largo_cm", "ancho_cm", ...]}
-#+end_example
-
-Y un texto donde va un número (cambien ="peso_kg": 0.31= por
-="peso_kg": "abc"= en el archivo):
-
-#+begin_example
-{"error": "el campo peso_kg debe ser un número"}
-#+end_example
-
-*Para comprobar:* las cuatro respuestas coinciden con las de arriba.
-
-*** Paso 18 — Con varias copias
-
-Si hicieron la etapa 5 de la ruta de Django, no hace falta nada más.
-Como =modelo_medios.joblib= está dentro del proyecto, =COPY . .= lo
-mete en la imagen, y como scikit-learn está en =requirements.txt=, se
-instala dentro del contenedor. Cada copia carga el mismo modelo, así
-que todas recomiendan lo mismo para el mismo paquete.
-
-#+begin_src shell
-docker compose up --build
-#+end_src
-
-Y prueben con la misma petición, ahora contra el balanceador en
-=http://localhost:8000/entregas/recomendar/=.
-
-Fíjense en lo que significa esto para el futuro: si entrenan un
-modelo mejor, basta con reemplazar el archivo, construir la imagen
-otra vez y reemplazar las copias. El código de la plataforma no
-cambia.
-
-*** Paso 19 — Del medio sugerido al plan de entrega
-
-La recomendación termina en un nombre: ="dron"=. Un nombre no entrega
-paquetes. Falta lo que vimos en la parte de patrones: cada medio
-planea la entrega a su manera (Strategy), y alguien tiene que
-convertir el nombre en el objeto correcto (una fábrica simple, como
-=MedioFactory.crear= en [[*Quién hace el =new=][Quién hace el =new=]]).
-
-Creen =entregas/medios.py=:
-
-#+begin_src python
-from abc import ABC, abstractmethod
-
-
-class MedioDeEntrega(ABC):
-    @abstractmethod
-    def planear(self, paquete: dict) -> dict:
-        pass
-
-
-class EntregaBicicleta(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] / 15 * 60
-        return {"medio": "bicicleta", "minutos": round(minutos), "indicacion": "ruta por ciclovías"}
-
-
-class EntregaMotocicleta(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] / 35 * 60
-        return {"medio": "moto", "minutos": round(minutos), "indicacion": "ruta por avenidas"}
-
-
-class EntregaCamioneta(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] / 30 * 60
-        indicacion = "unidad refrigerada" if paquete["refrigerado"] else "ruta de reparto"
-        return {"medio": "camioneta", "minutos": round(minutos), "indicacion": indicacion}
-
-
-class EntregaDron(MedioDeEntrega):
-    def planear(self, paquete):
-        minutos = paquete["distancia_km"] * 0.75 / 70 * 60
-        return {"medio": "dron", "minutos": round(minutos), "indicacion": "vuelo en línea recta"}
-
-
-MEDIOS = {
-    "bicicleta": EntregaBicicleta,
-    "moto": EntregaMotocicleta,
-    "camioneta": EntregaCamioneta,
-    "dron": EntregaDron,
-}
-
-
-def crear_medio(nombre: str) -> MedioDeEntrega:
-    return MEDIOS[nombre]()
-#+end_src
-
-Cada clase es una estrategia: todas responden =planear(paquete)=,
-cada una a su manera. Aquí el plan es sencillo (un tiempo estimado y
-una indicación); en un sistema real cada estrategia calcularía la ruta
-con su propio servicio de mapas. El dron, por ejemplo, vuela en línea
-recta, así que su distancia real es más corta que la de la calle.
-
-=crear_medio= es la fábrica: el único lugar que conoce las clases
-concretas. El diccionario =MEDIOS= hace el papel del =switch=.
-Cuando aparezca un medio nuevo, se agrega una clase y una línea al
-diccionario.
-
-En la vista =recomendar= solo cambian dos cosas. Agreguen el =import=:
-
-#+begin_src python
-from .medios import crear_medio
-#+end_src
-
-Y al final de la vista, pidan el plan al medio sugerido:
-
-#+begin_src python
-    sugerencia = obtener_recomendador().sugerir(paquete)
-    plan = crear_medio(sugerencia.medio).planear(paquete)
-    return JsonResponse(
-        {"medio": sugerencia.medio, "motivo": sugerencia.motivo, "plan": plan},
-        json_dumps_params={"ensure_ascii": False},
-    )
-#+end_src
-
-*Para comprobar:* con el =paquete.json= del paso 17 (a las 3:00):
-
-#+begin_example
-{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio", "plan": {"medio": "moto", "minutos": 22, "indicacion": "ruta por avenidas"}}
-#+end_example
-
-Con =hora_salida= en =16=:
-
-#+begin_example
-{"medio": "dron", "motivo": "árbol de decisión, confianza 84%", "plan": {"medio": "dron", "minutos": 8, "indicacion": "vuelo en línea recta"}}
-#+end_example
-
-Y si además cambian =refrigerado= a =1=, el modelo elige camioneta y
-la estrategia de la camioneta pide la unidad refrigerada:
-
-#+begin_example
-{"medio": "camioneta", "motivo": "árbol de decisión, confianza 100%", "plan": {"medio": "camioneta", "minutos": 25, "indicacion": "unidad refrigerada"}}
-#+end_example
-
-** Por qué la IA no hace desaparecer los patrones de diseño
-
-Es fácil pensar que, si ahora un modelo decide qué medio usar, ya no
-hacen falta Strategy, Adapter ni fábricas: «la IA lo resuelve». Con lo
-que acaban de construir se puede ver por qué eso no es cierto.
-
-*** El modelo responde una sola pregunta
-
-Sigan lo que pasa con un paquete desde que llega hasta que sale la
-respuesta:
-
-#+begin_example
-App o página web
-   │  POST /entregas/recomendar/
-   ▼
-Vista recomendar ............ lee y valida; no decide nada
-   │
-   ├── obtener_recomendador().sugerir(paquete) ... Adapter
-   │       └── RecomendadorArbol: el modelo propone, las reglas descartan
-   │                     │
-   │                     ▼
-   │               Sugerencia(medio, motivo)
-   │
-   └── crear_medio(sugerencia.medio) ............... fábrica simple
-           └── .planear(paquete) ................... Strategy
-                     │
-                     ▼
-               plan de entrega
-#+end_example
-
-| Qué hay que hacer                          | Quién lo hace                  | Qué lo hace posible                  |
-|--------------------------------------------+--------------------------------+--------------------------------------|
-| Recibir la petición y validar los datos    | La vista =recomendar=          | Una vista delgada                    |
-| Elegir el medio más conveniente            | *El modelo*                    | El entrenamiento                     |
-| Traducir probabilidades a una =Sugerencia= | =RecomendadorArbol=            | Adapter                              |
-| Descartar lo imposible                     | =reglas.py=                    | Reglas del negocio escritas a mano   |
-| Convertir ="dron"= en un objeto            | =crear_medio=                  | Fábrica simple                       |
-| Planear la entrega                         | =EntregaDron=, =EntregaMotocicleta=... | Strategy                     |
-| Cargar el modelo una sola vez              | =obtener_recomendador=         | Una instancia compartida por proceso |
-
-El modelo ocupa una sola fila de esta tabla. Reemplazó la parte que
-antes era un =if= largo para elegir el medio, pero todo lo demás sigue
-siendo software, y sigue necesitando estar ordenado. El modelo dice
-«dron»; no sabe planear un vuelo, ni validar un JSON, ni guardar un
-pedido.
-
-*** El modelo es un proveedor más, y los proveedores cambian
-
-En esta misma materia el recomendador ya cambió varias veces: primero
-fue un proveedor externo que respondía =route_hint=, luego un árbol de
-decisión, y se puede cambiar por un Random Forest o, en el ejercicio
-5, por unas reglas sencillas. Mañana podría ser un modelo de lenguaje
-contratado por internet.
-
-Gracias a la interfaz =RecomendadorIA=, cada uno de esos cambios toca
-una línea: la de =obtener_recomendador=. Comparen con lo que pasa si
-el modelo se usa directamente en la vista:
-
-#+begin_src python
-def recomendar(request):
-    paquete = json.loads(request.body)
-    modelo = joblib.load("entregas/modelo/modelo_medios.joblib")
-    probabilidades = modelo.predict_proba(pd.DataFrame([paquete]))[0]
-    medio = modelo.classes_[probabilidades.argmax()]
-    if medio == "dron" and (paquete["hora_salida"] < 6 or paquete["clima"] != "despejado"):
-        medio = "moto"
-    if medio == "dron":
-        minutos = paquete["distancia_km"] * 0.75 / 70 * 60
-    elif medio == "moto":
-        ...
-#+end_src
-
-Funciona, y una IA que escribe código probablemente propondría algo
-así si se le pide «hazme la recomendación». Pero:
-
-- La vista carga el archivo en cada petición, así que es lenta.
-- =pandas= y scikit-learn quedan metidos en la vista. El día que se
-  use un proveedor externo, hay que reescribirla.
-- Las reglas del negocio quedan mezcladas con la predicción, y
-  repetidas en cada lugar que necesite recomendar: el panel, la app,
-  las pruebas.
-- El =if= de los medios vuelve a aparecer, que es justo el =switch=
-  de 200 líneas del que partió la sección de Strategy.
-
-Es el mismo problema de siempre, con un modelo en medio.
-
-*** El modelo se equivoca y se cae
-
-En el paso 12 vimos que el modelo propone algo imposible en 1.2 % de
-los casos. Además, un modelo envejece, y si es un servicio externo se
-puede caer o tardar en responder. Ninguna de esas cosas se arregla
-con un modelo mejor; se arregla con diseño:
-
-- Las reglas del negocio viven aparte del modelo (=reglas.py=), para
-  que ninguna recomendación imposible llegue al despacho.
-- Como todos los recomendadores cumplen la misma interfaz, se puede
-  escribir uno que envuelva a otro y, si el principal falla, use un
-  respaldo (ejercicio 6). Es lo que se discutió en
-  [[*La IA se cae y el pedido sigue vivo][La IA se cae y el pedido sigue vivo]]: el pedido no puede depender de
-  que la IA conteste.
-
-*** La IA que escribe código tampoco los elimina
-
-Lo mismo pasa con las herramientas de IA que generan código. Escriben
-rápido, pero el costo de un sistema no está en escribirlo la primera
-vez, sino en cambiarlo durante años. Los patrones existen para ese
-segundo costo. Además, son el vocabulario para pedirle bien las cosas
-a una IA («escribe un adaptador que cumpla =RecomendadorIA=») y para
-revisar lo que propone (como en [[*Uso de IA en el diseño de software][Uso de IA en el diseño de software]]).
-
-#+begin_quote
-La IA cambia *quién* toma una decisión. No cambia *cuánto cuesta*
-cambiar el código cuando esa decisión, o quien la toma, cambia. Los
-patrones de diseño atienden lo segundo.
-#+end_quote
-
-** Random Forest: cambiar una línea
-
-Si quieren comparar, en el paso 6 cambien el árbol por un bosque:
-
-#+begin_src python
-from sklearn.ensemble import RandomForestClassifier
-
-modelo = Pipeline([
-    ("preparacion", preparacion),
-    ("arbol", RandomForestClassifier(n_estimators=300, random_state=42, n_jobs=-1)),
-])
-#+end_src
-
-Todo lo demás (entrenar, evaluar, guardar, usar y el adaptador de
-Django) funciona igual, porque los dos tienen =fit=, =predict= y
-=predict_proba=. Solo dejarán de funcionar =export_text= y la lectura
-de reglas del paso 8, porque un bosque son 300 árboles votando. El
-script =entrenar_modelo.py= de la carpeta ya entrena un Random Forest;
-con este dataset llega a 93.1 %.
-
-¿Cuál conviene? El bosque acierta un punto más, pero no se puede
-explicar y el archivo guardado pesa unos 60 MB, demasiado para subirlo
-al repositorio como hicimos con el árbol. Para la plataforma de esta
-materia, el árbol es suficiente: un punto de diferencia lo cubren de
-todos modos las reglas del paso 12, y poder explicarle al jefe de
-logística por qué se eligió la moto vale mucho.
-
-** Qué hay que tener en cuenta
-
-- *Los datos son sintéticos.* El modelo aprendió reglas que alguien
-  inventó para generar el dataset. En una empresa real se entrenaría
-  con el historial de envíos, y habría que revisar que ese historial
-  refleje buenas decisiones y no los errores de siempre.
-- *El modelo envejece.* Si la empresa compra drones con más
-  autonomía o cambia sus tarifas, el modelo sigue recomendando como
-  antes. Hay que volver a entrenarlo con datos nuevos de vez en cuando.
-- *Las reglas del negocio no se le dejan al modelo.* Lo que es
-  imposible o prohibido se valida siempre con código escrito a mano.
-- *La versión de las bibliotecas importa.* El modelo se entrena y se
-  usa con la misma versión de scikit-learn.
-
-** Ejercicios
-
-1. *Una pregunta nueva para el árbol.* Agreguen al dataset una columna
-   =es_de_noche= (1 si la hora es menor a 6 o mayor o igual a 21, 0 si
-   no), agréguenla a =NUMERICAS=, entrenen otra vez y cuenten cuántas
-   veces el modelo sugiere un medio imposible. ¿Bajó de 121? ¿Por qué
-   le ayuda esa columna al árbol?
-2. *Las clases desbalanceadas.* Entrenen con
-   =DecisionTreeClassifier(..., class_weight="balanced")=. ¿Qué pasa
-   con el =recall= del dron? ¿Y con su =precision=? ¿Qué preferiría la
-   empresa, y por qué?
-3. *Menos preguntas.* Entrenen con =--profundidad 4= e impriman el
-   árbol completo con =export_text= sin =max_depth=. ¿Lo podrían
-   escribir como una cadena de =if= en Python? ¿Qué se pierde?
-4. *Datos sucios.* Generen el dataset con
-   =python generar_dataset.py --faltantes 0.05 --salida sucio.csv=,
-   que deja un 5 % de celdas vacías, y entrenen con
-   =python entrenar_arbol.py --datos sucio.csv=. Las versiones
-   recientes de scikit-learn aceptan huecos en los árboles, así que
-   va a entrenar, pero con menos exactitud. Agreguen un
-   =SimpleImputer= a la preparación para llenar los huecos (con la
-   mediana en las numéricas y el valor más frecuente en las
-   categóricas) y comparen. Después piensen en la plataforma: si la
-   app móvil manda un paquete sin peso, ¿la vista debería rellenarlo
-   o rechazarlo? ¿Por qué?
-5. *Otro proveedor detrás de la misma interfaz.* Escriban un
-   =RecomendadorReglas= que no use ningún modelo, solo un par de =if=,
-   y cámbienlo en =obtener_recomendador=. Comprueben que la vista
-   funciona sin tocarla. ¿Qué patrón hace posible ese cambio?
-6. *Un recomendador con respaldo.* Escriban un
-   =RecomendadorConRespaldo(principal, respaldo)= que también cumpla
-   =RecomendadorIA=: llama al principal y, si lanza una excepción,
-   usa el respaldo y lo dice en el =motivo=. Úsenlo con el árbol como
-   principal y el =RecomendadorReglas= del ejercicio 5 como respaldo.
-   Para simular la falla, hagan que =RecomendadorArbol.sugerir= lance
-   una excepción. ¿Qué patrón del catálogo se parece a un objeto que
-   envuelve a otro con la misma interfaz y le agrega algo?
-
 * Cierre
 
 La pregunta importante no es «¿cuántos patrones utilicé?». Es:
@@ -7119,13 +5488,6 @@ de más.
 
 Si la respuesta es «demasiadas cosas», hay un problema de diseño.
 #+end_quote
-
-
-
-
-
-
-
 * De una Aplicación Django + Flutter a una Arquitectura de Microservicios
 
 
@@ -7172,8 +5534,6 @@ En esta arquitectura:
 
 Esta separación constituye una buena base antes de considerar una
 arquitectura de microservicios.
-
-
 ** 1. Una idea importante: separar no significa utilizar microservicios
 
 Es importante distinguir dos conceptos.
@@ -7199,8 +5559,6 @@ Frontend separado + backend monolítico.
 #+end_quote
 
 Esto NO significa que tengamos microservicios.
-
-
 *** 1.1 ¿Entonces cuál es la ventaja?
 
 Aunque Django siga siendo una sola aplicación, ya hemos separado dos
@@ -7226,8 +5584,6 @@ responsabilidades importantes:
 #+end_example
 
 Esta separación facilita posteriormente la evolución del sistema.
-
-
 ** 2. ¿Por qué Flutter y Django combinan bien?
 
 Flutter se especializa principalmente en construir interfaces para:
@@ -7259,8 +5615,6 @@ Por ejemplo:
 #+end_example
 
 Cada tecnología realiza aquello para lo que está mejor preparada.
-
-
 ** 3. Responsabilidades de Flutter
 
 Flutter debería encargarse principalmente de:
@@ -7287,8 +5641,6 @@ final response = await http.get(
 Flutter solicita información.
 
 No debería acceder directamente a PostgreSQL.
-
-
 ** 4. Responsabilidades de Django
 
 Django puede encargarse de:
@@ -7331,8 +5683,6 @@ Django
    v
 PostgreSQL
 #+end_example
-
-
 ** 5. ¿Por qué no poner la lógica de negocio en Flutter?
 
 Supongamos que tenemos una regla:
@@ -7364,8 +5714,6 @@ Si la regla solamente estuviera implementada en Flutter, los otros
 clientes podrían ignorarla.
 
 Por eso las reglas importantes deben permanecer en el backend.
-
-
 ** 6. Django como punto central del sistema
 
 Django puede convertirse en la fuente principal de las reglas de
@@ -7393,8 +5741,6 @@ negocio.
 #+end_example
 
 Esto permite que todos los clientes respeten las mismas reglas.
-
-
 ** 7. Ventaja de Django: desarrollo rápido
 
 Una de las grandes ventajas de Django es que proporciona muchas
@@ -7418,8 +5764,6 @@ Django incluye o facilita:
 
 Sin un framework completo tendríamos que desarrollar o integrar muchas
 de estas características manualmente.
-
-
 ** 8. El ORM de Django
 
 Django proporciona un ORM que permite trabajar con la base de datos
@@ -7451,8 +5795,6 @@ en lugar de escribir directamente:
 SELECT *
 FROM alumno;
 #+end_src
-
-
 *** 8.1 ¿Por qué es importante arquitectónicamente?
 
 Porque centraliza gran parte del acceso a los datos.
@@ -7474,8 +5816,6 @@ Esto facilita:
 - migraciones,
 - pruebas,
 - evolución del modelo.
-
-
 ** 9. Django REST Framework
 
 Cuando Django trabaja con Flutter es común utilizar:
@@ -7491,8 +5831,6 @@ DRF
 #+end_example
 
 Django REST Framework permite convertir Django en una API.
-
-
 *** 9.1 Ejemplo
 
 Podemos tener:
@@ -7536,8 +5874,6 @@ PATCH  /api/alumnos/25/
 
 DELETE /api/alumnos/25/
 #+end_example
-
-
 ** 10. Django permite comenzar sencillo
 
 Supongamos que estamos desarrollando un sistema escolar.
@@ -7566,8 +5902,6 @@ Esto tiene una ventaja importante:
 No necesitamos resolver problemas distribuidos que todavía no
 tenemos.
 #+end_quote
-
-
 ** 11. Aplicación monolítica
 
 Un monolito significa que gran parte del backend se despliega como una
@@ -7594,8 +5928,6 @@ proyecto/
 #+end_example
 
 Todo pertenece al mismo proyecto Django.
-
-
 ** 12. Monolito no significa código desorganizado
 
 Existe una confusión frecuente:
@@ -7631,8 +5963,6 @@ proyecto_escolar/
 #+end_example
 
 Cada módulo tiene responsabilidades específicas.
-
-
 ** 13. Monolito modular
 
 Este concepto es especialmente importante antes de hablar de
@@ -7646,8 +5976,6 @@ Monolito modular.
 
 La aplicación sigue siendo una sola aplicación desplegable, pero
 internamente está organizada en módulos.
-
-
 *** 13.1 Ejemplo
 
 #+begin_example
@@ -7670,8 +5998,6 @@ internamente está organizada en módulos.
 Los módulos tienen responsabilidades diferentes.
 
 Pero todavía pertenecen a la misma aplicación.
-
-
 ** 14. ¿Por qué comenzar con un monolito modular?
 
 Porque resulta mucho más sencillo aprender y controlar:
@@ -7692,13 +6018,9 @@ Primero separar responsabilidades.
 
 Después, solamente si existe una necesidad real, separar procesos.
 #+end_quote
-
-
 ** 15. Evolución natural de una aplicación
 
 Una aplicación podría evolucionar de esta manera.
-
-
 *** Etapa 1: Django tradicional
 
 #+begin_example
@@ -7711,8 +6033,6 @@ Django
    +-- templates
    +-- datos
 #+end_example
-
-
 *** Etapa 2: frontend separado
 
 #+begin_example
@@ -7724,8 +6044,6 @@ Django REST API
    v
 PostgreSQL
 #+end_example
-
-
 *** Etapa 3: monolito modular
 
 #+begin_example
@@ -7743,8 +6061,6 @@ Django REST API
    v
 PostgreSQL
 #+end_example
-
-
 *** Etapa 4: algunos servicios independientes
 
 Posteriormente podemos descubrir que alguna parte necesita separarse.
@@ -7762,8 +6078,6 @@ Posteriormente podemos descubrir que alguna parte necesita separarse.
        Django Core          Notificaciones
                               Servicio
 #+end_example
-
-
 *** Etapa 5: microservicios
 
 Si el sistema realmente lo requiere:
@@ -7783,8 +6097,6 @@ Si el sistema realmente lo requiere:
        v                v                v
       BD               BD               BD
 #+end_example
-
-
 ** 16. Ventaja de Django: modularidad mediante aplicaciones
 
 Django permite crear aplicaciones independientes dentro de un proyecto.
@@ -7833,8 +6145,6 @@ sistema/
 
 Esta modularidad puede ser un excelente paso previo a los
 microservicios.
-
-
 ** 17. Django ayuda a encontrar los límites del sistema
 
 Supongamos que tenemos:
@@ -7883,8 +6193,6 @@ Podríamos evolucionar a:
 #+end_example
 
 No necesitamos dividir todo al mismo tiempo.
-
-
 ** 18. Django también puede utilizarse para microservicios
 
 Es importante aclarar algo:
@@ -7929,18 +6237,12 @@ Podrían coexistir distintas tecnologías.
     Django          Java            Python
                                      FastAPI
 #+end_example
-
-
 ** 19. ¿Qué ventajas tiene Django para construir servicios?
 
 Django ofrece varias ventajas importantes.
-
-
 *** 19.1 Autenticación
 
 Django cuenta con un sistema maduro de autenticación.
-
-
 *** 19.2 Permisos
 
 Podemos administrar:
@@ -7949,29 +6251,19 @@ Podemos administrar:
 - grupos,
 - roles,
 - permisos.
-
-
 *** 19.3 ORM
 
 Facilita trabajar con bases de datos relacionales.
-
-
 *** 19.4 Migraciones
 
 Permite evolucionar la estructura de la base de datos.
-
-
 *** 19.5 Django REST Framework
 
 Permite crear APIs rápidamente.
-
-
 *** 19.6 Panel administrativo
 
 Django Admin permite construir interfaces administrativas con muy poco
 código.
-
-
 *** 19.7 Seguridad
 
 Django proporciona mecanismos para ayudar a evitar problemas comunes
@@ -7981,8 +6273,6 @@ como:
 - XSS,
 - inyección SQL,
 - manejo inseguro de sesiones.
-
-
 ** 20. Django Admin como ventaja importante
 
 Una de las características más útiles de Django es:
@@ -8013,8 +6303,6 @@ Esto es especialmente útil para:
 - aplicaciones empresariales,
 - catálogos,
 - mantenimiento de información.
-
-
 ** 21. ¿Por qué Django puede ser conveniente antes de microservicios?
 
 Porque permite concentrarnos primero en el problema real.
@@ -8050,13 +6338,9 @@ Antes de preocuparnos por:
 
 ¿Cómo implementamos API Gateway?
 #+end_example
-
-
 ** 22. Problemas que aparecen con los microservicios
 
 Cuando dividimos una aplicación aparecen nuevos problemas.
-
-
 *** 22.1 Comunicación por red
 
 Antes:
@@ -8083,8 +6367,6 @@ Ahora pueden existir:
 - timeout,
 - desconexiones,
 - errores HTTP.
-
-
 ** 23. Fallos parciales
 
 En un monolito:
@@ -8128,8 +6410,6 @@ Entonces debemos decidir:
 #+end_quote
 
 Este problema no es trivial.
-
-
 ** 24. Transacciones distribuidas
 
 Supongamos que realizamos una compra.
@@ -8180,8 +6460,6 @@ Envíos
 cada servicio podría utilizar una base de datos distinta.
 
 Ya no tenemos una única transacción sencilla.
-
-
 ** 25. Consistencia eventual
 
 Los sistemas distribuidos frecuentemente necesitan trabajar con
@@ -8203,8 +6481,6 @@ Durante algunos instantes dos servicios podrían tener información
 diferente.
 
 Esto requiere diseños más avanzados.
-
-
 ** 26. Los microservicios necesitan infraestructura adicional
 
 Una arquitectura basada en microservicios puede requerir:
@@ -8242,8 +6518,6 @@ Por ejemplo:
                       |
                  RabbitMQ/Kafka
 #+end_example
-
-
 ** 27. Microservicios aumentan el costo operacional
 
 En un monolito podríamos desplegar:
@@ -8277,8 +6551,6 @@ Cada componente necesita:
 - seguridad,
 - monitoreo,
 - actualización.
-
-
 ** 28. Por eso no conviene comenzar necesariamente con microservicios
 
 Una arquitectura podría parecer más moderna:
@@ -8300,13 +6572,9 @@ La arquitectura debe responder a las necesidades del sistema.
 La complejidad arquitectónica debe justificarse mediante una necesidad
 real.
 #+end_quote
-
-
 ** 29. Ventajas de comenzar con Django + Flutter
 
 Podemos resumir varias ventajas.
-
-
 *** 29.1 Menor complejidad inicial
 
 #+begin_example
@@ -8318,8 +6586,6 @@ PostgreSQL
 #+end_example
 
 es relativamente sencillo de comprender.
-
-
 *** 29.2 Separación clara
 
 Flutter:
@@ -8339,13 +6605,9 @@ PostgreSQL:
 #+begin_example
 Datos
 #+end_example
-
-
 *** 29.3 Desarrollo rápido
 
 Django ya incorpora muchas herramientas.
-
-
 *** 29.4 Menor infraestructura
 
 No necesitamos inicialmente:
@@ -8354,31 +6616,21 @@ No necesitamos inicialmente:
 - brokers,
 - gateways,
 - service discovery.
-
-
 *** 29.5 Pruebas más sencillas
 
 Podemos probar el sistema dentro de un mismo proyecto.
-
-
 *** 29.6 Refactorización más sencilla
 
 Mover código dentro del mismo proyecto suele ser más sencillo que mover
 funcionalidad entre servicios distribuidos.
-
-
 *** 29.7 Permite descubrir los límites reales
 
 Conforme crece el sistema descubrimos qué módulos realmente necesitan
 separarse.
-
-
 ** 30. ¿Cuándo comenzar a considerar microservicios?
 
 Los microservicios comienzan a resultar interesantes cuando aparecen
 necesidades concretas.
-
-
 *** Caso 1: escalamiento independiente
 
 Supongamos:
@@ -8397,8 +6649,6 @@ Procesamiento de imágenes
 Quizá no tenga sentido escalar toda la aplicación.
 
 Podríamos separar procesamiento de imágenes.
-
-
 ** 31. Caso 2: equipos diferentes
 
 Supongamos que tenemos:
@@ -8419,8 +6669,6 @@ Logística
 
 Si los equipos necesitan desplegar independientemente, los
 microservicios pueden aportar ventajas.
-
-
 ** 32. Caso 3: tecnologías diferentes
 
 Tal vez una parte del sistema requiera:
@@ -8442,8 +6690,6 @@ Java
 #+end_example
 
 Una arquitectura distribuida permite cierta independencia tecnológica.
-
-
 ** 33. Caso 4: procesos muy especializados
 
 Supongamos una aplicación médica.
@@ -8471,8 +6717,6 @@ El procesamiento de imágenes podría necesitar:
 - servidores especializados.
 
 Ese módulo podría tener sentido como servicio independiente.
-
-
 ** 34. ¿Todo debe convertirse en microservicio?
 
 No.
@@ -8504,8 +6748,6 @@ Podemos tener una arquitectura híbrida.
 La mayor parte de la aplicación puede permanecer en Django.
 
 Solamente se extraen las partes que realmente lo necesitan.
-
-
 ** 35. De módulo Django a microservicio
 
 Supongamos que inicialmente tenemos:
@@ -8548,8 +6790,6 @@ o:
 #+begin_example
 RabbitMQ
 #+end_example
-
-
 ** 36. Aquí aparece otra ventaja del diseño modular
 
 Si desde el inicio tenemos:
@@ -8583,8 +6823,6 @@ Por eso:
 Un buen monolito modular puede ser una excelente preparación para una
 arquitectura de microservicios.
 #+end_quote
-
-
 ** 37. Patrones de diseño dentro de Django
 
 Antes de estudiar microservicios podemos aplicar patrones dentro del
@@ -8606,8 +6844,6 @@ Por ejemplo:
 
     Strategy     Adapter     Repository
 #+end_example
-
-
 ** 38. Strategy en Django
 
 Supongamos diferentes formas de calcular una calificación.
@@ -8625,8 +6861,6 @@ Supongamos diferentes formas de calcular una calificación.
 No necesitamos microservicios.
 
 Es un problema de diseño interno.
-
-
 ** 39. Adapter en Django
 
 Supongamos que integramos:
@@ -8657,8 +6891,6 @@ Nuevamente:
 No necesitamos crear tres microservicios solamente porque tenemos tres
 proveedores.
 #+end_quote
-
-
 ** 40. Service Layer
 
 También podemos separar la lógica de negocio de las vistas.
@@ -8703,8 +6935,6 @@ service.inscribir(
     grupo
 )
 #+end_src
-
-
 ** 41. Esto prepara mejor el camino hacia microservicios
 
 Ahora tenemos:
@@ -8724,8 +6954,6 @@ Datos
 
 Si algún día queremos extraer esa funcionalidad, sus responsabilidades
 ya están mejor definidas.
-
-
 ** 42. Arquitectura recomendada inicialmente
 
 Para una aplicación web/móvil de tamaño pequeño o mediano podríamos
@@ -8764,8 +6992,6 @@ tener:
 
                    PostgreSQL
 #+end_example
-
-
 ** 43. Evolución posterior
 
 Si existe una necesidad real:
@@ -8791,14 +7017,10 @@ Si existe una necesidad real:
 #+end_example
 
 No fue necesario convertir cada módulo en microservicio.
-
-
 ** 44. Una ruta de aprendizaje recomendable
 
 Para comprender correctamente estas arquitecturas podemos estudiar en
 este orden:
-
-
 *** Nivel 1
 
 #+begin_example
@@ -8812,8 +7034,6 @@ Aprender:
 - URLs,
 - ORM,
 - autenticación.
-
-
 *** Nivel 2
 
 #+begin_example
@@ -8828,8 +7048,6 @@ Aprender:
 - serializers,
 - API,
 - autenticación por tokens.
-
-
 *** Nivel 3
 
 #+begin_example
@@ -8841,8 +7059,6 @@ Aprender:
 - frontend/backend,
 - consumo de APIs,
 - separación de responsabilidades.
-
-
 *** Nivel 4
 
 #+begin_example
@@ -8856,8 +7072,6 @@ Aprender:
 - servicios,
 - dependencias,
 - patrones de diseño.
-
-
 *** Nivel 5
 
 #+begin_example
@@ -8869,8 +7083,6 @@ Aprender:
 - contenerización,
 - despliegue,
 - variables de entorno.
-
-
 *** Nivel 6
 
 #+begin_example
@@ -8882,8 +7094,6 @@ Aprender:
 - comunicación entre procesos,
 - APIs internas,
 - autenticación entre servicios.
-
-
 *** Nivel 7
 
 #+begin_example
@@ -8898,26 +7108,22 @@ Aprender:
 - observabilidad,
 - consistencia distribuida,
 - escalamiento.
-
-
 ** 45. Comparación
 
-| Aspecto | Django monolítico modular | Microservicios |
-|---------+----------------------------+----------------|
-| Inicio | Sencillo | Complejo |
-| Despliegue | Uno | Varios |
-| Comunicación | Interna | Red |
-| Base de datos | Puede ser única | Normalmente distribuidas |
-| Debug | Más sencillo | Más complejo |
-| Transacciones | Sencillas | Más complejas |
-| Infraestructura | Menor | Mayor |
-| Escalamiento | Aplicación completa | Servicio individual |
-| Equipos pequeños | Adecuado | Puede ser excesivo |
-| Equipos grandes | Puede complicarse | Puede aportar independencia |
-| Desarrollo inicial | Rápido | Más lento |
-| Operación | Sencilla | Compleja |
-
-
+| Aspecto            | Django monolítico modular | Microservicios              |
+|--------------------+---------------------------+-----------------------------|
+| Inicio             | Sencillo                  | Complejo                    |
+| Despliegue         | Uno                       | Varios                      |
+| Comunicación       | Interna                   | Red                         |
+| Base de datos      | Puede ser única           | Normalmente distribuidas    |
+| Debug              | Más sencillo              | Más complejo                |
+| Transacciones      | Sencillas                 | Más complejas               |
+| Infraestructura    | Menor                     | Mayor                       |
+| Escalamiento       | Aplicación completa       | Servicio individual         |
+| Equipos pequeños   | Adecuado                  | Puede ser excesivo          |
+| Equipos grandes    | Puede complicarse         | Puede aportar independencia |
+| Desarrollo inicial | Rápido                    | Más lento                   |
+| Operación          | Sencilla                  | Compleja                    |
 ** 46. Django frente a los microservicios
 
 No debemos formular la comparación como:
@@ -8951,8 +7157,6 @@ o:
 #+begin_example
 Django dentro de microservicios
 #+end_example
-
-
 ** 47. La comparación correcta
 
 Podemos comparar:
@@ -8977,8 +7181,6 @@ mientras que Django puede utilizarse en ambos.
 
        Monolito modular    Microservicio
 #+end_example
-
-
 ** 48. ¿Qué ventaja tiene Django antes de migrar a microservicios?
 
 La principal ventaja es que permite:
@@ -9015,8 +7217,6 @@ Finalmente, si es necesario:
 
     distribuir
 #+end_example
-
-
 ** 49. Error frecuente
 
 Un error frecuente consiste en pensar:
@@ -9042,8 +7242,6 @@ Sería parecido a construir:
 #+end_example
 
 para una organización que todavía utiliza solamente una oficina.
-
-
 ** 50. Otro error: microservicio por tabla
 
 Esto sería una mala interpretación:
@@ -9065,8 +7263,6 @@ Microservicio Grupo
 Los microservicios no deberían dividirse simplemente por tablas.
 
 Normalmente representan capacidades del negocio.
-
-
 ** 51. Dividir por responsabilidad del negocio
 
 Por ejemplo:
@@ -9095,8 +7291,6 @@ Facturación
 #+end_example
 
 Estos límites tienen más sentido que crear un servicio por cada tabla.
-
-
 ** 52. Ejemplo con un sistema escolar
 
 Inicialmente:
@@ -9139,8 +7333,6 @@ Posteriormente el sistema podría crecer.
 #+end_example
 
 Pero esta división aparece después de identificar necesidades reales.
-
-
 ** 53. Principio importante
 
 Una idea útil para arquitectura de software es:
@@ -9166,8 +7358,6 @@ código desorganizado distribuido por la red
 #+end_example
 
 lo cual generalmente es todavía más difícil de mantener.
-
-
 ** 54. Conclusión
 
 Una arquitectura:
@@ -9250,8 +7440,6 @@ La meta es construir un sistema mantenible.
 Los microservicios son solamente una posible herramienta para conseguirlo
 cuando las necesidades del sistema justifican su complejidad.
 #+end_quote
-
-
 ** 55. Preguntas para discusión
 
 1. ¿Separar Flutter y Django significa utilizar microservicios?
