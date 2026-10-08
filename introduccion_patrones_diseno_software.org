@@ -6940,6 +6940,397 @@ logística por qué se eligió la moto vale mucho.
    una excepción. ¿Qué patrón del catálogo se parece a un objeto que
    envuelve a otro con la misma interfaz y le agrega algo?
 
+*** Actividad individual — Lo que hay detrás de la implementación
+
+Esta actividad es *individual* y de razonamiento: no se pide escribir
+código. Las preguntas repasan todo lo que construimos, desde el
+entorno virtual hasta el modelo dentro de la plataforma. Antes de
+responder, lean con calma la ruta de Django (etapas 1 a 5 y
+/Qué hay que tener pensado si el sistema crece/) y esta sección
+completa.
+
+Cuando una pregunta muestra código, es para analizarlo. Respondan con
+sus palabras y expliquen siempre el *porqué*: una respuesta correcta
+sin justificación vale la mitad.
+
+**** Cómo se entrega: un commit por persona
+
+Cada quien sube su propio archivo al repositorio del equipo, desde su
+computadora y con su cuenta. No se vale que una sola persona suba los
+archivos de todos: en el historial del repositorio se revisa quién
+hizo cada commit.
+
+1. Actualicen su copia del repositorio:
+
+   #+begin_src shell
+   git pull
+   #+end_src
+
+2. Creen la carpeta =actividades/implementacion/= (si no existe) y
+   dentro un archivo con su matrícula y su primer apellido, por
+   ejemplo =actividades/implementacion/21120345_garcia.md=.
+
+3. Usen esta plantilla y respondan debajo de cada pregunta:
+
+   #+begin_example
+   # Actividad individual — Lo que hay detrás de la implementación
+
+   Nombre:
+   Matrícula:
+   Equipo:
+
+   ## A1
+   (respuesta)
+
+   ## A2
+   a) ...
+   b) ...
+   c) ...
+
+   ...
+
+   ## F1
+   a) ...
+   b) ...
+   c) ...
+   #+end_example
+
+4. Revisen que Git los tenga registrados con su nombre y su correo
+   (solo hace falta una vez por computadora):
+
+   #+begin_src shell
+   git config user.name
+   git config user.email
+   #+end_src
+
+   Si sale vacío o con el nombre de otra persona:
+
+   #+begin_src shell
+   git config --global user.name "Su Nombre"
+   git config --global user.email "su_correo@ejemplo.com"
+   #+end_src
+
+5. Suban su archivo:
+
+   #+begin_src shell
+   git add actividades/implementacion/21120345_garcia.md
+   git commit -m "Actividad implementación: 21120345 García"
+   git push
+   #+end_src
+
+   Si =git push= responde que el repositorio remoto tiene cambios que
+   ustedes no tienen (porque un compañero subió su archivo antes),
+   ejecuten =git pull= y vuelvan a hacer =git push=. Como cada quien
+   trabaja en un archivo distinto, no debería haber conflictos.
+
+*Para comprobar:* =git log --oneline -- actividades/implementacion/=
+muestra su commit con su nombre como autor.
+
+Pueden usar la IA como se propone en
+[[*Uso de IA en el diseño de software][Uso de IA en el diseño de software]]: para discutir una
+duda o pedir un contraejemplo, no para que responda por ustedes. Las
+respuestas tienen que hablar de lo que ustedes hicieron en la
+plataforma. Dos respuestas iguales entre compañeros se anulan.
+
+**** A — Entorno virtual, proyecto y contenedor (15 puntos)
+
+*A1 — Dos opiniones en el equipo (5 puntos).* Dos integrantes del
+equipo discuten:
+
+#+begin_quote
+Ana: «Ya tengo Docker instalado, así que el entorno virtual sobra».
+
+Luis: «Con el entorno virtual me basta. Si llega mucha gente, abro
+más terminales con =runserver= y listo».
+#+end_quote
+
+¿Qué tiene de cierto y qué tiene de falso cada opinión? Expliquen qué
+aísla un entorno virtual, qué aísla un contenedor y para qué usamos
+cada uno en el curso.
+
+*A2 — Se borró la carpeta =.venv= (5 puntos).* Un compañero borró por
+accidente la carpeta =.venv= de su proyecto y está seguro de que
+perdió el trabajo de toda la semana.
+
+a) ¿Perdió su código? ¿Por qué?
+
+b) ¿Qué necesita para dejar el proyecto funcionando otra vez y qué
+papel juega =requirements.txt=?
+
+c) Otro compañero dice que «activar» el entorno instala Python en la
+computadora. ¿Qué hace realmente la activación y por qué hay que
+repetirla en cada terminal nueva?
+
+*A3 — ¿Dónde está =/app=? (5 puntos).* El =Dockerfile= del proyecto
+contiene:
+
+#+begin_example
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+#+end_example
+
+Un alumno busca la carpeta =/app= en su computadora y no la encuentra.
+
+a) ¿Dónde existe =/app=? ¿Qué copia exactamente =COPY . .=?
+
+b) El archivo =.dockerignore= excluye =.venv/= y =db.sqlite3=. ¿Qué
+problema evita cada una de esas dos líneas?
+
+**** B — El backend entrega datos (15 puntos)
+
+*B1 — La regla en el JavaScript (5 puntos).* Para avanzar rápido, el
+equipo programa en el JavaScript de la página web la regla que decide
+si un paquete va en moto o en dron. Tres meses después llega la
+aplicación móvil.
+
+a) ¿Qué problemas van a aparecer?
+
+b) ¿Por qué se dice en los apuntes que, con un buen backend, el
+frontend «se puede cambiar»? ¿Qué es lo único que el backend le
+entrega al frontend?
+
+*B2 — Un campo con otro nombre (5 puntos).* La dirección
+=/entregas/estado/= responde:
+
+#+begin_example
+{"servicio": "entregas", "version": 1, "medios_disponibles": ["camioneta", "moto", "bicicleta", "dron"]}
+#+end_example
+
+Un desarrollador decide que =medios_disponibles= es muy largo y lo
+cambia a =medios=. La página web la actualiza el mismo día.
+
+¿Qué le pasa a la aplicación móvil que ya está instalada en miles de
+teléfonos? ¿Qué es el «contrato» entre backend y frontend, y para qué
+sirve el campo =version=?
+
+*B3 — «La app ya valida» (5 puntos).* La aplicación móvil no deja
+enviar un paquete sin peso. Por eso un integrante propone quitar de la
+vista =recomendar= las validaciones de campos faltantes y de números.
+
+¿Están de acuerdo? Justifiquen. ¿Qué diferencia hay entre la
+validación del frontend y la del backend?
+
+**** C — Escalar con varias copias (20 puntos)
+
+*C1 — Más grande o más copias (5 puntos).* La plataforma empieza a
+tardar a la hora de la comida.
+
+a) Expliquen la diferencia entre escalar verticalmente y escalar
+horizontalmente.
+
+b) ¿Qué límite tiene escalar verticalmente?
+
+c) ¿Qué hace el balanceador (nginx) cuando hay tres copias de Django?
+
+*C2 — El pedido que no existe (5 puntos).* En la etapa 5 registramos
+un pedido con la versión que lo guarda en el diccionario
+=pedidos_en_memoria=. Con =runserver= parecía funcionar, pero con tres
+copias el resultado fue este:
+
+#+begin_example
+{"folio": "99E50CCE", "registrado_por": "e6c28e82ce8f"}
+
+{"error": "pedido no encontrado", "atendido_por": "2f9984c34dd1"}
+{"error": "pedido no encontrado", "atendido_por": "13f2d8f64f76"}
+{"error": "pedido no encontrado", "atendido_por": "e6c28e82ce8f"}
+#+end_example
+
+a) ¿Por qué no lo encuentran las otras copias?
+
+b) ¿Por qué tampoco lo encuentra =e6c28e82ce8f=, que fue la copia que
+lo registró? (Pista: cada copia arranca Gunicorn con =--workers 2=.)
+
+c) Un compañero concluye: «Docker rompió el código». ¿Tiene razón?
+
+*C3 — El pedido a medio llenar (5 puntos).* El registro de un pedido
+se hace en dos pasos: primero se manda el destino y después se
+confirma. El destino del primer paso se guarda en una variable global
+de =views.py=.
+
+¿Por qué esto falla con varias copias? ¿Por qué guardarlo en
+=request.session= sí funciona, si la sesión también «se recuerda»
+entre peticiones? ¿Dónde guarda Django la sesión en nuestro proyecto?
+
+*C4 — Lo que se hace una sola vez (5 puntos).* Respondan los tres
+casos:
+
+a) Cada copia tiene programado enviar a los clientes un aviso diario a
+las 8:00. Con cinco copias, ¿qué pasa? ¿Dónde debería vivir esa tarea?
+
+b) ¿Por qué en el =docker-compose.yml= las migraciones están en un
+servicio aparte (=migrar=) y no al arrancar cada copia?
+
+c) Con veinte copias y cuatro procesos de Gunicorn por copia, ¿cuántas
+conexiones abre la plataforma a PostgreSQL? Si PostgreSQL acepta 100
+por defecto, ¿qué conclusión sacan sobre agregar copias «sin límite»?
+¿Por qué SQLite deja de servir en cuanto hay varias copias?
+
+**** D — El modelo de aprendizaje automático (25 puntos)
+
+*D1 — 99 % de exactitud (5 puntos).* Un equipo entrena el árbol de
+decisión con los 10 000 envíos y lo evalúa con esos mismos 10 000.
+Obtiene 99 % y lo presenta como su resultado.
+
+a) ¿Por qué ese número no dice nada?
+
+b) ¿Para qué sirve apartar el 20 % de los datos con =train_test_split=?
+
+c) ¿Qué problema evita =stratify=y= en este dataset en particular?
+(Recuerden cuántos envíos son de dron.)
+
+*D2 — Números para las categorías (5 puntos).* Un alumno propone, en
+lugar del /one-hot encoding/, convertir el clima así:
+=despejado = 0=, =lluvia = 1=, =viento_fuerte = 2=.
+
+¿Qué idea falsa le estaría dando al árbol? ¿Cómo lo evita el
+/one-hot encoding/?
+
+¿Y por qué se guarda la preparación y el árbol juntos en un
+=Pipeline=? ¿Qué problema evita el día que se use el modelo con un
+paquete nuevo?
+
+*D3 — Más profundo no siempre es mejor (5 puntos).*
+
+| Profundidad máxima | Exactitud en la prueba | Hojas |
+|--------------------+------------------------+-------|
+| 4                  | 79.0 %                 | 9     |
+| 8                  | 92.1 %                 | 47    |
+| 10                 | 92.4 %                 | 92    |
+| Sin límite         | 91.8 %                 | 346   |
+
+a) ¿Por qué el árbol sin límite, que es el más grande, acierta menos
+que el de profundidad 8? ¿Cómo se llama ese fenómeno?
+
+b) Si el de profundidad 10 acierta un poco más, ¿por qué elegimos 8?
+
+*D4 — Lo que esconde la exactitud (5 puntos).* En la prueba, el árbol
+obtuvo para el dron:
+
+#+begin_example
+        precision    recall
+dron      0.839      0.905
+#+end_example
+
+a) Expliquen con palabras qué significa cada número en el caso del
+dron.
+
+b) ¿Qué error es más grave para la empresa: mandar en dron un paquete
+que no debía ir en dron, o no reconocer un paquete que sí podía ir en
+dron? ¿Qué número mide cada error?
+
+c) ¿Por qué el modelo no llega al 100 %, y por qué eso no es
+necesariamente malo?
+
+*D5 — Árbol o bosque (5 puntos).*
+
+|                             | Árbol de decisión | Random Forest |
+|-----------------------------+-------------------+---------------|
+| Exactitud                   | 92.1 %            | 93.1 %        |
+| ¿Se pueden leer sus reglas? | Sí                | No            |
+| Tamaño del archivo          | 14 KB             | 60 MB         |
+
+El jefe de logística quiere usar siempre «el que acierte más». ¿Qué le
+responderían? Den al menos dos argumentos que no sean la exactitud.
+
+¿Qué cambia en la vista de Django si un día se cambia el árbol por el
+bosque? ¿Por qué?
+
+**** E — El modelo dentro de la plataforma (15 puntos)
+
+*E1 — El dron de las 3:00 (5 puntos).* Para un paquete ligero a 13 km
+que sale a las 3:00, el modelo propone dron con 84 % de confianza. La
+plataforma responde:
+
+#+begin_example
+{"medio": "moto", "motivo": "árbol de decisión, confianza 13%; se descartó dron por las reglas del negocio"}
+#+end_example
+
+a) ¿Por qué el árbol se equivoca justamente con la hora de la noche?
+
+b) Un compañero propone: «mejor entrenamos un modelo más grande hasta
+que no se equivoque». ¿Por qué eso no sustituye a las reglas del
+negocio?
+
+c) ¿Por qué las reglas viven en =reglas.py= y no dentro del
+recomendador del árbol?
+
+*E2 — ¿No que nada en memoria? (5 puntos).* En la etapa 5 aprendimos
+que no se debe guardar nada importante en la memoria del programa. Sin
+embargo, el recomendador hace esto:
+
+#+begin_example
+@lru_cache(maxsize=1)
+def obtener_recomendador() -> RecomendadorIA:
+    return RecomendadorArbol()
+#+end_example
+
+y el modelo se queda en la memoria de cada copia.
+
+¿Es una contradicción? Expliquen qué diferencia hay entre el modelo y
+un pedido. ¿Qué pasaría si, en lugar de eso, cada petición cargara el
+archivo =.joblib=?
+
+*E3 — Funciona en mi computadora (5 puntos).* El equipo entrenó el
+modelo con scikit-learn 1.9.0 en una laptop. En el =requirements.txt=
+solo escribieron =scikit-learn=, sin versión. Meses después construyen
+la imagen de Docker y el modelo no carga.
+
+¿Por qué pasa esto? ¿Cómo se evita? ¿Qué relación tiene con la idea
+del entorno virtual y del contenedor de la sección A?
+
+**** F — Caso integrador (10 puntos)
+
+*F1 — ¿Ya no hacen falta los patrones?* La empresa contrata un
+servicio de inteligencia artificial externo que recibe el paquete y
+responde:
+
+#+begin_example
+{"vehiculo": "DRONE", "certeza": "alta"}
+#+end_example
+
+Al escuchar la noticia, un integrante del equipo dice:
+
+#+begin_quote
+«Si la IA ya decide el medio, podemos borrar =RecomendadorIA=, la
+fábrica =crear_medio= y las estrategias =EntregaDron=,
+=EntregaMotocicleta=… Que la vista llame directo al servicio y listo».
+#+end_quote
+
+a) ¿Qué archivo o clase nueva hay que escribir para usar el servicio
+externo, y qué patrón es? ¿Qué partes de la plataforma *no* cambian?
+(3 puntos)
+
+b) Siguiendo el recorrido de un paquete desde que llega a
+=/entregas/recomendar/= hasta que sale el plan de entrega, expliquen
+qué parte de ese recorrido hace la IA y qué partes siguen necesitando
+diseño. (4 puntos)
+
+c) Respondan al compañero con al menos dos argumentos de por qué la IA
+no hace desaparecer los patrones de diseño. Consideren qué pasa si el
+servicio se cae o si mañana se cambia de proveedor. (3 puntos)
+
+#+begin_quote
+*Recuerden:* la IA cambia quién toma una decisión. Lo que hay que
+explicar es qué pasa con el resto del sistema cuando esa decisión, o
+quien la toma, cambia.
+#+end_quote
+
+**** Cómo se revisa
+
+| Puntos por pregunta de 5 | Criterio |
+|--------------------------+----------|
+| 5 | Respuesta correcta, justificada y conectada con lo que hicieron en la plataforma |
+| 3 o 4 | Correcta, pero con la justificación incompleta o algún detalle equivocado |
+| 1 o 2 | Idea parcialmente correcta, sin el porqué |
+| 0 | Incorrecta, o solo nombra un concepto sin explicarlo |
+
+La pregunta F1 vale 10 puntos, repartidos como indica cada inciso. Si
+el commit no es de la persona que firma el archivo, la actividad no
+cuenta.
+
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
 Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
