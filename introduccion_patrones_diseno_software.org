@@ -5829,7 +5829,8 @@ Los archivos están en el repositorio, en la carpeta
 | [[file:proyectos/dataset-medios/envios_medios.csv][=envios_medios.csv=]] | El dataset: 10 000 envíos con el medio recomendado |
 | [[file:proyectos/dataset-medios/entrenar_arbol.py][=entrenar_arbol.py=]] | El script completo de la etapa 2 |
 | [[file:proyectos/dataset-medios/usar_modelo.py][=usar_modelo.py=]] | El script completo de la etapa 3 |
-| [[file:proyectos/dataset-medios/entrenar_modelo.py][=entrenar_modelo.py=]] | Un Random Forest para comparar |
+| [[file:proyectos/dataset-medios/probar_modelo.py][=probar_modelo.py=]] | Prueba el modelo con un paquete que se describe desde la terminal |
+| [[file:proyectos/dataset-medios/entrenar_modelo.py][=entrenar_modelo.py=]] | Un Random Forest para comparar; lo guarda en =modelo_bosque.joblib= |
 | [[file:proyectos/dataset-medios/generar_dataset.py][=generar_dataset.py=]] | El programa que generó el dataset |
 | [[file:proyectos/dataset-medios/README.md][=README.md=]] | El diccionario de datos y cómo se generó el dataset |
 
@@ -5857,7 +5858,7 @@ sola línea.
 | Qué es                      | Un solo árbol de preguntas             | Cientos de árboles que votan |
 | Exactitud con este dataset  | 92.1 %                                 | 93.1 %                       |
 | ¿Se pueden leer sus reglas? | Sí                                     | No en la práctica            |
-| Tamaño del archivo guardado | Unos 14 KB                             | Unos 60 MB (con 300 árboles) |
+| Tamaño del archivo guardado | Unos 14 KB                             | Unos 50 MB (con 300 árboles) |
 | Para qué lo usamos aquí     | Aprender, explicar y ponerlo en Django | Comparar al final            |
 
 *** Etapa 1 — Preparar
@@ -6197,6 +6198,16 @@ Se entrena una vez y el modelo se guarda en un archivo; después
 cualquier programa lo carga y lo usa. Como guardamos el =Pipeline=
 completo, el archivo incluye la preparación de las columnas y el árbol.
 
+Mientras el script corre, el modelo vive en la memoria, en la variable
+=modelo=, y desaparece cuando el programa termina. =joblib.dump= lo
+escribe en el disco: =modelo_medios.joblib= es un archivo como
+cualquier otro, que se queda en la carpeta aunque apaguen la
+computadora. Se puede copiar a otra carpeta, subir al repositorio o
+meter en la imagen de Docker, y cada programa que lo cargue con
+=joblib.load= obtiene exactamente el mismo modelo, sin volver a
+entrenar. Eso es lo que hacen el paso 11, =usar_modelo.py= y la
+plataforma de Django en la etapa 4.
+
 *Para comprobar la etapa completa:*
 
 #+begin_src shell
@@ -6205,7 +6216,13 @@ python entrenar_arbol.py
 
 Debe mostrar la exactitud de 92.1 %, el reporte, la matriz de
 confusión, las reglas y terminar con =Modelo guardado en
-modelo_medios.joblib=. El archivo pesa unos 14 KB.
+modelo_medios.joblib=. En la carpeta debe aparecer ese archivo, de unos
+14 KB. Si quieren guardarlo con otro nombre, por ejemplo para no
+sobrescribir uno anterior:
+
+#+begin_src shell
+python entrenar_arbol.py --profundidad 4 --salida arbol_prof4.joblib
+#+end_src
 
 *** Etapa 3 — Usar el modelo
 
@@ -6341,6 +6358,65 @@ Fíjense en el tercer caso. El modelo prefería el dron con 84 % de
 confianza, porque ese paquete se parece mucho al del segundo caso.
 Pero a las 3:00 el dron no puede volar, así que las reglas lo
 descartan y se elige la moto, que era su segunda opción.
+
+*Prueben con sus propios paquetes.* =usar_modelo.py= siempre prueba
+los mismos cinco ejemplos. Para describir un paquete desde la terminal,
+sin editar código, está [[file:proyectos/dataset-medios/probar_modelo.py][=probar_modelo.py=]]. Carga el archivo del
+modelo, muestra qué opina de cada medio, marca los que descartan las
+reglas y dice el medio final. Solo la distancia y el peso son
+obligatorios; lo demás tiene un valor común (medidas de 20 × 15 × 10
+cm, zona residencial, clima despejado, mediodía, tráfico medio).
+
+#+begin_src shell
+python probar_modelo.py --distancia 9 --peso 0.5 --medidas 15 10 8 --zona periferia --hora 16
+#+end_src
+
+#+begin_example
+Modelo: modelo_medios.joblib
+Paquete: 9.0 km, 0.5 kg, 1.2 L, periferia, despejado, 16:00, prioridad normal
+
+Lo que opina el modelo:
+  dron        84.1%
+  moto        13.1%
+  camioneta    2.8%
+  bicicleta    0.0%   <- no es posible, lo descartan las reglas
+
+Medio recomendado: dron
+#+end_example
+
+El mismo paquete, pero a las 3:00:
+
+#+begin_src shell
+python probar_modelo.py --distancia 9 --peso 0.5 --medidas 15 10 8 --zona periferia --hora 3
+#+end_src
+
+#+begin_example
+Lo que opina el modelo:
+  dron        84.1%   <- no es posible, lo descartan las reglas
+  moto        13.1%
+  camioneta    2.8%
+  bicicleta    0.0%   <- no es posible, lo descartan las reglas
+
+Medio recomendado: moto
+#+end_example
+
+El modelo da exactamente las mismas probabilidades a las 16:00 y a las
+3:00: no aprendió que el dron no vuela de noche. Son las reglas las que
+cambian la decisión.
+
+Otros que vale la pena probar:
+
+#+begin_src shell
+python probar_modelo.py --distancia 30 --peso 3 --refrigerado --zona rural
+python probar_modelo.py --distancia 18 --peso 14 --medidas 55 40 35 --clima lluvia --fragil
+python probar_modelo.py --distancia 9 --peso 0.5 --modelo modelo_bosque.joblib
+python probar_modelo.py --help
+#+end_src
+
+=--help= muestra todas las opciones y los valores permitidos. Si
+escriben un valor que no existe, por ejemplo =--clima granizo=, el
+script lo rechaza y dice cuáles se aceptan. El mismo comando funciona
+en PowerShell.
 
 *** Etapa 4 — Conectarlo a la plataforma
 
@@ -6876,13 +6952,26 @@ modelo = Pipeline([
 
 Todo lo demás (entrenar, evaluar, guardar, usar y el adaptador de
 Django) funciona igual, porque los dos tienen =fit=, =predict= y
-=predict_proba=. Solo dejarán de funcionar =export_text= y la lectura
-de reglas del paso 8, porque un bosque son 300 árboles votando. El
-script =entrenar_modelo.py= de la carpeta ya entrena un Random Forest;
-con este dataset llega a 93.1 %.
+=predict_proba=. Lo único que ya no se puede es leer las reglas del
+paso 8, porque un bosque son 300 árboles votando; =entrenar_arbol.py=
+se salta ese paso solo si detecta que el modelo no es un árbol.
+
+El script =entrenar_modelo.py= de la carpeta ya entrena un Random
+Forest (con este dataset llega a 93.1 %) y también lo guarda en un
+archivo, =modelo_bosque.joblib=. Para usarlo en lugar del árbol:
+
+#+begin_src shell
+python entrenar_modelo.py
+python usar_modelo.py --modelo modelo_bosque.joblib
+#+end_src
+
+=usar_modelo.py= carga el archivo que se le indique; sin =--modelo=,
+usa =modelo_medios.joblib=. Para cambiarlo en Django, basta con poner
+el archivo del bosque en =entregas/modelo/= y cambiar el nombre en
+=RUTA_MODELO=.
 
 ¿Cuál conviene? El bosque acierta un punto más, pero no se puede
-explicar y el archivo guardado pesa unos 60 MB, demasiado para subirlo
+explicar y el archivo guardado pesa unos 50 MB, demasiado para subirlo
 al repositorio como hicimos con el árbol. Para la plataforma de esta
 materia, el árbol es suficiente: un punto de diferencia lo cubren de
 todos modos las reglas del paso 12, y poder explicarle al jefe de
@@ -7230,7 +7319,7 @@ necesariamente malo?
 |-----------------------------+-------------------+---------------|
 | Exactitud                   | 92.1 %            | 93.1 %        |
 | ¿Se pueden leer sus reglas? | Sí                | No            |
-| Tamaño del archivo          | 14 KB             | 60 MB         |
+| Tamaño del archivo          | 14 KB             | 50 MB         |
 
 El jefe de logística quiere usar siempre «el que acierte más». ¿Qué le
 responderían? Den al menos dos argumentos que no sean la exactitud.
