@@ -17,8 +17,13 @@ perfectas.
 | `envios_medios.csv` | El dataset listo para usar: 10 000 envíos. |
 | `generar_dataset.py` | El generador. Solo usa la biblioteca estándar de Python. |
 | `entrenar_arbol.py` | Entrena el árbol de decisión, muestra sus reglas y lo guarda en `modelo_medios.joblib`. |
-| `usar_modelo.py` | Carga el modelo guardado y recomienda el medio para paquetes nuevos, validando las reglas del negocio. Primero hay que correr `entrenar_arbol.py`. |
-| `entrenar_modelo.py` | Un Random Forest para comparar resultados. Requiere `pandas` y `scikit-learn`. |
+| `usar_modelo.py` | Carga un modelo guardado y recomienda el medio para paquetes nuevos, validando las reglas del negocio. Primero hay que correr `entrenar_arbol.py`. Con `--modelo` se elige qué archivo cargar. |
+| `probar_modelo.py` | Prueba un modelo guardado con un paquete que se describe desde la terminal, por ejemplo `python probar_modelo.py --distancia 9 --peso 0.5 --hora 3`. `--help` muestra todas las opciones. |
+| `entrenar_modelo.py` | Un Random Forest para comparar resultados. Lo guarda en `modelo_bosque.joblib` (unos 50 MB). |
+
+Los modelos entrenados quedan guardados como archivos `.joblib` en la carpeta
+desde donde se ejecutó el script. Se pueden copiar y reutilizar en cualquier
+programa con `joblib.load`, sin volver a entrenar.
 
 La explicación paso a paso está en los apuntes, en la sección
 *La IA dentro de la plataforma: un modelo que recomienda el medio de transporte*.
@@ -116,10 +121,11 @@ python entrenar_arbol.py
 python usar_modelo.py
 ```
 
-Entrenar el Random Forest para comparar:
+Entrenar el Random Forest para comparar y usarlo:
 
 ```bash
 python entrenar_modelo.py
+python usar_modelo.py --modelo modelo_bosque.joblib
 ```
 
 Resultado con el dataset por defecto (20 % de los datos para prueba):

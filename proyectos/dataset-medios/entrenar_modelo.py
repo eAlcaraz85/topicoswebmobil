@@ -1,14 +1,15 @@
-"""Entrena un modelo base con el dataset de envíos y muestra qué tan bien predice.
+"""Entrena un Random Forest con el dataset de envíos, muestra qué tan bien predice y lo guarda en un archivo.
 
-Requiere: pip install pandas scikit-learn
+Requiere: pip install pandas scikit-learn joblib
 
 Uso:
     python entrenar_modelo.py
-    python entrenar_modelo.py --datos envios_medios.csv
+    python entrenar_modelo.py --datos envios_medios.csv --salida modelo_bosque.joblib
 """
 
 import argparse
 
+import joblib
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
@@ -29,6 +30,7 @@ OBJETIVO = "medio_recomendado"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--datos", default="envios_medios.csv")
+    parser.add_argument("--salida", default="modelo_bosque.joblib")
     args = parser.parse_args()
 
     datos = pd.read_csv(args.datos)
@@ -82,6 +84,10 @@ def main():
     print("Paquete de ejemplo: 6.5 km, 1.2 kg, express, residencial, despejado, tráfico alto")
     for medio, prob in sorted(zip(modelo.classes_, probabilidades), key=lambda t: -t[1]):
         print(f"  {medio:<10} {prob:.1%}")
+
+    # El bosque son 300 árboles, así que el archivo pesa decenas de megas.
+    joblib.dump(modelo, args.salida)
+    print(f"\nModelo guardado en {args.salida}")
 
 
 if __name__ == "__main__":

@@ -75,13 +75,16 @@ def main():
         index=etiquetas, columns=etiquetas,
     ), end="\n\n")
 
-    # 7. Ver las primeras reglas que aprendió el árbol.
-    nombres = list(modelo.named_steps["preparacion"].get_feature_names_out())
-    nombres = [n.split("__", 1)[1] for n in nombres]
-    print("Primeros niveles del árbol:")
-    print(export_text(modelo.named_steps["arbol"], feature_names=nombres, max_depth=3))
+    # 7. Ver las primeras reglas que aprendió el árbol. Solo se puede con un
+    #    árbol: si lo cambian por un Random Forest, este paso se salta.
+    if isinstance(modelo.named_steps["arbol"], DecisionTreeClassifier):
+        nombres = list(modelo.named_steps["preparacion"].get_feature_names_out())
+        nombres = [n.split("__", 1)[1] for n in nombres]
+        print("Primeros niveles del árbol:")
+        print(export_text(modelo.named_steps["arbol"], feature_names=nombres, max_depth=3))
 
-    # 8. Guardar el modelo entrenado.
+    # 8. Guardar el modelo entrenado en un archivo. Cualquier programa puede
+    #    cargarlo después con joblib.load, sin volver a entrenar.
     joblib.dump(modelo, args.salida)
     print(f"Modelo guardado en {args.salida}")
 

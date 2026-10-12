@@ -1,15 +1,25 @@
-"""Usa el modelo ya entrenado para recomendar el medio de un paquete nuevo.
+"""Carga un modelo ya entrenado desde su archivo y recomienda el medio de paquetes nuevos.
 
 Primero hay que entrenarlo con: python entrenar_arbol.py
 
 Uso:
     python usar_modelo.py
+    python usar_modelo.py --modelo modelo_bosque.joblib
 """
+
+import argparse
+import sys
+from pathlib import Path
 
 import joblib
 import pandas as pd
 
-modelo = joblib.load("modelo_medios.joblib")
+
+def cargar_modelo(ruta):
+    if not Path(ruta).exists():
+        sys.exit(f"No encuentro {ruta}. Primero entrenen el modelo con: python entrenar_arbol.py")
+    return joblib.load(ruta)
+
 
 # Límites que ningún modelo puede saltarse. El modelo aprende de ejemplos y
 # a veces se equivoca; estas reglas vienen del negocio y no se negocian.
@@ -93,6 +103,13 @@ EJEMPLOS = {
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--modelo", default="modelo_medios.joblib")
+    args = parser.parse_args()
+
+    modelo = cargar_modelo(args.modelo)
+    print(f"Modelo cargado de {args.modelo}\n")
+
     for nombre, paquete in EJEMPLOS.items():
         resultado = recomendar_medio(paquete)
         print(nombre)
