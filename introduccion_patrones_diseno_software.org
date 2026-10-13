@@ -7029,6 +7029,273 @@ logística por qué se eligió la moto vale mucho.
    una excepción. ¿Qué patrón del catálogo se parece a un objeto que
    envuelve a otro con la misma interfaz y le agrega algo?
 
+*** Actividades de análisis con el dataset
+
+Antes de confiar en un modelo hay que conocer los datos con los que
+aprendió. En estas cinco actividades se interroga al dataset y al
+modelo que ya tienen guardado para entender qué decide el medio de
+transporte, qué aprendió el árbol, en qué se equivoca y qué se podría
+hacer para mejorarlo.
+
+Aquí no hay scripts para copiar. Cada actividad dice qué herramientas
+de =pandas= o scikit-learn sirven, pero el código lo escriben ustedes:
+ya vieron todas las piezas en las etapas 2 y 3. Lo importante no es
+el código, sino lo que deciden y cómo lo justifican.
+
+Cada actividad tiene tres momentos:
+
+1. *Predigan.* Antes de ejecutar nada, escriban en =ANALISIS.md= qué
+   creen que va a salir y por qué. Equivocarse no resta puntos; no
+   predecir, sí. Es la única forma de saber si los datos los
+   sorprendieron.
+2. *Comprueben.* Escriban el código, ejecútenlo y comparen con su
+   predicción. Si fallaron, expliquen qué no habían considerado.
+3. *Decidan.* Cada actividad termina con una pregunta /Para pensar/ que
+   no tiene una sola respuesta correcta. Se califica el argumento, no
+   la conclusión.
+
+**** Antes de empezar
+
+- Trabajen en la carpeta =proyectos/dataset-medios/= (o en una copia
+  con =envios_medios.csv=, =entrenar_arbol.py= y =usar_modelo.py=).
+- Si no tienen =modelo_medios.joblib=, ejecuten antes
+  =python entrenar_arbol.py=.
+- Pueden reutilizar lo que ya existe: =from entrenar_arbol import
+  NUMERICAS, CATEGORICAS, OBJETIVO= y =from usar_modelo import
+  LIMITES, es_posible=.
+
+*Qué se entrega.* En el repositorio del equipo, una carpeta
+=actividades/analisis-dataset/= con:
+
+- El código de cada actividad (scripts o cuaderno de Jupyter).
+- Un archivo =ANALISIS.md= con, para cada actividad: la predicción,
+  el resultado (la tabla o los números copiados de la terminal), la
+  comparación entre los dos y la respuesta a cada pregunta.
+
+| Se califica | Cómo |
+|-------------+------|
+| Predicción | Que exista y tenga una razón, aunque resulte equivocada |
+| Evidencia | Cada afirmación va acompañada del número o la tabla que la respalda |
+| Explicación | Cuando la predicción falla, explican qué no habían considerado |
+| Decisión | La pregunta /Para pensar/ tiene una postura clara y argumentos que vienen de sus datos |
+
+**** Actividad 1 — El retrato del dataset
+
+*Predigan.* Cuando llueve, ¿qué medio creen que domina? ¿Y para el
+centro de la ciudad? ¿Cuál será la distancia más larga que recorre
+una bicicleta en los datos? ¿Habrá envíos con una etiqueta que rompa
+las reglas del negocio?
+
+*Herramientas.*
+
+- =pd.crosstab(datos[columna], datos["medio_recomendado"], normalize="index")=
+  da, para cada valor de la columna, el porcentaje de envíos que va
+  en cada medio.
+- =datos.groupby("medio_recomendado")[columnas].agg(["min", "median", "max"])=
+  resume las columnas numéricas por medio.
+- =datos.apply(funcion, axis=1)= aplica una función a cada fila; con
+  =es_posible= pueden revisar si cada etiqueta respeta las reglas.
+
+*Preguntas.*
+
+1. ¿En qué zonas y con qué climas el dron nunca aparece? ¿Qué regla
+   del paso 12 lo explica en cada caso?
+2. La bicicleta casi no va a la periferia, aunque ninguna regla se lo
+   prohíbe. ¿Qué otra columna lo explica? Demuéstrenlo con un número.
+3. Comparen los máximos de distancia, peso y volumen de cada medio con
+   la tabla =LIMITES=. ¿Qué límites se pueden adivinar solo mirando
+   los datos? ¿Cuál no y por qué?
+4. Hay más de cien camionetas para viajes de menos de 2 km, lo que
+   suena a desperdicio. ¿Cuántas tienen una razón clara para ir en
+   camioneta? Para las que no, propongan una explicación.
+
+*Para pensar.* Si les dieran solo el CSV, sin las reglas, ¿podrían
+reconstruir las reglas del negocio a partir de los datos? ¿Cuáles sí
+y cuáles no? ¿Qué riesgo hay en dejar que un modelo «descubra» las
+reglas en lugar de escribirlas a mano?
+
+**** Actividad 2 — La hora y el dron
+
+*Predigan.* ¿Cuántos drones creen que salen a las 3:00? ¿Qué
+porcentaje de los envíos creen que sale de noche (antes de las 6 o
+desde las 21)?
+
+*Herramientas.*
+
+- =pd.crosstab(datos["hora_salida"], datos["medio_recomendado"])=.
+- Para verlo como gráfica (requiere =pip install matplotlib=):
+  =tabla.plot(kind="bar", stacked=True)= y
+  =.figure.savefig("archivo.png")=.
+
+*Preguntas.*
+
+1. ¿En qué horas no hay ni un solo dron? ¿Coincide exactamente con la
+   regla?
+2. ¿Cuántos envíos de noche hay, comparados con los de día? ¿Qué
+   consecuencia tiene eso para lo que el modelo puede aprender sobre
+   la noche?
+3. Entre las 20:00 y las 21:00 las bicicletas casi desaparecen y las
+   motos aumentan. Busquen en el =README.md= qué lo explica.
+4. Un árbol solo pregunta «¿la hora es menor o igual que X?». ¿Por qué
+   le cuesta representar «de noche»? ¿Cuántas preguntas sobre la hora
+   necesitaría como mínimo?
+
+*Para pensar.* Sin mirar los ejercicios de arriba, diseñen una columna
+nueva que le facilite al árbol entender la noche. Expliquen cómo la
+calcularían a partir de las columnas que ya existen y cómo
+comprobarían, con un número, que de verdad ayudó. Si les da tiempo,
+háganlo.
+
+**** Actividad 3 — Anatomía de los errores
+
+*Predigan.* ¿Qué confusión creen que será la más frecuente? ¿El modelo
+confundirá alguna vez una bicicleta con una camioneta?
+
+*Herramientas.*
+
+- Para estudiar los errores necesitan exactamente los envíos que el
+  modelo nunca vio. Por eso tienen que separar los datos *igual* que
+  en el paso 4: mismas columnas, =test_size=0.2=, =stratify= y
+  =random_state=42=. Respondan también: ¿qué pasaría con su análisis
+  si usaran otro =random_state=?
+- =joblib.load("modelo_medios.joblib")= y =modelo.predict(x_prueba)=.
+- =x_prueba.assign(real=y_prueba, predicho=...)= junta lo real y lo
+  predicho en una tabla; con un filtro se quedan con los errores, y
+  con =groupby(["real", "predicho"]).size()= los cuentan.
+
+*Preguntas.*
+
+1. ¿Cuántos errores hay y cuáles son las tres confusiones más
+   frecuentes? ¿Son entre medios parecidos o muy distintos? ¿Qué les
+   dice eso?
+2. Revisen los envíos que eran moto y el modelo mandó a dron. ¿Cuántos
+   son de noche? ¿Cuáles corregirían las reglas del negocio y cuáles
+   no? ¿Qué tienen en común los que no?
+3. Revisen los que eran moto y el modelo mandó a bicicleta. ¿Están
+   cerca del límite de 7 km? Si no es la distancia, busquen qué
+   columnas los distinguen de las bicicletas que el modelo sí acertó.
+
+*Para pensar.* Si solo pudieran arreglar un tipo de error, ¿cuál
+elegirían y por qué? ¿Lo arreglarían cambiando el modelo, los datos o
+las reglas del negocio?
+
+**** Actividad 4 — ¿Qué columnas usa de verdad el modelo?
+
+*Predigan.* Antes de ver nada, ordenen las catorce columnas de la más
+importante a la menos importante para elegir el medio. Marquen las que
+creen que el modelo no usa.
+
+*Herramientas.*
+
+- =modelo.named_steps["arbol"].feature_importances_= da la importancia
+  de cada columna (todas suman 1), en el mismo orden que
+  =modelo.named_steps["preparacion"].get_feature_names_out()=.
+- Para saber qué pasa sin una columna, entrenen otro árbol igual pero
+  quitándola de =NUMERICAS= o =CATEGORICAS=, y mídanlo con los mismos
+  envíos de prueba.
+
+*Preguntas.*
+
+1. ¿Cuáles son las cuatro columnas más importantes? ¿Coinciden con las
+   primeras preguntas del árbol del paso 8? ¿Y con su predicción?
+2. ¿Qué columna, al quitarla, baja más la exactitud? ¿Cuáles no la
+   cambian nada?
+3. La zona de destino tiene importancia cero, pero en la actividad 1
+   vieron que el dron nunca va al centro. ¿Cómo puede ser que el
+   modelo no use la zona y, aun así, la plataforma nunca mande un dron
+   al centro?
+
+*Para pensar.* La app le pide a la persona catorce datos. Si el modelo
+no usa algunos, ¿deberían dejar de pedirlos? ¿Hay razones para pedir
+un dato que el modelo no usa?
+
+**** Actividad 5 — El dron es minoría: ¿hay que balancear el dataset?
+
+Solo el 9.5 % de los envíos son de dron, contra el 45.8 % de moto. A
+eso se le llama un dataset /desbalanceado/: una clase tiene muchos
+menos ejemplos que las demás. Muchos modelos aprenden a favorecer a la
+clase mayoritaria, porque equivocarse con la minoritaria les cuesta
+poco en la exactitud total. Esta actividad es la más abierta: no se
+trata de aplicar una receta, sino de decidir si hace falta balancear,
+cómo hacerlo sin engañarse y qué consecuencias tiene para la
+plataforma.
+
+***** Parte A — Pensar antes de tocar los datos
+
+Respondan antes de escribir código:
+
+1. ¿Qué exactitud tendría un «modelo» que nunca dice dron y siempre
+   acierta todo lo demás? ¿Y uno que siempre dice moto? ¿Qué les dice
+   eso sobre usar la exactitud para juzgar un dataset desbalanceado?
+   ¿Qué medidas del paso 7 usarían en su lugar?
+2. ¿Por qué hay tan pocos drones? ¿Es un error de los datos o refleja
+   cómo funciona la empresa? ¿Cambia eso la decisión de balancear?
+3. Si deciden balancear, ¿se balancea antes o después de separar los
+   datos de entrenamiento y de prueba? ¿Se balancean también los datos
+   de prueba? Justifiquen las dos respuestas *antes* de experimentar.
+
+***** Parte B — Probar estrategias
+
+Propongan y prueben *al menos tres* formas de balancear. No les
+decimos cuáles; piensen en estas ideas generales y decidan cómo
+llevarlas a código:
+
+- quitar ejemplos de las clases que sobran;
+- repetir ejemplos de la clase que falta;
+- conseguir ejemplos nuevos de la clase que falta (el generador del
+  dataset acepta =--filas= y =--semilla=);
+- decirle al modelo que equivocarse con un dron cuesta más (busquen
+  qué hace el parámetro =class_weight= de =DecisionTreeClassifier=).
+
+Reglas para que la comparación sea justa:
+
+- Todas las estrategias se evalúan con los *mismos* 2 000 envíos de
+  prueba de siempre, sin tocarlos. Les conviene escribir una función
+  =evaluar(x_entreno, y_entreno)= que entrene un árbol igual al del
+  paso 6 y lo mida siempre con esa prueba.
+- Para cada estrategia, llenen esta tabla:
+
+| Estrategia | Envíos de entrenamiento | Exactitud | Precision dron | Recall dron | Veces que predice dron | Sugerencias imposibles |
+|------------+-------------------------+-----------+----------------+-------------+------------------------+------------------------|
+| Sin balancear |  |  |  |  |  |  |
+| ... |  |  |  |  |  |  |
+
+  Las sugerencias imposibles se cuentan con =es_posible= sobre lo que
+  predijo el modelo, como en el paso 12. En la prueba hay 190 drones
+  reales; comparen con cuántas veces los predice cada modelo.
+
+Después, *hagan trampa a propósito una vez*: balanceen haciendo lo
+contrario de lo que respondieron en la pregunta 3 de la parte A
+(por ejemplo, repitan drones antes de separar, o balanceen también la
+prueba) y midan otra vez. Expliquen por qué los números mejoran y por
+qué esa mejora es falsa.
+
+***** Parte C — Interpretar
+
+1. ¿Qué pasó con el recall del dron y qué pasó con su precision? ¿Por
+   qué una sube cuando la otra baja?
+2. ¿Alguna estrategia dejó al modelo con muchos menos datos de
+   entrenamiento? ¿Qué se pierde con eso?
+3. Si dos estrategias distintas les dieron números casi iguales para
+   el dron, expliquen por qué son, en el fondo, la misma idea.
+4. En el paso 15, el =motivo= de la respuesta dice «confianza 84 %».
+   Después de balancear, ¿ese porcentaje sigue significando lo mismo?
+   (Piensen en qué proporción de drones vio el modelo al entrenar y
+   qué proporción hay en la realidad.)
+
+***** Parte D — Decidir
+
+*Para pensar.* La empresa les pregunta si deben usar el modelo
+balanceado en la plataforma. Respondan con una recomendación y sus
+razones. Consideren:
+
+- qué le cuesta más a la empresa: mandar un dron cuando no convenía,
+  o no usar el dron cuando sí convenía;
+- cuáles de esos errores corrigen las reglas del negocio y cuáles no;
+- qué pasaría si mañana la empresa compra el doble de drones;
+- que la respuesta «no balancear» también es válida, si la
+  justifican.
+
 *** Actividad individual — Lo que hay detrás de la implementación
 
 Esta actividad es *individual* y de razonamiento: no se pide escribir
