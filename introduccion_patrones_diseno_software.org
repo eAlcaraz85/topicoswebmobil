@@ -7032,10 +7032,15 @@ logística por qué se eligió la moto vale mucho.
 *** Actividades de análisis con el dataset
 
 Antes de confiar en un modelo hay que conocer los datos con los que
-aprendió. En estas cinco actividades se interroga al dataset y al
+aprendió. En estas ocho actividades se interroga al dataset y al
 modelo que ya tienen guardado para entender qué decide el medio de
 transporte, qué aprendió el árbol, en qué se equivoca y qué se podría
 hacer para mejorarlo.
+
+Las actividades 6, 7 y 8 son de reto. No basta con medir: hay que
+leer el código del generador, deducir cómo /debería/ comportarse el
+modelo y poner en duda los números de las actividades anteriores.
+Háganlas después de terminar las cinco primeras.
 
 Aquí no hay scripts para copiar. Cada actividad dice qué herramientas
 de =pandas= o scikit-learn sirven, pero el código lo escriben ustedes:
@@ -7295,6 +7300,180 @@ razones. Consideren:
 - qué pasaría si mañana la empresa compra el doble de drones;
 - que la respuesta «no balancear» también es válida, si la
   justifican.
+
+**** Actividad 6 — ¿Quién se equivoca: el modelo o los datos?
+
+Hasta ahora, «error» significó «el modelo no dijo lo mismo que la
+etiqueta». Pero lean =generar_dataset.py=: la etiqueta de cada envío
+sale de una fórmula de costo (=puntaje=) a la que se le agrega ruido,
+para imitar que dos operadores con la misma información no siempre
+deciden igual. Además, el 3 % de las etiquetas se cambia a propósito
+por otro medio posible. Es decir, algunas etiquetas están mal. ¿Cuántos
+de los errores del modelo son, en realidad, errores de las etiquetas?
+
+*Predigan.* Si toman la decisión «perfecta» (el medio más barato según
+la fórmula, sin ruido) y la comparan con las etiquetas de los 2 000
+envíos de prueba, ¿en qué porcentaje creen que coinciden? Con esa cifra
+en mente, ¿el 92.1 % del modelo es bueno o malo?
+
+*Herramientas.*
+
+- =import generar_dataset as g= les da =g.MEDIOS=,
+  =g.es_posible(medio, paquete)= y =g.puntaje(medio, paquete, rng)=.
+  Lean =puntaje=: lo único que hace con =rng= es llamar a
+  =rng.gauss(1.0, 0.08)=. Piensen qué objeto le pueden pasar en lugar
+  de un generador aleatorio para que no meta ruido.
+- Con eso escriban =optimo(paquete)=: de los medios posibles, el de
+  menor puntaje sin ruido.
+- =fila.to_dict()= convierte una fila de =x_prueba= en el diccionario
+  que esperan esas funciones.
+- Para el modelo, usen la recomendación con reglas del paso 12 (el
+  primer medio posible del ranking), no solo =predict=.
+
+*Preguntas.*
+
+1. ¿En qué porcentaje coinciden el óptimo y las etiquetas en la
+   prueba? Ese número es el /techo/: es muy difícil que un modelo lo
+   supere, porque la parte de las etiquetas que es ruido no se puede
+   predecir. ¿Qué tan lejos está el modelo del techo, sin reglas y con
+   reglas?
+2. ¿En qué porcentaje coincide el modelo (con reglas) con el óptimo?
+   Tomen los envíos donde el modelo «se equivocó» según la etiqueta:
+   ¿en cuántos eligió, en realidad, el óptimo? Regresen a la
+   actividad 3: ¿qué confusiones resultaron no ser errores del modelo?
+3. Calculen el costo total (con =puntaje= sin ruido) de tres formas de
+   decidir los 2 000 envíos: el óptimo, las etiquetas (lo que
+   decidieron los operadores) y el modelo. ¿Cuánto se pasa cada una
+   del óptimo, en porcentaje? ¿Quién decide mejor: el modelo o los
+   operadores de los que aprendió? ¿Cómo es posible que el alumno
+   supere al maestro? (Piensen en =min_samples_leaf=5=: cada hoja
+   decide por mayoría entre varios envíos parecidos.)
+4. Entrenen el mismo árbol, pero con las etiquetas del óptimo en lugar
+   de las originales. ¿Cuánto baja el costo? ¿Valdría la pena pagarle
+   a alguien para «limpiar» las etiquetas?
+
+*Para pensar.* Si la empresa ya tiene la fórmula, ¿para qué quiere un
+modelo? Describan una situación real en la que la fórmula no exista y
+lo único que haya sean las decisiones de los operadores. En esa
+situación no hay =optimo=: ¿cómo sabrían si un error es culpa del
+modelo o del operador? ¿Qué cambia eso en la forma de leer la
+exactitud de cualquier modelo?
+
+**** Actividad 7 — ¿El modelo razona o memoriza? Pruebas de coherencia
+
+La exactitud dice cuántas veces acierta el modelo, pero no si sus
+decisiones tienen sentido. Un modelo puede acertar el 92 % de las
+veces y, aun así, mandar un paquete en camioneta solo porque ahora
+pesa menos. En esta actividad escriben pruebas que detectan ese tipo
+de incoherencias, igual que una prueba unitaria detecta un error en el
+código.
+
+*Predigan.* Si a un paquete le quitan la mitad del peso y todo lo
+demás queda igual, ¿puede cambiar el medio recomendado? ¿Hacia cuál?
+¿Y si se vuelve frágil? ¿Y si sale a las 16:00 en lugar de las 10:00,
+con el mismo tráfico?
+
+*Herramientas.*
+
+- La fórmula de =generar_dataset.py= (=puntaje= y =es_posible=) dice
+  cómo /debería/ reaccionar el modelo a cada cambio.
+- Una prueba de coherencia toma los 2 000 envíos de prueba, les aplica
+  el mismo cambio a todos (por ejemplo, =copia["fragil"] = 1=), vuelve
+  a recomendar y cuenta en cuántos el medio cambió /en una dirección
+  que la fórmula no permite/.
+
+*Preguntas.*
+
+1. Lean =puntaje= y =es_posible= y escriban al menos cuatro
+   propiedades del tipo «si X cambia así, el medio nunca debería pasar
+   a Y» o «si X cambia así, el medio no debería cambiar». Cada una con
+   su justificación a partir de la fórmula. Pistas: ¿=puntaje= usa el
+   peso? ¿Para qué usa la hora? ¿A qué medio castiga más cada
+   penalización? ¿A qué medio frena más el tráfico?
+2. Un compañero propone esta propiedad: «si el destino está más cerca,
+   el medio nunca debería pasar a camioneta». ¿Es cierta según la
+   fórmula? Demuéstrenlo con cuentas, o encuentren un paquete que la
+   rompa usando el óptimo de la actividad 6.
+3. Programen sus propiedades y cuenten las violaciones del modelo
+   guardado (con reglas).
+4. Entrenen un árbol sin límite de profundidad (sin =max_depth= y con
+   =min_samples_leaf=1=) y repitan las pruebas. Hagan una tabla con
+   las dos versiones: exactitud y violaciones por propiedad. ¿Por qué
+   un árbol que memoriza rompe muchas más propiedades, si su exactitud
+   solo bajó unos puntos?
+5. Prueben un cambio más: el valor declarado pasa de menos de 20 000 a
+   30 000 pesos. ¿Cuántas decisiones cambia el modelo? ¿Cuántas cambia
+   el óptimo? Expliquen la diferencia (cuenten cuántos envíos del
+   dataset valen más de 20 000). ¿Una prueba de «nunca se mueve en la
+   dirección equivocada» detecta este problema? ¿Qué tipo de prueba sí
+   lo detectaría?
+
+*Para pensar.* Antes de cambiar el archivo del modelo en Django
+(=RUTA_MODELO=), el equipo quiere un examen automático que todo modelo
+nuevo tenga que aprobar. ¿Cuáles de sus pruebas pondrían ahí y con qué
+tolerancia: cero violaciones, 1 %? ¿Qué preferirían en producción: un
+modelo con 93 % de exactitud y cincuenta incoherencias, o uno con 92 %
+y dos? ¿Qué incoherencias corrige =reglas.py= y cuáles no puede
+corregir ninguna regla?
+
+**** Actividad 8 — El mundo cambia
+
+El modelo aprendió con los envíos del año pasado. Este año pasan dos
+cosas en la empresa:
+
+- Llega una temporada de lluvias: el 55 % de los días llueve y el
+  15 % hay viento fuerte (antes, 20 % y 10 %).
+- La empresa compra drones nuevos que cargan hasta 5 kg y 25 litros y
+  vuelan hasta 25 km (antes, 2.5 kg, 12 litros y 15 km).
+
+¿Sigue sirviendo el modelo? Y si no, ¿cómo se darían cuenta?
+
+*Predigan.* ¿Cuál de los dos cambios le hace más daño al modelo?
+Cuando el modelo se equivoque por culpa del cambio, ¿creen que lo hará
+con menos confianza que de costumbre?
+
+*Herramientas.*
+
+- Para simular cada escenario, hagan una copia de
+  =generar_dataset.py= (por ejemplo, =generar_lluvias.py=) y cambien
+  =CLIMAS= o el límite del dron en =LIMITES=. Generen 5 000 envíos con
+  otra semilla:
+  =python generar_lluvias.py --filas 5000 --semilla 99 --salida lluvias.csv=.
+- Generen también 5 000 envíos con el generador original y la misma
+  semilla. Es su referencia: así saben qué parte de la diferencia se
+  debe al cambio y no a que son envíos distintos.
+- =modelo.predict_proba= da la confianza (la probabilidad más alta) de
+  cada recomendación.
+
+*Preguntas.*
+
+1. Para la referencia y los dos escenarios, midan: exactitud,
+   confianza media, porcentaje de cada medio entre las
+   recomendaciones y porcentaje de recomendaciones corregidas por las
+   reglas. ¿Qué cambio le hace más daño? ¿Por qué el otro casi no le
+   afecta, si los datos cambiaron tanto?
+2. En producción, el medio correcto no se conoce en el momento: el
+   modelo solo ve paquetes y responde. Sin usar la columna
+   =medio_recomendado= de los escenarios, ¿con qué señal se habrían
+   dado cuenta de cada cambio? Si para alguno no encuentran ninguna,
+   expliquen por qué es invisible.
+3. Actualicen el límite del dron en =LIMITES= (las reglas) sin
+   reentrenar. ¿Mejora? ¿Por qué?
+4. Supongan que solo tienen 1 000 envíos del mundo nuevo (generen
+   1 000 con =--semilla 123=). Prueben al menos tres formas de
+   reentrenar, todas evaluadas con los 5 000 envíos del escenario de
+   los drones: solo datos nuevos (con 200, 500 y 1 000), los 10 000
+   viejos más los nuevos, y una idea suya. ¿Por qué juntar viejos y
+   nuevos casi no ayuda? ¿Qué tienen de malo los datos viejos?
+
+*Para pensar.* En la plataforma de Django, ¿qué tendrían que empezar a
+guardar desde hoy para darse cuenta de un cambio como el de los
+drones, sin esperar a que alguien se queje? (Piensen en el momento en
+que el operador elige un medio distinto del sugerido, y en qué patrón
+del curso sirve para registrar ese hecho sin meterlo en la vista.)
+Cuando la empresa compre los drones, ¿qué archivos y qué datos tienen
+que cambiar, y en qué orden? ¿Quién debería decidir que llegó el
+momento de reentrenar: un programador, el propio modelo o una métrica?
 
 *** Actividad individual — Lo que hay detrás de la implementación
 
