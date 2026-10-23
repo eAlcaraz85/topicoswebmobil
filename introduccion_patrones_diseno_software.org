@@ -3843,8 +3843,9 @@ mínimo que resolvería el problema *actual*.
 :END:
 
 Las actividades se resuelven a partir de los apartados teóricos de la
-unidad. Las misiones de abajo son análisis escrito. El bloque *Cinco
-días* es trabajo autónomo: estudiar, pensar e *implementar* el
+unidad. Las misiones de abajo son análisis escrito. Hay una actividad
+teórica sobre *monolito con API frente a microservicios*. El bloque
+*Cinco días* es trabajo autónomo: estudiar, pensar e *implementar* el
 enunciado en web (Django).
 
 ** Misiones: patrones de software para aplicaciones web
@@ -7866,6 +7867,134 @@ La pregunta F1 vale 10 puntos, repartidos como indica cada inciso. Si
 el commit no es de la persona que firma el archivo, la actividad no
 cuenta.
 
+** Actividad — Monolito con API frente a microservicios
+:PROPERTIES:
+:CUSTOM_ID: actividad-monolito-api-microservicios
+:END:
+
+Actividad *teórica e individual*: no se pide código nuevo ni Docker.
+El objetivo es demostrar que entienden la diferencia entre un monolito
+expuesto por API (lo que es la plataforma de entregas hoy) y una
+arquitectura de microservicios.
+
+Lean antes el apartado
+[[*Monolito conectado por API frente a microservicios][Monolito conectado por API frente a microservicios]]
+(dentro de *De una Aplicación Django + Flutter a una Arquitectura de
+Microservicios*). Las respuestas tienen que apoyarse en ese texto y
+en lo que ya vieron del proyecto (=entregas/views.py=,
+=recomendador.py=, =reglas.py=, =medios.py=).
+
+**** Cómo se entrega: un commit por persona
+
+1. =git pull= en el repositorio del equipo.
+2. Creen =actividades/arquitectura/= si no existe, y un archivo
+   =actividades/arquitectura/<matrícula>_<apellido>.md=
+   (ejemplo: =actividades/arquitectura/21120345_garcia.md=).
+3. Usen la plantilla de abajo, respondan y hagan *su* commit:
+
+   #+begin_src shell
+   git add actividades/arquitectura/21120345_garcia.md
+   git commit -m "Actividad arquitectura: <matrícula> <apellido>"
+   git push
+   #+end_src
+
+No se vale que una persona suba los archivos de todo el equipo. Si el
+commit no es de quien firma el archivo, la actividad no cuenta.
+Respuestas calcadas entre compañeros se anulan.
+
+**** Plantilla
+
+#+begin_example
+# Actividad — Monolito con API frente a microservicios
+
+Nombre:
+Matrícula:
+Equipo:
+
+## 1. Clasificar la plataforma actual
+(respuesta)
+
+## 2. La trampa de los endpoints
+(respuesta)
+
+## 3. La misma operación en dos mundos
+(respuesta)
+
+## 4. Decisión de la empresa
+(respuesta)
+
+## 5. Un solo corte
+(respuesta)
+#+end_example
+
+**** Preguntas
+
+***** 1. Clasificar la plataforma actual (15 puntos)
+
+Dibujen (ASCII o lista de cajas) la arquitectura *actual* de
+=plataforma-entregas=: quién es el cliente, qué proceso corre en el
+servidor, qué URL usa el front. Digan en *una* frase si es monolito
+clásico, monolito + API o microservicios, y justifiquen con *una*
+evidencia concreta (archivo, comando de arranque o forma de llamar al
+modelo).
+
+***** 2. La trampa de los endpoints (20 puntos)
+
+Un compañero afirma:
+
+#+begin_quote
+Ya tenemos microservicios: hay =/entregas/hola/=, =/entregas/recomendar/=
+y el HTML está aparte.
+#+end_quote
+
+Refuten o acepten en máximo ocho líneas. Tienen que usar, con sus
+palabras, la idea del apartado: *API separa clientes del servidor;
+microservicios separan servidores entre sí.*
+
+***** 3. La misma operación en dos mundos (25 puntos)
+
+Tomen el caso de las 3:00 (el modelo puede preferir dron y las reglas
+quedarse con moto). Escriban:
+
+- el flujo en el *monolito + API* de hoy: qué vista entra, qué módulos
+  se llaman *en memoria* (=recomendador=, =reglas=, =medios=);
+- el flujo si =recomendador= fuera *otro servicio*: qué saltos de red
+  habría y qué podría hacer Pedidos si ese servicio no responde.
+
+No hace falta inventar URLs perfectas; sí hace falta que se note la
+diferencia entre =import= y una llamada HTTP.
+
+***** 4. Decisión de la empresa (20 puntos)
+
+La empresa dice: «El Random Forest pesa unos 50 MB y lo reentrenamos
+cada semana; los pedidos casi no cambian de código». ¿Qué
+recomiendan?
+
+- quedarse en monolito + API,
+- extraer *solo* el servicio de IA,
+- partir todo (pedidos, IA, notificaciones…).
+
+Una postura clara y *tres* argumentos. «Quedarse en monolito» es
+válido si lo justifican con costo, equipo o complejidad.
+
+***** 5. Un solo corte (20 puntos)
+
+Propongan *un* microservicio (no tres). Digan:
+
+- qué se lleva (¿=recomendador.py=? ¿los =.joblib=? ¿=reglas.py=?);
+- qué se queda en el backend de pedidos (¿=medios.py=? ¿la vista?);
+- por qué ese corte y no «un servicio por archivo».
+
+**** Cómo se califica
+
+| Se califica | Cómo |
+|-------------+------|
+| Clasificación | Nombran la arquitectura correcta y dan una evidencia del proyecto |
+| Trampa | Refutan o aceptan con el criterio API vs procesos separados |
+| Dos mundos | Se ve la diferencia entre llamadas en memoria y saltos de red |
+| Decisión | Postura clara + tres argumentos ligados al caso (modelo grande / pedidos estables) |
+| Un corte | Un solo servicio, con dueño de archivos y justificación |
+
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
 Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
@@ -8152,6 +8281,263 @@ responsabilidades importantes:
 #+end_example
 
 Esta separación facilita posteriormente la evolución del sistema.
+
+
+** Monolito conectado por API frente a microservicios
+
+Esta es la confusión más común del semestre. Muchos equipos dicen «ya
+tenemos microservicios» porque:
+
+- el front (Flutter, React o HTML) está separado,
+- el backend expone una API REST,
+- se habla por HTTP/JSON.
+
+Eso *no* son microservicios. Eso es un *monolito detrás de una API*.
+La plataforma de entregas que armamos en Django está exactamente en
+ese punto: un solo =manage.py=, una sola app =entregas=, un solo
+modelo =.joblib= y una sola base (si la hubiera), y el navegador o la
+app móvil la consumen por =POST /entregas/recomendar/=.
+
+
+*** Tres arquitecturas que se confunden
+
+| Arquitectura | Qué hay en el servidor | Cómo habla el cliente | ¿Son microservicios? |
+|--------------+------------------------+-----------------------+----------------------|
+| Monolito clásico | Django sirve plantillas HTML y la lógica | El navegador pide páginas | No |
+| Monolito + API | Un solo backend Django; front aparte | HTTP/JSON a *una* API | No |
+| Microservicios | Varios backends independientes | HTTP/JSON a un /Gateway/ o a varios servicios | Sí |
+
+El salto importante no es «¿hay API?». El salto es «¿hay *varios*
+procesos desplegables, cada uno dueño de su parte del negocio?».
+
+
+*** Cómo se ve el monolito conectado por API (lo que ya hicieron)
+
+#+begin_example
+  Navegador / Flutter / curl
+              |
+              |  POST /entregas/recomendar/
+              |  Content-Type: application/json
+              v
+     ┌────────────────────────────┐
+     │   Un solo Django           │
+     │   (plataforma-entregas)    │
+     │                            │
+     │  vistas → recomendador →   │
+     │  reglas → medios → modelo  │
+     │                            │
+     │  Un solo proceso           │
+     │  Un solo puerto (8000)     │
+     │  Un solo requirements.txt  │
+     └────────────────────────────┘
+#+end_example
+
+Características:
+
+- *Un despliegue.* Si cambian =reglas.py=, reinician *toda* la
+  aplicación.
+- *Una llamada de red* del cliente al servidor. Dentro del servidor,
+  =recomendador.explicar= llama a =es_posible= y a =crear_medio= con
+  funciones de Python: *no hay red entre módulos*.
+- *Una versión del código.* El árbol, el bosque y la red neuronal
+  viven en la misma carpeta =entregas/modelo/=.
+- *Transacciones sencillas.* Si mañana guardan el pedido y el cobro en
+  la misma base, un =transaction.atomic= alcanza.
+
+Por eso «conectado con API» no cambia la arquitectura interna: solo
+cambia *quién* dibuja la pantalla. La lógica sigue siendo un monolito.
+
+
+*** Cómo se ven (y se usan) los microservicios
+
+En microservicios el mismo negocio se parte en *servicios* que:
+
+1. se despliegan por separado,
+2. se comunican por red (HTTP, gRPC o mensajes),
+3. suelen tener su propia base de datos,
+4. pueden fallar uno sin apagar a los demás.
+
+Para la plataforma de entregas, una división *posible* (no obligatoria)
+sería:
+
+#+begin_example
+  Navegador / Flutter
+           |
+           v
+     ┌─────────────┐
+     │ API Gateway │  (única puerta: auth, enrutado, límite de tasa)
+     └──────┬──────┘
+            |
+   +--------+--------+----------------+
+   |                 |                |
+   v                 v                v
+┌──────────┐   ┌───────────┐   ┌──────────────┐
+│ Pedidos  │   │ Recomendar│   │ Notificar    │
+│ :8001    │   │ (IA)      │   │ :8003        │
+│          │   │ :8002     │   │              │
+│ BD       │   │ modelo    │   │ cola/correo  │
+│ pedidos  │   │ .joblib   │   │              │
+└──────────┘   └───────────┘   └──────────────┘
+#+end_example
+
+*Cómo se usa en la práctica* (el flujo de un pedido):
+
+1. El cliente manda =POST /pedidos= al *Gateway* (no a cada servicio).
+2. El Gateway autentica y reenvía a *Pedidos*.
+3. Pedidos necesita un medio: llama por HTTP a
+   =POST http://recomendar:8002/sugerir= con el JSON del paquete.
+4. Recomendar carga su modelo, aplica *sus* reglas (o consulta un
+   servicio de reglas) y responde ={"medio":"dron","motivo":"..."}=.
+5. Pedidos guarda el pedido en *su* base y publica un evento
+   =PedidoCreado=.
+6. Notificar escucha el evento y manda el correo. Pedidos no espera
+   al correo para responder al cliente.
+
+Eso es «utilizar» microservicios: no es solo tener carpetas, es tener
+*procesos*, *contratos de API entre servicios* y *fallos parciales* que
+hay que diseñar.
+
+
+*** La misma operación en los dos mundos
+
+Caso: recomendar medio para un paquete a las 3:00.
+
+*Monolito + API (hoy):*
+
+#+begin_example
+Cliente
+  → POST /entregas/recomendar/   (una sola llamada)
+     → views.recomendar
+        → obtener_recomendador("arbol").explicar(paquete)   # llamada en memoria
+        → crear_medio(...).planear(paquete)                # llamada en memoria
+  ← {"medio":"moto","motivo":"...","proceso":[...]}
+#+end_example
+
+Si el modelo tarda o falla, falla *toda* la petición del monolito.
+Si reinician el servidor para actualizar el =.joblib=, cae también
+=hola/= y cualquier otra ruta.
+
+*Microservicios:*
+
+#+begin_example
+Cliente
+  → POST /gateway/pedidos
+       → servicio Pedidos
+            → HTTP POST http://recomendar/sugerir
+                 ← {"medio":"moto","motivo":"..."}
+            → guarda pedido
+            → publica PedidoCreado
+  ← {"folio":"ENV-…","medio":"moto"}
+#+end_example
+
+Aquí hay *al menos dos saltos de red*. Si Recomendar está caído,
+Pedidos puede: rechazar el pedido, usar un medio por defecto, o
+encolar y reintentar. Esa decisión *no existía* en el monolito: ahí
+era un =import= que siempre estaba o no estaba.
+
+
+*** Diferencias que importan (más allá del dibujo)
+
+| Pregunta | Monolito + API | Microservicios |
+|----------|----------------|----------------|
+| ¿Cuántos =runserver= / contenedores hay? | Uno | Varios |
+| ¿Cómo se llama el módulo de IA? | =from .recomendador import ...= | =requests.post("http://recomendar/...")= |
+| ¿Quién es dueño de la base? | Una base compartida (o ninguna aún) | Cada servicio la suya |
+| ¿Cómo despliego un cambio del modelo? | Redesplegar todo Django | Redesplegar solo el servicio de IA |
+| ¿Qué pasa si falla la IA? | Falla la petición entera (salvo que programen un =try=) | Pedidos puede seguir con un plan B |
+| ¿Dónde vive el Adapter / Strategy? | Dentro del mismo repo | Dentro del servicio que los necesita; el contrato entre servicios es la API |
+| ¿Hace falta Gateway? | No: el front ya habla con una sola API | Casi siempre sí: una puerta, muchos detrás |
+| ¿La API del front implica microservicios? | No | Solo si detrás hay varios servicios |
+
+
+*** «Tener API» no reparte el trabajo
+
+Un error frecuente:
+
+#+begin_quote
+Si expongo =/usuarios=, =/pedidos= y =/recomendar= en el mismo Django,
+ya tengo microservicios.
+#+end_quote
+
+No. Tienen *varios endpoints* de un solo proceso. Es como tener tres
+ventanillas en la misma oficina: el cliente ve tres mostradores, pero
+es el mismo edificio, la misma caja y el mismo cierre de puertas.
+
+Microservicios sería: tres oficinas en edificios distintos, cada una
+con su llave, y un recepcionista (Gateway) que indica a cuál ir.
+
+
+*** Cómo se comunican los microservicios (uso real)
+
+Hay dos estilos; en clase conviene reconocerlos:
+
+1. *Síncrono (HTTP/REST o gRPC).* Pedidos espera la respuesta de
+   Recomendar. Simple de entender; acopla disponibilidad: si el otro
+   no contesta, usted tampoco.
+2. *Asíncrono (cola / eventos).* Pedidos publica =PedidoCreado=;
+   Notificar y Reportes reaccionan cuando puedan. El cliente no espera
+   el correo. Aparecen *consistencia eventual* y la necesidad de no
+   procesar el mismo evento dos veces (idempotencia).
+
+En el monolito, Observer o una señal de Django hacen un papel parecido
+*sin red*. Al pasar a microservicios, ese Observer suele convertirse
+en un bus de mensajes.
+
+
+*** Qué gana y qué pierde cada opción
+
+*Monolito + API — conviene cuando:*
+
+- el equipo es pequeño (como en el curso),
+- el dominio todavía se está entendiendo,
+- necesitan transacciones simples (pedido + cobro juntos),
+- quieren una sola forma de correr el proyecto (=runserver=).
+
+*Microservicios — empiezan a pagar la pena cuando:*
+
+- una parte (por ejemplo la IA) necesita otra escala, otro lenguaje o
+  otro ritmo de despliegue,
+- equipos distintos son dueños de pedidos y de recomendaciones,
+- un fallo de notificaciones *no* debe tumbar el alta del pedido.
+
+*Microservicios cuestan:*
+
+- más infraestructura (contenedores, Gateway, logs, trazas),
+- depurar a través de la red,
+- versionar contratos (=/sugerir= v1 vs v2),
+- datos repartidos (ya no hay un =JOIN= fácil entre pedidos y
+  usuarios).
+
+
+*** Puente con lo que ya programaron
+
+| Pieza de la plataforma | En monolito + API | Si un día fuera microservicio |
+|------------------------+-------------------+-------------------------------|
+| =entregas/views.py= | Entrada HTTP única | Podría quedar en Pedidos o en el Gateway |
+| =recomendador.py= (Adapter) | Módulo del mismo proceso | Servicio =recomendar= con su propia API |
+| =reglas.py= | Mismo repo | Misma librería compartida *o* servicio de políticas (con cuidado de no crear un «monolito distribuido») |
+| =medios.py= (Strategy) | Mismo proceso | Suele quedarse junto a Pedidos: planear la entrega es del dominio de pedidos, no del modelo |
+| =modelo_*.joblib= | Carpeta local | Artefacto del servicio de IA; se actualiza sin tocar Pedidos |
+| Front HTML / Flutter | Cliente de *una* URL base | Cliente del Gateway; no conoce cuántos servicios hay detrás |
+
+La lección de patrones no se borra: el Adapter sigue traduciendo
+probabilidades a =Sugerencia=; solo cambia *en qué proceso* vive.
+
+
+*** Idea para llevarse
+
+#+begin_quote
+API separa *clientes* del *servidor*.
+
+Microservicios separan *servidores* entre sí.
+#+end_quote
+
+Mientras tengan un solo Django detrás de la API, tienen un monolito
+bien expuesto. Eso no es un insulto: es la arquitectura correcta para
+aprender y para la mayoría de los proyectos del semestre. Los
+microservicios aparecen cuando el *monolito modular* ya no aguanta una
+necesidad concreta de escala, de equipo o de despliegue… no cuando
+aparece el primer =fetch=.
 
 
 ** 2. ¿Por qué Flutter y Django combinan bien?
@@ -10182,29 +10568,45 @@ cuando las necesidades del sistema justifican su complejidad.
 
 1. ¿Separar Flutter y Django significa utilizar microservicios?
 
-2. ¿Qué responsabilidades deberían permanecer en Django?
+2. ¿En qué se diferencia un monolito conectado por API de una
+   arquitectura de microservicios? Usen la plataforma de entregas como
+   ejemplo.
 
-3. ¿Por qué Flutter no debería conectarse directamente a PostgreSQL?
+3. Si hoy exponen =/usuarios=, =/pedidos= y =/recomendar= en el mismo
+   Django, ¿tienen tres microservicios? ¿Por qué sí o por qué no?
 
-4. ¿Qué es un monolito modular?
+4. ¿Qué responsabilidades deberían permanecer en Django?
 
-5. ¿Por qué un monolito no necesariamente representa una mala
+5. ¿Por qué Flutter no debería conectarse directamente a PostgreSQL?
+
+6. ¿Qué es un monolito modular?
+
+7. ¿Por qué un monolito no necesariamente representa una mala
    arquitectura?
 
-6. ¿Qué ventajas proporciona Django antes de considerar
+8. ¿Qué ventajas proporciona Django antes de considerar
    microservicios?
 
-7. ¿Qué nuevos problemas aparecen cuando distribuimos una aplicación?
+9. ¿Qué nuevos problemas aparecen cuando distribuimos una aplicación
+   (red, fallos parciales, transacciones)?
 
-8. ¿Qué diferencia existe entre un módulo Django y un microservicio?
+10. ¿Qué diferencia existe entre un módulo Django y un microservicio?
 
-9. ¿Cuándo tendría sentido extraer un módulo de Django y convertirlo
-   en servicio?
+11. En la plataforma de entregas, si el servicio de IA se cayera y
+    estuvieran en microservicios, ¿qué podría hacer Pedidos? ¿Y en el
+    monolito actual?
 
-10. ¿Por qué no sería conveniente crear un microservicio por cada tabla
+12. ¿Cuándo tendría sentido extraer =recomendador.py= a un servicio
+    aparte? ¿Qué se llevarían con él y qué se quedaría en Pedidos
+    (=medios.py=, =reglas.py=…)?
+
+13. ¿Por qué no sería conveniente crear un microservicio por cada tabla
     de la base de datos?
 
-11. ¿Django puede utilizarse para desarrollar un microservicio?
+14. ¿Django puede utilizarse para desarrollar un microservicio?
 
-12. ¿Por qué deberíamos identificar primero los límites del negocio
+15. ¿Por qué deberíamos identificar primero los límites del negocio
     antes de dividir físicamente el sistema?
+
+16. Completen la frase: «API separa ___ del servidor; microservicios
+    separan ___ entre sí.»
