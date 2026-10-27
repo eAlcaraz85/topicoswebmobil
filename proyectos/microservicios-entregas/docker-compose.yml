@@ -1,0 +1,37 @@
+# Tres procesos distintos = microservicios (no son réplicas del mismo monolito).
+#
+#   cliente -> gateway:8080 -> pedidos:8001 -> recomendar:8002
+#
+# Uso:
+#   docker compose up --build
+#   curl -s http://127.0.0.1:8080/salud/recomendar
+#   curl -s -X POST -H "Content-Type: application/json" -d @paquete.json \
+#        http://127.0.0.1:8080/pedidos
+
+services:
+  recomendar:
+    build: ./recomendar
+    container_name: ms-recomendar
+    # Sin ports publicados a propósito: el cliente pasa por el gateway.
+    # Descomenten la línea de abajo solo para depurar el servicio a solas:
+    # ports: ["8002:8002"]
+
+  pedidos:
+    build: ./pedidos
+    container_name: ms-pedidos
+    environment:
+      RECOMENDAR_URL: http://recomendar:8002
+      RECOMENDAR_TIMEOUT: "3"
+    depends_on:
+      - recomendar
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: ms-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - pedidos
+      - recomendar

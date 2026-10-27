@@ -3844,9 +3844,10 @@ mínimo que resolvería el problema *actual*.
 
 Las actividades se resuelven a partir de los apartados teóricos de la
 unidad. Las misiones de abajo son análisis escrito. Hay una actividad
-teórica sobre *monolito con API frente a microservicios*. El bloque
-*Cinco días* es trabajo autónomo: estudiar, pensar e *implementar* el
-enunciado en web (Django).
+teórica sobre *monolito con API frente a microservicios* y otra
+práctica: armar microservicios con Docker (sin proyecto listo; lo
+escriben ustedes). El bloque *Cinco días* es trabajo autónomo:
+estudiar, pensar e *implementar* el enunciado en web (Django).
 
 ** Misiones: patrones de software para aplicaciones web
 :PROPERTIES:
@@ -7995,6 +7996,205 @@ Propongan *un* microservicio (no tres). Digan:
 | Decisión | Postura clara + tres argumentos ligados al caso (modelo grande / pedidos estables) |
 | Un corte | Un solo servicio, con dueño de archivos y justificación |
 
+** Actividad — Microservicios con Docker
+:PROPERTIES:
+:CUSTOM_ID: actividad-microservicios-docker
+:END:
+
+Van a *construir* ustedes la versión en microservicios de la
+plataforma de entregas. No hay un zip listo ni un repo para clonar:
+parten de lo que ya saben (Docker de la ruta de Django, el modelo
+=.joblib=, =reglas.py=) y de lo que pide este enunciado.
+
+Trabajo en *equipo* (el código) + *informe individual* (el razonamiento).
+
+Lean antes [[*Monolito conectado por API frente a microservicios][Monolito
+conectado por API frente a microservicios]] y
+[[*Docker: cómo se ven los microservicios de verdad][Docker: cómo se ven
+los microservicios de verdad]].
+
+**** Meta
+
+Al terminar deben poder hacer esto, con *tres* contenedores distintos:
+
+#+begin_src shell
+docker compose up --build
+curl -s -X POST -H "Content-Type: application/json" \
+  -d @paquete.json http://127.0.0.1:8080/pedidos
+#+end_src
+
+La respuesta trae un folio y un medio. Por dentro, Pedidos le preguntó
+a Recomendar por HTTP. Si apagan Recomendar, Pedidos sigue vivo y
+avisa el fallo (o aplica un plan B).
+
+**** Carpeta del equipo
+
+En el repositorio del equipo, creen algo así (los nombres pueden
+variar un poco; las responsabilidades no):
+
+#+begin_example
+microservicios-entregas/
+  docker-compose.yml
+  paquete.json
+  gateway/
+    nginx.conf          (o el proxy que elijan)
+  pedidos/
+    Dockerfile
+    requirements.txt
+    app.py
+  recomendar/
+    Dockerfile
+    requirements.txt
+    app.py
+    reglas.py
+    modelo/
+      modelo_medios.joblib
+#+end_example
+
+El =.joblib= y =reglas.py= los copian de lo que ya entrenaron / usaron
+en el monolito. No reinventen el árbol: reutilicen el archivo.
+
+**** Paso 1 — Servicio =recomendar=
+
+Este contenedor *solo* recomienda. No crea folios ni guarda pedidos.
+
+Debe exponer, como mínimo:
+
+- =GET /salud= → ={"servicio":"recomendar","estado":"ok"}=
+- =POST /sugerir= → recibe el JSON del paquete (los mismos 14 campos
+  del monolito) y responde algo como:
+
+#+begin_example
+{
+  "servicio": "recomendar",
+  "medio": "moto",
+  "motivo": "...",
+  "preferido_por_modelo": "dron",
+  "corregido_por_reglas": true
+}
+#+end_example
+
+Lógica que ya conocen: cargar el modelo con =joblib=, armar un
+=DataFrame= de una fila, =predict_proba=, ordenar el ranking, y
+recorrer los medios con =es_posible= hasta encontrar el primero
+viable. Es el mismo criterio del Adapter; ahora vive en este proceso.
+
+Dependencias típicas: Flask (u otro marco chico), =joblib=, =pandas=,
+=scikit-learn= —*la misma versión* con la que entrenaron—. El
+=Dockerfile= sigue la idea del paso 10 de Django: =FROM python:3.12-slim=,
+instalar =requirements.txt=, copiar el código, exponer el puerto
+(por ejemplo 8002), arrancar =app.py=.
+
+*Para comprobar sin Compose todavía:* pueden correr el servicio en su
+máquina, mandarle un =curl= al =/sugerir= y ver que responde. Cuando
+esté en Docker, el cliente normal no hablará directo con este puerto.
+
+**** Paso 2 — Servicio =pedidos=
+
+Este contenedor crea el pedido. *No* carga el =.joblib=.
+
+Debe exponer:
+
+- =GET /salud= → que diga que es pedidos y, si quieren, la URL con la
+  que llama a recomendar;
+- =POST /pedidos= → recibe el mismo JSON de paquete, llama a
+  =POST {RECOMENDAR_URL}/sugerir=, inventa un folio, guarda el pedido
+  en una lista en memoria y responde folio + medio + motivo.
+
+La URL de recomendar sale de una variable de entorno, por ejemplo
+=RECOMENDAR_URL=. Dentro de Compose valdrá
+=http://recomendar:8002=. Si ponen =localhost=, desde el contenedor
+de Pedidos estarían hablándose a sí mismos: no encontrarán a
+Recomendar.
+
+Si la llamada falla (timeout, conexión rechazada), *no* tumben el
+proceso. Respondan con un error claro (por ejemplo HTTP 503) y un
+plan B: un medio por defecto y una frase que diga que recomendar no
+estuvo disponible. Eso es el fallo parcial.
+
+Dependencias: Flask (o similar) y =requests=. En el =requirements.txt=
+de Pedidos *no* va scikit-learn.
+
+**** Paso 3 — Gateway
+
+El cliente solo debe conocer un puerto, por ejemplo el 8080. Nginx
+sirve bien; también un proxy mínimo en Python. Lo que tiene que hacer:
+
+- =/pedidos= → reenviar al servicio pedidos;
+- (opcional) =/sugerir= → reenviar a recomendar, útil para depurar;
+- =/salud/pedidos= y =/salud/recomendar= → salud de cada uno.
+
+El gateway es la única pieza que publica puerto a su computadora
+(=8080:80=). Pedidos y Recomendar pueden quedarse solo en la red
+interna de Compose.
+
+**** Paso 4 — =docker-compose.yml=
+
+Tres servicios: =recomendar=, =pedidos=, =gateway=. Ideas clave:
+
+- =build: ./pedidos= y =build: ./recomendar= (cada uno con su
+  =Dockerfile=);
+- en =pedidos=, =environment: RECOMENDAR_URL: http://recomendar:8002=;
+- =depends_on= para arrancar en orden razonable;
+- el gateway monta su =nginx.conf= (o el archivo que usen) y publica
+  =8080:80=.
+
+Cuando Compose crea la red, el nombre del servicio *es* el nombre de
+host. Por eso =http://recomendar:8002= funciona entre contenedores.
+
+**** Paso 5 — Probar
+
+1. =docker compose up --build=
+2. =docker compose ps= — tienen que verse *tres* contenedores, no tres
+   copias de la misma imagen.
+3. Salud de ambos servicios a través del gateway.
+4. =POST= con =paquete.json=. Antes de mirar el resultado, escriban
+   qué medio esperan si =hora_salida= es 3 (noche) y por qué.
+5. =docker compose stop recomendar=, vuelvan a mandar el =POST=,
+   anoten qué respondió Pedidos, y =docker compose start recomendar=.
+
+**** Entrega
+
+*Código (equipo).* La carpeta =microservicios-entregas/= en el repo,
+con lo necesario para que otra persona haga =docker compose up --build=
+y reproduzca el =POST=.
+
+*Informe (individual).* Un commit por persona en
+=actividades/microservicios-docker/<matrícula>_<apellido>.md=:
+
+#+begin_example
+# Actividad — Microservicios con Docker
+
+Nombre:
+Matrícula:
+Equipo:
+
+## 1. Predicción (hora 3) vs resultado
+## 2. docker compose ps (qué hay en cada contenedor)
+## 3. Fallo al apagar recomendar
+## 4. Réplicas de la etapa 5 vs esto
+## 5. Camino de un POST /pedidos (red vs import)
+## 6. Si solo cambia el .joblib, ¿qué reconstruyen?
+## 7. Dos límites de esta práctica antes de producción
+#+end_example
+
+En la 4: por qué las réplicas del monolito *no* son microservicios y
+esto sí. En la 5: dibujo o lista cliente → gateway → … → modelo. En
+la 6: comparen con el monolito Django. En la 7: no implementen la
+solución; solo digan qué faltaría.
+
+**** Cómo se califica
+
+| Se mira | Criterio |
+|---------+----------|
+| Arranque | Tres servicios distintos; el =POST= por el puerto del gateway funciona |
+| Separación | Pedidos no tiene scikit-learn; Recomendar no inventa folios |
+| Fallo parcial | Al apagar recomendar, pedidos responde sin caerse el compose entero |
+| Informe | Predicción, evidencia de =ps=, contraste con réplicas y con el monolito |
+
+Si entregan un solo contenedor con tres rutas «como si fueran
+servicios», no cuenta: vuelve a ser monolito con API.
+
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
 Estos cinco días no hay sesión. El equipo (los mismos *cinco*)
@@ -8538,6 +8738,86 @@ aprender y para la mayoría de los proyectos del semestre. Los
 microservicios aparecen cuando el *monolito modular* ya no aguanta una
 necesidad concreta de escala, de equipo o de despliegue… no cuando
 aparece el primer =fetch=.
+
+
+*** Docker: cómo se ven los microservicios de verdad
+
+Hasta aquí el dibujo. Con Docker la diferencia se nota en la
+práctica: cada microservicio va en *su* contenedor, con *su* imagen, y
+=docker compose= los pone en la misma red para que se hablen por
+nombre.
+
+Ojo: en la ruta de Django ya usaron Compose para *réplicas* —varias
+copias del mismo monolito detrás de un balanceador—. Eso aguanta más
+tráfico del *mismo* sistema. No reparte responsabilidades. Aquí la
+idea es otra: contenedores que hacen trabajos distintos.
+
+**** Réplicas del monolito ≠ microservicios
+
+#+begin_example
+Réplicas (etapa 5):
+
+  balanceador → app  app  app     (misma imagen)
+
+
+Microservicios:
+
+  gateway → pedidos | recomendar   (imágenes distintas)
+#+end_example
+
+| | Réplicas | Microservicios |
+|-+----------+----------------|
+| Contenido de cada contenedor | El mismo programa | Programas distintos |
+| Para qué | Más carga del mismo sistema | Separar oficios y fallos |
+| Cambiar el modelo de IA | Redesplegar todas las copias | Redesplegar solo el de recomendación |
+| Apagar un contenedor | Las otras copias siguen igual | Puede caer *solo* una capacidad |
+
+**** Qué van a armar (y por qué Docker)
+
+En la actividad van a partir el monolito de entregas en tres piezas:
+
+#+begin_example
+cliente
+   |
+   v
+gateway :8080          ← una sola puerta hacia afuera
+   |
+   +---> pedidos       ← crea el folio; pide sugerencia por HTTP
+   |
+   +---> recomendar    ← carga el .joblib y aplica las reglas
+#+end_example
+
+Docker sirve aquí para tres cosas concretas:
+
+1. *Forzar el borde.* Pedidos no puede hacer =import= del modelo: el
+   modelo vive en otro contenedor. La única forma de hablarle es HTTP.
+2. *Red con nombres.* Dentro de Compose, el host =recomendar= apunta
+   al contenedor de ese servicio. Por eso la URL no es =localhost=
+   (eso sería «yo mismo»), sino algo como =http://recomendar:8002=.
+3. *Fallo parcial.* Pueden apagar solo el contenedor de recomendación
+   y ver que Pedidos sigue respondiendo —con un plan B o con un
+   error claro—. En el monolito, si el modelo no carga al arrancar,
+   suele caerse todo el proceso.
+
+**** Dependencias distintas a propósito
+
+Cada servicio lleva su propio =requirements.txt= y su =Dockerfile=.
+Pedidos necesita algo para HTTP (=requests= o similar). Recomendar
+necesita =joblib=, =pandas= y =scikit-learn=. Si mezclan todo en una
+sola imagen «por comodidad», vuelven al monolito disfrazado.
+
+El gateway puede ser nginx (solo enruta) o un programa mínimo que
+reenvíe. Lo importante no es la marca: es que el *cliente* no tenga
+que conocer los puertos internos de cada servicio.
+
+**** Lo que esta práctica no pretende ser
+
+No es un sistema de producción. Los pedidos pueden vivir en una lista
+en memoria; no hace falta base de datos ni login. El monolito del
+curso sigue siendo Django; aquí pueden usar Flask u otro marco
+pequeño solo para no arrastrar todo Django a cada servicio. Un
+microservicio *sí* puede ser Django: lo que define el estilo es el
+proceso separado y el contrato HTTP, no el framework.
 
 
 ** 2. ¿Por qué Flutter y Django combinan bien?
@@ -10610,3 +10890,10 @@ cuando las necesidades del sistema justifican su complejidad.
 
 16. Completen la frase: «API separa ___ del servidor; microservicios
     separan ___ entre sí.»
+
+17. ¿Por qué =docker compose= con tres *réplicas* del mismo Django no
+    demuestra microservicios, y tres servicios con imágenes distintas
+    sí?
+
+18. Si apagan el contenedor =recomendar=, ¿qué debería pasar con
+    Pedidos y con el Gateway?
