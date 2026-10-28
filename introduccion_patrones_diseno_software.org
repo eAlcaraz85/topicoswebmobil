@@ -8015,17 +8015,17 @@ los microservicios de verdad]].
 
 **** Meta
 
-Al terminar deben poder hacer esto, con *tres* contenedores distintos:
+Al terminar deben poder:
 
-#+begin_src shell
-docker compose up --build
-curl -s -X POST -H "Content-Type: application/json" \
-  -d @paquete.json http://127.0.0.1:8080/pedidos
-#+end_src
+1. abrir =http://127.0.0.1:8080/= y ver un *formulario HTML* (como el
+   del monolito, pero hablando solo con el gateway);
+2. crear un pedido desde el navegador y ver folio + medio;
+3. con =curl=, lo mismo por =POST /pedidos=;
+4. apagar Recomendar y comprobar que Pedidos sigue vivo (plan B o
+   error claro).
 
-La respuesta trae un folio y un medio. Por dentro, Pedidos le preguntó
-a Recomendar por HTTP. Si apagan Recomendar, Pedidos sigue vivo y
-avisa el fallo (o aplica un plan B).
+Todo con *tres* contenedores distintos. Por dentro, el front →
+gateway → pedidos → recomendar (HTTP).
 
 **** Carpeta del equipo
 
@@ -8038,6 +8038,8 @@ microservicios-entregas/
   paquete.json
   gateway/
     nginx.conf          (o el proxy que elijan)
+    html/
+      index.html        ← el front que ve el usuario
   pedidos/
     Dockerfile
     requirements.txt
@@ -8052,7 +8054,10 @@ microservicios-entregas/
 #+end_example
 
 El =.joblib= y =reglas.py= los copian de lo que ya entrenaron / usaron
-en el monolito. No reinventen el árbol: reutilicen el archivo.
+en el monolito. No reinventen el árbol: reutilicen el archivo. El HTML
+lo escriben ustedes: pueden inspirarse en el formulario del monolito
+Django, pero la página *no* debe llamar a =/entregas/recomendar/= de
+Django; solo a las rutas del gateway (=/pedidos=, =/salud/...=).
 
 **** Paso 1 — Servicio =recomendar=
 
@@ -8115,20 +8120,126 @@ estuvo disponible. Eso es el fallo parcial.
 Dependencias: Flask (o similar) y =requests=. En el =requirements.txt=
 de Pedidos *no* va scikit-learn.
 
-**** Paso 3 — Gateway
+**** Paso 3 — Gateway + página HTML
 
 El cliente solo debe conocer un puerto, por ejemplo el 8080. Nginx
-sirve bien; también un proxy mínimo en Python. Lo que tiene que hacer:
+sirve bien; también un proxy mínimo en Python. El gateway hace *dos*
+trabajos:
 
-- =/pedidos= → reenviar al servicio pedidos;
-- (opcional) =/sugerir= → reenviar a recomendar, útil para depurar;
-- =/salud/pedidos= y =/salud/recomendar= → salud de cada uno.
+1. *Servir el front:* al abrir =/= debe salir un =index.html= (formulario
+   de paquete).
+2. *Enrutar la API:*
+   - =/pedidos= → servicio pedidos;
+   - (opcional) =/sugerir= → recomendar, útil para depurar;
+   - =/salud/pedidos= y =/salud/recomendar= → salud de cada uno.
 
 El gateway es la única pieza que publica puerto a su computadora
 (=8080:80=). Pedidos y Recomendar pueden quedarse solo en la red
 interna de Compose.
 
-**** Paso 4 — =docker-compose.yml=
+Con nginx, la idea es: =root= apunta a la carpeta del HTML; las
+rutas =/pedidos= y =/salud/...= van con =proxy_pass= a los
+=upstream=. En Compose montan el =nginx.conf= *y* la carpeta =html/=
+dentro del contenedor del gateway.
+
+**** Paso 4 — Qué debe hacer el HTML
+
+No hace falta que sea bonito; sí que se entienda el punto de vista
+microservicios. La página:
+
+- tiene el formulario con los campos del paquete (pueden partir del
+  HTML del monolito y adaptarlo);
+- incluye un *selector de modelo* (=arbol=, =bosque=, =red=), como en
+  el monolito: ese valor viaja en el JSON hasta Recomendar (Pedidos
+  solo lo reenvía; no carga el =.joblib=);
+- al enviar, hace =fetch("/pedidos", { method: "POST", ... })= —*sin*
+  poner host ni puerto de Pedidos ni de Recomendar;
+- muestra el folio, el medio, el motivo y *qué modelo* se usó;
+- conviene mostrar un recorrido corto: «pasó por el gateway →
+  pedidos llamó a recomendar → llegó esta sugerencia»;
+- (opcional pero útil) un botón que consulte =/salud/pedidos= y
+  =/salud/recomendar= y diga si cada servicio responde.
+
+En Recomendar, el =POST /sugerir= debe aceptar el campo =modelo= y
+cargar el =.joblib= correspondiente (pueden tener los tres archivos en
+=recomendar/modelo/=). Si falta uno, deshabiliten esa opción en el
+selector o respondan error claro.
+
+Si apagan Recomendar y crean un pedido desde la página, deben verse
+el error o el plan B *sin* que la página se quede en blanco: Pedidos
+sigue contestando.
+
+***** Ejemplo mínimo de =gateway/html/index.html=
+
+Esto alcanza para arrancar. Faltan varios campos del paquete: háganlos
+ustedes (o tomen valores fijos en el JSON). Lo importante es el
+selector de modelo y que el =fetch= vaya a =/pedidos= del gateway, no
+a Django.
+
+#+begin_src html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Pedidos (microservicios)</title>
+</head>
+<body>
+  <h1>Crear pedido</h1>
+  <p>El navegador solo habla con el gateway.</p>
+
+  <form id="f">
+    <label>Modelo
+      <select name="modelo">
+        <option value="arbol">Árbol</option>
+        <option value="bosque">Random Forest</option>
+        <option value="red">Red neuronal</option>
+      </select>
+    </label>
+    <label>Distancia (km) <input name="distancia_km" value="12.64"></label>
+    <label>Peso (kg) <input name="peso_kg" value="0.31"></label>
+    <label>Hora (0–23) <input name="hora_salida" value="3"></label>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <pre id="salida"></pre>
+
+  <script>
+    const form = document.getElementById("f");
+    const salida = document.getElementById("salida");
+
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const datos = Object.fromEntries(new FormData(form).entries());
+      // Completen el resto de campos que pide Recomendar:
+      Object.assign(datos, {
+        largo_cm: 11.7, ancho_cm: 7.6, alto_cm: 10.6, volumen_l: 0.94,
+        fragil: 0, refrigerado: 0, valor_declarado_mxn: 4603,
+        prioridad: "mismo_dia", zona_destino: "periferia",
+        clima: "despejado", trafico: "medio",
+      });
+      ["distancia_km", "peso_kg", "hora_salida", "largo_cm", "ancho_cm",
+       "alto_cm", "volumen_l", "fragil", "refrigerado", "valor_declarado_mxn"
+      ].forEach((c) => { datos[c] = Number(datos[c]); });
+
+      const r = await fetch("/pedidos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+      const cuerpo = await r.json();
+      salida.textContent =
+        "HTTP " + r.status + "\n" + JSON.stringify(cuerpo, null, 2);
+    });
+  </script>
+</body>
+</html>
+#+end_src
+
+Si al enviar ven folio y medio, el camino navegador → gateway →
+pedidos → recomendar ya está funcionando. Después pueden poner todos
+los inputs en el formulario y mostrar el recorrido con más detalle.
+
+**** Paso 5 — =docker-compose.yml=
 
 Tres servicios: =recomendar=, =pedidos=, =gateway=. Ideas clave:
 
@@ -8136,28 +8247,29 @@ Tres servicios: =recomendar=, =pedidos=, =gateway=. Ideas clave:
   =Dockerfile=);
 - en =pedidos=, =environment: RECOMENDAR_URL: http://recomendar:8002=;
 - =depends_on= para arrancar en orden razonable;
-- el gateway monta su =nginx.conf= (o el archivo que usen) y publica
+- el gateway monta =nginx.conf= y la carpeta =html/=, y publica
   =8080:80=.
 
 Cuando Compose crea la red, el nombre del servicio *es* el nombre de
 host. Por eso =http://recomendar:8002= funciona entre contenedores.
 
-**** Paso 5 — Probar
+**** Paso 6 — Probar
 
 1. =docker compose up --build=
-2. =docker compose ps= — tienen que verse *tres* contenedores, no tres
-   copias de la misma imagen.
-3. Salud de ambos servicios a través del gateway.
-4. =POST= con =paquete.json=. Antes de mirar el resultado, escriban
-   qué medio esperan si =hora_salida= es 3 (noche) y por qué.
-5. =docker compose stop recomendar=, vuelvan a mandar el =POST=,
-   anoten qué respondió Pedidos, y =docker compose start recomendar=.
+2. =docker compose ps= — tres contenedores, imágenes distintas.
+3. Abrir =http://127.0.0.1:8080/= — debe verse el formulario, no solo
+   texto plano.
+4. Crear un pedido desde el navegador (hora 3). Antes, escriban qué
+   medio esperan y por qué.
+5. Repetir con =curl= y =paquete.json= (misma API).
+6. =docker compose stop recomendar=, crear otro pedido desde la página
+   o con =curl=, anotar qué pasó, y =docker compose start recomendar=.
 
 **** Entrega
 
 *Código (equipo).* La carpeta =microservicios-entregas/= en el repo,
-con lo necesario para que otra persona haga =docker compose up --build=
-y reproduzca el =POST=.
+con lo necesario para que otra persona haga =docker compose up --build=,
+abra el navegador en =8080= y cree un pedido.
 
 *Informe (individual).* Un commit por persona en
 =actividades/microservicios-docker/<matrícula>_<apellido>.md=:
@@ -8169,31 +8281,38 @@ Nombre:
 Matrícula:
 Equipo:
 
-## 1. Predicción (hora 3) vs resultado
+## 1. Predicción (hora 3) vs resultado (navegador)
 ## 2. docker compose ps (qué hay en cada contenedor)
-## 3. Fallo al apagar recomendar
+## 3. Fallo al apagar recomendar (qué mostró la página o el curl)
 ## 4. Réplicas de la etapa 5 vs esto
-## 5. Camino de un POST /pedidos (red vs import)
+## 5. Camino: navegador → … → modelo (red vs import)
 ## 6. Si solo cambia el .joblib, ¿qué reconstruyen?
 ## 7. Dos límites de esta práctica antes de producción
+## 8. ¿En qué se parece y en qué no el HTML al del monolito Django?
+## 9. Misma hora 3 con árbol, bosque y red: ¿coincidieron?
 #+end_example
 
 En la 4: por qué las réplicas del monolito *no* son microservicios y
-esto sí. En la 5: dibujo o lista cliente → gateway → … → modelo. En
-la 6: comparen con el monolito Django. En la 7: no implementen la
-solución; solo digan qué faltaría.
+esto sí. En la 5: dibujo o lista. En la 6: comparen con el monolito
+Django. En la 7: no implementen la solución; solo digan qué faltaría.
+En la 8: mismo formulario (y selector de modelo), ¿misma arquitectura
+detrás? En la 9: prueben los tres modelos con el mismo paquete de
+noche y comenten si el medio o el motivo cambiaron.
 
 **** Cómo se califica
 
 | Se mira | Criterio |
 |---------+----------|
-| Arranque | Tres servicios distintos; el =POST= por el puerto del gateway funciona |
+| Arranque | Tres servicios distintos; =8080= muestra el HTML |
+| Front | El formulario crea el pedido vía =/pedidos= del gateway |
 | Separación | Pedidos no tiene scikit-learn; Recomendar no inventa folios |
-| Fallo parcial | Al apagar recomendar, pedidos responde sin caerse el compose entero |
-| Informe | Predicción, evidencia de =ps=, contraste con réplicas y con el monolito |
+| Fallo parcial | Al apagar recomendar, la UI o el curl muestran el plan B / error sin tumbar todo |
+| Informe | Predicción, =ps=, contraste con réplicas, monolito y el HTML |
 
 Si entregan un solo contenedor con tres rutas «como si fueran
-servicios», no cuenta: vuelve a ser monolito con API.
+servicios», no cuenta: vuelve a ser monolito con API. Si el HTML
+llama directo a Django u otro puerto interno, tampoco: el cliente
+solo debe conocer el gateway.
 
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
@@ -8774,18 +8893,23 @@ Microservicios:
 
 **** Qué van a armar (y por qué Docker)
 
-En la actividad van a partir el monolito de entregas en tres piezas:
+En la actividad van a partir el monolito de entregas en tres piezas,
+y el gateway además sirve el HTML del formulario:
 
 #+begin_example
-cliente
+navegador (formulario en /)
    |
    v
-gateway :8080          ← una sola puerta hacia afuera
+gateway :8080          ← HTML + enrutado; única puerta hacia afuera
    |
    +---> pedidos       ← crea el folio; pide sugerencia por HTTP
    |
    +---> recomendar    ← carga el .joblib y aplica las reglas
 #+end_example
+
+Así el desarrollo se ve «completo» desde el punto de vista del
+usuario (página web), pero por detrás ya no es un solo Django: son
+varios contenedores.
 
 Docker sirve aquí para tres cosas concretas:
 

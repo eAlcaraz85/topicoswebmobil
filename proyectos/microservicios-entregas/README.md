@@ -13,7 +13,12 @@ cd proyectos/microservicios-entregas
 docker compose up --build
 ```
 
-Probar:
+Abrir en el navegador: http://127.0.0.1:8080/
+
+Ahí está el formulario. Manda el paquete al gateway → pedidos → recomendar
+y muestra el recorrido entre servicios.
+
+Probar por terminal:
 
 ```bash
 curl -s http://127.0.0.1:8080/salud/pedidos

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entregas — vista microservicios</title>
+  <style>
+    :root {
+      --fondo: #eef2f6;
+      --tarjeta: #fff;
+      --texto: #1a2332;
+      --muted: #5a6a7a;
+      --borde: #d0d8e0;
+      --gateway: #1f4e79;
+      --pedidos: #0b6e4f;
+      --recomendar: #8a4500;
+      --error: #9b1c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.45;
+    }
+    main { max-width: 980px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; }
+    h1 { margin: 0 0 0.3rem; font-size: 1.55rem; }
+    .intro { color: var(--muted); margin: 0 0 1.25rem; max-width: 48rem; }
+    .arquitectura {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+    .caja {
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      border-top: 4px solid var(--borde);
+    }
+    .caja.gateway { border-top-color: var(--gateway); }
+    .caja.pedidos { border-top-color: var(--pedidos); }
+    .caja.recomendar { border-top-color: var(--recomendar); }
+    .caja h2 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+    .caja p { margin: 0; font-size: 0.82rem; color: var(--muted); }
+    .estado {
+      display: inline-block;
+      margin-top: 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: #e8eef3;
+    }
+    .estado.ok { background: #e6f4ef; color: var(--pedidos); }
+    .estado.ko { background: #fde8e8; color: var(--error); }
+    .estado.espera { color: var(--muted); }
+    form {
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 1.15rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem 1rem;
+    }
+    label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.88rem; font-weight: 600; }
+    label.ancho-completo { grid-column: 1 / -1; }
+    input, select {
+      font: inherit; padding: 0.5rem 0.6rem;
+      border: 1px solid var(--borde); border-radius: 6px; background: #fff;
+    }
+    .acciones {
+      grid-column: 1 / -1;
+      display: flex; flex-wrap: wrap; gap: 0.55rem; margin-top: 0.3rem;
+    }
+    button {
+      font: inherit; font-weight: 600; border: none; border-radius: 6px;
+      padding: 0.6rem 1rem; cursor: pointer;
+    }
+    button.primario { background: var(--gateway); color: #fff; }
+    button.secundario { background: #e8eef3; color: var(--texto); }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    #resultado {
+      margin-top: 1.15rem; background: var(--tarjeta);
+      border: 1px solid var(--borde); border-radius: 10px;
+      padding: 1.1rem 1.2rem; display: none;
+    }
+    #resultado.visible { display: block; }
+    #resultado.error { border-color: #e2b4b4; background: #fff8f8; }
+    .medio {
+      display: inline-block; background: #e6f4ef; color: var(--pedidos);
+      font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;
+      text-transform: uppercase; font-size: 0.85rem;
+    }
+    .flujo { list-style: none; margin: 0.9rem 0 0; padding: 0; }
+    .flujo li {
+      position: relative; padding: 0.75rem 0.8rem 0.75rem 2.8rem;
+      border: 1px solid var(--borde); border-radius: 8px;
+      margin-bottom: 0.45rem; background: #fafbfc; font-size: 0.9rem;
+    }
+    .flujo .num {
+      position: absolute; left: 0.7rem; top: 0.75rem;
+      width: 1.5rem; height: 1.5rem; border-radius: 50%;
+      background: var(--gateway); color: #fff; font-size: 0.75rem;
+      font-weight: 700; display: grid; place-items: center;
+    }
+    .flujo li.pedidos .num { background: var(--pedidos); }
+    .flujo li.recomendar .num { background: var(--recomendar); }
+    .flujo strong { display: block; margin-bottom: 0.15rem; }
+    .flujo span { color: var(--muted); font-size: 0.85rem; }
+    pre {
+      margin: 0.75rem 0 0; padding: 0.7rem; background: #f0f3f6;
+      border-radius: 6px; overflow-x: auto; font-size: 0.8rem;
+    }
+    .nota { color: var(--muted); font-size: 0.85rem; margin-top: 1rem; }
+    code { background: #e8eef3; padding: 0.1rem 0.3rem; border-radius: 4px; }
+    @media (max-width: 720px) {
+      .arquitectura, form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Plataforma de entregas (microservicios)</h1>
+    <p class="intro">
+      El formulario habla solo con el <strong>gateway</strong> (puerto 8080).
+      El gateway enruta a <strong>pedidos</strong>; pedidos llama por HTTP a
+      <strong>recomendar</strong>. Tres contenedores distintos.
+    </p>
+
+    <div class="arquitectura" aria-label="Estado de los servicios">
+      <div class="caja gateway">
+        <h2>1. Gateway</h2>
+        <p>nginx · única puerta</p>
+        <span class="estado espera" id="est-gateway">revisando…</span>
+      </div>
+      <div class="caja pedidos">
+        <h2>2. Pedidos</h2>
+        <p>crea folio · orquesta</p>
+        <span class="estado espera" id="est-pedidos">revisando…</span>
+      </div>
+      <div class="caja recomendar">
+        <h2>3. Recomendar</h2>
+        <p>modelo + reglas</p>
+        <span class="estado espera" id="est-recomendar">revisando…</span>
+      </div>
+    </div>
+
+    <form id="form-paquete">
+      <label class="ancho-completo">Modelo
+        <select name="modelo" id="modelo">
+          <option value="arbol" selected>Árbol de decisión</option>
+          <option value="bosque">Random Forest</option>
+          <option value="red">Red neuronal (MLP)</option>
+        </select>
+      </label>
+      <label>Distancia (km)
+        <input name="distancia_km" type="number" step="any" value="12.64" required>
+      </label>
+      <label>Peso (kg)
+        <input name="peso_kg" type="number" step="any" value="0.31" required>
+      </label>
+      <label>Largo (cm)
+        <input name="largo_cm" type="number" step="any" value="11.7" required>
+      </label>
+      <label>Ancho (cm)
+        <input name="ancho_cm" type="number" step="any" value="7.6" required>
+      </label>
+      <label>Alto (cm)
+        <input name="alto_cm" type="number" step="any" value="10.6" required>
+      </label>
+      <label>Volumen (L)
+        <input name="volumen_l" type="number" step="any" value="0.94" required>
+      </label>
+      <label>Valor declarado (MXN)
+        <input name="valor_declarado_mxn" type="number" step="any" value="4603" required>
+      </label>
+      <label>Hora de salida (0–23)
+        <input name="hora_salida" type="number" min="0" max="23" value="3" required>
+      </label>
+      <label>Frágil
+        <select name="fragil"><option value="0" selected>No</option><option value="1">Sí</option></select>
+      </label>
+      <label>Refrigerado
+        <select name="refrigerado"><option value="0" selected>No</option><option value="1">Sí</option></select>
+      </label>
+      <label>Prioridad
+        <select name="prioridad">
+          <option value="normal">normal</option>
+          <option value="express">express</option>
+          <option value="mismo_dia" selected>mismo_dia</option>
+        </select>
+      </label>
+      <label>Zona destino
+        <select name="zona_destino">
+          <option value="centro">centro</option>
+          <option value="residencial">residencial</option>
+          <option value="periferia" selected>periferia</option>
+          <option value="rural">rural</option>
+        </select>
+      </label>
+      <label>Clima
+        <select name="clima">
+          <option value="despejado" selected>despejado</option>
+          <option value="lluvia">lluvia</option>
+          <option value="viento_fuerte">viento_fuerte</option>
+        </select>
+      </label>
+      <label>Tráfico
+        <select name="trafico">
+          <option value="bajo">bajo</option>
+          <option value="medio" selected>medio</option>
+          <option value="alto">alto</option>
+        </select>
+      </label>
+      <div class="acciones">
+        <button type="submit" class="primario" id="btn-enviar">Crear pedido</button>
+        <button type="button" class="secundario" id="btn-noche">Ejemplo noche</button>
+        <button type="button" class="secundario" id="btn-dia">Ejemplo tarde (dron)</button>
+        <button type="button" class="secundario" id="btn-salud">Revisar salud</button>
+      </div>
+    </form>
+
+    <div id="resultado" aria-live="polite"></div>
+    <p class="nota">
+      API: <code>POST /pedidos</code> (pasa por el gateway).
+      Salud: <code>/salud/pedidos</code> y <code>/salud/recomendar</code>.
+    </p>
+  </main>
+
+  <script>
+    const form = document.getElementById("form-paquete");
+    const resultado = document.getElementById("resultado");
+    const btnEnviar = document.getElementById("btn-enviar");
+
+    function setEstado(id, ok, texto) {
+      const el = document.getElementById(id);
+      el.className = "estado " + (ok === null ? "espera" : ok ? "ok" : "ko");
+      el.textContent = texto;
+    }
+
+    async function revisarSalud() {
+      setEstado("est-gateway", null, "revisando…");
+      setEstado("est-pedidos", null, "revisando…");
+      setEstado("est-recomendar", null, "revisando…");
+      try {
+        const r = await fetch("/");
+        setEstado("est-gateway", r.ok, r.ok ? "arriba · :8080" : "sin respuesta");
+      } catch {
+        setEstado("est-gateway", false, "caído");
+      }
+      try {
+        const r = await fetch("/salud/pedidos");
+        const d = await r.json();
+        setEstado("est-pedidos", r.ok, r.ok ? "ok · " + (d.pedidos_en_memoria || 0) + " en memoria" : "error");
+      } catch {
+        setEstado("est-pedidos", false, "no responde");
+      }
+      try {
+        const r = await fetch("/salud/recomendar");
+        const d = await r.json();
+        const listos = (d.modelos || []).filter((m) => m.listo).map((m) => m.id);
+        setEstado(
+          "est-recomendar",
+          r.ok,
+          r.ok ? "ok · " + (listos.join(", ") || "sin .joblib") : "error"
+        );
+        const sel = document.getElementById("modelo");
+        (d.modelos || []).forEach((m) => {
+          const opt = sel.querySelector('option[value="' + m.id + '"]');
+          if (opt) opt.disabled = !m.listo;
+        });
+      } catch {
+        setEstado("est-recomendar", false, "apagado o caído");
+      }
+    }
+
+    function leerPaquete() {
+      const datos = Object.fromEntries(new FormData(form).entries());
+      [
+        "distancia_km", "peso_kg", "largo_cm", "ancho_cm", "alto_cm",
+        "volumen_l", "fragil", "refrigerado", "valor_declarado_mxn", "hora_salida",
+      ].forEach((c) => { datos[c] = Number(datos[c]); });
+      return datos;
+    }
+
+    function htmlFlujo(cuerpo, ok) {
+      const sug = cuerpo.sugerencia || {};
+      const pasos = [];
+      pasos.push({
+        clase: "gateway", n: 1, titulo: "Gateway (nginx)",
+        det: "Recibió el POST /pedidos y lo mandó al contenedor pedidos.",
+      });
+      if (!ok && cuerpo.plan_b) {
+        pasos.push({
+          clase: "pedidos", n: 2, titulo: "Pedidos — fallo parcial",
+          det: "Intentó llamar a recomendar y no respondió. Siguió vivo y ofreció plan B: "
+            + cuerpo.plan_b.medio + " (" + cuerpo.plan_b.motivo + ").",
+        });
+        pasos.push({
+          clase: "recomendar", n: 3, titulo: "Recomendar",
+          det: "No disponible. Apaguen/enciendan con: docker compose stop|start recomendar",
+        });
+      } else if (ok) {
+        pasos.push({
+          clase: "pedidos", n: 2, titulo: "Pedidos",
+          det: "Creó el folio " + cuerpo.folio + " y llamó a " + (cuerpo.llamada_a || "recomendar") + ".",
+        });
+        const corr = sug.corregido_por_reglas
+          ? " Las reglas descartaron " + sug.preferido_por_modelo + "."
+          : "";
+        pasos.push({
+          clase: "recomendar", n: 3, titulo: "Recomendar (modelo + reglas)",
+          det: (sug.motivo || cuerpo.motivo || "") + corr,
+        });
+      } else {
+        pasos.push({
+          clase: "pedidos", n: 2, titulo: "Pedidos",
+          det: cuerpo.error || "Error al crear el pedido.",
+        });
+      }
+      return '<ol class="flujo">' + pasos.map((p) =>
+        '<li class="' + p.clase + '"><span class="num">' + p.n + "</span>" +
+        "<strong>" + p.titulo + "</strong><span>" + p.det + "</span></li>"
+      ).join("") + "</ol>";
+    }
+
+    function mostrar(ok, titulo, cuerpo) {
+      resultado.className = "visible" + (ok ? "" : " error");
+      let cabeza = "<h2>" + titulo + "</h2>";
+      if (ok) {
+        cabeza +=
+          "<p>Folio: <strong>" + cuerpo.folio + "</strong></p>" +
+          "<p>Modelo: <strong>" + (cuerpo.modelo_nombre || cuerpo.modelo || "—") + "</strong></p>" +
+          '<p>Medio: <span class="medio">' + cuerpo.medio + "</span></p>" +
+          "<p>" + (cuerpo.motivo || "") + "</p>";
+      } else if (cuerpo.plan_b) {
+        cabeza +=
+          "<p>" + (cuerpo.error || "") + "</p>" +
+          '<p>Plan B: <span class="medio">' + cuerpo.plan_b.medio + "</span> — "
+          + cuerpo.plan_b.motivo + "</p>";
+      } else {
+        cabeza += "<p>" + (cuerpo.error || JSON.stringify(cuerpo)) + "</p>";
+      }
+      resultado.innerHTML =
+        cabeza +
+        "<h2>Recorrido entre servicios</h2>" +
+        htmlFlujo(cuerpo, ok) +
+        "<details><summary>JSON</summary><pre>" +
+        JSON.stringify(cuerpo, null, 2) + "</pre></details>";
+    }
+
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      btnEnviar.disabled = true;
+      try {
+        const r = await fetch("/pedidos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(leerPaquete()),
+        });
+        const cuerpo = await r.json();
+        if (r.status === 201) mostrar(true, "Pedido creado", cuerpo);
+        else mostrar(false, "HTTP " + r.status, cuerpo);
+        revisarSalud();
+      } catch (e) {
+        mostrar(false, "No hubo respuesta del gateway", { error: String(e) });
+      } finally {
+        btnEnviar.disabled = false;
+      }
+    });
+
+    document.getElementById("btn-noche").addEventListener("click", () => {
+      form.distancia_km.value = 12.64; form.peso_kg.value = 0.31;
+      form.largo_cm.value = 11.7; form.ancho_cm.value = 7.6; form.alto_cm.value = 10.6;
+      form.volumen_l.value = 0.94; form.valor_declarado_mxn.value = 4603;
+      form.hora_salida.value = 3; form.prioridad.value = "mismo_dia";
+      form.zona_destino.value = "periferia"; form.clima.value = "despejado";
+      form.trafico.value = "medio"; form.requestSubmit();
+    });
+
+    document.getElementById("btn-dia").addEventListener("click", () => {
+      form.distancia_km.value = 8.95; form.peso_kg.value = 0.54;
+      form.largo_cm.value = 17.3; form.ancho_cm.value = 10.7; form.alto_cm.value = 15;
+      form.volumen_l.value = 2.78; form.valor_declarado_mxn.value = 789;
+      form.hora_salida.value = 16; form.prioridad.value = "normal";
+      form.zona_destino.value = "periferia"; form.clima.value = "despejado";
+      form.trafico.value = "medio"; form.requestSubmit();
+    });
+
+    document.getElementById("btn-salud").addEventListener("click", revisarSalud);
+    revisarSalud();
+  </script>
+</body>
+</html>

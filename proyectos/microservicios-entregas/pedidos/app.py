@@ -69,6 +69,8 @@ def crear():
         "creado": datetime.now(timezone.utc).isoformat(),
         "medio": sugerencia.get("medio"),
         "motivo": sugerencia.get("motivo"),
+        "modelo": sugerencia.get("modelo"),
+        "modelo_nombre": sugerencia.get("modelo_nombre"),
         "sugerencia": sugerencia,
         "paquete": paquete,
     }
@@ -78,6 +80,8 @@ def crear():
         "folio": folio,
         "medio": pedido["medio"],
         "motivo": pedido["motivo"],
+        "modelo": pedido["modelo"],
+        "modelo_nombre": pedido["modelo_nombre"],
         "llamada_a": f"{RECOMENDAR_URL}/sugerir",
         "sugerencia": sugerencia,
     }), 201
