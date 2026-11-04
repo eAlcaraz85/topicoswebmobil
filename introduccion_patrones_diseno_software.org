@@ -8500,10 +8500,780 @@ Si la respuesta es «demasiadas cosas», hay un problema de diseño.
 
 
 
+* Flutter: fundamentos, instalación y widgets
+
+Este apartado va *antes* de juntar Flutter con Django y con
+microservicios. La idea es entender qué es Flutter, por qué existe,
+cómo se instala y qué es un *widget* —la pieza con la que se construye
+toda la interfaz—. Sin eso, el capítulo siguiente (API, gateway,
+contenedores) se siente como magia.
+
+Después de esto viene
+[[*De una Aplicación Django + Flutter a una Arquitectura de Microservicios][De una Aplicación Django + Flutter a una Arquitectura de Microservicios]].
+Al final del camino, cuando ya conocen el gateway, está
+[[*Flutter: front, contenedor y empaquetado][Flutter: front, contenedor y empaquetado]]
+(Docker del =build/web= y =apk=).
+
+
+** Qué problema viene a resolver
+
+Hacer una app «de verdad» suele exigir:
+
+- una interfaz en el navegador,
+- otra en Android (Kotlin/Java),
+- otra en iPhone (Swift),
+
+y tres equipos, tres estilos de UI y tres formas de hablar con el
+servidor. El costo no es solo escribir pantallas: es mantenerlas
+alineadas cuando cambia el JSON del backend.
+
+Flutter nace para atacar eso: *un solo código de interfaz* que se
+compila a web, Android e iOS (y escritorio si hace falta). El lenguaje
+es Dart. El backend —Django, Pedidos, Recomendar— no se reescribe: la
+app solo consume HTTP/JSON.
+
+Eso no vuelve inútil al diseñador nativo ni borra las tiendas de
+aplicaciones. Solo cambia el punto de partida del semestre: primero
+una UI compartida; después, si un día hace falta un módulo 100 %
+nativo, se puede integrar.
+
+
+** Por qué existe
+
+Las apps móviles clásicas dibujan la pantalla con los componentes del
+sistema operativo. Cada SO tiene los suyos. Flutter hace otra apuesta:
+
+#+begin_quote
+En lugar de pedirle al sistema «ponme un botón de Android», Flutter
+*dibuja* el botón píxel a píxel con su propio motor (Skia /
+Impeller). Por eso se ve igual en un Samsung y en un Pixel… y se
+parece mucho a lo que ven en web.
+#+end_quote
+
+De ahí salen dos consecuencias importantes:
+
+1. *Control visual.* El equipo define el diseño; no pelea tanto con
+   «en iOS el switch se ve distinto».
+2. *Un árbol de piezas.* Toda pantalla es un árbol de *widgets*. Quien
+   entiende el árbol entiende Flutter.
+
+En este curso importa porque la plataforma de entregas es web *y*
+móvil. Con un solo front pueden demostrar el mismo =POST /pedidos= en
+Chrome y en el emulador, contra el mismo gateway.
+
+
+** Instalación
+
+La documentación oficial cambia de vez en cuando; lo estable es el
+orden: instalar el SDK → comprobar con =flutter doctor= → instalar un
+editor → un dispositivo (emulador o Chrome).
+
+*** Linux (Debian/Ubuntu y similares)
+
+1. Dependencias habituales del sistema (si faltan, =doctor= lo dirá):
+
+#+begin_src shell
+sudo apt update
+sudo apt install -y curl git unzip xz-utils zip libglu1-mesa
+#+end_src
+
+2. Bajar el SDK (versión /stable/) desde
+   [[https://docs.flutter.dev/get-started/install][docs.flutter.dev]]
+   o clonar el repo:
+
+#+begin_src shell
+cd ~
+git clone https://github.com/flutter/flutter.git -b stable
+#+end_src
+
+3. Agregar Flutter al =PATH= (en = ~/.bashrc= o =~/.zshrc=):
+
+#+begin_example
+export PATH="$PATH:$HOME/flutter/bin"
+#+end_example
+
+Luego =source ~/.bashrc= (o la shell que usen).
+
+4. Comprobar:
+
+#+begin_src shell
+flutter doctor
+#+end_src
+
+No hace falta que todo salga en verde el primer día. Lo crítico es:
+SDK encontrado, y al menos *un* destino para correr (Chrome y/o
+Android).
+
+*** Windows
+
+1. Instalar [[https://git-scm.com][Git]] y, para Android, Android Studio.
+2. Descargar el SDK de Flutter (zip) desde la guía oficial e
+   inconveniente en una ruta *sin espacios raros* (por ejemplo
+   =C:\src\flutter=).
+3. Agregar =C:\src\flutter\bin= al =PATH= del usuario.
+4. Abrir PowerShell o CMD nuevo y correr =flutter doctor=.
+5. Aceptar licencias de Android si =doctor= lo pide:
+
+#+begin_src shell
+flutter doctor --android-licenses
+#+end_src
+
+*** macOS
+
+Similar a Linux: clonar o descomprimir el SDK, exportar =PATH=,
+=flutter doctor=. Para iOS hace falta Xcode (App Store) y los
+herramientas de línea de comandos. Para el semestre, muchos equipos
+cubren web + Android y dejan iOS como lectura.
+
+*** Editor
+
+Cualquiera de estos basta:
+
+- *VS Code* + extensiones «Flutter» y «Dart»,
+- *Android Studio* + plugin Flutter,
+- u otro IDE con soporte Dart.
+
+El editor no reemplaza al SDK: sin =flutter= en el =PATH=, no compilan.
+
+*** Dispositivos de prueba
+
+| Destino | Para qué | Cómo arrancar algo típico |
+|---------+----------+---------------------------|
+| Chrome | Front web rápido | =flutter run -d chrome= |
+| Emulador Android | App «como celular» | AVD desde Android Studio + =flutter run= |
+| Celular por USB | Prueba real | Depuración USB activada |
+| iOS Simulator | Solo en Mac | Xcode + simulador |
+
+*** Lo que =flutter doctor= está preguntando
+
+Es una lista de *cadenas* que Flutter necesita. Si falta Android
+toolchain, no podrán sacar =apk=. Si falta Chrome, aún pueden usar el
+emulador. Vayan resolviendo lo que el laboratorio pida; no hace falta
+un =doctor= perfecto para empezar a ver widgets.
+
+
+** Primer proyecto
+
+En una carpeta de trabajo (no dentro de =~/flutter=, que es el SDK):
+
+#+begin_src shell
+flutter create entregas_ui
+cd entregas_ui
+#+end_src
+
+Eso crea un proyecto nuevo. El árbol relevante es:
+
+#+begin_example
+entregas_ui/
+├── lib/
+│   └── main.dart      ← aquí viven las pantallas (empiezan aquí)
+├── pubspec.yaml       ← nombre del proyecto y dependencias
+├── android/           ← empaquetado Android (más adelante)
+├── ios/               ← empaquetado iOS (hace falta Mac)
+├── web/               ← lo que usa Chrome con flutter run -d chrome
+└── test/
+#+end_example
+
+Para el semestre casi todo el trabajo de UI está en =lib/=. El resto
+son carpetas de plataforma; no hace falta tocarlas para aprender
+widgets.
+
+El =main.dart= del template trae un contador de demo. Sirve para
+comprobar la instalación:
+
+#+begin_src shell
+flutter run -d chrome
+#+end_src
+
+Si abre Chrome y ven el contador, la herramienta está bien. Los
+ejemplos de abajo *reemplazan* ese contenido de =lib/main.dart= (o
+parten de él).
+
+
+** Widgets: por qué existen
+
+En HTML piensan en etiquetas (=div=, =button=). En Android nativo, en
+=View=. Flutter unifica todo bajo una idea:
+
+#+begin_quote
+Un *widget* es una descripción de un pedazo de interfaz. Puede ser
+tan chico como un texto o tan grande como una pantalla entera.
+#+end_quote
+
+¿Por qué ese modelo y no «una función que pinta botones»?
+
+1. *Composición.* Una pantalla es widgets dentro de widgets (como
+   cajas rusas). Eso permite reutilizar un =TarjetaPedido= en la lista
+   y en el detalle.
+2. *Declarativo.* Ustedes dicen *cómo debe verse* el estado actual;
+   Flutter se encarga de actualizar la pantalla cuando el estado
+   cambia. No andan a mano «borra el TextView 3 y pon otro».
+3. *Un solo árbol.* Depurar es seguir el árbol: =Scaffold= → =Column=
+   → =Text= + =ElevatedButton=. Si algo no se ve, casi siempre está
+   mal anidado o sin espacio (flex) en el padre.
+
+Sin widgets no hay Flutter: el motor dibuja lo que el árbol describe.
+
+
+** StatelessWidget y StatefulWidget
+
+Dos familias que van a usar todo el tiempo.
+
+*** StatelessWidget — «solo muestro»
+
+No guarda estado que cambie con el tiempo. Recibe datos (por el
+constructor) y arma el árbol. Ejemplo: una etiqueta con el folio que
+ya vino del servidor.
+
+#+begin_src dart
+class EtiquetaFolio extends StatelessWidget {
+  const EtiquetaFolio({super.key, required this.folio});
+
+  final String folio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('Folio: $folio');
+  }
+}
+#+end_src
+
+Solo con la clase no se ve nada en pantalla: hay que *usarla* dentro
+de un =MaterialApp=. En =lib/main.dart= pueden dejar algo así (borren
+el contador del template):
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: Scaffold(
+      body: Center(
+        child: EtiquetaFolio(folio: 'D2757CBE'),
+      ),
+    ),
+  ));
+}
+
+class EtiquetaFolio extends StatelessWidget {
+  const EtiquetaFolio({super.key, required this.folio});
+
+  final String folio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('Folio: $folio');
+  }
+}
+#+end_src
+
+Luego, desde =entregas_ui/=:
+
+#+begin_src shell
+flutter run -d chrome
+#+end_src
+
+Deberían ver =Folio: D2757CBE=. Si cambian el string y guardan, hot
+reload actualiza la pantalla.
+
+*** StatefulWidget — «puedo cambiar»
+
+Guarda estado (=State=) que sí muta: texto de un campo, «cargando…»,
+lista de pedidos. Cuando llaman =setState=, Flutter vuelve a construir
+la parte afectada.
+
+#+begin_src dart
+class ContadorSimple extends StatefulWidget {
+  const ContadorSimple({super.key});
+
+  @override
+  State<ContadorSimple> createState() => _ContadorSimpleState();
+}
+
+class _ContadorSimpleState extends State<ContadorSimple> {
+  int _n = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Pedidos en pantalla: $_n'),
+        ElevatedButton(
+          onPressed: () => setState(() => _n++),
+          child: const Text('Sumar'),
+        ),
+      ],
+    );
+  }
+}
+#+end_src
+
+Para probarlo, en =lib/main.dart= el =home= apunta al widget con
+estado:
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: Scaffold(
+      body: Center(child: ContadorSimple()),
+    ),
+  ));
+}
+
+// …pegues aquí ContadorSimple y _ContadorSimpleState…
+#+end_src
+
+Al tocar *Sumar*, el número sube. Eso es =setState=: Flutter vuelve a
+correr =build= de esa parte.
+
+Regla práctica del curso: si la pantalla solo *muestra* lo que ya
+trajo el HTTP, muchas veces basta un =StatelessWidget= (o un
+=StatefulWidget= pequeño solo para el «loading / error»). No metan la
+regla del dron en el =State=.
+
+
+** Widgets básicos
+
+Todos viven dentro de un =MaterialApp= (tema y navegación de
+Material Design). El esqueleto típico de una pantalla, ya listo para
+pegar en =lib/main.dart= (reemplaza el =home= anterior):
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Entregas')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Nuevo pedido'),
+            const TextField(
+              decoration: InputDecoration(labelText: 'Distancia (km)'),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: null, // luego: POST al gateway
+              child: const Text('Crear pedido'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+=onPressed: null= deja el botón deshabilitado a propósito; cuando
+quieran la acción, pasan una función. Con =flutter run -d chrome=
+deberían ver la barra «Entregas», el campo y el botón.
+
+Para qué sirve cada uno:
+
+| Widget | Para qué |
+|--------+----------|
+| =MaterialApp= / =CupertinoApp= | Tema, rutas y convenciones (Material o iOS) |
+| =Scaffold= | Estructura de pantalla: barra, cuerpo, botón flotante… |
+| =AppBar= | Título y acciones de la pantalla |
+| =Text= | Mostrar texto |
+| =TextField= | Capturar texto del usuario |
+| =ElevatedButton= (u otros =*Button=) | Disparar una acción |
+| =Column= / =Row= | Apilar hijos en vertical u horizontal |
+| =Padding= / =SizedBox= | Espacio; sin ellos todo queda pegado |
+| =Container= | Caja con color, borde, tamaño cuando hace falta |
+| =ListView= | Listas que hacen scroll (muchos pedidos) |
+| =ListTile= | Fila típica de lista (título, subtítulo, icono) |
+| =Expanded= / =Flexible= | Repartir el espacio libre dentro de un =Row=/=Column= |
+| =Switch= / =Checkbox= | Opciones sí/no |
+| =DropdownButton= | Elegir un valor de una lista corta |
+| =Navigator= | Cambiar de pantalla |
+| =SnackBar= / =AlertDialog= | Avisos al usuario |
+| =CircularProgressIndicator= | «Cargando…» mientras llega el HTTP |
+
+Cada ejemplo de abajo es un =lib/main.dart= completo: péguenlo,
+guarden y =flutter run -d chrome= (o hot reload si ya está corriendo).
+
+
+*** Lista de pedidos (=ListView= + =ListTile=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: ListaPedidos()));
+}
+
+class ListaPedidos extends StatelessWidget {
+  const ListaPedidos({super.key});
+
+  static const folios = ['D2757CBE', 'A1B2C3D4', 'F00D1234'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pedidos')),
+      body: ListView.builder(
+        itemCount: folios.length,
+        itemBuilder: (context, i) {
+          return ListTile(
+            leading: const Icon(Icons.local_shipping),
+            title: Text(folios[i]),
+            subtitle: const Text('tocar para ver detalle'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Elegiste ${folios[i]}')),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+#+end_src
+
+Prueben: al tocar una fila aparece un =SnackBar= abajo.
+
+
+*** Fila con espacio repartido (=Row= + =Expanded=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Resumen')),
+      body: const Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(child: Text('Folio D2757CBE')),
+            Text('dron'),
+          ],
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+Sin =Expanded=, el texto largo puede empujar o desbordar. Con
+=Expanded=, el folio usa el espacio libre y «dron» se queda a la
+derecha.
+
+
+*** Opción sí/no (=Switch=)
+
+Útil para «urgente», «frágil», etc.
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: FormularioOpciones()));
+}
+
+class FormularioOpciones extends StatefulWidget {
+  const FormularioOpciones({super.key});
+
+  @override
+  State<FormularioOpciones> createState() => _FormularioOpcionesState();
+}
+
+class _FormularioOpcionesState extends State<FormularioOpciones> {
+  bool urgente = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Opciones')),
+      body: SwitchListTile(
+        title: const Text('Envío urgente'),
+        value: urgente,
+        onChanged: (v) => setState(() => urgente = v),
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Elegir medio (=DropdownButton=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: ElegirMedio()));
+}
+
+class ElegirMedio extends StatefulWidget {
+  const ElegirMedio({super.key});
+
+  @override
+  State<ElegirMedio> createState() => _ElegirMedioState();
+}
+
+class _ElegirMedioState extends State<ElegirMedio> {
+  String medio = 'moto';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Medio')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: DropdownButton<String>(
+          value: medio,
+          isExpanded: true,
+          items: const [
+            DropdownMenuItem(value: 'moto', child: Text('Motocicleta')),
+            DropdownMenuItem(value: 'dron', child: Text('Dron')),
+            DropdownMenuItem(value: 'camioneta', child: Text('Camioneta')),
+          ],
+          onChanged: (v) {
+            if (v != null) setState(() => medio = v);
+          },
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+En el producto real el medio lo decide el backend; aquí solo practican
+el control de UI.
+
+
+*** Diálogo de confirmación (=AlertDialog=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: ConfirmarPedido()));
+}
+
+class ConfirmarPedido extends StatelessWidget {
+  const ConfirmarPedido({super.key});
+
+  Future<void> _confirmar(BuildContext context) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Crear pedido'),
+        content: const Text('¿Mandar el POST al gateway?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sí'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aquí iría el HTTP')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Confirmar')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => _confirmar(context),
+          child: const Text('Crear pedido'),
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Dos pantallas (=Navigator=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: PantallaLista()));
+}
+
+class PantallaLista extends StatelessWidget {
+  const PantallaLista({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Lista')),
+      body: ListTile(
+        title: const Text('D2757CBE'),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const PantallaDetalle(folio: 'D2757CBE'),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class PantallaDetalle extends StatelessWidget {
+  const PantallaDetalle({super.key, required this.folio});
+
+  final String folio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Detalle $folio')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Volver'),
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Estado de carga (=CircularProgressIndicator=)
+
+Simula «esperando al servidor» sin HTTP todavía:
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: CargaFalsa()));
+}
+
+class CargaFalsa extends StatefulWidget {
+  const CargaFalsa({super.key});
+
+  @override
+  State<CargaFalsa> createState() => _CargaFalsaState();
+}
+
+class _CargaFalsaState extends State<CargaFalsa> {
+  bool cargando = false;
+  String? resultado;
+
+  Future<void> _simular() async {
+    setState(() {
+      cargando = true;
+      resultado = null;
+    });
+    await Future<void>.delayed(const Duration(seconds: 2));
+    setState(() {
+      cargando = false;
+      resultado = 'Folio D2757CBE';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Carga')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (cargando) const CircularProgressIndicator(),
+            if (resultado != null) Text(resultado!),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: cargando ? null : _simular,
+              child: const Text('Crear (simulado)'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+Cuando conecten el gateway de verdad, el =await Future.delayed= se
+cambia por el =http.post=.
+
+
+** Hot reload: por qué se siente distinto
+
+Con la app en ejecución, al guardar un cambio de UI Flutter intenta
+*recargar en caliente* sin perder el estado de la pantalla. Por eso
+conviene construir la interfaz de a poco: mueven un =Padding=,
+guardan, ven el resultado. Si el árbol se rompe del todo, hacen
+*restart* (reinicio completo).
+
+
+** Dónde termina Flutter y dónde empieza el backend
+
+Flutter:
+
+- pantallas, navegación, validación *visual* de formularios,
+- llamadas HTTP,
+- guardar un token de sesión en el dispositivo (con cuidado).
+
+No debería:
+
+- decidir si el dron es posible,
+- acceder a PostgreSQL,
+- duplicar las reglas de =reglas.py=.
+
+El cliente es cliente, igual que con el HTML del gateway. El siguiente
+capítulo muestra cómo se engancha a Django y, más adelante, a
+microservicios.
+
+
+** Preguntas cortas
+
+1. ¿Qué problema de mantenimiento ataca Flutter al existir web y
+   móvil en el mismo producto?
+2. ¿Por qué Flutter dibuja sus propios controles en lugar de usar solo
+   los nativos del sistema?
+3. ¿En qué se diferencian un =StatelessWidget= y un =StatefulWidget=?
+4. Si =flutter doctor= se queja del toolchain de Android pero Chrome
+   está bien, ¿pueden empezar la clase de widgets igual? ¿Qué no
+   podrán hacer todavía?
+5. ¿Por qué un =Column= sin =Expanded= a veces «desborda» la pantalla
+   cuando meten muchos hijos?
+6. ¿Qué widget usarían para mostrar muchos folios con scroll, y cuál
+   para avisar «pedido creado» sin cambiar de pantalla?
+7. ¿En qué se parece el ejemplo de =CircularProgressIndicator= a una
+   llamada real al gateway?
+
+
 * De una Aplicación Django + Flutter a una Arquitectura de Microservicios
 
 
 ** Introducción
+
+Parte de
+[[*Flutter: fundamentos, instalación y widgets][Flutter: fundamentos,
+instalación y widgets]]. Aquí juntamos ese front con Django y,
+después, con microservicios.
 
 Cuando comenzamos el desarrollo de una aplicación web o móvil es
 frecuente encontrar recomendaciones como:
@@ -8891,7 +9661,7 @@ Microservicios:
 | Cambiar el modelo de IA | Redesplegar todas las copias | Redesplegar solo el de recomendación |
 | Apagar un contenedor | Las otras copias siguen igual | Puede caer *solo* una capacidad |
 
-**** Qué van a armar (y por qué Docker)
+**** Qué van a armar
 
 En la actividad van a partir el monolito de entregas en tres piezas,
 y el gateway además sirve el HTML del formulario:
@@ -8910,6 +9680,112 @@ gateway :8080          ← HTML + enrutado; única puerta hacia afuera
 Así el desarrollo se ve «completo» desde el punto de vista del
 usuario (página web), pero por detrás ya no es un solo Django: son
 varios contenedores.
+
+**** Por qué aparece cada pieza
+
+Qué problema aparece si esa pieza no existe.
+
+***** El problema de fondo
+
+Cuando el sistema deja de ser «un solo programa», el cliente (HTML,
+Flutter web o la app del teléfono) se enfrenta a una pregunta
+incómoda: *¿a cuántas direcciones tengo que hablar?* Si la respuesta
+es «a Pedidos, a Recomendar, a notificaciones…», el front se vuelve
+frágil: cada cambio de IP, de puerto o de máquina rompe la app. Además
+exponen servicios que no deberían ser públicos (el modelo, la base).
+
+La idea: *separar oficios en procesos distintos, pero ofrecer al
+cliente un solo punto de entrada.*
+
+***** Por qué nginx como gateway
+
+nginx es un programa hecho para *escuchar HTTP* con muy poca lógica de
+negocio. Sirve para dos trabajos que el sistema necesita igual:
+
+1. Entregar al navegador los archivos del front (HTML, o el
+   =build/web= de Flutter).
+2. *Reenviar* (=proxy=) peticiones como =/pedidos= hacia otro
+   proceso que sí sabe crear folios.
+
+¿Por qué no dejar que Flutter hable directo con cada microservicio?
+Porque entonces la app móvil tendría que conocer la topología interna.
+Mañana Recomendar se muda a otra laptop o a otro server: habría que
+republicar la app solo por un cambio de red. Con un borde único, la
+app sigue apuntando al mismo host (el gateway); lo que se mueve es
+*detrás*.
+
+¿Por qué nginx y no «otro Django más» en la puerta? Porque en la
+puerta queremos algo estable, rápido y aburrido: TLS, rutas, a veces
+límite de peticiones. Si el recepcionista también entrenara el modelo
+y guardara pedidos, cada fallo o cada redespliegue del modelo tumba
+la puerta entera. En corto: *el borde no es el negocio; es el acceso
+al negocio.*
+
+En la práctica del curso, «gateway» suele ser nginx con un
+=nginx.conf= corto. En producción puede ser otra marca; la idea es
+la misma.
+
+***** Por qué Pedidos no es lo mismo que Recomendar
+
+Crear un folio y orquestar el envío es un oficio. Calcular el medio
+con un =.joblib= y reglas es otro.
+
+Si viven en el mismo proceso (monolito), reentrenar el modelo o colgar
+scikit-learn puede tumbar también el alta del pedido. Si viven
+separados, Pedidos puede seguir respondiendo con un plan B cuando
+Recomendar está caído: *fallo parcial*. Por eso se parten: distintos
+ritmos de cambio, distintas dependencias, distintos fallos.
+
+Pedidos *llama* a Recomendar por HTTP. No hace =import= del modelo:
+así se obliga el borde entre oficios. Recomendar no inventa folios:
+así no hay dos dueños del mismo dato.
+
+***** Por qué el front (HTML o Flutter) no carga el modelo
+
+La tentación es meter el =.joblib= en la app «para ir más rápido».
+Mejor no:
+
+- el modelo y las reglas de negocio son de la empresa, no del
+  teléfono;
+- actualizar el árbol implicaría republicar el =apk=;
+- el tamaño y las bibliotecas no caben bien en el cliente;
+- cualquiera podría inspeccionar o alterar la lógica.
+
+El front pinta y envía JSON. Quien decide el medio es el backend (vía
+gateway → pedidos → recomendar). Cuando pasen a *Flutter móvil*,
+cambia el empaquetado (=apk=), no esa separación.
+
+***** Por qué Docker y Compose en este recorte
+
+Docker no «crea» microservicios por magia. Aquí hace falta porque
+queremos *procesos aislados* que se puedan apagar por separado y
+mover de máquina. Compose declara cómo se ven entre sí (=recomendar=
+como nombre, =RECOMENDAR_URL=, un solo puerto publicado en el
+gateway). Sin eso, en el salón vuelven a enredarse con =localhost=
+y con «en mi laptop sí jala».
+
+***** Cómo se lee el dibujo completo
+
+#+begin_example
+  Flutter / HTML          ← necesita una sola URL (el borde)
+         │
+         ▼
+      nginx/gateway       ← necesario para no filtrar la red interna
+         │                  y para no redesplegar la app a cada cambio
+         ▼
+      Pedidos             ← necesario como dueño del folio / orquestación
+         │
+         ▼
+      Recomendar          ← necesario aparte: modelo pesado y fallable
+#+end_example
+
+Cada flecha es un «por qué»: si quitan una caja, reaparece el problema
+que esa caja estaba conteniendo (acoplamiento, fallo total, app que
+conoce de más, o modelo mezclado con el pedido).
+
+El salto a móviles con Flutter reutiliza lo mismo: la app instalada
+es otro cliente del *mismo* gateway. No se diseña una arquitectura
+nueva para Android; se cambia el cliente.
 
 Docker sirve aquí para tres cosas concretas:
 
@@ -11021,3 +11897,373 @@ cuando las necesidades del sistema justifican su complejidad.
 
 18. Si apagan el contenedor =recomendar=, ¿qué debería pasar con
     Pedidos y con el Gateway?
+
+
+* Flutter: front, contenedor y empaquetado
+
+Parte de
+[[*Flutter: fundamentos, instalación y widgets][fundamentos y widgets]]
+y de
+[[*De una Aplicación Django + Flutter a una Arquitectura de Microservicios][Django + Flutter → microservicios]].
+
+Aquí: meter el *front web* de Flutter en un contenedor, empaquetar
+para celular y seguir hablando *solo* con el gateway.
+
+
+** Por qué Flutter en este curso
+
+La plataforma de entregas pide *web y móvil*. Sin un marco
+multiplataforma tendrían que mantener dos (o tres) fronts: un
+navegador, un Android y un iOS, cada uno con su idioma y sus
+librerías de red.
+
+Flutter apuesta a otra cosa: *un solo código* de interfaz que compila
+hacia:
+
+- Web (Chrome, etc.),
+- Android,
+- iOS,
+- y, si hace falta, escritorio.
+
+El backend (Django monolítico o microservicios detrás del gateway) no
+cambia: sigue siendo JSON por HTTPS. Flutter solo pinta pantallas y
+llama a la API. Las reglas de negocio *no* viven en el teléfono; ya
+vimos por qué en el apartado de responsabilidades.
+
+*** Ventajas que importan aquí
+
+| Ventaja | Qué significa en la práctica |
+|---------+------------------------------|
+| Un código, varios destinos | El mismo =http.get= al gateway sirve en web y en la app |
+| UI declarativa | Pantallas como árboles de widgets; se parece a pensar en composición |
+| Buen ciclo de prueba | =flutter run= con recarga rápida mientras programan |
+| Empaquetado claro | =build web=, =build apk= / =appbundle=, =build ipa= (con Mac para iOS) |
+| Encaja con Docker (web) | El resultado de =build/web= se sirve con nginx en un contenedor |
+
+*** Lo que Flutter *no* resuelve solo
+
+- No reemplaza al backend ni a la base de datos.
+- No convierte un monolito en microservicios.
+- Empaquetar para la Play Store / App Store pide cuentas de
+  desarrollador, firmas y revisión: el =apk= de clase no es lo mismo
+  que publicar en producción.
+- iOS en serio necesita un Mac; en el laboratorio a veces se queda en
+  Android + web.
+
+
+** Idea de arquitectura con Flutter
+
+#+begin_example
+     ┌─────────────────────────┐
+     │  Flutter                │
+     │  (web en contenedor     │
+     │   o app instalada)      │
+     └───────────┬─────────────┘
+                 │  HTTPS / JSON
+                 ▼
+     ┌─────────────────────────┐
+     │  Gateway  :8080 / 443   │
+     └───────────┬─────────────┘
+                 │
+        ┌────────┴────────┐
+        ▼                 ▼
+   Django o Pedidos   Recomendar / otros
+#+end_example
+
+El front *solo* conoce la URL base del gateway (o del Django si aún
+están en monolito + API). Nunca la IP interna de Recomendar.
+
+
+** Tutorial breve: proyecto Flutter que habla con la API
+
+Asumimos Flutter instalado (=flutter doctor= sin errores graves) y un
+backend ya respondiendo, por ejemplo:
+
+#+begin_example
+http://127.0.0.1:8080/pedidos
+#+end_example
+
+o, en el monolito:
+
+#+begin_example
+http://127.0.0.1:8000/entregas/recomendar/
+#+end_example
+
+*** Paso 1 — Crear el proyecto
+
+#+begin_src shell
+flutter create entregas_app
+cd entregas_app
+#+end_src
+
+Para este curso basta el template por defecto. Borren el contador de
+demo cuando armen la pantalla de pedido.
+
+*** Paso 2 — Dependencia HTTP
+
+En =pubspec.yaml=, bajo =dependencies:=:
+
+#+begin_example
+http: ^1.2.0
+#+end_example
+
+Luego:
+
+#+begin_src shell
+flutter pub get
+#+end_src
+
+*** Paso 3 — Una llamada mínima
+
+La idea es la misma del =fetch= del HTML: armar un JSON y hacer POST.
+En Dart, algo de este estilo (ajusten la URL a su gateway):
+
+#+begin_src dart
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+Future<Map<String, dynamic>> crearPedido(
+  Map<String, dynamic> paquete,
+) async {
+  final url = Uri.parse('http://10.0.2.2:8080/pedidos');
+  // 10.0.2.2 = "localhost de la PC" visto desde el emulador Android.
+  // En web/local usen http://127.0.0.1:8080/pedidos
+  // En dispositivo físico: la IP de la máquina en la WiFi.
+
+  final respuesta = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(paquete),
+  );
+
+  if (respuesta.statusCode >= 400) {
+    throw Exception('Error ${respuesta.statusCode}: ${respuesta.body}');
+  }
+  return jsonDecode(respuesta.body) as Map<String, dynamic>;
+}
+#+end_src
+
+*** Nota sobre =localhost=
+
+| Dónde corre Flutter | URL típica hacia el backend en su PC |
+|---------------------|--------------------------------------|
+| Chrome (=flutter run -d chrome=) | =http://127.0.0.1:8080/...= |
+| Emulador Android | =http://10.0.2.2:8080/...= |
+| Celular físico (misma WiFi) | =http://192.168.x.x:8080/...= |
+
+Es el mismo problema mental que =localhost= dentro de un contenedor:
+«localhost» es *esta* máquina, no necesariamente la del servidor.
+
+*** Paso 4 — Pantalla delgada
+
+La UI solo: formulario o botones de ejemplo, llamar a =crearPedido=,
+mostrar =folio= y =medio=. La lógica de «¿es posible el dron?» no se
+reescribe en Dart: ya la resolvió el backend.
+
+
+** Contenedor Docker para el front web
+
+En microservicios ya tenían un nginx sirviendo =index.html=. Con
+Flutter web el flujo es:
+
+1. Compilar el front a archivos estáticos.
+2. Copiarlos a una imagen nginx (o similar).
+3. Orquestar ese contenedor junto al gateway o *como* el front detrás
+   del gateway.
+
+*** ¿Por qué contenerizar el front?
+
+- Misma idea que el backend: «en mi laptop se veía» deja de ser una
+  excusa; la imagen lleva el =build/web= tal cual.
+- En Compose pueden levantar *front + gateway + pedidos + recomendar*
+  con un solo =docker compose up=.
+- En producción el contenedor del front (o el bucket + CDN) se
+  versiona aparte del de Pedidos: cambian un color sin redesplegar el
+  modelo.
+- No es lo mismo que empaquetar el =apk=: el contenedor es para
+  *servir la web*; el celular instala un binario distinto.
+
+*** Paso 1 — Probar el build web en seco
+
+#+begin_src shell
+cd entregas_app
+flutter build web --release
+#+end_src
+
+Queda la carpeta =build/web/= (HTML, JS, assets). Pueden abrirla con
+cualquier servidor estático para revisar.
+
+*** Paso 2 — =Dockerfile= multi-etapa
+
+En la raíz del proyecto Flutter (=entregas_app/Dockerfile=):
+
+#+begin_src docker
+# Etapa 1: compilar
+FROM ghcr.io/cirruslabs/flutter:stable AS build
+WORKDIR /app
+COPY pubspec.* ./
+RUN flutter pub get
+COPY . .
+RUN flutter build web --release
+
+# Etapa 2: solo los estáticos
+FROM nginx:1.27-alpine
+COPY --from=build /app/build/web /usr/share/nginx/html
+EXPOSE 80
+#+end_src
+
+La primera etapa necesita el SDK de Flutter; la segunda es chica: solo
+nginx y los archivos ya compilados. Eso es lo que conviene subir a un
+registro de imágenes.
+
+*** Paso 3 — Engancharlo en Compose
+
+Ejemplo mínimo (nombres orientativos):
+
+#+begin_src yaml
+services:
+  front:
+    build: ./entregas_app
+    ports:
+      - "3000:80"
+
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - pedidos
+      - recomendar
+#+end_src
+
+Dos estilos habituales:
+
+1. *Front en :3000 y API en :8080* — el Flutter web llama a
+   =http://localhost:8080/...= (en desarrollo) o a la URL pública del
+   API en producción.
+2. *Un solo borde* — el gateway sirve el HTML/JS de Flutter *y*
+   enruta =/pedidos=. Entonces el =fetch= puede ser relativo
+   (=/pedidos=), igual que en el HTML de la práctica. Para eso el
+   gateway copia o monta el =build/web= (o hace =proxy_pass= al
+   contenedor =front=).
+
+En clase el estilo 2 refuerza la lección del gateway: el cliente solo
+conoce un origen.
+
+*** CORS (si front y API van en puertos distintos)
+
+Si el JS sale de =:3000= y la API de =:8080=, el navegador puede
+bloquear la petición. Soluciones típicas:
+
+- mismo origen vía gateway (recomendado en la práctica),
+- o cabeceras CORS en Django / en el gateway.
+
+No «arreglen» CORS abriendo el backend a cualquier origen en
+producción sin pensarlo.
+
+
+** Empaquetar para móvil (teoría + comandos)
+
+Contenedor ≠ tienda de aplicaciones. Empaquetar es generar el
+artefacto que instala el sistema operativo del teléfono.
+
+*** Android
+
+#+begin_src shell
+flutter build apk --release
+# o, para Play Store:
+flutter build appbundle --release
+#+end_src
+
+- =apk=: instalable a mano (clase, prueba en el salón).
+- =appbundle= (=.aab=): formato que pide Google Play.
+
+Hace falta firmar con un keystore en un release serio; en el curso
+pueden usar el debug o un keystore de práctica si el profesor lo
+define.
+
+*** iOS
+
+#+begin_src shell
+flutter build ipa --release
+#+end_src
+
+Requiere Mac + Xcode + cuenta de desarrollador Apple para distribuir.
+En muchos semestres se demuestra Android + web y se deja iOS como
+lectura.
+
+*** Ventajas del empaquetado móvil frente a «solo web»
+
+| | Web (contenedor / navegador) | App empaquetada |
+|--|------------------------------|-----------------|
+| Instalación | URL | Tienda o =apk= |
+| Acceso a sensores / notificaciones push | Limitado | Más natural |
+| Actualizar | Redesplegar front | Nueva versión en tienda (o MDMs) |
+| Misma API detrás | Sí | Sí |
+
+La ventaja de Flutter es no reescribir la UI para cada fila de esa
+tabla: cambian el *destino del build*, no el contrato con el gateway.
+
+
+** Comparación rápida: dónde vive cada cosa
+
+| Pieza | Qué es | Comando / artefacto típico |
+|-------+--------+----------------------------|
+| Código Flutter | Proyecto | =entregas_app/= |
+| Front web en Docker | Estáticos en nginx | =flutter build web= → imagen |
+| App Android | Paquete instalable | =flutter build apk= / =appbundle= |
+| App iOS | Paquete Apple | =flutter build ipa= |
+| Backend | Django o microservicios | =runserver= / =compose= |
+| Gateway | Borde HTTP | nginx / API gateway |
+
+
+** Buenas prácticas (para no pelearse con el laboratorio)
+
+1. *URL configurable.* No dejen la IP del salón clavada en el código.
+   Usen un =--dart-define=API_BASE=...= o un archivo de entorno por
+   modo (dev / prod).
+2. *Una base URL.* Web, emulador y celular solo cambian esa base; las
+   rutas (=/pedidos=) son las mismas.
+3. *El front no es el gateway.* Meter Flutter y Pedidos en el mismo
+   contenedor «para simplificar» vuelve al monolito disfrazado.
+4. *Versión del SDK.* Fijen un canal (=stable=) en el equipo; si cada
+   quien tiene un Flutter distinto, el build del Dockerfile y el local
+   divergen.
+5. *Secretos.* Tokens y claves no van en el =apk= ni en la imagen
+   pública del front si pueden evitarse; lo sensible se queda en el
+   backend.
+
+
+** Cómo encaja con lo que ya hicieron
+
+| Ya vieron | Con Flutter suman |
+|-----------|-------------------|
+| HTML + =fetch= al gateway | Misma idea con =package:http= |
+| Contenedor nginx del HTML | Contenedor nginx del =build/web= |
+| Monolito + API | Flutter como otro cliente más (además del HTML) |
+| Microservicios | Flutter no conoce Recomendar; solo el gateway |
+| Selector de modelo / folio | Pantallas que muestran lo que Pedidos ya resolvió |
+
+
+** Preguntas para discutir (Flutter)
+
+1. Si el =apk= y el contenedor web salen del mismo repo Flutter, ¿por
+   qué el backend sigue siendo uno (o un gateway) y no «un backend por
+   plataforma»?
+
+2. ¿Qué problema están resolviendo al poner el =build/web= en Docker
+   que *no* resuelven con =flutter run -d chrome= en cada laptop?
+
+3. Un compañero quiere meter el =.joblib= dentro de la app Flutter
+   «para no depender del servidor». ¿Qué ganan y qué rompen
+   (actualizaciones, tamaño, reglas de negocio, secretos)?
+
+4. En la WiFi del salón, el celular físico no alcanza =10.0.2.2=.
+   ¿Qué URL usan y qué tiene que estar abierto en la PC del gateway?
+
+5. ¿En qué se parece contenerizar Flutter web a contenerizar el HTML
+   de la práctica de microservicios? ¿En qué se diferencia del
+   =apk=?
+
