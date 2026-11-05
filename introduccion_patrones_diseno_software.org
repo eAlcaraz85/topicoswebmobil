@@ -9219,6 +9219,652 @@ Cuando conecten el gateway de verdad, el =await Future.delayed= se
 cambia por el =http.post=.
 
 
+*** Formulario con controladores (=TextEditingController=)
+
+Así leen lo que escribió el usuario al pulsar el botón:
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: AltaPedido()));
+}
+
+class AltaPedido extends StatefulWidget {
+  const AltaPedido({super.key});
+
+  @override
+  State<AltaPedido> createState() => _AltaPedidoState();
+}
+
+class _AltaPedidoState extends State<AltaPedido> {
+  final distancia = TextEditingController();
+  final peso = TextEditingController();
+
+  @override
+  void dispose() {
+    distancia.dispose();
+    peso.dispose();
+    super.dispose();
+  }
+
+  void _enviar() {
+    final d = distancia.text.trim();
+    final p = peso.text.trim();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('distancia=$d peso=$p')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Alta')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: distancia,
+              decoration: const InputDecoration(labelText: 'Distancia (km)'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: peso,
+              decoration: const InputDecoration(labelText: 'Peso (kg)'),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: _enviar, child: const Text('Crear')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Validar antes de mandar (=Form= + =TextFormField=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: FormValidado()));
+}
+
+class FormValidado extends StatefulWidget {
+  const FormValidado({super.key});
+
+  @override
+  State<FormValidado> createState() => _FormValidadoState();
+}
+
+class _FormValidadoState extends State<FormValidado> {
+  final _clave = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Validación')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _clave,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Distancia (km)'),
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Obligatorio';
+                  }
+                  final n = double.tryParse(v);
+                  if (n == null || n <= 0) return 'Número > 0';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  if (_clave.currentState!.validate()) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Formulario OK')),
+                    );
+                  }
+                },
+                child: const Text('Validar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Scroll cuando no cabe (=SingleChildScrollView=)
+
+Si meten muchos campos en un =Column= sin scroll, en pantallas chicas
+falla. Envuélvanlo:
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Scroll')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: List.generate(
+            20,
+            (i) => ListTile(title: Text('Campo / pedido $i')),
+          ),
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** Menú inferior (=BottomNavigationBar=)
+
+Dos «secciones» en la misma app (lista / alta):
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: Shell()));
+}
+
+class Shell extends StatefulWidget {
+  const Shell({super.key});
+
+  @override
+  State<Shell> createState() => _ShellState();
+}
+
+class _ShellState extends State<Shell> {
+  int indice = 0;
+
+  static const pantallas = [
+    Center(child: Text('Aquí va la lista de pedidos')),
+    Center(child: Text('Aquí va el formulario de alta')),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Entregas')),
+      body: pantallas[indice],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: indice,
+        onTap: (i) => setState(() => indice = i),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Lista'),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Alta'),
+        ],
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Pestañas (=DefaultTabController= + =TabBar=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: ConPestanas()));
+}
+
+class ConPestanas extends StatelessWidget {
+  const ConPestanas({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Seguimiento'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Activos'),
+              Tab(text: 'Historial'),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            Center(child: Text('Pedidos en camino')),
+            Center(child: Text('Pedidos entregados')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Cajón lateral (=Drawer=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Menú')),
+      drawer: Drawer(
+        child: ListView(
+          children: const [
+            DrawerHeader(child: Text('Entregas UI')),
+            ListTile(leading: Icon(Icons.home), title: Text('Inicio')),
+            ListTile(leading: Icon(Icons.settings), title: Text('Ajustes')),
+          ],
+        ),
+      ),
+      body: const Center(child: Text('Abran el menú ☰')),
+    ),
+  ));
+}
+#+end_src
+
+
+*** Botón flotante (=FloatingActionButton=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('FAB')),
+      body: const Center(child: Text('Lista de pedidos')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.add),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+En la app real, el =onPressed= puede abrir la pantalla de alta
+(=Navigator.push=).
+
+
+*** Tarjeta de un pedido (=Card= + =ListTile=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Tarjeta')),
+      body: const Padding(
+        padding: EdgeInsets.all(16),
+        child: Card(
+          child: ListTile(
+            leading: Icon(Icons.local_shipping),
+            title: Text('Folio D2757CBE'),
+            subtitle: Text('Medio: dron · 12 km'),
+            trailing: Icon(Icons.chevron_right),
+          ),
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** Tirar para actualizar (=RefreshIndicator=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: ListaRefrescable()));
+}
+
+class ListaRefrescable extends StatefulWidget {
+  const ListaRefrescable({super.key});
+
+  @override
+  State<ListaRefrescable> createState() => _ListaRefrescableState();
+}
+
+class _ListaRefrescableState extends State<ListaRefrescable> {
+  List<String> folios = ['A111', 'B222'];
+
+  Future<void> _refrescar() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    setState(() {
+      folios = [...folios, 'C${folios.length}'];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Refresh')),
+      body: RefreshIndicator(
+        onRefresh: _refrescar,
+        child: ListView.builder(
+          itemCount: folios.length,
+          itemBuilder: (_, i) => ListTile(title: Text(folios[i])),
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+En Chrome a veces el gesto es raro; en emulador/celular se nota mejor.
+Cuando tengan API, =_refrescar= hace =GET= y reemplaza =folios=.
+
+
+*** Resultado de un =Future= (=FutureBuilder=)
+
+Patrón típico cuando el dato viene «después» (HTTP):
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+Future<List<String>> cargarFolios() async {
+  await Future<void>.delayed(const Duration(seconds: 1));
+  return ['D2757CBE', 'A1B2C3D4'];
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('FutureBuilder')),
+      body: FutureBuilder<List<String>>(
+        future: cargarFolios(),
+        builder: (context, snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snap.hasError) {
+            return Center(child: Text('Error: ${snap.error}'));
+          }
+          final datos = snap.data!;
+          return ListView(
+            children: [for (final f in datos) ListTile(title: Text(f))],
+          );
+        },
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** POST mínimo con =package:http=
+
+En =pubspec.yaml=, bajo =dependencies:=:
+
+#+begin_example
+http: ^1.2.0
+#+end_example
+
+Luego =flutter pub get=. Ejemplo (ajusten la URL a su backend o
+gateway; si aún no corre, verán error de red y eso también cuenta
+como práctica):
+
+#+begin_src dart
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(const MaterialApp(home: PostPedido()));
+}
+
+class PostPedido extends StatefulWidget {
+  const PostPedido({super.key});
+
+  @override
+  State<PostPedido> createState() => _PostPedidoState();
+}
+
+class _PostPedidoState extends State<PostPedido> {
+  String mensaje = 'Sin enviar';
+  bool cargando = false;
+
+  Future<void> _crear() async {
+    setState(() {
+      cargando = true;
+      mensaje = 'Enviando…';
+    });
+    try {
+      final url = Uri.parse('http://127.0.0.1:8080/pedidos');
+      final r = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'distancia_km': 12,
+          'peso_kg': 1.5,
+        }),
+      );
+      setState(() => mensaje = '${r.statusCode}: ${r.body}');
+    } catch (e) {
+      setState(() => mensaje = 'Fallo de red: $e');
+    } finally {
+      setState(() => cargando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('HTTP POST')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+              onPressed: cargando ? null : _crear,
+              child: const Text('POST /pedidos'),
+            ),
+            const SizedBox(height: 16),
+            if (cargando) const LinearProgressIndicator(),
+            Text(mensaje),
+          ],
+        ),
+      ),
+    );
+  }
+}
+#+end_src
+
+En el emulador Android usen =http://10.0.2.2:8080/pedidos= en lugar
+de =127.0.0.1=.
+
+
+*** Tema rápido (=ThemeData=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+      useMaterial3: true,
+    ),
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Tema')),
+      body: Center(
+        child: FilledButton(
+          onPressed: () {},
+          child: const Text('Crear pedido'),
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** Cuadrícula (=GridView=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Medios')),
+      body: GridView.count(
+        crossAxisCount: 2,
+        children: const [
+          Card(child: Center(child: Text('Moto'))),
+          Card(child: Center(child: Text('Dron'))),
+          Card(child: Center(child: Text('Camioneta'))),
+          Card(child: Center(child: Text('Bici'))),
+        ],
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** Imagen de red (=Image.network=)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Mapa / foto')),
+      body: Center(
+        child: Image.network(
+          'https://docs.flutter.dev/assets/images/dash/dash-fainting.gif',
+          height: 160,
+          errorBuilder: (_, __, ___) => const Text('No cargó la imagen'),
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** =SafeArea= (notch / barras del sistema)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: SafeArea(
+      child: Scaffold(
+        body: Center(child: Text('Contenido lejos del notch')),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
+*** Buscar en la lista (=TextField= + filtro)
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(home: BuscadorFolios()));
+}
+
+class BuscadorFolios extends StatefulWidget {
+  const BuscadorFolios({super.key});
+
+  @override
+  State<BuscadorFolios> createState() => _BuscadorFoliosState();
+}
+
+class _BuscadorFoliosState extends State<BuscadorFolios> {
+  final todos = const ['D2757CBE', 'A1B2C3D4', 'F00D1234', 'ZZ99AA'];
+  String filtro = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final vistos = todos
+        .where((f) => f.toLowerCase().contains(filtro.toLowerCase()))
+        .toList();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Buscar')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              decoration: const InputDecoration(
+                labelText: 'Filtrar folio',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (t) => setState(() => filtro = t),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              children: [for (final f in vistos) ListTile(title: Text(f))],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+#+end_src
+
+
+*** Página de error / vacío
+
+#+begin_src dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Vacío')),
+      body: const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.inbox, size: 64),
+            SizedBox(height: 12),
+            Text('No hay pedidos todavía'),
+            SizedBox(height: 12),
+            // ElevatedButton… hacia el alta
+          ],
+        ),
+      ),
+    ),
+  ));
+}
+#+end_src
+
+
 ** Hot reload: por qué se siente distinto
 
 Con la app en ejecución, al guardar un cambio de UI Flutter intenta
@@ -12266,4 +12912,856 @@ tabla: cambian el *destino del build*, no el contrato con el gateway.
 5. ¿En qué se parece contenerizar Flutter web a contenerizar el HTML
    de la práctica de microservicios? ¿En qué se diferencia del
    =apk=?
+
+
+* Entrenar un modelo chico para el asistente (mini LLM)
+
+Con el árbol de medios ya vieron el ciclo completo: dataset →
+entrenar → guardar → cargar → predecir. Para el bot del Proyecto 2
+pasan por algo parecido, pero el objetivo cambia. El =.joblib= de
+envíos *elige un medio*. El modelo del asistente *entiende una
+pregunta del comprador* y ayuda a responderla (con datos de su
+sistema, no inventando el ranking del dron).
+
+No hace falta un modelo de miles de millones de parámetros. De
+hecho, en la frontera (incluso en tarjetas chicas) se experimenta
+con redes muy pequeñas entrenadas en un solo tema. Aquí nos quedamos
+con esa lección de tamaño: *poco peso, dominio estrecho, que corra
+en la máquina del salón*. Nadie está obligado a usar hardware raro;
+entrenan y sirven el modelo desde su backend.
+
+** En qué se parece a lo del árbol (y en qué no)
+
+| | Medios (=entrenar_arbol.py=) | Asistente (mini LLM / clasificador) |
+|--|------------------------------|-------------------------------------|
+| Entrada | Distancia, peso, zona… | Texto del comprador |
+| Salida | Medio + confianza | Intención, respuesta corta, o ambos |
+| Dataset | CSV de envíos | Pares pregunta → lo que deberían hacer/decir |
+| Archivo | =modelo_medios.joblib= | Pesos / pipeline / checkpoint chico |
+| Quién lo usa | Vista =recomendar= | Endpoint del bot |
+
+Misma disciplina: no entrenar en cada clic. Se entrena *offline*, se
+guarda, la API solo carga y responde.
+
+** Qué van a entrenar, en la práctica
+
+Tienen tres caminos; elijan uno y documenten por qué:
+
+1. *Clasificador de intenciones* (el más realista en laboratorio).
+   Etiquetas del estilo =rastreo_folio=, =pregunta_medios=,
+   =buscar_producto=, =saludo=, =no_se=. Entrenan con scikit-learn
+   (TF-IDF + regresión logística / SVM / un árbol) o algo igual de
+   corto. Guardan con =joblib=, igual que el de medios. El bot, según
+   la intención, llama a su API o arma una respuesta con plantilla.
+
+2. *Modelo de lenguaje pequeño afinado al dominio.* Parten de un
+   checkpoint chico (de los que caben en disco sin drama) y lo
+   afinan con sus preguntas de entregas/tienda. Generan respuestas
+   cortas. Si se pone lento o se come la RAM, bajan tamaño o
+   vuelven al clasificador.
+
+3. *Híbrido.* El clasificador decide la intención; solo algunas
+   intenciones pasan por generación. Suele ser lo más estable.
+
+Lo que no cuenta: pegar la API de un chat comercial y decir que
+«entrenaron». Usar una API externa como *apoyo* se puede, pero el
+apartado pide ver *su* dataset y *su* entrenamiento (aunque sea el
+clasificador).
+
+** Armar el dataset del comprador
+
+Antes de codear redes, escriben ejemplos. Cincuenta bien pensados
+valen más que cinco mil copiados. Cada fila es algo que un comprador
+diría y lo que el sistema debería entender:
+
+#+begin_example
+texto,intencion,nota
+"donde esta mi pedido D2757CBE",rastreo_folio,tiene folio
+"por que me pusieron camioneta",pregunta_medios,despues de recomendar
+"tienen algo liviano para regalo",buscar_producto,
+"hola",saludo,
+"el dron llega de noche?",pregunta_medios,
+#+end_example
+
+Varien redacción («¿y mi folio?», «rastrear D2757CBE»). Metan casos
+sin folio, groserías suaves, preguntas fuera de tema (=no_se=). Eso
+es lo que después prueba si el bot alucina o pide datos de verdad.
+
+Si afinan un LM, el dataset puede ser pregunta → respuesta esperada,
+siempre anclada a su dominio (envíos, folios, productos de *su*
+base).
+
+** Desarrollar el modelo (clasificador de intenciones)
+
+Aquí va el camino que sí cabe en el laboratorio, paso a paso. Si
+después afinan un LM chico, el *contrato* hacia Django puede ser el
+mismo: texto → intención (y datos) → respuesta.
+
+*** Dataset de ejemplo
+
+Guarden algo así en =preguntas_comprador.csv= (amplíenlo; esto es
+solo semilla):
+
+#+begin_example
+texto,intencion
+hola,saludo
+buenas tardes,saludo
+hey,saludo
+donde esta mi pedido D2757CBE,rastreo_folio
+rastrear folio A1B2C3D4,rastreo_folio
+como va el envio F00D1234,rastreo_folio
+quiero ver mi pedido,rastreo_folio
+por que me toco camioneta,pregunta_medios
+que medios usan,pregunta_medios
+el dron puede de noche,pregunta_medios
+me conviene moto o bici,pregunta_medios
+tienen algo liviano,buscar_producto
+busco un regalo barato,buscar_producto
+que productos hay,buscar_producto
+cual es el clima en marte,no_se
+receta de pastel,no_se
+#+end_example
+
+Repitan cada intención con otras palabras. Sin eso el modelo memoriza
+tres frases y en la demo se cae.
+
+*** Script =entrenar_asistente.py=
+
+Misma idea que =entrenar_arbol.py=: lee CSV, entrena, imprime
+métrica, guarda =.joblib=.
+
+#+begin_src python
+from pathlib import Path
+
+import joblib
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+
+ROOT = Path(__file__).resolve().parent
+datos = pd.read_csv(ROOT / "preguntas_comprador.csv")
+
+X_train, X_test, y_train, y_test = train_test_split(
+    datos["texto"],
+    datos["intencion"],
+    test_size=0.25,
+    random_state=42,
+    stratify=datos["intencion"],
+)
+
+pipe = Pipeline([
+    ("tfidf", TfidfVectorizer(ngram_range=(1, 2), min_df=1)),
+    ("clf", LogisticRegression(max_iter=2000)),
+])
+pipe.fit(X_train, y_train)
+
+print("Exactitud:", round(pipe.score(X_test, y_test), 3))
+print(classification_report(y_test, pipe.predict(X_test), zero_division=0))
+
+salida = ROOT / "modelo_asistente.joblib"
+joblib.dump(pipe, salida)
+print("Guardado en", salida)
+#+end_src
+
+#+begin_src shell
+python entrenar_asistente.py
+#+end_src
+
+Si =stratify= se queja porque alguna clase tiene pocas filas,
+agreguen más ejemplos de esa intención (no quiten el =stratify= a
+lo loco: es la señal de que el CSV está flaco).
+
+*** Probar fuera de Django
+
+#+begin_src python
+import joblib
+
+modelo = joblib.load("modelo_asistente.joblib")
+for frase in [
+    "hola",
+    "donde esta mi pedido D2757CBE",
+    "por que camioneta",
+    "receta de tacos",
+]:
+    print(frase, "→", modelo.predict([frase])[0])
+#+end_src
+
+Si «dónde está D2757CBE» no sale =rastreo_folio=, vuelvan al CSV.
+Igual que con el árbol y la madrugada: el modelo no adivina lo que
+no le enseñaron.
+
+
+** Del =.joblib= a la respuesta del bot
+
+El modelo solo dice la *intención*. Quien arma la respuesta útil
+para el comprador es código de ustedes: busca folio, lista
+productos, o manda al recomendador.
+
+*** Extraer un folio del texto (utilidad chica)
+
+#+begin_src python
+import re
+
+FOLIO = re.compile(r"\b([A-Z0-9]{6,12})\b", re.I)
+
+def sacar_folio(texto: str) -> str | None:
+    m = FOLIO.search(texto or "")
+    return m.group(1).upper() if m else None
+#+end_src
+
+Ajusten el patrón a cómo generen folios en su app.
+
+*** Módulo =asistente.py= (carga una vez, responde)
+
+Pueden ponerlo junto al recomendador, por ejemplo
+=entregas/asistente.py=:
+
+#+begin_src python
+from pathlib import Path
+import joblib
+import re
+
+FOLIO = re.compile(r"\b([A-Z0-9]{6,12})\b", re.I)
+_ruta = Path(__file__).resolve().parent / "modelo" / "modelo_asistente.joblib"
+_modelo = None
+
+def obtener_modelo():
+    global _modelo
+    if _modelo is None:
+        _modelo = joblib.load(_ruta)
+    return _modelo
+
+def sacar_folio(texto: str):
+    m = FOLIO.search(texto or "")
+    return m.group(1).upper() if m else None
+
+def responder(texto: str, buscar_pedido=None, listar_productos=None):
+    """buscar_pedido(folio) y listar_productos() las inyectan desde la vista."""
+    texto = (texto or "").strip()
+    if not texto:
+        return {
+            "intencion": "no_se",
+            "respuesta": "Escríbeme una pregunta sobre tu pedido o el envío.",
+            "folio": None,
+        }
+
+    intencion = obtener_modelo().predict([texto])[0]
+    folio = sacar_folio(texto)
+
+    if intencion == "saludo":
+        return {
+            "intencion": intencion,
+            "respuesta": "Hola. Puedo ayudarte a rastrear un folio, "
+            "explicar los medios de envío o buscar productos.",
+            "folio": folio,
+        }
+
+    if intencion == "rastreo_folio":
+        if not folio:
+            return {
+                "intencion": intencion,
+                "respuesta": "Pásame el folio (por ejemplo D2757CBE) y te digo cómo va.",
+                "folio": None,
+            }
+        pedido = buscar_pedido(folio) if buscar_pedido else None
+        if not pedido:
+            return {
+                "intencion": intencion,
+                "respuesta": f"No encontré el folio {folio} en el sistema.",
+                "folio": folio,
+            }
+        return {
+            "intencion": intencion,
+            "respuesta": (
+                f"El pedido {folio} va por {pedido.get('medio', '?')} "
+                f"y está en estado {pedido.get('estado', 'registrado')}."
+            ),
+            "folio": folio,
+            "pedido": pedido,
+        }
+
+    if intencion == "pregunta_medios":
+        return {
+            "intencion": intencion,
+            "respuesta": (
+                "El medio lo decide el recomendador del sistema "
+                "(modelo + reglas): moto, dron, bici o camioneta según "
+                "peso, distancia y zona. Si quieres una sugerencia "
+                "concreta, usa la pantalla de recomendar o manda los "
+                "datos del paquete; yo no invento el medio."
+            ),
+            "folio": folio,
+        }
+
+    if intencion == "buscar_producto":
+        productos = listar_productos() if listar_productos else []
+        if not productos:
+            return {
+                "intencion": intencion,
+                "respuesta": "Aún no hay productos cargados en la base.",
+                "folio": folio,
+            }
+        nombres = ", ".join(p["nombre"] for p in productos[:5])
+        return {
+            "intencion": intencion,
+            "respuesta": f"Entre lo que tenemos: {nombres}.",
+            "folio": folio,
+            "productos": productos[:5],
+        }
+
+    return {
+        "intencion": intencion,
+        "respuesta": "Eso se me sale del dominio de la tienda y los envíos. "
+        "Prueba con un folio, un producto o una duda de medios.",
+        "folio": folio,
+    }
+#+end_src
+
+Copien =modelo_asistente.joblib= a =entregas/modelo/= (como hicieron
+con =modelo_medios.joblib=). La vista no entrena: solo llama
+=responder=.
+
+
+** Conectarlo a Django (=POST /entregas/asistente/=)
+
+En =views.py= (misma idea delgada que =recomendar=):
+
+#+begin_src python
+import json
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+from .asistente import responder
+# from .models import Pedido, Producto  # cuando existan
+#+end_src
+
+#+begin_src python
+@csrf_exempt
+@require_POST
+def asistente(request):
+    try:
+        cuerpo = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "el cuerpo debe ser JSON"}, status=400)
+
+    texto = cuerpo.get("mensaje") or cuerpo.get("texto") or ""
+
+    def buscar_pedido(folio):
+        # Ejemplo: sustituyan por su modelo real
+        # p = Pedido.objects.filter(folio=folio).first()
+        # if not p: return None
+        # return {"folio": p.folio, "medio": p.medio, "estado": p.estado}
+        return None
+
+    def listar_productos():
+        # return list(Producto.objects.values("nombre", "precio", "peso_kg")[:10])
+        return []
+
+    salida = responder(texto, buscar_pedido=buscar_pedido, listar_productos=listar_productos)
+    return JsonResponse(salida, json_dumps_params={"ensure_ascii": False})
+#+end_src
+
+En =urls.py=:
+
+#+begin_src python
+path("asistente/", views.asistente, name="asistente"),
+#+end_src
+
+*Para comprobar* con el servidor arriba:
+
+#+begin_src shell
+curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"mensaje":"hola"}' \
+  http://127.0.0.1:8000/entregas/asistente/
+#+end_src
+
+#+begin_src shell
+curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"mensaje":"donde esta mi pedido D2757CBE"}' \
+  http://127.0.0.1:8000/entregas/asistente/
+#+end_src
+
+La primera debería traer =intencion: saludo=. La segunda,
+=rastreo_folio=; si aún no hay pedido en base, el mensaje dirá que
+no lo encontró —eso está bien: el modelo acertó la intención y el
+bot no inventó un estado.
+
+
+** Conectarlo a Flutter (pantalla de chat)
+
+Dependencia =http= en =pubspec.yaml=, =flutter pub get=. Ejemplo de
+pantalla que manda el mensaje del comprador al endpoint:
+
+#+begin_src dart
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class ChatComprador extends StatefulWidget {
+  const ChatComprador({super.key});
+
+  @override
+  State<ChatComprador> createState() => _ChatCompradorState();
+}
+
+class _ChatCompradorState extends State<ChatComprador> {
+  // Chrome: 127.0.0.1 — emulador Android: 10.0.2.2
+  static const base = 'http://127.0.0.1:8000/entregas';
+
+  final control = TextEditingController();
+  final mensajes = <Map<String, String>>[];
+  bool enviando = false;
+
+  @override
+  void dispose() {
+    control.dispose();
+    super.dispose();
+  }
+
+  Future<void> _enviar() async {
+    final texto = control.text.trim();
+    if (texto.isEmpty || enviando) return;
+
+    setState(() {
+      mensajes.add({'rol': 'comprador', 'texto': texto});
+      control.clear();
+      enviando = true;
+    });
+
+    try {
+      final r = await http.post(
+        Uri.parse('$base/asistente/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'mensaje': texto}),
+      );
+      final data = jsonDecode(r.body) as Map<String, dynamic>;
+      final respuesta = data['respuesta']?.toString() ?? r.body;
+      final intencion = data['intencion']?.toString() ?? '';
+      setState(() {
+        mensajes.add({
+          'rol': 'bot',
+          'texto': intencion.isEmpty ? respuesta : '[$intencion] $respuesta',
+        });
+      });
+    } catch (e) {
+      setState(() {
+        mensajes.add({'rol': 'bot', 'texto': 'No pude hablar con el servidor: $e'});
+      });
+    } finally {
+      setState(() => enviando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Asistente')),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: mensajes.length,
+              itemBuilder: (_, i) {
+                final m = mensajes[i];
+                final mio = m['rol'] == 'comprador';
+                return Align(
+                  alignment: mio ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.all(10),
+                    color: mio ? Colors.teal.shade50 : Colors.grey.shade200,
+                    child: Text(m['texto']!),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (enviando) const LinearProgressIndicator(),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: control,
+                    decoration: const InputDecoration(
+                      hintText: 'Escribe tu pregunta…',
+                      border: OutlineInputBorder(),
+                    ),
+                    onSubmitted: (_) => _enviar(),
+                  ),
+                ),
+                IconButton(
+                  onPressed: enviando ? null : _enviar,
+                  icon: const Icon(Icons.send),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+#+end_src
+
+En el =home= o en el tab del asistente:
+
+#+begin_src dart
+MaterialApp(home: ChatComprador())
+#+end_src
+
+Flujo que deben poder enseñar: comprador escribe → Flutter =POST=
+→ Django carga =modelo_asistente.joblib= → intención → consulta
+base o plantilla → JSON → burbuja del bot. Si piden un medio
+concreto, el bot los manda al recomendador; no inventa dron.
+
+#+begin_example
+Flutter (chat)  --POST /entregas/asistente/-->  Django
+                                                 | carga joblib
+                                                 | intenta folio / productos
+                                                 v
+                                              respuesta JSON
+#+end_example
+
+
+** Errores típicos
+
+- Dataset de diez frases y esperar magia.
+- Entrenar dentro de la vista HTTP.
+- Que el bot «elija» el medio sin pasar por el =.joblib= de envíos.
+- Olvidar copiar =modelo_asistente.joblib= junto al código que hace
+  =joblib.load=.
+- Dejar =127.0.0.1= en el emulador Android (usen =10.0.2.2=).
+
+
+* Proyectos Flutter (progresivos)
+
+** Descripción general de los proyectos
+
+A lo largo de los tres proyectos desarrollarán un sistema que integre
+*dos componentes de inteligencia artificial*:
+
+1. *Recomendador de medios de envío.* Utilizarán el modelo
+   desarrollado durante el curso (=.joblib=) junto con las reglas
+   para seleccionar el medio de transporte más adecuado según las
+   características del paquete.
+2. *Asistente inteligente.* Entrenarán e incorporarán un asistente
+   (véase [[*Entrenar un modelo chico para el asistente (mini LLM)][Entrenar
+   un modelo chico para el asistente]]) que interactúe con el
+   *comprador*, usando el catálogo y los pedidos como contexto para
+   responder preguntas y apoyar la compra o el seguimiento.
+
+El catálogo y la gestión de pedidos son la base del sistema, pero el
+objetivo principal es *integrar y usar ambos componentes de IA* en
+una aplicación funcional, no limitarse a formularios de alta y
+consulta.
+
+- Los *proyectos 1 y 2* son *individuales*.
+- El *proyecto 3* se desarrolla en *equipo* e integra aplicación
+  *web* y *móvil* (Flutter).
+
+Al inicio trabajarán con Django y SQLite. Si más adelante usan Docker
+o varias instancias, podrán migrar a PostgreSQL, como se revisó en
+clase. El trabajo se entrega en un repositorio donde se pueda ver la
+evolución del sistema.
+
+
+** Proyecto 1 — Individual: gestión de datos y recomendador de envíos
+
+*** Objetivo
+
+Desarrollar una primera versión funcional del sistema con *Django,
+SQLite y Flutter*, integrando el recomendador de medios de envío
+(=.joblib=) y las reglas de decisión trabajadas en el curso.
+
+La idea es que vean cómo un modelo de IA entra en una aplicación
+real y cómo se comunican backend y cliente.
+
+*** 1. Integración del recomendador
+
+El sistema debe usar el modelo de IA para generar una recomendación
+a partir de los datos de un paquete.
+
+La respuesta al usuario debe incluir:
+
+- medio de envío recomendado,
+- nivel de confianza del modelo,
+- si las reglas modificaron la sugerencia original (=corregido=),
+- información relevante del ranking de medios evaluados.
+
+Esa recomendación debe *mostrarse en la interfaz* y usarse para
+registrar un pedido con su folio.
+
+*Importante:* no basta con correr el modelo a mano o ver el
+resultado solo en la consola. La recomendación forma parte del
+funcionamiento de la aplicación.
+
+*** 2. Backend — Django y SQLite
+
+El backend debe permitir:
+
+- Configurar SQLite (=db.sqlite3=) y definir los modelos necesarios
+  para el catálogo (o lo que ofrezcan) y los pedidos.
+- Cargar datos de prueba para verificar el flujo.
+- Exponer servicios JSON de listado y detalle.
+- Implementar un =POST= que reciba las características del paquete
+  y ejecute el recomendador con sus reglas.
+- Registrar un pedido con el medio devuelto por el servidor y
+  generar un folio.
+- De manera adicional, un =GET= para consultar un pedido por folio.
+
+En esta etapa el recomendador vive en el monolito Django. El
+gateway y los microservicios se abordan después.
+
+*** 3. Aplicación — Flutter
+
+La interfaz debe permitir al usuario trabajar con el sistema:
+
+- catálogo en lista (y pantalla de detalle),
+- búsqueda básica,
+- formulario del paquete (distancia, peso, zona y demás campos que
+  pida el modelo),
+- pantalla que muestre con claridad el medio recomendado, la
+  confianza y el efecto de las reglas,
+- confirmación del pedido y visualización del folio,
+- estados de carga y errores de red,
+- URL base del servidor fácil de cambiar (Chrome, emulador, WiFi).
+
+La app consume el backend por JSON. Las decisiones del recomendador
+y las reglas de negocio se quedan en el servidor.
+
+*** 4. Relación con los temas del curso
+
+Deben identificar y aplicar, con una explicación breve de *dónde*
+aparecen en *su* código:
+
+- *Strategy:* organización de medios / reglas de envío.
+- *Repository:* acceso a datos mediante modelos Django (sin SQL en
+  la UI).
+- *JSON y HTTP:* comunicación entre backend y cliente.
+- *Front Controller:* entrada y enrutado de peticiones en Django.
+
+No basta con enumerar nombres: digan qué problema les resolvió cada
+idea.
+
+*** 5. Entregables
+
+1. Código del backend y de la app Flutter.
+2. Instrucciones para instalar y ejecutar el proyecto.
+3. Datos de prueba.
+4. Capturas del flujo: *paquete → recomendación de IA → reglas →
+   pedido → folio*.
+5. Una explicación corta de un caso en el que las reglas corrijan
+   la recomendación del modelo y por qué ocurrió.
+
+*** 6. Criterios de evaluación
+
+| Criterio | Porcentaje |
+|----------|-----------:|
+| Modelos de datos, SQLite y servicios JSON | 20 % |
+| Integración y funcionamiento del recomendador de IA | 35 % |
+| Flutter: navegación, búsqueda y estados | 25 % |
+| Explicación técnica, arquitectura y separación cliente-servidor | 20 % |
+| *Total* | *100 %* |
+
+*** Consideración final
+
+Se busca una integración real entre la app, el backend, el modelo y
+las reglas. Se valora que puedan justificar la separación de
+responsabilidades y mostrar qué pasa cuando el modelo propone un
+medio que las reglas deben corregir.
+
+
+** Proyecto 2 — Individual: asistente inteligente para el comprador
+
+*** Objetivo
+
+Partiendo del Proyecto 1, entrenar e integrar un *asistente* que
+ayude al comprador (preguntas sobre folio, productos, medios,
+seguimiento), según el apartado
+[[*Entrenar un modelo chico para el asistente (mini LLM)][Entrenar un
+modelo chico para el asistente]].
+
+El asistente *no sustituye* al recomendador de envíos: orienta,
+consulta datos y, cuando hace falta decidir el medio, remite al
+flujo o al endpoint de recomendación.
+
+*** 1. Entrenamiento del asistente
+
+Deben:
+
+- armar un dataset propio de preguntas del comprador e intenciones
+  (o pares pregunta-respuesta, si afinan un modelo de lenguaje
+  pequeño),
+- entrenar el modelo *fuera* de la petición HTTP,
+- guardar el artefacto (por ejemplo =modelo_asistente.joblib=),
+- mostrar una métrica sencilla de prueba.
+
+Pegar solo un chat comercial sin entrenamiento propio no cumple el
+objetivo de este proyecto.
+
+*** 2. Backend — endpoint del asistente
+
+- =POST= (por ejemplo =/entregas/asistente/=) que reciba el mensaje
+  del comprador.
+- Cargar el modelo entrenado y obtener la intención (o la
+  generación).
+- Según el caso, consultar folio, productos o indicar el uso del
+  recomendador.
+- Responder JSON con al menos =intencion= y =respuesta= útiles para
+  la UI.
+
+Si la salida del modelo viene en otro formato, traduzcan en el
+servidor (Adapter).
+
+*** 3. Flutter — chat del comprador
+
+- Pantalla de chat que envíe el mensaje al endpoint y muestre la
+  respuesta.
+- El resto del sistema del Proyecto 1 sigue disponible
+  (recomendación, búsqueda por folio).
+- Debe notarse un solo producto: el comprador puede preguntar al
+  bot y también usar las pantallas «normales».
+
+*** 4. Relación con los temas del curso
+
+- *Adapter:* si adaptan la salida del asistente o de un proveedor.
+- Separación cliente/servidor: Flutter no carga el =.joblib=.
+- Reutilizar Repository / JSON del proyecto anterior.
+- Dejar claro qué hace el clasificador/LM y qué hace el
+  recomendador de medios.
+
+*** 5. Entregables
+
+1. Código actualizado (backend + Flutter).
+2. Dataset (o muestra representativa) y script de entrenamiento.
+3. Artefacto del modelo o instrucciones inequívocas para generarlo.
+4. Capturas del chat (saludo, rastreo con folio, pregunta de
+   medios, fuera de dominio).
+5. Nota breve: enfoque elegido (clasificador, mini LM o híbrido) y
+   por qué el bot no inventa el medio de envío.
+
+*** 6. Criterios de evaluación
+
+| Criterio | Porcentaje |
+|----------|-----------:|
+| Entrenamiento y artefacto del asistente | 25 % |
+| Bot útil al comprador con datos reales | 25 % |
+| No sustituye al recomendador de envíos | 15 % |
+| Búsqueda / pantallas previas + chat en Flutter | 20 % |
+| Explicación técnica y bordes (Adapter, cliente-servidor) | 15 % |
+| *Total* | *100 %* |
+
+*** Consideración final
+
+Un chat que solo responde frases fijas sin modelo entrenado, o que
+«adivina» moto/dron sin pasar por el recomendador, no cumple. Se
+valora el enlace *pregunta → modelo del asistente → datos del
+sistema*.
+
+
+** Proyecto 3 — Equipo: integración, aplicación web y móvil
+
+*** Objetivo
+
+Integrar en un solo producto el recomendador de envíos, el asistente
+del comprador, el catálogo y los pedidos, y demostrar la misma
+aplicación Flutter en *web* y en *móvil*.
+
+Aquí se consolida lo visto en el semestre: API o microservicios,
+patrones justificados, base de datos (SQLite o PostgreSQL según el
+despliegue) y trabajo colaborativo sobre un repositorio común.
+
+*** 1. Alcance funcional
+
+El sistema integrado debe permitir, como mínimo:
+
+- explorar catálogo y buscar,
+- obtener recomendación de envío con el modelo del curso,
+- registrar pedido y consultar por folio,
+- conversar con el asistente en el rol de comprador,
+- usar la app en navegador *y* en emulador o dispositivo Android
+  (mismo código Flutter).
+
+*** 2. Arquitectura
+
+El equipo elige y justifica una de estas líneas:
+
+- *Monolito Django + API,* con clientes web y móvil; o
+- *Microservicios* con gateway (por ejemplo Pedidos y Recomendar
+  separados); el asistente se ubica sin romper el borde. Flutter no
+  llama a IPs internas de los servicios.
+
+Si usan varias copias o Compose, migren a PostgreSQL como en los
+apuntes. Demuestren, si aplica, qué ocurre al apagar un servicio.
+
+*** 3. Patrones y temas del curso
+
+En un informe de equipo indiquen *dónde* aparece cada idea en su
+código (o escriban que no aplica y por qué):
+
+| Tema | Uso típico en este sistema |
+|------|----------------------------|
+| Strategy | Medios y reglas de envío |
+| Adapter | Salida del asistente u otro JSON externo |
+| Facade | Orquestar confirmación de pedido / envío |
+| Repository | Productos y pedidos |
+| Gateway / BFF | Una puerta para web y móvil |
+| Observer | Efectos después de guardar (si existen) |
+| Front Controller | Rutas Django o nginx |
+| MVC | UI Flutter frente a API y modelos |
+
+*** 4. Empaquetado web y móvil
+
+- Web: =flutter run -d chrome= y/o =flutter build web= (puede
+  servirse detrás del gateway).
+- Móvil: emulador o =apk=.
+- Misma demo en ambos destinos; documenten la URL base por
+  plataforma.
+
+*** 5. Entregables
+
+1. Repositorio del equipo con instrucciones claras.
+2. Diagrama de arquitectura actual.
+3. Demostración en vivo (web y móvil).
+4. Informe *individual* de cada integrante.
+5. Video de respaldo (recomendado).
+
+*** 6. Criterios de evaluación
+
+| Criterio | Porcentaje |
+|----------|-----------:|
+| Integración recomendador + asistente + búsqueda/datos | 25 % |
+| App web y app móvil con el mismo código | 20 % |
+| Arquitectura y base de datos | 15 % |
+| Patrones y decisiones del semestre | 15 % |
+| Repositorio e instrucciones reproducibles | 10 % |
+| Demo e informes individuales | 15 % |
+| *Total* | *100 %* |
+
+*** Consideración final
+
+No se pide publicar en tiendas ni pagos reales. Sí se pide un
+sistema coherente: las dos IAs, clientes web/móvil y una
+arquitectura que puedan explicar con lo visto en clase.
+
+
+** Resumen del recorrido
+
+| Proyecto | Enfoque principal | Modalidad |
+|----------|-------------------|-----------|
+| 1 | Datos + recomendador de envíos | Individual |
+| 2 | Entrenar y conectar el asistente del comprador | Individual |
+| 3 | Integración completa, web y móvil | Equipo |
+
+El Proyecto 2 sin entrenamiento propio del asistente no se considera
+completo. El Proyecto 3 sin las dos IAs de los proyectos anteriores
+se queda en una app de formularios.
 
