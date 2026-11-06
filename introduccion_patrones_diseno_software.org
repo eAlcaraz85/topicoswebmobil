@@ -13448,150 +13448,199 @@ Flutter (chat)  --POST /entregas/asistente/-->  Django
 A lo largo de los tres proyectos desarrollarán un sistema que integre
 *dos componentes de inteligencia artificial*:
 
-1. *Recomendador de medios de envío.* Utilizarán el modelo
-   desarrollado durante el curso (=.joblib=) junto con las reglas
-   para seleccionar el medio de transporte más adecuado según las
-   características del paquete.
+1. *Recomendador (modelo + reglas).* Partirán del código y del
+   flujo que ya vieron en clase (entrenar, guardar =.joblib=,
+   cargar, aplicar reglas, exponer por API). No tienen que inventar
+   otra tubería desde cero: *ajustan* ese material a *su* tema y a
+   *sus* datos. Lo que sí cambia —y aquí hay que pensar— es *qué*
+   recomienda el modelo: no tiene que ser el medio de transporte
+   del ejemplo del curso.
 2. *Asistente inteligente.* Entrenarán e incorporarán un asistente
    (véase [[*Entrenar un modelo chico para el asistente (mini LLM)][Entrenar
-   un modelo chico para el asistente]]) que interactúe con el
-   *comprador*, usando el catálogo y los pedidos como contexto para
-   responder preguntas y apoyar la compra o el seguimiento.
+   un modelo chico para el asistente]]) que hable con el
+   *comprador* o usuario final, usando catálogo y pedidos (u
+   órdenes) como contexto.
 
-El catálogo y la gestión de pedidos son la base del sistema, pero el
-objetivo principal es *integrar y usar ambos componentes de IA* en
-una aplicación funcional, no limitarse a formularios de alta y
-consulta.
+El catálogo y los pedidos son el escenario. Además de integrar las
+dos IAs, los proyectos piden *analizar e identificar patrones de
+diseño* en el lado web (Django, API, monolito o servicios) y en el
+lado móvil/cliente (Flutter), con base en lo revisado en
+[[*Patrones de Diseño en Aplicaciones Web y Móviles][Patrones de
+Diseño en Aplicaciones Web y Móviles]] y en el resto de los apuntes.
+No basta con que la app «corra»: hay que explicar qué patrón aparece,
+dónde está en el código y qué problema resuelve.
 
-- Los *proyectos 1 y 2* son *individuales*.
-- El *proyecto 3* se desarrolla en *equipo* e integra aplicación
-  *web* y *móvil* (Flutter).
+*** Asignación de problemas
 
-Al inicio trabajarán con Django y SQLite. Si más adelante usan Docker
-o varias instancias, podrán migrar a PostgreSQL, como se revisó en
-clase. El trabajo se entrega en un repositorio donde se pueda ver la
-evolución del sistema.
+Cada estudiante desarrolla los proyectos 1 y 2 sobre el dominio que
+corresponde a su matrícula. La base técnica es la misma (Django,
+SQLite, Flutter, modelo =.joblib= con reglas y, en el proyecto 2,
+asistente entrenado). Lo que cambia es el negocio y la decisión que
+toma el recomendador.
+
+Deben adaptar el material visto en clase a las variables y clases de
+su dominio. No basta con dejar el ejemplo de medios de transporte
+(moto, dron, bicicleta, camioneta) si su problema pide otra cosa.
+
+| # | Matrícula | Problema / dominio | El recomendador decide… (definir features y reglas) |
+|---+-----------+--------------------+-----------------------------------------------------|
+| 1 | 22120632 | Farmacia a domicilio | Canal de surtido o prioridad (normal / frío / controlado) |
+| 2 | 22121351 | Dark kitchen / comida | Tipo de empaque o ventana de entrega |
+| 3 | 22120637 | Refacciones automotrices | Almacén o proveedor más conveniente |
+| 4 | 21121503 | Librería / papelería | Producto o combo sugerido |
+| 5 | 22121331 | Mascotas / veterinaria | Urgencia o tamaño de kit de cuidado |
+| 6 | 22121299 | Floristería | Nivel de cuidado en traslado (frágil / estándar) |
+| 7 | 20120107 | Lavandería industrial | Programa de lavado o prioridad de lote |
+| 8 | 20120985 | Gimnasio / suplementos | Plan o paquete recomendado al perfil |
+| 9 | 21560353 | Cafetería de especialidad | Método de preparación / tamaño sugerido |
+| 10 | 20121000 | Tienda de electrónicos | Nivel de garantía o seguro sugerido |
+| 11 | 22121304 | Mudanzas chicas | Cuadrilla o tipo de vehículo de carga |
+| 12 | 22121348 | Renta de herramientas | Herramienta o kit según el trabajo |
+| 13 | 22121308 | Laboratorio clínico (muestras) | Prioridad de procesamiento de muestra |
+| 14 | 22121275 | Uniformes escolares | Talla / paquete sugerido |
+| 15 | 22121289 | Panadería / repostería | Lote o turno de horneado |
+| 16 | 22120694 | Reciclaje / recolección | Ruta o tipo de contenedor |
+| 17 | 22121313 | Papelería de oficina (B2B) | Reorden automático o proveedor |
+| 18 | 22121283 | Turismo local / tours | Tour o horario sugerido |
+| 19 | 22120701 | Autolavado | Paquete de servicio |
+| 20 | 22121333 | Reparación de celulares | Nivel de diagnóstico / prioridad de cola |
+| 21 | 22121268 | Vivero / plantas | Tipo de envío hortícola o riego sugerido |
+| 22 | 22121364 | Instrumentos musicales | Nivel de embalaje / seguro |
+| 23 | 22121280 | Óptica | Paquete de lentes / tratamiento sugerido |
+| 24 | 22121336 | Congelados / abarrotes fríos | Cadena de frío o slot de entrega |
+| 25 | 22121282 | Imprenta rápida | Acabado o cola de impresión |
+| 26 | 22121349 | Bicicletas / e-bike | Plan de mantenimiento sugerido |
+| 27 | 22121326 | Cosméticos / dermocosmética | Rutina o producto según perfil |
+| 28 | 22121334 | Artículos deportivos | Nivel de actividad / kit sugerido |
+| 29 | 22121311 | Tintorería fina | Programa de cuidado de la prenda |
+
+*** Modalidad
+
+- *Proyectos 1 y 2:* individuales, cada uno con el problema de su
+  matrícula.
+- *Proyecto 3:* en equipo. Para participar hay que haber entregado
+  los proyectos 1 y 2. El equipo trabaja sobre un solo dominio (el
+  de un integrante o uno acordado) e integra la aplicación web y
+  móvil.
+
+Al inicio se usa Django con SQLite. Si el despliegue lo requiere
+(Docker o varias instancias), se puede pasar a PostgreSQL como en
+los apuntes. El código se mantiene en un repositorio con historial
+claro.
 
 
-** Proyecto 1 — Individual: gestión de datos y recomendador de envíos
+** Proyecto 1 — Individual: datos y recomendador adaptado al tema
 
 *** Objetivo
 
-Desarrollar una primera versión funcional del sistema con *Django,
-SQLite y Flutter*, integrando el recomendador de medios de envío
-(=.joblib=) y las reglas de decisión trabajadas en el curso.
+Primera versión del sistema con *Django, SQLite y Flutter*,
+integrando un recomendador basado en el material del curso
+(=.joblib= + reglas), *ajustado a los datos y a la decisión de su
+tema*.
 
-La idea es que vean cómo un modelo de IA entra en una aplicación
-real y cómo se comunican backend y cliente.
+Deben entender cómo entra un modelo en una app real y cómo hablan
+backend y cliente.
 
 *** 1. Integración del recomendador
 
-El sistema debe usar el modelo de IA para generar una recomendación
-a partir de los datos de un paquete.
+A partir de entradas propias del dominio (no necesariamente
+«paquete de mensajería»), el sistema genera una recomendación.
 
 La respuesta al usuario debe incluir:
 
-- medio de envío recomendado,
+- la clase o decisión recomendada (la que definieron para su tema),
 - nivel de confianza del modelo,
-- si las reglas modificaron la sugerencia original (=corregido=),
-- información relevante del ranking de medios evaluados.
+- si las reglas modificaron la sugerencia original (=corregido= o
+  equivalente),
+- información útil del ranking de alternativas, si aplica.
 
-Esa recomendación debe *mostrarse en la interfaz* y usarse para
-registrar un pedido con su folio.
+Esa salida se *muestra en la interfaz* y alimenta el registro de un
+pedido / orden / solicitud con folio (o identificador equivalente).
 
-*Importante:* no basta con correr el modelo a mano o ver el
-resultado solo en la consola. La recomendación forma parte del
-funcionamiento de la aplicación.
+*Importante:* no basta con ejecutar el script de entrenamiento a
+mano o mirar la consola. El modelo forma parte del flujo de la
+aplicación. Pueden partir del código que ya se les dio en clase;
+el trabajo está en adaptar datos, etiquetas, reglas y el significado
+de la predicción.
 
 *** 2. Backend — Django y SQLite
 
-El backend debe permitir:
+- =db.sqlite3= y modelos del catálogo (o inventario) y de
+  pedidos/órdenes.
+- Datos de prueba coherentes con el tema.
+- JSON de listado y detalle.
+- =POST= que reciba las características de entrada, ejecute el
+  modelo + reglas y devuelva la recomendación.
+- Registrar la operación con el resultado del servidor y un folio.
+- De manera adicional, =GET= por folio.
 
-- Configurar SQLite (=db.sqlite3=) y definir los modelos necesarios
-  para el catálogo (o lo que ofrezcan) y los pedidos.
-- Cargar datos de prueba para verificar el flujo.
-- Exponer servicios JSON de listado y detalle.
-- Implementar un =POST= que reciba las características del paquete
-  y ejecute el recomendador con sus reglas.
-- Registrar un pedido con el medio devuelto por el servidor y
-  generar un folio.
-- De manera adicional, un =GET= para consultar un pedido por folio.
-
-En esta etapa el recomendador vive en el monolito Django. El
-gateway y los microservicios se abordan después.
+El recomendador vive en el monolito Django. Gateway y microservicios
+van después.
 
 *** 3. Aplicación — Flutter
 
-La interfaz debe permitir al usuario trabajar con el sistema:
+- Lista y detalle del catálogo; búsqueda básica.
+- Formulario con los campos que *su* modelo necesita.
+- Pantalla clara de la recomendación (confianza, corrección por
+  reglas, ranking si lo hay).
+- Confirmación y folio.
+- Carga, errores de red y URL base configurable.
 
-- catálogo en lista (y pantalla de detalle),
-- búsqueda básica,
-- formulario del paquete (distancia, peso, zona y demás campos que
-  pida el modelo),
-- pantalla que muestre con claridad el medio recomendado, la
-  confianza y el efecto de las reglas,
-- confirmación del pedido y visualización del folio,
-- estados de carga y errores de red,
-- URL base del servidor fácil de cambiar (Chrome, emulador, WiFi).
+La app solo consume JSON. El modelo y las reglas se quedan en el
+servidor.
 
-La app consume el backend por JSON. Las decisiones del recomendador
-y las reglas de negocio se quedan en el servidor.
+*** 4. Análisis de patrones (web y móvil)
 
-*** 4. Relación con los temas del curso
+Entreguen un apartado escrito (una o dos páginas bastan) donde
+identifiquen patrones en *su* implementación, no en un ejemplo
+ajeno. Deben cubrir al menos el backend (web/API) y el cliente
+Flutter.
 
-Deben identificar y aplicar, con una explicación breve de *dónde*
-aparecen en *su* código:
+Orientación (usen los que sí apliquen; si uno no cabe, digan por
+qué):
 
-- *Strategy:* organización de medios / reglas de envío.
-- *Repository:* acceso a datos mediante modelos Django (sin SQL en
-  la UI).
-- *JSON y HTTP:* comunicación entre backend y cliente.
-- *Front Controller:* entrada y enrutado de peticiones en Django.
+- *Strategy* (o equivalente): alternativas / reglas del
+  recomendador.
+- *Repository:* acceso a datos con modelos Django.
+- *Front Controller:* entrada y rutas en Django.
+- *MVC* (a groso modo): separación pantallas Flutter / JSON /
+  modelos.
+- En el cliente: composición de UI, navegación o manejo de estado
+  como decisión de diseño (aunque no lleve nombre GoF).
 
-No basta con enumerar nombres: digan qué problema les resolvió cada
-idea.
+Para cada patrón: nombre, archivo o módulo, y qué inconveniente
+evitan.
 
 *** 5. Entregables
 
-1. Código del backend y de la app Flutter.
-2. Instrucciones para instalar y ejecutar el proyecto.
-3. Datos de prueba.
-4. Capturas del flujo: *paquete → recomendación de IA → reglas →
-   pedido → folio*.
-5. Una explicación corta de un caso en el que las reglas corrijan
-   la recomendación del modelo y por qué ocurrió.
+1. Código backend y Flutter.
+2. Instrucciones de instalación y ejecución.
+3. Datos de prueba (y, si aplica, cómo regenerar el =.joblib=).
+4. Capturas: *entradas → recomendación → reglas → registro → folio*.
+5. Un caso en el que las reglas corrijan al modelo, con explicación.
+6. Párrafo: qué recomienda su sistema frente al ejemplo de clase.
+7. El análisis de patrones web y móvil del punto 4.
 
-*** 6. Criterios de evaluación
-
-| Criterio | Porcentaje |
-|----------|-----------:|
-| Modelos de datos, SQLite y servicios JSON | 20 % |
-| Integración y funcionamiento del recomendador de IA | 35 % |
-| Flutter: navegación, búsqueda y estados | 25 % |
-| Explicación técnica, arquitectura y separación cliente-servidor | 20 % |
-| *Total* | *100 %* |
 
 *** Consideración final
 
-Se busca una integración real entre la app, el backend, el modelo y
-las reglas. Se valora que puedan justificar la separación de
-responsabilidades y mostrar qué pasa cuando el modelo propone un
-medio que las reglas deben corregir.
+Se valora la integración real del modelo y que el análisis de
+patrones coincida con el código entregado.
 
 
 ** Proyecto 2 — Individual: asistente inteligente para el comprador
 
 *** Objetivo
 
-Partiendo del Proyecto 1, entrenar e integrar un *asistente* que
-ayude al comprador (preguntas sobre folio, productos, medios,
-seguimiento), según el apartado
+Partiendo del Proyecto 1 (*mismo tema*), entrenar e integrar un
+*asistente* que ayude al comprador o usuario (folio, productos,
+«¿por qué me salió X?», seguimiento), según
 [[*Entrenar un modelo chico para el asistente (mini LLM)][Entrenar un
 modelo chico para el asistente]].
 
-El asistente *no sustituye* al recomendador de envíos: orienta,
-consulta datos y, cuando hace falta decidir el medio, remite al
-flujo o al endpoint de recomendación.
+El asistente *no sustituye* al recomendador del proyecto 1: orienta,
+consulta datos y, cuando hace falta la decisión del modelo de
+dominio, remite a ese flujo o endpoint.
 
 *** 1. Entrenamiento del asistente
 
@@ -13630,61 +13679,59 @@ servidor (Adapter).
 - Debe notarse un solo producto: el comprador puede preguntar al
   bot y también usar las pantallas «normales».
 
-*** 4. Relación con los temas del curso
+*** 4. Análisis de patrones (web y móvil)
 
-- *Adapter:* si adaptan la salida del asistente o de un proveedor.
-- Separación cliente/servidor: Flutter no carga el =.joblib=.
-- Reutilizar Repository / JSON del proyecto anterior.
-- Dejar claro qué hace el clasificador/LM y qué hace el
-  recomendador de medios.
+Actualicen el análisis del proyecto 1. Añadan al menos:
+
+- *Adapter* (si traduce la salida del asistente u otro formato).
+- Separación cliente/servidor: el =.joblib= no vive en Flutter.
+- Qué cambia en el cliente (chat, estados de red) frente al
+  backend (endpoint, carga del modelo).
+- Diferencia de responsabilidad entre el recomendador del dominio y
+  el asistente.
+
+Sigan anclando cada nombre a un archivo o módulo propio.
 
 *** 5. Entregables
 
 1. Código actualizado (backend + Flutter).
 2. Dataset (o muestra representativa) y script de entrenamiento.
 3. Artefacto del modelo o instrucciones inequívocas para generarlo.
-4. Capturas del chat (saludo, rastreo con folio, pregunta de
-   medios, fuera de dominio).
-5. Nota breve: enfoque elegido (clasificador, mini LM o híbrido) y
-   por qué el bot no inventa el medio de envío.
+4. Capturas del chat (saludo, consulta con folio, pregunta del
+   dominio, fuera de dominio).
+5. Nota breve: enfoque del asistente y por qué no inventa la
+   decisión del recomendador.
+6. Análisis de patrones web y móvil actualizado.
 
-*** 6. Criterios de evaluación
-
-| Criterio | Porcentaje |
-|----------|-----------:|
-| Entrenamiento y artefacto del asistente | 25 % |
-| Bot útil al comprador con datos reales | 25 % |
-| No sustituye al recomendador de envíos | 15 % |
-| Búsqueda / pantallas previas + chat en Flutter | 20 % |
-| Explicación técnica y bordes (Adapter, cliente-servidor) | 15 % |
-| *Total* | *100 %* |
 
 *** Consideración final
 
 Un chat que solo responde frases fijas sin modelo entrenado, o que
-«adivina» moto/dron sin pasar por el recomendador, no cumple. Se
-valora el enlace *pregunta → modelo del asistente → datos del
-sistema*.
+«adivina» la decisión del dominio sin pasar por el recomendador, no
+cumple. Se valora el enlace *pregunta → modelo del asistente →
+datos del sistema*.
 
 
 ** Proyecto 3 — Equipo: integración, aplicación web y móvil
 
 *** Objetivo
 
-Integrar en un solo producto el recomendador de envíos, el asistente
-del comprador, el catálogo y los pedidos, y demostrar la misma
-aplicación Flutter en *web* y en *móvil*.
+Integrar recomendador (adaptado al tema), asistente, catálogo y
+pedidos, y demostrar la misma app Flutter en *web* y *móvil*.
 
-Aquí se consolida lo visto en el semestre: API o microservicios,
-patrones justificados, base de datos (SQLite o PostgreSQL según el
-despliegue) y trabajo colaborativo sobre un repositorio común.
+Requisito: cada integrante debe haber entregado los proyectos 1 y
+2. El equipo trabaja sobre *un* tema (el mismo de sus individuales
+o uno acordado al migrar lo mejor de cada repo).
+
+Se consolida lo del semestre: API o microservicios, patrones,
+SQLite o PostgreSQL según el despliegue, y repo compartido.
 
 *** 1. Alcance funcional
 
 El sistema integrado debe permitir, como mínimo:
 
 - explorar catálogo y buscar,
-- obtener recomendación de envío con el modelo del curso,
+- obtener la recomendación del modelo adaptado al tema,
 - registrar pedido y consultar por folio,
 - conversar con el asistente en el rol de comprador,
 - usar la app en navegador *y* en emulador o dispositivo Android
@@ -13702,21 +13749,27 @@ El equipo elige y justifica una de estas líneas:
 Si usan varias copias o Compose, migren a PostgreSQL como en los
 apuntes. Demuestren, si aplica, qué ocurre al apagar un servicio.
 
-*** 3. Patrones y temas del curso
+*** 3. Análisis de patrones (web y móvil)
 
-En un informe de equipo indiquen *dónde* aparece cada idea en su
-código (o escriban que no aplica y por qué):
+El informe del equipo debe contrastar el diseño en el *servidor*
+(API, monolito o microservicios, gateway) y en el *cliente*
+(Flutter web y Flutter móvil). Indiquen dónde aparece cada idea en
+su código, o escriban que no aplica y por qué:
 
 | Tema | Uso típico en este sistema |
 |------|----------------------------|
-| Strategy | Medios y reglas de envío |
+| Strategy | Alternativas / reglas del recomendador del tema |
 | Adapter | Salida del asistente u otro JSON externo |
-| Facade | Orquestar confirmación de pedido / envío |
+| Facade | Orquestar la confirmación del pedido |
 | Repository | Productos y pedidos |
 | Gateway / BFF | Una puerta para web y móvil |
 | Observer | Efectos después de guardar (si existen) |
 | Front Controller | Rutas Django o nginx |
 | MVC | UI Flutter frente a API y modelos |
+
+Además: qué es igual y qué cambia entre la build web y la móvil
+(URL base, empaquetado, restricciones), sin inventar una
+arquitectura distinta por plataforma.
 
 *** 4. Empaquetado web y móvil
 
@@ -13731,37 +13784,27 @@ código (o escriban que no aplica y por qué):
 1. Repositorio del equipo con instrucciones claras.
 2. Diagrama de arquitectura actual.
 3. Demostración en vivo (web y móvil).
-4. Informe *individual* de cada integrante.
-5. Video de respaldo (recomendado).
+4. Informe de equipo con el análisis de patrones web y móvil.
+5. Informe *individual* de cada integrante.
+6. Video de respaldo (recomendado).
 
-*** 6. Criterios de evaluación
-
-| Criterio | Porcentaje |
-|----------|-----------:|
-| Integración recomendador + asistente + búsqueda/datos | 25 % |
-| App web y app móvil con el mismo código | 20 % |
-| Arquitectura y base de datos | 15 % |
-| Patrones y decisiones del semestre | 15 % |
-| Repositorio e instrucciones reproducibles | 10 % |
-| Demo e informes individuales | 15 % |
-| *Total* | *100 %* |
 
 *** Consideración final
 
-No se pide publicar en tiendas ni pagos reales. Sí se pide un
-sistema coherente: las dos IAs, clientes web/móvil y una
-arquitectura que puedan explicar con lo visto en clase.
+No se pide publicar en tiendas ni pagos reales. Sí un sistema
+coherente: las dos IAs, clientes web y móvil, y un análisis de
+patrones alineado con el código.
 
 
 ** Resumen del recorrido
 
 | Proyecto | Enfoque principal | Modalidad |
 |----------|-------------------|-----------|
-| 1 | Datos + recomendador de envíos | Individual |
+| 1 | Datos + recomendador *adaptado al tema* (código del curso ajustado) | Individual |
 | 2 | Entrenar y conectar el asistente del comprador | Individual |
-| 3 | Integración completa, web y móvil | Equipo |
+| 3 | Integración, web y móvil (tras haber hecho 1 y 2) | Equipo |
 
-El Proyecto 2 sin entrenamiento propio del asistente no se considera
-completo. El Proyecto 3 sin las dos IAs de los proyectos anteriores
-se queda en una app de formularios.
+Misma base técnica para todos; el dominio lo fija la matrícula. El
+proyecto 2 requiere el asistente entrenado. El proyecto 3 integra
+lo construido en 1 y 2 en web y móvil.
 
