@@ -3844,9 +3844,10 @@ mínimo que resolvería el problema *actual*.
 
 Las actividades se resuelven a partir de los apartados teóricos de la
 unidad. Las misiones de abajo son análisis escrito. Hay una actividad
-teórica sobre *monolito con API frente a microservicios* y otra
-práctica: armar microservicios con Docker (sin proyecto listo; lo
-escriben ustedes). El bloque *Cinco días* es trabajo autónomo:
+teórica sobre *monolito con API frente a microservicios*, otra
+práctica de microservicios con Docker, y una de *corpus RAG* (diseño
+y crítica del material del asistente, con desacoplamiento por API)
+antes del chatbot. El bloque *Cinco días* es trabajo autónomo:
 estudiar, pensar e *implementar* el enunciado en web (Django).
 
 ** Misiones: patrones de software para aplicaciones web
@@ -8313,6 +8314,219 @@ Si entregan un solo contenedor con tres rutas «como si fueran
 servicios», no cuenta: vuelve a ser monolito con API. Si el HTML
 llama directo a Django u otro puerto interno, tampoco: el cliente
 solo debe conocer el gateway.
+
+** Actividad — Dataset para un asistente con recuperación (RAG)
+:PROPERTIES:
+:CUSTOM_ID: actividad-rag-corpus
+:END:
+
+
+Antes de armar el chatbot del Proyecto 2 conviene separar dos ideas
+que a menudo se mezclan:
+
+- *Clasificar* lo que el comprador quiere (intención: rastreo,
+  saludo, fuera de tema…).
+- *Recuperar* información escrita del negocio y *después* responder
+  con ese contexto (RAG: Retrieval-Augmented Generation).
+
+En el segundo caso el modelo no «se sabe» el catálogo de memoria: se
+le pasan fragmentos relevantes de documentos que ustedes prepararon.
+Si el corpus está mal cortado, desactualizado o vacío de lo que la
+gente pregunta, el asistente alucina con educación. Esta actividad
+es de *lectura y análisis*: diseñan y critican un dataset/corpus
+para RAG, anclado al problema de su matrícula. Todavía no
+implementan el chat completo. Sí deben dejar claro cómo se
+*desacopla* el cliente (Flutter) del corpus y de los modelos: solo
+API.
+
+Lean también, cuando lleguen a código, el apartado
+[[*Entrenar un modelo chico para el asistente (mini LLM)][Entrenar un
+modelo chico para el asistente]]. Aquí el foco es el *material* que
+ese asistente podría consultar.
+
+
+*** Qué es RAG (solo lo necesario)
+
+Flujo típico:
+
+#+begin_example
+pregunta del comprador
+        |
+        v
+  buscar en un corpus   ← documentos partidos en trozos (chunks)
+  (recuperación)
+        |
+        v
+  armar un contexto     ← los 2–5 trozos más parecidos a la pregunta
+        |
+        v
+  generar / redactar    ← LM o plantilla usando SOLO ese contexto
+  la respuesta
+#+end_example
+
+Sin corpus útil, no hay RAG: hay un chat genérico. El dataset de
+esta actividad no es el CSV de intenciones (=texto,intencion=); es
+el conjunto de *fuentes* (políticas, FAQs, fichas de producto,
+reglas de envío de *su* dominio) y la forma de partirlas.
+
+
+*** Material para analizar (léanlo completo)
+
+Imaginen que un equipo dejó este «corpus» para un asistente de
+entregas. Cada bloque sería un documento o un chunk candidato:
+
+#+begin_example
+[DOC-A] politica_envio.txt
+"Enviamos a todo el país. A veces usamos dron. Los pedidos llegan
+rápido. Si hay problema llame a soporte. Actualizado hace mucho."
+
+[DOC-B] faq.md
+Pregunta: ¿Cuál es mi folio?
+Respuesta: Su folio aparece en el correo.
+Pregunta: ¿Por qué camioneta?
+Respuesta: Porque el sistema lo decidió.
+Pregunta: ¿Horario de drones?
+Respuesta: Cuando se pueda.
+
+[DOC-C] producto_cafe.json (pegado como texto)
+{ "id": 12, "nombre": "Café 500g", "peso_kg": 0.5, "precio": 180,
+  "descripcion": "Ver ficha en el sitio. " }
+
+[DOC-D] reglas_internas.txt
+"NUNCA decir al cliente el score del modelo. Si peso > 5 usar
+camioneta aunque el árbol diga dron. Zona rural: no bicicleta.
+Este archivo es confidencial — ¿debería estar en el RAG?"
+
+[DOC-E] fragmento_wiki_copiado.txt
+"Un large language model es una red neuronal… (tres párrafos de
+definición genérica de Wikipedia sin mencionar la tienda)."
+
+[DOC-F] horario_reparto.md
+"Lunes a viernes 9:00–18:00. Sábados 9:00–14:00. Domingos no hay
+reparto salvo mismo_dia contratado. Folio de ejemplo D2757CBE no
+es real; no lo usen como dato de un cliente."
+#+end_example
+
+
+*** Trabajo individual (matrícula = dominio)
+
+Resuelvan por escrito. Una respuesta correcta sin *porqué* vale la
+mitad. Usen el dominio de
+[[*Asignación de problemas][Asignación de problemas]].
+
+**** A1 — Corpus frente a intenciones
+
+1. En una tabla, contrasten:
+
+| | Dataset de intenciones | Corpus / dataset para RAG |
+|--|------------------------|---------------------------|
+| Unidad típica | | |
+| Para qué sirve en el bot | | |
+| Qué falla si está mal | | |
+
+2. ¿Pueden convivir los dos en el mismo asistente? ¿En qué orden
+   los usarían (primero intención, primero recuperación, o según
+   el caso)? Justifiquen con el flujo de su dominio.
+
+**** A2 — Autopsia del material de ejemplo
+
+Para cada =DOC-A= … =DOC-F=, indiquen:
+
+- ¿Sirve para RAG del comprador? (sí / no / a medias)
+- Un defecto concreto (vago, desactualizado, filtración, ruido,
+  chunk inútil, etc.).
+- Qué harían: reescribir, partir, sacar del índice, o dejar.
+
+Al menos tres documentos deben quedar *fuera* del índice público o
+fuertemente reescritos; expliquen cuáles y por qué.
+
+**** A3 — Diseño del corpus de *su* problema
+
+Para el dominio de su matrícula, propongan:
+
+1. *Lista de fuentes* (mínimo 6): nombre del documento, origen
+   (manual, FAQ, ficha, política) y si es apto para el comprador o
+   solo interno.
+2. *Cinco preguntas reales* que un cliente haría.
+3. Para cada pregunta, *qué documento(s)* deberían recuperarse. Si
+   ninguno existe aún, márquenla como *hueco del corpus*.
+4. Una regla de *chunking* en prosa (por párrafos, por sección
+   Markdown, por producto…). ¿Qué tamaño aproximado buscan y qué
+   pasa si cortan a la mitad una regla importante?
+
+**** A4 — Casos límite (análisis)
+
+Respondan con el dominio propio:
+
+1. El recuperador trae un chunk correcto y otro viejo que se
+   contradicen. ¿Qué debe hacer el asistente? ¿Quién es responsable
+   de eso: el índice, el prompt, o el negocio?
+2. La pregunta necesita un dato *vivo* (folio, estado del pedido).
+   ¿Eso va en el corpus RAG o en una consulta a la base vía API?
+   Separénlo con claridad.
+3. Alguien mete al índice el =.joblib= o un dump de la base. ¿Qué
+   riesgo hay (seguridad, tamaño, sentido del RAG)?
+
+**** A5 — Criterio de calidad (rúbrica propia)
+
+Armen una lista de *cinco criterios* para aceptar un chunk en su
+corpus (ejemplos de idea: fecha, audiencia, una sola idea, sin
+datos personales, verificable…). Luego evalúen con esa rúbrica dos
+chunks inventados por ustedes: uno aceptable y uno rechazado.
+
+
+
+**** A6 — Desacoplamiento por API (lectura crítica)
+
+El asistente del comprador no debe «abrir» el corpus ni el =.joblib=
+desde Flutter. Todo pasa por HTTP, igual que el resto de la
+plataforma.
+
+1. Dibujen (cajas y flechas) *tres* caminos distintos y digan qué
+   componente es dueño de cada uno:
+
+   - Flutter → ¿qué URL? → respuesta al chat;
+   - recuperación RAG (dónde vive el índice / los chunks);
+   - dato vivo (folio, estado) vía API de pedidos o equivalente.
+
+2. Completen la tabla:
+
+| Pieza | ¿La ve Flutter? | ¿Se llama por API? | Si falla, ¿qué ve el comprador? |
+|-------+-----------------+--------------------+---------------------------------|
+| Corpus / chunks | | | |
+| Modelo de intenciones (=.joblib=) | | | |
+| Pedido por folio en SQLite | | | |
+| Recomendador del dominio | | | |
+
+3. Un compañero propone meter el índice RAG *dentro* del =apk= «para
+   ir más rápido». Refuten o acepten con el mismo criterio que usaron
+   al no meter el =.joblib= de medios en el teléfono.
+
+4. Si más adelante hay gateway (microservicios), ¿el chat del
+   comprador habla con el gateway o con cada servicio? ¿Por qué?
+
+*** Entrega
+
+Archivo individual, por ejemplo:
+
+#+begin_example
+actividades/rag_corpus/MATRICULA_apellido.md
+#+end_example
+
+Incluyan nombre, matrícula, dominio asignado y secciones A1–A6.
+Si el curso usa repositorio, un commit por persona.
+
+
+*** Para discutir en clase (después de entregar)
+
+- ¿RAG sustituye al clasificador de intenciones o lo complementa?
+- ¿Quién actualiza el corpus cuando cambia una política?
+- ¿En qué se parece cuidar el corpus a cuidar el dataset del árbol
+  de medios?
+- Si Flutter solo habla por API, ¿quién es dueño de actualizar el
+  corpus cuando cambia una política del negocio?
+
+
 
 ** Cinco días — Estudiar, pensar e implementar (sin clase)
 
@@ -12916,19 +13130,25 @@ tabla: cambian el *destino del build*, no el contrato con el gateway.
 
 * Entrenar un modelo chico para el asistente (mini LLM)
 
+Antes de este bloque conviene haber entregado la
+[[*Actividad — Dataset para un asistente con recuperación (RAG)][actividad
+de corpus RAG]] (en *Actividades*): corpus frente a intenciones y
+desacoplamiento por API.
+
 Con el árbol de medios ya vieron el ciclo completo: dataset →
 entrenar → guardar → cargar → predecir. Para el bot del Proyecto 2
 pasan por algo parecido, pero el objetivo cambia. El =.joblib= de
 envíos *elige un medio*. El modelo del asistente *entiende una
 pregunta del comprador* y ayuda a responderla (con datos de su
-sistema, no inventando el ranking del dron).
+sistema, no inventando el ranking del dron). Clasificador y corpus
+de recuperación resuelven problemas distintos y pueden convivir; el
+cliente solo habla por HTTP.
 
 No hace falta un modelo de miles de millones de parámetros. De
-hecho, en la frontera (incluso en tarjetas chicas) se experimenta
-con redes muy pequeñas entrenadas en un solo tema. Aquí nos quedamos
-con esa lección de tamaño: *poco peso, dominio estrecho, que corra
-en la máquina del salón*. Nadie está obligado a usar hardware raro;
-entrenan y sirven el modelo desde su backend.
+hecho, en la frontera se experimenta con redes muy pequeñas
+entrenadas en un solo tema. Aquí nos quedamos con esa lección de
+tamaño: *poco peso, dominio estrecho, que corra en la máquina del
+salón*. Entrenan y sirven el modelo desde su backend.
 
 ** En qué se parece a lo del árbol (y en qué no)
 
@@ -13644,11 +13864,18 @@ dominio, remite a ese flujo o endpoint.
 
 *** 1. Entrenamiento del asistente
 
+Conviene haber entregado antes la
+[[*Actividad — Dataset para un asistente con recuperación (RAG)][actividad
+de corpus RAG]]: ahí separan intenciones, documentos recuperables y
+datos vivos de la API.
+
 Deben:
 
 - armar un dataset propio de preguntas del comprador e intenciones
   (o pares pregunta-respuesta, si afinan un modelo de lenguaje
   pequeño),
+- si usan recuperación, un corpus alineado a su dominio (no el
+  material defectuoso de la actividad),
 - entrenar el modelo *fuera* de la petición HTTP,
 - guardar el artefacto (por ejemplo =modelo_asistente.joblib=),
 - mostrar una métrica sencilla de prueba.
