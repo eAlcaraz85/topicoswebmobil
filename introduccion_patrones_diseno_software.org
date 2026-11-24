@@ -3625,6 +3625,13 @@ contraejemplos y revisiones.
 9. Revisar la implementación (sin reescribir de primeras).
 10. Ayudar a *justificar* técnicamente la decisión (el alumno firma).
 
+Con el repo del semestre en marcha, pueden seguir con:
+
+- [[*Auditar el proyecto con IA libre (sin costo)][Auditar el proyecto con IA libre]]
+- [[*Desarrollar el mismo proyecto con IA libre (sin costo)][Desarrollar el mismo proyecto con IA libre]]
+
+Ahí está el paso a paso con herramientas libres o sin costo.
+
 *** La IA como segundo diseñador
 
 #+begin_example
@@ -3849,6 +3856,13 @@ práctica de microservicios con Docker, y una de *corpus RAG* (diseño
 y crítica del material del asistente, con desacoplamiento por API)
 antes del chatbot. El bloque *Cinco días* es trabajo autónomo:
 estudiar, pensar e *implementar* el enunciado en web (Django).
+
+En los proyectos también está el apartado para
+[[*Auditar el proyecto con IA libre (sin costo)][auditar con IA libre]]
+y el de
+[[*Desarrollar el mismo proyecto con IA libre (sin costo)][desarrollar
+con IA sin costo]]. Misma regla que en el resto del curso: la IA
+propone; ustedes comprueban.
 
 ** Misiones: patrones de software para aplicaciones web
 :PROPERTIES:
@@ -13024,47 +13038,425 @@ No «arreglen» CORS abriendo el backend a cualquier origen en
 producción sin pensarlo.
 
 
-** Empaquetar para móvil (teoría + comandos)
+** De Flutter web al celular: app Android paso a paso
 
-Contenedor ≠ tienda de aplicaciones. Empaquetar es generar el
-artefacto que instala el sistema operativo del teléfono.
+Hasta aquí muchos probaron la interfaz con
+=flutter run -d chrome=. Eso alcanza para widgets y para ver que el
+JSON responde. El Proyecto 3 pide *también* el teléfono: en un
+producto real el mismo cliente suele vivir en web y en móvil.
 
-*** Android
+La buena noticia de Flutter es que no reescriben las pantallas.
+Cambia el destino del build y, a veces, la URL del backend:
+
+- =lib/= se reutiliza (UI, =http=, estado);
+- en Chrome construyen para web; en el emulador o el celular,
+  para Android;
+- =localhost= en la PC no es la misma dirección que ve el teléfono
+  (=10.0.2.2= en el emulador, o la IP WiFi en un aparato físico).
+
+Ojo con no confundir empaquetados: Docker del front sirve la *web*.
+El celular instala un =apk= (o un =.aab= si algún día van a Play
+Store). No son lo mismo.
+
+En el curso trabajamos sobre todo *Android*. iOS aparece al final
+como lectura: hace falta Mac y cuenta Apple.
+
+*** Qué necesitan antes
+
+Si el entorno está a medias, el =apk= se vuelve pelea innecesaria.
+Revisen:
+
+1. Flutter en el =PATH= (=which flutter=; =flutter doctor=).
+2. Android Studio instalado (trae SDK y emulador).
+3. Licencias aceptadas:
 
 #+begin_src shell
+flutter doctor --android-licenses
+#+end_src
+
+4. Al menos un dispositivo:
+
+   - un *AVD* (emulador) creado en Android Studio → Device Manager, o
+   - un celular con *depuración USB* activada.
+
+5. El proyecto Flutter ya corre en Chrome (pantallas + =http= al
+   backend). Si en web aún no habla con la API, arreglen eso primero.
+
+Si =flutter doctor= marca en rojo el toolchain de Android, no
+siguen al =build apk=: primero ponen verde (o al menos usable) esa
+línea.
+
+*** Paso 1 — Abrir / crear el proyecto
+
+Si ya tienen el front:
+
+#+begin_src shell
+cd entregas_app   # o el nombre de su repo Flutter
+flutter pub get
+#+end_src
+
+Si parten de cero:
+
+#+begin_src shell
+flutter create entregas_app
+cd entregas_app
+flutter pub get
+#+end_src
+
+La carpeta =android/= la genera Flutter: ahí vive el proyecto Gradle
+que termina armando el =apk=. No hace falta reescribir la UI en
+Kotlin para esta práctica.
+
+*** Paso 2 — URL del backend según el dispositivo
+
+=localhost= en el teléfono *no* es su laptop. Cada cliente necesita
+la dirección vista desde donde corre la app.
+
+| Dónde corre la app | Base URL típica hacia Django / gateway |
+|--------------------|----------------------------------------|
+| Chrome en la PC | =http://127.0.0.1:8080= (o =:8000=) |
+| Emulador Android | =http://10.0.2.2:8080= |
+| Celular físico (misma WiFi) | =http://192.168.x.x:8080= (IP de la PC) |
+
+Conviene una sola constante o =--dart-define= para no olvidar un
+=127.0.0.1= pegado en el código el día de la demo móvil.
+
+Ejemplo al compilar:
+
+#+begin_src shell
+flutter run -d emulator-5554 --dart-define=API_BASE=http://10.0.2.2:8080
+#+end_src
+
+Y en Dart:
+
+#+begin_src dart
+const apiBase = String.fromEnvironment(
+  'API_BASE',
+  defaultValue: 'http://127.0.0.1:8080',
+);
+#+end_src
+
+*** Paso 3 — HTTP claro en Android (si usan =http://= en el salón)
+
+En desarrollo a veces el backend va sin HTTPS. Android, desde
+versiones recientes, puede bloquear tráfico *cleartext*.
+
+Opciones de laboratorio:
+
+- levantar el API con HTTPS (más trabajo), o
+- permitir cleartext *solo en debug* (documenten que no es
+  producción).
+
+En =android/app/src/main/AndroidManifest.xml=, dentro de
+=<application ...>=, para pruebas locales suele aparecer:
+
+#+begin_example
+android:usesCleartextTraffic="true"
+#+end_example
+
+Quítenlo o limítenlo cuando pasen a un entorno serio. Sin esto,
+pueden ver fallos de red «misteriosos» solo en el =apk=.
+
+*** Paso 4 — Probar en el emulador *antes* de empaquetar
+
+1. Arranquen el AVD desde Android Studio (o):
+
+#+begin_src shell
+flutter emulators
+flutter emulators --launch <id_del_emulador>
+#+end_src
+
+2. Con el emulador visible:
+
+#+begin_src shell
+flutter devices
+flutter run
+#+end_src
+
+Si hay varios dispositivos, elijan con =-d=:
+
+#+begin_src shell
+flutter run -d emulator-5554
+#+end_src
+
+Comprueben el flujo del Proyecto 3: catálogo → recomendación →
+folio → chat (si ya está). Si falla la red, revisen URL
+(=10.0.2.2=) y que el backend escuche en =0.0.0.0= o en la interfaz
+correcta (no solo en un socket inaccesible).
+
+*** Paso 5 — Celular físico por USB (opcional pero útil)
+
+1. En el teléfono: opciones de desarrollador → depuración USB.
+2. Cable; acepten el diálogo de autorizar el PC.
+3. =flutter devices= debe listar el aparato.
+4. =flutter run= (o =-d <id>=).
+5. URL: IP de la PC en la WiFi, mismo segmento que el teléfono;
+   firewall permitiendo el puerto del gateway/Django.
+
+*** Paso 6 — Construir el =apk=
+
+Cuando el flujo ya corre con =flutter run=, empaquetan: dejan de
+depender solo de la sesión de desarrollo y generan un archivo que
+sí se puede instalar.
+
+#+begin_src shell
+cd entregas_app
+flutter pub get
 flutter build apk --release
-# o, para Play Store:
+#+end_src
+
+Salida habitual:
+
+#+begin_example
+build/app/outputs/flutter-apk/app-release.apk
+#+end_example
+
+Ese archivo es el que copian al teléfono (USB, Drive, etc.) e
+instalan. En Android puede hacer falta «instalar apps desconocidas»
+para ese administrador de archivos.
+
+Variantes útiles en clase:
+
+#+begin_src shell
+# Más de un abi; el de arriba suele bastar
+flutter build apk --release
+
+# Por arquitectura (apk más chicos)
+flutter build apk --split-per-abi --release
+#+end_src
+
+Para *Play Store* (más adelante, no obligatorio en el salón):
+
+#+begin_src shell
 flutter build appbundle --release
 #+end_src
 
-- =apk=: instalable a mano (clase, prueba en el salón).
-- =appbundle= (=.aab=): formato que pide Google Play.
+Eso genera un =.aab= en =build/app/outputs/bundle/release/=. La
+tienda no se alimenta con el =apk= de debug improvisado: pide
+cuenta de desarrollador, firmas y revisión.
 
-Hace falta firmar con un keystore en un release serio; en el curso
-pueden usar el debug o un keystore de práctica si el profesor lo
-define.
+*** Paso 7 — Instalar el =apk= desde la PC (=adb=)
 
-*** iOS
+Con el teléfono o emulador conectado:
+
+#+begin_src shell
+adb install -r build/app/outputs/flutter-apk/app-release.apk
+#+end_src
+
+=-r= reinstala/actualiza si ya estaba. Si =adb= no aparece, usen el
+de Android SDK (=platform-tools=) o abran la terminal de Android
+Studio.
+
+*** Paso 8 — Firma (qué basta en el curso)
+
+- =flutter run= y el =apk= de *debug* usan la clave de depuración
+  automática: sirve para demostrar en el salón.
+- =flutter build apk --release= firma con la config de release del
+  proyecto; al inicio Flutter trae un esquema de debug/release que
+  permite instalar el release de práctica.
+- Un release «de verdad» (tienda) pide *keystore* propio, guardar
+  la contraseña fuera del repo y configurar
+  =android/key.properties= (ese archivo *no* se sube a Git).
+
+Para la materia: que el =apk= abra, hable con su API y muestre el
+flujo. Publicar en Play Store es plus, no el mínimo.
+
+*** iOS (lectura)
 
 #+begin_src shell
 flutter build ipa --release
 #+end_src
 
-Requiere Mac + Xcode + cuenta de desarrollador Apple para distribuir.
-En muchos semestres se demuestra Android + web y se deja iOS como
-lectura.
+Hace falta macOS, Xcode y cuenta Apple. En muchos equipos del
+semestre se entrega Android (=apk=) + web.
 
-*** Ventajas del empaquetado móvil frente a «solo web»
+*** Resumen: web frente a móvil
 
-| | Web (contenedor / navegador) | App empaquetada |
-|--|------------------------------|-----------------|
-| Instalación | URL | Tienda o =apk= |
-| Acceso a sensores / notificaciones push | Limitado | Más natural |
-| Actualizar | Redesplegar front | Nueva versión en tienda (o MDMs) |
-| Misma API detrás | Sí | Sí |
+| | Web | App Android |
+|--|-----|-------------|
+| Comando típico | =flutter build web= / =run -d chrome= | =flutter build apk= / =run= |
+| Artefacto | =build/web/= | =app-release.apk= |
+| Cómo «instalar» | URL o nginx | Archivo =apk= o tienda |
+| URL a la API | =127.0.0.1= en la PC | =10.0.2.2= o IP WiFi |
+| Misma lógica de negocio | En el servidor | En el servidor |
 
-La ventaja de Flutter es no reescribir la UI para cada fila de esa
-tabla: cambian el *destino del build*, no el contrato con el gateway.
+
+** Actualizar la app con Git y volver a construir el móvil
+
+El Proyecto 3 es en equipo: el código Flutter va en un repositorio
+compartido. Actualizar la app en el salón *no* es mandarse el
+=apk= por el chat. Es traer lo que el compañero subió, acomodar
+dependencias y volver a construir el instalable.
+
+En la práctica:
+
+1. incorporan lo nuevo con Git (=pull= / merge),
+2. resuelven paquetes Dart (=flutter pub get=),
+3. generan de nuevo el =apk= (o prueban con =flutter run=).
+
+Web y móvil quedan amarrados al mismo historial: un commit se puede
+demostrar en Chrome y en el teléfono.
+
+*** Qué sí y qué no va al repositorio
+
+El repo debe alcanzar para que otra persona clone y reconstruya.
+No es un depósito de carpetas =build/=.
+
+Suban:
+
+- =lib/=, =pubspec.yaml=, =pubspec.lock=,
+- =android/= y =ios=/ (plantillas del proyecto; sin secretos),
+- =README= con cómo correr y cómo construir el =apk=.
+
+No suban:
+
+- =build/=,
+- =.dart_tool/=,
+- keystores y =key.properties= con contraseñas,
+- =.env= con tokens,
+- =.idea/= / basura local si no la acordaron.
+
+El =.gitignore= de =flutter create= ya ignora buena parte de
+=build/=; no lo borren a la ligera.
+
+*** Paso 1 — Primer control de versiones (si el repo nace ahora)
+
+#+begin_src shell
+cd entregas_app
+git init
+# revisen .gitignore
+git add .
+git status
+git commit -m "Primera versión del front Flutter del Proyecto 3"
+#+end_src
+
+En remoto (GitHub, GitLab, el que usen en la materia):
+
+#+begin_src shell
+git remote add origin <url-del-repo>
+git push -u origin main
+#+end_src
+
+(o =master=, según su rama por defecto).
+
+*** Paso 2 — Trabajo en equipo: ramas cortas
+
+Acuerden una rama principal (=main=) siempre *demostrable*.
+
+#+begin_src shell
+git checkout main
+git pull
+git checkout -b feature/pantalla-folio
+# …cambios…
+git add lib/
+git commit -m "Muestra folio y medio tras el POST"
+git push -u origin feature/pantalla-folio
+#+end_src
+
+Integran con merge/pull request según el flujo del curso. Eviten un
+solo commit gigante la noche anterior: el historial es parte de la
+evaluación del equipo.
+
+*** Paso 3 — Actualizar una copia ya clonada
+
+En cada laptop del equipo, antes de construir el =apk= nuevo:
+
+#+begin_src shell
+cd entregas_app
+git checkout main
+git pull
+flutter pub get
+#+end_src
+
+Si alguien cambió =pubspec.yaml= (por ejemplo =http:=), =pub get=
+es obligatorio. Si no, pueden compilar una versión vieja de las
+dependencias y pelearse entre compañeros «a mí sí me corre».
+
+*** Paso 4 — Regenerar e instalar la app móvil
+
+Después del =pull=:
+
+#+begin_src shell
+flutter clean          # si hay basura de builds raros; opcional
+flutter pub get
+flutter build apk --release
+adb install -r build/app/outputs/flutter-apk/app-release.apk
+#+end_src
+
+O, en desarrollo:
+
+#+begin_src shell
+flutter run -d <dispositivo>
+#+end_src
+
+Eso *es* actualizar la aplicación en el salón: nuevo código en Git →
+nuevo artefacto en el teléfono. No hace falta la Play Store para
+demostrar el Proyecto 3.
+
+*** Paso 5 — Versión visible (recomendado)
+
+En =pubspec.yaml=:
+
+#+begin_example
+version: 1.0.0+1
+#+end_example
+
+- =1.0.0= → nombre de versión que ven los humanos.
+- =+1= → =versionCode= en Android (cada subida a tienda debe
+  subir este número).
+
+Cuando entreguen un =apk= de avance:
+
+#+begin_example
+version: 1.1.0+2
+#+end_example
+
+y un commit: =«apk 1.1.0: chat + folio»=. Así saben qué binario
+corresponde a qué commit (=git log= / tag).
+
+Opcional:
+
+#+begin_src shell
+git tag -a v1.1.0 -m "Demo salón: web + apk"
+git push origin v1.1.0
+#+end_src
+
+*** Paso 6 — Clonar en una máquina limpia (prueba de fuego)
+
+Un integrante (o el docente) prueba:
+
+#+begin_src shell
+git clone <url-del-repo>
+cd entregas_app
+flutter pub get
+flutter build apk --release
+#+end_src
+
+Si solo «corre en la laptop de quien lo armó», el README o el repo
+están incompletos (=pubspec=, assets, instrucciones de URL).
+
+*** Errores frecuentes al actualizar
+
+| Síntoma | Qué revisar |
+|---------+-------------|
+| El =apk= viejo sigue en el teléfono | =adb install -r= o desinstalar a mano |
+| Compila pero no habla con la API | URL (=10.0.2.2= / IP); cleartext; backend arriba |
+| =pub get= falla tras =pull= | Versión de Flutter distinta; acuerden canal =stable= |
+| Conflictos en =pubspec.lock= | Una persona resuelve, commit, el resto =pull= |
+| Repo enorme | Metieron =build/= o =.apk=; sáquenlos del historial a futuro con =.gitignore= |
+
+*** Cómo encaja con el Proyecto 3
+
+| Momento | Git | Móvil |
+|---------+-----+-------|
+| Integran pantallas | commits / ramas | =flutter run= en emulador |
+| Cierran un avance | =tag= o release note en el README | =flutter build apk= y prueban instalación |
+| Demo en salón | =main= actualizado | =apk= o =run= al dispositivo de la demo |
+| Otro compañero continúa | =git pull= + =pub get= | vuelve a construir el =apk= |
+
+La tienda de aplicaciones es un canal de distribución. En clase, Git
++ =flutter build apk= ya demuestran que la app móvil se *construye*
+y se *actualiza* a partir del mismo código que la web.
 
 
 ** Comparación rápida: dónde vive cada cosa
@@ -14023,15 +14415,355 @@ coherente: las dos IAs, clientes web y móvil, y un análisis de
 patrones alineado con el código.
 
 
+** Auditar el proyecto con IA libre (sin costo)
+
+En este apartado van a pasar el proyecto por una IA que actúe como
+*segundo revisor*: que señale riesgos, acoplamientos y huecos. Lo
+importante no es el chat largo, sino lo que hacen después: abrir el
+código, la demo y el README, y decidir qué hallazgo es cierto, cuál
+está exagerado y cuál se inventó el modelo.
+
+Pueden practicar desde el Proyecto 1. En el 3 conviene una pasada
+de equipo *antes* de la demo.
+
+*** Qué sí y qué no hace esta auditoría
+
+Tiene sentido pedirle que mire:
+
+- si Flutter y el backend hablan el mismo JSON,
+- si el =.joblib= y el corpus siguen en el servidor,
+- si los patrones del informe aparecen de verdad en archivos,
+- si el =apk= quedó con =localhost= o con IPs internas de Docker,
+- si hay secretos en el repo,
+- si el README alcanza para que alguien más levante el sistema,
+- si está documentado el =build web= y el =build apk=.
+
+No tiene sentido pedirle un «examen de hacker» ni que reescriba el
+proyecto. Tampoco que firme por ustedes el análisis de patrones.
+
+Mientras leen cada hallazgo, pregúntense: *¿en qué archivo lo
+comprobaría en cinco minutos?* Si no saben, aún no lo anoten como
+hecho.
+
+*** Herramientas libres o sin costo
+
+No hace falta pagar suscripción. Hay dos caminos cómodos en clase:
+
+1. *En su computadora:* Ollama (u otra interfaz local como LM
+   Studio) con un modelo abierto (Llama, Mistral, Gemma, Qwen, un
+   modelo de código…). El código no tiene que salir a internet.
+2. *En la nube con cupo gratis:* HuggingChat, Google AI Studio
+   (Gemini), Groq u otros free tiers. Sirven si la laptop no aguanta
+   un modelo grande; cuiden no pegar secretos.
+
+| Herramienta | Para qué la usan | Costo típico |
+|------------|------------------|--------------|
+| Ollama + modelo abierto | Revisar en local | Gratis (usa RAM/disco) |
+| LM Studio | Igual, con interfaz visual | Gratis en uso habitual |
+| Continue (o similar) + Ollama | Preguntar cerca del editor | Gratis con modelo local |
+| Aider + modelo local | Cambios chicos con Git | Gratis si el modelo no cobra |
+| HuggingChat | Segunda opinión en el navegador | Capa gratuita |
+| Gemini (AI Studio) / Groq | Cupo gratis sin GPU | Dentro del free tier |
+
+Documenten en el informe qué usaron. Si la máquina se ahoga, bajen
+a un modelo más chico (del orden de 7B u 8B) o usen un cupo gratis:
+el método importa más que el tamaño del modelo.
+
+*** Paso 1 — Armar un paquete de contexto (sin secretos)
+
+#+begin_src shell
+cd repo_proyecto3
+git status
+# confirmen que no hay .env, key.properties ni contraseñas
+#+end_src
+
+Preparen un resumen corto para la IA:
+
+- dominio del equipo,
+- monolito o microservicios (una frase),
+- lista de endpoints,
+- árbol breve de carpetas,
+- dos o tres fragmentos útiles (vista del recomendador, =http= en
+  Flutter, gateway).
+
+No le peguen todo el historial de Git. Si revisan en la nube, menos
+aún secretos. En local el hábito es el mismo: no acostumbrarse a
+pegar contraseñas «porque es prueba».
+
+*** Paso 2 — Probar que la herramienta responde
+
+Con Ollama, por ejemplo:
+
+#+begin_src shell
+# instalen desde https://ollama.com
+ollama pull llama3.2
+# opcional, si hay RAM y quieren un modelo más de código:
+# ollama pull qwen2.5-coder:7b
+ollama run llama3.2
+#+end_src
+
+Una pregunta corta basta para ver que está vivo. Si usan Continue u
+otro cliente, apunten a =http://localhost:11434= y al mismo modelo.
+
+*** Paso 3 — Prompt de auditoría (con evidencias)
+
+Pidan hallazgos comprobables, no un show:
+
+#+begin_quote
+Eres revisor de un proyecto universitario (Django + Flutter, posible
+nginx/gateway, recomendador .joblib + asistente).
+
+Contexto del equipo:
+[pegar dominio, arquitectura en 10 líneas, lista de endpoints]
+
+Fragmentos / estructura:
+[pegar árbol y 1–3 archivos clave]
+
+Tareas:
+1. Lista hallazgos numerados. Cada uno: severidad (alta/media/baja),
+   archivo o módulo sospechoso, evidencia en el texto que te di,
+   riesgo si es cierto, y cómo lo verificaría un humano en 5 minutos.
+2. Separa «hecho con evidencia» de «hipótesis sin evidencia».
+3. Señala contradicciones con un enunciado que exige: modelo en
+   servidor, mismo front web/móvil, sin secretos en el repo.
+4. No reescribas el proyecto. No inventes archivos que no mencioné.
+5. Cierra con las 5 comprobaciones manuales más útiles antes de la demo.
+#+end_quote
+
+Si inventa rutas que ustedes no tienen, córtenlo: «solo puedes citar
+lo que aparece arriba».
+
+*** Paso 4 — Segunda opinión
+
+Pasen el *mismo* resumen a otra IA gratis (otro modelo en Ollama, un
+chat con cupo gratis, etc.) y armen una tabla:
+
+| Hallazgo | IA A | IA B | ¿Lo vimos en el código? | Qué haremos |
+|----------|------|------|-------------------------|-------------|
+| … | sí/no | sí/no | sí / no / parcial | … |
+
+Si solo una lo menciona y al abrir el archivo no está, es ruido. Si
+las dos coinciden y el código lo confirma, prioricen el arreglo.
+
+*** Paso 5 — Cómo analizar el resultado
+
+Lo que entregan no es el log del chat. Es un informe corto (una a
+tres páginas) donde se ve que *ustedes* pensaron:
+
+1. herramientas y modelos (nombre; local o nube);
+2. qué le pasaron y qué omitieron;
+3. tabla de hallazgos verificados;
+4. al menos dos falsos positivos con referencia a su código
+   («dijo X; en =views.py= se ve Y»);
+5. cambios hechos después (commits o PR);
+6. qué quedó pendiente y por qué.
+
+Sin esa verificación, cualquiera imprime alucinaciones. Por eso el
+informe importa más que el chat.
+
+*** Paso 6 — Cierre antes de la demo
+
+#+begin_src shell
+git pull
+flutter analyze
+# humo: recomendación, folio, chat; build web o apk si aplica
+#+end_src
+
+Una línea en el README («última auditoría: fecha, modelo, hallazgos
+confirmados») ayuda al equipo el día de la presentación.
+
+*** Errores frecuentes
+
+| Qué pasa | Qué hacer |
+|----------|-----------|
+| Inventa microservicios que no existen | Acotar el prompt; exigir citas |
+| Todo sale «crítico» | Calibrar severidad ustedes |
+| Pegaron un =.env= en un chat web | Rotar secretos; no repetirlo |
+| El informe de patrones lo escribió la IA | Ustedes firman el análisis |
+| El modelo local se queda sin memoria | Modelo más chico o cupo gratis |
+
+
+** Desarrollar el mismo proyecto con IA libre (sin costo)
+
+También pueden *construir* los proyectos 1 a 3 con ayuda de una IA
+sin pagar. El orden que sí funciona en clase es este:
+
+#+begin_example
+ustedes escriben el diseño
+    → la IA propone un fragmento
+        → ustedes lo leen, lo adaptan a su tema
+            → lo corren y lo corrigen
+#+end_example
+
+Si pegan el enunciado entero y entregan el volcado, no hay proyecto:
+hay pegamento. Siguen haciendo falta Django, SQLite o PostgreSQL,
+Flutter, el =.joblib= y —en el asistente— datos y entrenamiento
+propios. La IA acelera lo repetitivo; no inventa el dominio de su
+matrícula.
+
+*** Qué herramientas usar (sin costo)
+
+Elijan una línea y déjenla dicha en el README:
+
+*En local.* Ollama con un modelo de código razonable para su RAM;
+editor con un cliente que hable con ese modelo; si quieren, un
+asistente de terminal ligado a Git para commits chicos.
+
+*Cupo gratis en la nube.* Gemini (AI Studio), Groq, HuggingChat u
+otro free tier: copian fragmentos, pegan la propuesta en el repo y
+versionan con Git.
+
+*Híbrido.* Diseños o auditorías largas en la nube; el día a día con
+un modelo local pequeño para no agotar límites.
+
+No es obligatorio pagar Copilot ni un plan plus. Quien ya lo tenga
+puede usarlo; las reglas de abajo igual aplican.
+
+*** Paso 1 — Diseñar antes de pedir código
+
+En =DISENO.md= (o en el informe) escriban:
+
+- qué decide el recomendador en *su* tema,
+- campos de los modelos Django,
+- endpoints con un JSON de ejemplo,
+- pantallas Flutter y el flujo del usuario,
+- que el =.joblib= y el corpus viven en el servidor.
+
+Eso es el contrato. Si la IA inventa otra app (pizzas, drones,
+repartos genéricos), la corrigen: manda la matrícula.
+
+*** Paso 2 — Pedir el sistema por rebanadas
+
+Un pedido «haz el Proyecto 3 completo» suele salir frágil. Avancen
+así:
+
+1. modelos, admin y datos de prueba;
+2. listado del catálogo;
+3. =.joblib= + =POST= de recomendar;
+4. pantallas Flutter (lista → formulario → folio);
+5. asistente (dataset → entrenamiento → endpoint → chat);
+6. gateway o Compose solo si el 3 lo pide;
+7. =build web= y =build apk=.
+
+Después de cada rebanada: ejecutar, mirar, commit. Si rompe lo
+anterior, vuelvan con Git y pidan menos en el siguiente mensaje.
+
+*** Paso 3 — Prompts cortos (ejemplos)
+
+*Modelos:*
+
+#+begin_quote
+Según este DISENO.md [pegar], genera solo models.py y el admin
+para catálogo y pedidos. Campos exactos del diseño. Sin
+microservicios. Sin inventar apps extra. Explica en 5 líneas cómo
+probarlo con createsuperuser.
+#+end_quote
+
+*Recomendador:*
+
+#+begin_quote
+Tenemos modelo.joblib y reglas en reglas.py como en clase. Escribe
+la vista POST que: valide JSON, llame predicción+reglas, guarde
+pedido con folio, responda JSON con clase, confianza, corregido.
+No muevas el .joblib al cliente. Señala imports.
+#+end_quote
+
+*Flutter:*
+
+#+begin_quote
+Pantalla que lista GET /productos/ y navega a detalle. Usa package
+http, base URL por --dart-define=API_BASE. Maneja loading y error.
+No uses estado global complejo. Código para un solo archivo de
+pantalla + snippet de MaterialApp.
+#+end_quote
+
+*Cuando falla algo:*
+
+#+begin_quote
+Este es el error completo [pegar traceback]. Este es el archivo
+relevante [pegar]. No reescribas el proyecto. Dame 3 causas
+probables ordenadas y el cambio mínimo para la más probable.
+#+end_quote
+
+En todos: poco contexto, una tarea, y cómo lo probarían. Eviten
+«reescribe todo».
+
+*** Paso 4 — Adaptar al dominio
+
+Los chats genéricos tienden a devolver delivery, drone o pizza.
+Ustedes:
+
+- renombran entidades a su tema,
+- cambian variables y etiquetas del dataset,
+- reentrenan el =.joblib=,
+- revisan corpus e intenciones del asistente.
+
+Si el código sigue hablando de medios de transporte y su problema
+es óptica o tintorería, aún no está adaptado.
+
+*** Paso 5 — Probar de verdad (no solo leer el chat)
+
+- crear un producto y verlo en Flutter,
+- una recomendación donde las reglas corrijan al modelo,
+- folio consultable,
+- mensaje al asistente dentro y fuera de dominio,
+- misma app en Chrome y en emulador o =apk=,
+- =git clone= limpio con el README.
+
+Si eso no corre, el avance no está cerrado.
+
+*** Paso 6 — Decir qué hicieron con IA
+
+En el README o el informe anoten con naturalidad:
+
+- qué partes salieron con IA y con qué herramienta,
+- qué partes son datos y entrenamiento propios,
+- qué revisaron ustedes después.
+
+Usar IA está bien como acelerador. Entregar sin poder explicar
+*pregunta → API → joblib → JSON → pantalla* no cumple. En la demo o
+en el informe individual se nota.
+
+*** Rutina corta de equipo
+
+#+begin_example
+git pull
+  → releer DISENO.md
+    → pedir a la IA solo la rebanada del día
+      → adaptar al dominio
+        → probar a mano
+          → commit pequeño y push
+            → (opcional) auditoría rápida con otro modelo
+#+end_example
+
+*** Qué pedirle y qué no
+
+| Pedir | Evitar |
+|-------|--------|
+| Boilerplate, ideas de modelo de datos, tests de humo | «Haz todo el Proyecto 3 en un mensaje» |
+| Explicar un error con traceback | Pegar secretos o bases reales |
+| Comparar monolito y gateway *para su caso* | Copiar otra arquitectura sin adaptar |
+| Lista de casos de prueba | Que invente métricas de un modelo que no entrenaron |
+
+El apartado
+[[*Actualizar la app con Git y volver a construir el móvil][Actualizar
+la app con Git…]] sigue mandando el cierre: la IA puede proponer un
+diff; Git guarda el historial; =flutter build apk= demuestra el
+móvil. Un chat sin repo no es entrega.
+
+
 ** Resumen del recorrido
 
-| Proyecto | Enfoque principal | Modalidad |
-|----------|-------------------|-----------|
-| 1 | Datos + recomendador *adaptado al tema* (código del curso ajustado) | Individual |
+| Proyecto / práctica | Enfoque | Modalidad |
+|---------------------|---------|-----------|
+| 1 | Datos + recomendador *adaptado al tema* | Individual |
 | 2 | Entrenar y conectar el asistente del comprador | Individual |
-| 3 | Integración, web y móvil (tras haber hecho 1 y 2) | Equipo |
+| 3 | Integración, web y móvil (tras 1 y 2) | Equipo |
+| Auditoría con IA libre | Segundo revisor; verificar hallazgos a mano | Individual o equipo |
+| Desarrollo con IA libre | Diseñar → generar por partes → adaptar → probar | Individual o equipo |
 
-Misma base técnica para todos; el dominio lo fija la matrícula. El
-proyecto 2 requiere el asistente entrenado. El proyecto 3 integra
-lo construido en 1 y 2 en web y móvil.
+Misma base técnica; el dominio lo fija la matrícula. El proyecto 2
+pide el asistente entrenado. El 3 integra lo de 1 y 2 en web y
+móvil. La IA libre puede acelerar código y revisión; no sustituye
+datos, entrenamiento ni poder explicar el flujo.
 
