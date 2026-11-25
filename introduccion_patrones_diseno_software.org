@@ -3598,12 +3598,530 @@ confirma; Observer avisa.
 11. Tras =POST /pedidos=, ¿por qué redirigir a un =GET=?
 12. Al rotar el teléfono se pierde el pin del mapa: ¿qué falló?
 
+* Desarrollo de software con inteligencia artificial
+
+Este apartado describe, de manera teórica y formal, cómo se incorpora
+la inteligencia artificial al proceso de desarrollo de software: qué
+piezas tecnológicas intervienen, dónde intervienen los *modelos*,
+cómo se utilizan en la práctica profesional y por qué ha ganado
+relevancia la noción de *agente*. Complementa —no sustituye— el uso
+de la IA como apoyo al análisis de patrones
+([[*IA, caso integrador y ejercicios de razonamiento][IA, caso
+integrador…]]) y las prácticas con herramientas libres del Proyecto
+Flutter.
+
+** Qué se entiende por «desarrollar software con IA»
+
+Desarrollar con IA no significa que un modelo «escriba el sistema» de
+principio a fin sin intervención humana. Significa integrar
+capacidades de aprendizaje automático o de modelos generativos en
+*dos planos* distintos que conviene no mezclar:
+
+1. *IA como asistente del ciclo de vida del software.* El modelo
+   ayuda a especificar, diseñar, implementar, probar, documentar o
+   revisar. El producto entregado puede no contener ningún modelo en
+   ejecución.
+2. *IA como componente del producto.* El sistema en producción
+   invoca un modelo (clasificador, recomendador, modelo de lenguaje,
+   recuperación semántica, etc.) para tomar una decisión o generar
+   una respuesta. Es el caso del =.joblib= y del asistente en este
+   curso.
+
+Ambos planos pueden coexistir: un equipo usa un asistente de código
+mientras construye un servicio que, a su vez, carga un modelo propio.
+
+** Piezas tecnológicas del ecosistema
+
+| Pieza | Función | Ejemplo |
+|-------|---------|---------|
+| *Modelo* | Función matemática entrenada o preentrenada que transforma entradas en salidas | LLM, modelo de código, clasificador, embeddings |
+| *Entorno de ejecución* | Dónde corre la inferencia | CPU/GPU local, API en la nube, contenedor |
+| *Herramienta de desarrollo* | Interfaz que conecta al modelo con el editor o el repositorio | cliente de chat, extensión del IDE, CLI |
+| *Memoria / contexto* | Texto, archivos o embeddings que condicionan la respuesta | prompt, corpus RAG, historial |
+| *Herramientas externas (tools)* | Acciones que el sistema puede invocar más allá de generar texto | ejecutar tests, llamar una API, abrir un archivo |
+| *Agente* | Bucle que planifica, usa herramientas y observa resultados hasta un criterio de parada | asistente que edita el repo y corre =pytest= |
+| *Orquestación* | Políticas de permisos, registro, límites y supervisión humana | colas, gateways, human-in-the-loop |
+
+La tecnología «más adecuada» no es un nombre comercial único. Se
+elige según *dónde* debe ejecutarse el modelo, *qué* garantía se
+exige (privacidad, latencia, costo, reproducibilidad) y *qué* papel
+cumple (asistente frente a componente de negocio).
+
+** Tipos de modelos relevantes para software
+
+*** Modelos de lenguaje general (LLM)
+
+Modelos entrenados sobre grandes colecciones de texto. Generan y
+transforman lenguaje natural o código a partir de una instrucción
+(prompt). Son útiles para explicación, borradores, refactorizaciones
+propuestas y diálogo sobre un problema. No sustituyen la
+especificación ni las pruebas.
+
+*** Modelos orientados a código
+
+Variantes o especializaciones entrenadas con énfasis en lenguajes de
+programación, APIs y repositorios. Suelen comportarse mejor en
+completado, generación de tests y reparación de errores localizados.
+Siguen siendo probabilísticos: requieren revisión.
+
+*** Modelos pequeños o especializados (clasificadores, regresores, árboles)
+
+Modelos de tamaño reducido, a menudo entrenados con datos del
+dominio (como el =.joblib= del curso). Ofrecen latencia baja,
+despliegue simple y comportamiento más controlable cuando la tarea
+está bien delimitada (elegir una clase, una intención, un score).
+
+*** Modelos de embeddings y recuperación
+
+Transforman texto en vectores para búsqueda por similitud. Son la
+base de muchos sistemas *RAG* (Retrieval-Augmented Generation): se
+recuperan fragmentos pertinentes y, después, un LLM redacta con ese
+contexto. Separar *recuperación* de *generación* es una decisión de
+diseño, no un detalle de implementación.
+
+** Dónde se utilizan los modelos en el ciclo de desarrollo
+
+| Fase | Uso habitual del modelo | Riesgo si se delega sin control |
+|------|-------------------------|--------------------------------|
+| Elicitación / requisitos | Reformular historias, detectar ambigüedades | Requisitos inventados o incompletos |
+| Análisis y diseño | Proponer candidatos de arquitectura o patrones | Sobreingeniería o patrones mal aplicados |
+| Implementación | Completar código, generar módulos a partir de un contrato | Código que compila pero viola el dominio |
+| Pruebas | Sugerir casos, generar tests unitarios | Tests tautológicos o que no fallan cuando deben |
+| Revisión | Señalar olores, secretos, acoplamientos | Falsos positivos; sensación de «auditoría hecha» |
+| Operación | Asistentes de diagnóstico, bots internos | Acciones automáticas sobre producción sin permisos |
+| Producto en runtime | Recomendación, clasificación, chat al usuario | Alucinaciones, sesgo, dependencia de un proveedor |
+
+En un sistema bien delimitado, el *modelo de negocio* (recomendador,
+intenciones) vive en el *backend*, detrás de una API. El cliente
+(web, móvil, escritorio) no embebe pesos ni corpora completos, salvo
+casos excepcionales documentados.
+
+** Cómo se utilizan (modos de interacción)
+
+1. *Completado en el editor.* El modelo sugiere el siguiente
+   fragmento mientras se escribe. Acelera código rutinario; exige
+   atención a licencias y a secretos en el contexto.
+2. *Diálogo (chat) con contexto.* Se proporciona enunciado, error o
+   archivo y se obtiene una propuesta. El valor depende de la
+   calidad del contexto y de la verificación posterior.
+3. *Generación condicionada por recuperación (RAG).* El sistema
+   busca en documentación o datos propios y condiciona la respuesta.
+   Reduce invenciones cuando el corpus es correcto y está actualizado.
+4. *Llamada a herramientas (function calling / tool use).* El modelo
+   no solo responde texto: propone invocar funciones (consultar la
+   base, ejecutar un comando). La aplicación *decide* si ejecuta y
+   con qué permisos.
+5. *Ajuste o entrenamiento propio.* Se adapta un modelo a datos del
+   dominio (desde un clasificador clásico hasta un ajuste ligero de
+   un modelo de lenguaje). Implica gobierno de datos, métricas y
+   versionado del artefacto (=joblib=, pesos, etc.).
+6. *Evaluación.* Se miden exactitud, utilidad, latencia y tasas de
+   error; sin evaluación, no hay mejora controlada.
+
+El patrón metodológico recomendable es el mismo que en diseño con
+patrones: *hipótesis humana → propuesta automática → contraste con
+evidencia (código, pruebas, datos) → decisión firmada por el
+equipo*.
+
+** Criterios para elegir la tecnología adecuada
+
+No existe una única pila correcta. Conviene decidir con criterios
+explícitos:
+
+| Criterio | Pregunta guía | Implicación típica |
+|----------|---------------|--------------------|
+| Tarea | ¿Clasificar un dominio cerrado o dialogar en abierto? | Clasificador pequeño frente a LLM |
+| Datos | ¿Pueden salir de la organización? | Inferencia local o VPC frente a API pública |
+| Latencia y costo | ¿Respuesta en milisegundos y alto volumen? | Modelos pequeños o caché; cuidado con LLM grandes |
+| Reproducibilidad | ¿Hay que auditar la decisión meses después? | Versionar modelo, prompt y datos de evaluación |
+| Integración | ¿El resultado alimenta un pedido, un pago, un folio? | Modelo detrás de API; reglas de negocio aparte |
+| Competencia del equipo | ¿Pueden operar GPU, pipelines y monitoreo? | Empezar simple; complejizar con evidencia |
+
+En este curso, la elección didáctica prioriza modelos *propios y
+pequeños* para la decisión de negocio, API desacoplada y, aparte,
+asistentes de desarrollo *libres o sin costo* para acelerar
+implementación y auditoría, siempre bajo revisión humana.
+
+** Agentes: definición, atractivo y límites
+
+*** Qué es un agente en este contexto
+
+Un *agente* de software basado en modelos es un sistema que, ante un
+objetivo, *itera*: interpreta el estado, planifica un paso, invoca
+herramientas (editar archivos, ejecutar pruebas, llamar APIs),
+observa el resultado y continúa hasta cumplir un criterio de éxito o
+agotarse un presupuesto (pasos, tiempo, tokens).
+
+Se distingue de un chat clásico en que no se limita a una sola
+respuesta textual: mantiene un bucle de *acción y observación*.
+
+#+begin_example
+objetivo
+   → plan / siguiente acción
+        → herramienta (API, shell, editor, navegador…)
+             → observación (salida, error, diff)
+                  → ¿terminé?  —no→ volver a planear
+                               —sí→ entregar resultado
+#+end_example
+
+*** Por qué hay un interés generalizado en agentes
+
+Varias razones concurrentes explican la adopción discursiva y
+práctica:
+
+1. *Cierre de la brecha entre texto y acción.* Las organizaciones no
+   solo necesitan párrafos; necesitan cambios en repositorios,
+   tickets y entornos. El agente promete enlazar lenguaje y acción.
+2. *Automatización de tareas de integración.* Homogeneizar
+   boilerplate, migraciones mecánicas, preparación de entornos o
+   recorridos de prueba reduce trabajo repetitivo.
+3. *Interfaz natural sobre sistemas complejos.* Un objetivo en
+   lenguaje natural puede despachar varias herramientas detrás de un
+   mismo diálogo.
+4. *Narrativa de productividad.* Proveedores y equipos reportan
+   ciclos más cortos en tareas acotadas; ello incentiva
+   experimentación institucional.
+5. *Composición.* Un agente puede coordinar modelos distintos
+   (planificador, modelo de código, recuperador) bajo una política
+   común.
+
+*** Riesgos y condiciones de uso responsable
+
+- *Efectos laterales:* un agente con permiso de escritura o de red
+  puede modificar o exponer más de lo previsto.
+- *Bucles costosos o incorrectos:* sin límite de pasos ni criterios
+  de parada claros, el sistema gasta recursos o empeora el código.
+- *Falsa autonomía:* aparentar comprensión del dominio sin pasar por
+  requisitos, datos ni pruebas.
+- *Gobierno:* hace falta registro de acciones, permisos mínimos y
+  supervisión humana en cambios sensibles (producción, datos
+  personales, firmas).
+
+Por ello, en entornos académicos y profesionales serios, el agente se
+trata como *automatización supervisada*, no como sustituto del
+diseño, de la propiedad del código ni de la responsabilidad legal.
+
+*** Cuándo un agente es una tecnología adecuada
+
+Es razonable considerarlo cuando:
+
+- la tarea es repetible y verificable (tests, linters, builds),
+- el entorno de herramientas está acotado (sandbox, repo de
+  desarrollo),
+- existe un humano que revisa diffs y resultados,
+- el costo de un error es limitado y reversible (control de
+  versiones).
+
+Es poco razonable como único mecanismo cuando:
+
+- la decisión exige responsabilidad de negocio no codificada,
+- no hay oráculo de verdad (tests, métricas, corpus fiable),
+- se requiere reproducibilidad estricta sin registrar prompts ni
+  versiones de modelo.
+
+** Simulación y avance de procesos (asistentes tipo Claude y afines)
+
+Una parte central del avance reciente no es solo «mejor texto», sino
+la capacidad de *simular o ejecutar un proceso*: descomponer un
+objetivo en pasos, actuar sobre un entorno (editor, terminal,
+navegador, APIs) y continuar según lo observado. Productos y
+modelos de propósito general orientados a tareas —por ejemplo
+asistentes de la familia Claude, otros LLM con *tool use*, agentes
+integrados en el IDE o flujos de «computer use»— ilustran ese
+cambio: dejan de limitarse a una respuesta única y pasan a
+*recorrer* un procedimiento.
+
+*** Del mensaje único al proceso iterativo
+
+| Modalidad | Qué hace el sistema | Resultado típico |
+|-----------|---------------------|------------------|
+| Respuesta única (chat clásico) | Interpreta el prompt y genera un texto o un bloque de código | Borrador; el humano aplica los cambios |
+| Asistente con herramientas | Propone llamadas (leer archivo, buscar, ejecutar comando) y reacciona al resultado | Cambio acotado con evidencia intermedia |
+| Agente de proceso / IDE | Mantiene un plan, edita el repositorio, corre pruebas, corrige y reintenta | Diffs y logs a lo largo de varios pasos |
+| Uso de entorno (computer use) | Opera interfaces (navegador, escritorio) como si fuera un usuario | Automatización de flujos que no tienen API limpia |
+
+En todos los casos el *modelo* sigue siendo probabilístico. Lo nuevo
+es el *controlador del proceso*: memoria de pasos, políticas de
+herramientas, límites de iteración y, cuando existe, supervisión
+humana entre acciones.
+
+*** Cómo «avanzan» estas IA sobre una tarea
+
+De forma abstracta, el ciclo que simulan se parece a un proceso de
+ingeniería reducido:
+
+1. *Interpretación del objetivo* (requisito, bug, refactor, informe).
+2. *Planificación* (lista de pasos o siguiente acción).
+3. *Acción* sobre herramientas (lectura de código, edición, shell,
+   consulta web, llamada a API).
+4. *Observación* (salida del compilador, test fallido, contenido de
+   un archivo, captura de interfaz).
+5. *Replanificación* si el resultado no cumple el criterio.
+6. *Cierre* cuando se alcanza el objetivo, se agota el presupuesto
+   de pasos o se solicita confirmación humana.
+
+Ese bucle es lo que el discurso actual llama a menudo «agente» o
+«asistente autónomo». No implica comprensión humana del dominio; implica
+*política de control* + *modelo* + *herramientas*.
+
+*** Qué simulan realmente (y qué no)
+
+*Sí pueden simular o automatizar, con mayor o menor fiabilidad:*
+
+- recorridos de desarrollo (localizar archivo → editar → probar →
+  corregir),
+- procedimientos de diagnóstico (reproducir error → acotar causa →
+  proponer parche),
+- flujos documentales (leer enunciado → bosquejar diseño → generar
+  esqueleto → pedir revisión),
+- operación guiada de interfaces cuando no hay API (formularios,
+  paneles).
+
+*No sustituyen por sí solos:*
+
+- la definición contractual del sistema (qué debe hacer el negocio),
+- la validación empírica con datos y usuarios reales,
+- la responsabilidad sobre secretos, producción y cumplimiento,
+- la garantía de que el proceso simulado sea el proceso *correcto*
+  (pueden ejecutar con soltura un plan equivocado).
+
+La distinción importa en clase: un asistente que «avanza solo» puede
+completar un camino técnico y, aun así, alejarse del dominio de la
+matrícula o del contrato de la API.
+
+*** Familias de sistemas (sin fijar un proveedor como único)
+
+Conviene clasificar por *capacidad*, no por marca:
+
+1. *LLM en chat con tool use.* El modelo elige herramientas
+   declaradas por la aplicación (buscar, ejecutar, consultar).
+2. *Agentes de entorno de desarrollo.* Integrados al IDE o a la
+   CLI (por ejemplo, el agente de Cursor u otros asistentes del
+   editor); el proceso natural es el del repositorio (lectura de
+   archivos, diffs, tests, commits sugeridos, skills y reglas del
+   proyecto).
+3. *Agentes multipaso generales.* Persisten plan y estado entre
+   turnos; útiles en tareas largas.
+4. *Computer use / control de interfaz.* El proceso simulado es el
+   de un usuario ante la pantalla; útil cuando el sistema legado no
+   ofrece API.
+5. *Enjambres o multiagente.* Varios papeles (planificar, codificar,
+   revisar) coordinados; aumentan cobertura y también complejidad
+   de gobierno.
+
+Claude y sistemas análogos se sitúan, según el producto concreto, en
+alguna combinación de (1)–(4): diálogo, herramientas, multipaso y, en
+ciertas ofertas, interacción con el entorno.
+
+*** Implicaciones para quien desarrolla software
+
+1. *El proceso pasa a ser un artefacto de diseño.* Hay que definir
+   qué pasos puede dar la IA, con qué permisos y con qué criterios
+   de parada; no basta con «conectar un modelo».
+2. *La observabilidad es parte del sistema.* Sin registro de
+   acciones, prompts y resultados intermedios, no hay auditoría ni
+   mejora.
+3. *La verificación se desplaza al final de cada ciclo.* Tests,
+   análisis estático, revisión de diffs y comprobación del dominio
+   siguen siendo obligatorios; el proceso automático solo acelera la
+   propuesta.
+4. *La elección tecnológica depende del entorno de acción.* Si el
+   valor está en editar un repo, priorice agentes de IDE o CLI; si
+   está en una decisión de negocio en producción, priorice modelo
+   propio detrás de API, no un agente general con permisos amplios.
+5. *Compatibilidad con lo ya aprendido.* CI/CD, contenedores y
+   control de versiones son el armazón que hace *reversible* lo que
+   un agente avance; sin ellos, el proceso simulado deja deuda
+   difícil de deshacer.
+
+*** Criterio de adecuación (proceso simulado frente a modelo embebido)
+
+| Situación | Enfoque más adecuado |
+|-----------|----------------------|
+| Acelerar implementación o depuración en el laboratorio | Asistente/agente de proceso sobre el repo (con revisión) |
+| Decidir medio, intención o recomendación en runtime | Modelo de dominio versionado + API (+ reglas) |
+| Recorrer un sistema sin API | Computer use acotado y supervisado |
+| Tarea crítica e irreversible | Automatización mínima; humano en el bucle en cada paso |
+
+En síntesis: el salto que se observa en Claude y en sistemas
+comparables es la *simulación operativa de un proceso* (plan →
+acción → observación → avance). Eso explica gran parte del interés
+actual por los agentes. En ingeniería de software formal, ese salto
+se adopta como automatización instrumentada, no como delegación del
+criterio profesional.
+
+** Agentes en el IDE, skills y conocimiento empaquetado (caso Cursor)
+
+Además del chat multipaso genérico, ha madurado una clase de
+sistemas donde el *entorno de acción* es el propio entorno de
+desarrollo: el repositorio abierto, el terminal, el linter, el
+navegador integrado y, en su caso, servidores de herramientas
+externas. Cursor es un ejemplo representativo de este tipo de
+*agente de IDE*: el modelo no solo responde; opera sobre el
+proyecto con un bucle de herramientas (leer, editar, ejecutar,
+buscar, delegar subtareas).
+
+La misma idea aparece, con distintos nombres, en otros editores y
+CLI agentes. Lo relevante teóricamente no es la marca, sino la
+arquitectura: *modelo + herramientas del IDE + políticas del
+equipo + procedimientos reutilizables*.
+
+*** Capas que suelen componer un agente de IDE
+
+| Capa | Función | Ejemplo conceptual |
+|------|---------|-------------------|
+| Modelo | Razona y propone el siguiente paso | LLM de propósito general o de código |
+| Herramientas | Ejecutan acciones en el entorno | Editar archivo, terminal, búsqueda en el repo |
+| Contexto del proyecto | Reduce ambigüedad | Árbol de directorios, diffs, diagnósticos |
+| Reglas / políticas | Normas persistentes del equipo o del usuario | Estilo de commits, idioma, restricciones de seguridad |
+| *Skills* (procedimientos) | Instrucciones empaquetadas para una tarea concreta | «Cómo crear un skill», «cómo revisar un PR», «cómo exportar Org a HTML» |
+| Integraciones externas | Amplían el entorno más allá del disco local | APIs, gestores de issues, navegador, MCP u otros conectores |
+| Supervisión humana | Aprueba, corrige o detiene | Revisión del diff antes de integrar |
+
+Sin skills ni reglas, el agente improvisa en cada conversación. Con
+ellas, el equipo *externaliza proceso* en artefactos versionables.
+
+*** Qué es un *skill*
+
+Un *skill* es un procedimiento documentado —habitualmente en
+Markdown, a menudo con metadatos (nombre, descripción, cuándo
+aplicarlo)— que enseña al agente *cómo* realizar una tarea
+específica según las convenciones del proyecto o de la persona.
+
+No es un modelo nuevo ni un sustituto del LLM. Es *conocimiento
+operativo empaquetado*: pasos, plantillas, criterios de calidad y,
+a veces, scripts auxiliares. El agente, cuando la tarea coincide
+con la descripción del skill, debe leerlo y seguirlo en lugar de
+inventar un flujo ad hoc.
+
+Ejemplos de skills (genéricos):
+
+- crear o actualizar un componente según la guía de UI del repo,
+- preparar un commit con el formato acordado,
+- auditar un diff con una lista de comprobación,
+- generar la estructura de un servicio Django + prueba mínima,
+- publicar artefactos o exportar documentación.
+
+En Cursor, los skills suelen vivir como directorios con un
+=SKILL.md= (instrucción principal) y, opcionalmente, referencias o
+scripts. Pueden ser *personales* (válidos en todos los proyectos del
+usuario) o *de proyecto* (compartidos con quien clone el
+repositorio). Otros entornos implementan ideas análogas bajo
+nombres como playbooks, runbooks, recipes o agent instructions.
+
+*** Skills frente a reglas frente a prompts sueltos
+
+| Artefacto | Persistencia | Propósito |
+|-----------|--------------|-----------|
+| Prompt suelto en el chat | Solo esa conversación | Tarea puntual |
+| Regla (rule) | Continua en el trabajo con ese agente/proyecto | Política transversal («responda en español», «no invente APIs») |
+| Skill | Se activa cuando la tarea encaja | Procedimiento especializado paso a paso |
+| Documento de dominio / RAG | Consulta bajo demanda | Hechos del negocio o de la API |
+
+La regla dice *bajo qué restricciones* trabajar. El skill dice
+*cómo ejecutar un flujo*. El prompt suelto no deja aprendizaje
+acumulado para el equipo.
+
+*** Por qué importan en el desarrollo con IA
+
+1. *Repetibilidad.* El mismo procedimiento de «añadir endpoint +
+   test + entrada en el README» puede invocarse semanas después.
+2. *Transferencia de criterio.* Un integrante encapsula buenas
+   prácticas; el agente las aplica cuando otro pide una tarea
+   similar.
+3. *Reducción de alucinación de proceso.* El modelo deja de inventar
+   el orden de los pasos si el skill ya lo fija.
+4. *Alineación con ingeniería clásica.* Un skill bien escrito se
+   parece a un runbook o a una guía de contribución; la diferencia
+   es que está pensado para ser *consumido por un agente*, no solo
+   leído por humanos.
+5. *Complemento —no reemplazo— del modelo de negocio.* Los skills
+   del IDE aceleran *construir* el sistema; el =.joblib= o el
+   asistente del comprador siguen siendo componentes del *producto*
+   en runtime.
+
+*** Cursor (y análogos) en el mapa del curso
+
+En términos del semestre, un agente de IDE como Cursor se sitúa en
+el plano *IA como asistente del ciclo de vida*:
+
+- ayuda a implementar Django, Flutter, Docker o CI;
+- puede auditar el repo o generar borradores de tests;
+- no debe confundirse con el servicio =recomendar= ni con el chat
+  del comprador en producción.
+
+Buen uso académico y profesional:
+
+- skills y reglas del equipo versionados cuando aporten proceso
+  compartido;
+- revisión humana de cada cambio sustancial;
+- secretos fuera del contexto;
+- separación clara entre «me ayuda a programar» y «decide el
+  medio de entrega en el servidor».
+
+*** Mini esquema
+
+#+begin_example
+Usuario: objetivo en lenguaje natural
+        │
+        ▼
+Agente de IDE (p. ej. Cursor)
+        │
+        ├── reglas del proyecto / del usuario
+        ├── skills aplicables (SKILL.md, runbooks, …)
+        ├── herramientas (editar, terminal, búsqueda, navegador…)
+        └── modelo (planifica y redacta acciones)
+                │
+                ▼
+         diffs / logs / artefactos
+                │
+                ▼
+         humano revisa e integra (Git, CI)
+#+end_example
+
+** Relación con arquitecturas ya vistas en el curso
+
+| Idea del curso | Lectura en clave de IA |
+|----------------|------------------------|
+| Separación cliente / API | El modelo de negocio se invoca vía endpoint; el cliente no carga el =.joblib= |
+| Gateway | Un solo borde puede exponer tanto la API de pedidos como la del asistente |
+| Adapter | Traducir la salida heterogénea de un modelo al lenguaje del dominio |
+| Strategy / reglas | El modelo propone; las reglas de negocio corrigen o vetan |
+| Contenedores y CI/CD | El artefacto del modelo y el del cliente se versionan y despliegan como el resto del software |
+| Auditoría con IA libre | Uso del plano *asistente* para revisar el plano *producto* |
+| Agente de IDE + skills | Automatizan el *cómo construir*; no sustituyen el modelo detrás de la API |
+
+** Síntesis
+
+El desarrollo de software con IA combina modelos, contextos,
+herramientas y, en su forma más elaborada, agentes capaces de
+*simular o ejecutar procesos* (plan, acción, observación y avance),
+como se observa en asistentes multipaso, entornos tipo Claude,
+agentes de IDE (por ejemplo Cursor) y mecanismos de tool use o
+computer use. Los *skills* empaquetan procedimientos reutilizables
+que el agente debe seguir; las reglas fijan políticas permanentes.
+La tecnología adecuada se elige por la naturaleza de la tarea, las
+restricciones de datos y la necesidad de control. Los modelos se
+utilizan en el ciclo de vida (asistentes de proceso) y en tiempo de
+ejecución (componentes del producto). El interés por los agentes
+responde a cerrar el ciclo entre lenguaje y acción; su uso formal
+exige límites, permisos, observabilidad, evaluación y
+responsabilidad humana.
+
+Las prácticas concretas con herramientas sin costo y con el
+asistente del comprador se desarrollan en los apartados de proyectos
+y de IA aplicada al diseño.
+
+
 * IA, caso integrador y ejercicios de razonamiento
 
 ** Uso de IA en el diseño de software
 
-La IA es una *herramienta de análisis*, no un oráculo que decide el
-patrón. No debe concluir:
+El marco teórico general (modelos, ciclo de vida, agentes) está en
+[[*Desarrollo de software con inteligencia artificial][Desarrollo de
+software con inteligencia artificial]]. Aquí el foco es más estrecho:
+la IA como *herramienta de análisis* de diseño, no un oráculo que
+decide el patrón. No debe concluir:
 
 #+begin_quote
 «Utiliza Strategy porque sí».
@@ -12781,7 +13299,10 @@ y de
 [[*De una Aplicación Django + Flutter a una Arquitectura de Microservicios][Django + Flutter → microservicios]].
 
 Aquí: meter el *front web* de Flutter en un contenedor, empaquetar
-para celular y seguir hablando *solo* con el gateway.
+para celular, y —más adelante en este mismo bloque— un apartado de
+*CI/CD*: cómo una tubería construye la imagen Docker, el =apk= o el
+binario de escritorio y cómo se actualiza cada cliente. El front
+sigue hablando *solo* con el gateway.
 
 
 ** Por qué Flutter en este curso
@@ -13040,13 +13561,14 @@ producción sin pensarlo.
 
 ** De Flutter web al celular: app Android paso a paso
 
-Hasta aquí muchos probaron la interfaz con
-=flutter run -d chrome=. Eso alcanza para widgets y para ver que el
-JSON responde. El Proyecto 3 pide *también* el teléfono: en un
-producto real el mismo cliente suele vivir en web y en móvil.
+Hasta aquí es habitual haber probado la interfaz con
+=flutter run -d chrome=. Eso permite validar widgets y comprobar
+que el JSON responde. El Proyecto 3 exige *también* el cliente
+móvil: en un producto real el mismo front suele desplegarse en web
+y en dispositivos.
 
-La buena noticia de Flutter es que no reescriben las pantallas.
-Cambia el destino del build y, a veces, la URL del backend:
+Flutter permite reutilizar las pantallas. Cambia el destino del
+build y, en ocasiones, la URL del backend:
 
 - =lib/= se reutiliza (UI, =http=, estado);
 - en Chrome construyen para web; en el emulador o el celular,
@@ -13054,17 +13576,17 @@ Cambia el destino del build y, a veces, la URL del backend:
 - =localhost= en la PC no es la misma dirección que ve el teléfono
   (=10.0.2.2= en el emulador, o la IP WiFi en un aparato físico).
 
-Ojo con no confundir empaquetados: Docker del front sirve la *web*.
-El celular instala un =apk= (o un =.aab= si algún día van a Play
-Store). No son lo mismo.
+Conviene distinguir los empaquetados: Docker del front sirve la
+*web*. El dispositivo móvil instala un =apk= (o un =.aab= si se
+publica en Play Store). No son equivalentes.
 
 En el curso trabajamos sobre todo *Android*. iOS aparece al final
 como lectura: hace falta Mac y cuenta Apple.
 
 *** Qué necesitan antes
 
-Si el entorno está a medias, el =apk= se vuelve pelea innecesaria.
-Revisen:
+Si el entorno está incompleto, la generación del =apk= suele
+fallar. Verifiquen:
 
 1. Flutter en el =PATH= (=which flutter=; =flutter doctor=).
 2. Android Studio instalado (trae SDK y emulador).
@@ -13136,7 +13658,7 @@ const apiBase = String.fromEnvironment(
 );
 #+end_src
 
-*** Paso 3 — HTTP claro en Android (si usan =http://= en el salón)
+*** Paso 3 — HTTP claro en Android (si usan =http://= en desarrollo)
 
 En desarrollo a veces el backend va sin HTTPS. Android, desde
 versiones recientes, puede bloquear tráfico *cleartext*.
@@ -13155,7 +13677,7 @@ android:usesCleartextTraffic="true"
 #+end_example
 
 Quítenlo o limítenlo cuando pasen a un entorno serio. Sin esto,
-pueden ver fallos de red «misteriosos» solo en el =apk=.
+pueden observar fallos de red únicamente en el =apk=.
 
 *** Paso 4 — Probar en el emulador *antes* de empaquetar
 
@@ -13221,11 +13743,11 @@ Variantes útiles en clase:
 # Más de un abi; el de arriba suele bastar
 flutter build apk --release
 
-# Por arquitectura (apk más chicos)
+# Por arquitectura (apk de menor tamaño)
 flutter build apk --split-per-abi --release
 #+end_src
 
-Para *Play Store* (más adelante, no obligatorio en el salón):
+Para *Play Store* (opcional en este curso):
 
 #+begin_src shell
 flutter build appbundle --release
@@ -13250,7 +13772,7 @@ Studio.
 *** Paso 8 — Firma (qué basta en el curso)
 
 - =flutter run= y el =apk= de *debug* usan la clave de depuración
-  automática: sirve para demostrar en el salón.
+  automática: suficiente para demostraciones académicas.
 - =flutter build apk --release= firma con la config de release del
   proyecto; al inicio Flutter trae un esquema de debug/release que
   permite instalar el release de práctica.
@@ -13259,7 +13781,8 @@ Studio.
   =android/key.properties= (ese archivo *no* se sube a Git).
 
 Para la materia: que el =apk= abra, hable con su API y muestre el
-flujo. Publicar en Play Store es plus, no el mínimo.
+flujo. Publicar en Play Store es opcional; no forma parte del
+mínimo del curso.
 
 *** iOS (lectura)
 
@@ -13283,10 +13806,11 @@ semestre se entrega Android (=apk=) + web.
 
 ** Actualizar la app con Git y volver a construir el móvil
 
-El Proyecto 3 es en equipo: el código Flutter va en un repositorio
-compartido. Actualizar la app en el salón *no* es mandarse el
-=apk= por el chat. Es traer lo que el compañero subió, acomodar
-dependencias y volver a construir el instalable.
+El Proyecto 3 es en equipo: el código Flutter debe residir en un
+repositorio compartido. Actualizar la aplicación no consiste en
+intercambiar el =apk= de manera informal. Consiste en incorporar
+los cambios del repositorio, resolver dependencias y volver a
+construir el instalable.
 
 En la práctica:
 
@@ -13300,9 +13824,10 @@ demostrar en Chrome y en el teléfono.
 *** Qué sí y qué no va al repositorio
 
 El repo debe alcanzar para que otra persona clone y reconstruya.
-No es un depósito de carpetas =build/=.
+Debe permitir clonar y reconstruir el proyecto, no almacenar
+salidas de compilación (=build/=).
 
-Suban:
+Incluyan:
 
 - =lib/=, =pubspec.yaml=, =pubspec.lock=,
 - =android/= y =ios=/ (plantillas del proyecto; sin secretos),
@@ -13314,7 +13839,7 @@ No suban:
 - =.dart_tool/=,
 - keystores y =key.properties= con contraseñas,
 - =.env= con tokens,
-- =.idea/= / basura local si no la acordaron.
+- =.idea/= u otros archivos locales, salvo acuerdo explícito del equipo.
 
 El =.gitignore= de =flutter create= ya ignora buena parte de
 =build/=; no lo borren a la ligera.
@@ -13370,14 +13895,14 @@ flutter pub get
 
 Si alguien cambió =pubspec.yaml= (por ejemplo =http:=), =pub get=
 es obligatorio. Si no, pueden compilar una versión vieja de las
-dependencias y pelearse entre compañeros «a mí sí me corre».
+dependencias y obtener resultados distintos entre integrantes.
 
 *** Paso 4 — Regenerar e instalar la app móvil
 
 Después del =pull=:
 
 #+begin_src shell
-flutter clean          # si hay basura de builds raros; opcional
+flutter clean          # opcional, si el build previo quedó inconsistente
 flutter pub get
 flutter build apk --release
 adb install -r build/app/outputs/flutter-apk/app-release.apk
@@ -13389,9 +13914,9 @@ O, en desarrollo:
 flutter run -d <dispositivo>
 #+end_src
 
-Eso *es* actualizar la aplicación en el salón: nuevo código en Git →
-nuevo artefacto en el teléfono. No hace falta la Play Store para
-demostrar el Proyecto 3.
+Ese es el procedimiento de actualización en el curso: nuevo código
+en Git → nuevo artefacto en el dispositivo. No se requiere Play
+Store para demostrar el Proyecto 3.
 
 *** Paso 5 — Versión visible (recomendado)
 
@@ -13417,7 +13942,7 @@ corresponde a qué commit (=git log= / tag).
 Opcional:
 
 #+begin_src shell
-git tag -a v1.1.0 -m "Demo salón: web + apk"
+git tag -a v1.1.0 -m "Demostración: web + apk"
 git push origin v1.1.0
 #+end_src
 
@@ -13439,7 +13964,7 @@ están incompletos (=pubspec=, assets, instrucciones de URL).
 
 | Síntoma | Qué revisar |
 |---------+-------------|
-| El =apk= viejo sigue en el teléfono | =adb install -r= o desinstalar a mano |
+| El =apk= anterior permanece en el dispositivo | =adb install -r= o desinstalación manual |
 | Compila pero no habla con la API | URL (=10.0.2.2= / IP); cleartext; backend arriba |
 | =pub get= falla tras =pull= | Versión de Flutter distinta; acuerden canal =stable= |
 | Conflictos en =pubspec.lock= | Una persona resuelve, commit, el resto =pull= |
@@ -13451,12 +13976,351 @@ están incompletos (=pubspec=, assets, instrucciones de URL).
 |---------+-----+-------|
 | Integran pantallas | commits / ramas | =flutter run= en emulador |
 | Cierran un avance | =tag= o release note en el README | =flutter build apk= y prueban instalación |
-| Demo en salón | =main= actualizado | =apk= o =run= al dispositivo de la demo |
+| Demostración | =main= actualizado | =apk= o =run= en el dispositivo de la demo |
 | Otro compañero continúa | =git pull= + =pub get= | vuelve a construir el =apk= |
 
 La tienda de aplicaciones es un canal de distribución. En clase, Git
 + =flutter build apk= ya demuestran que la app móvil se *construye*
 y se *actualiza* a partir del mismo código que la web.
+
+El siguiente apartado sube un nivel: la misma construcción, pero
+*automatizada* (CI/CD), con contenedores y con los tres destinos
+habituales (web, móvil y escritorio).
+
+
+** CI/CD: construir el artefacto y actualizar web, móvil y escritorio
+
+Hasta aquí construyeron de forma manual:
+
+- =flutter build web= → carpeta (y luego imagen Docker),
+- =flutter build apk= → instalable Android,
+- =git pull= → otra persona vuelve a construir.
+
+Eso ya es el corazón del asunto. *CI/CD* no inventa otros comandos:
+los corre la máquina cuando ustedes empujan a Git, con las mismas
+reglas, para que no dependan de «en mi laptop compiló».
+
+*** Qué es CI y qué es CD
+
+- *CI (Integración Continua):* cada =push= (o cada pull request)
+  dispara una *tubería* que descarga el repo, instala dependencias,
+  corre pruebas si las hay y *construye* el artefacto. Si falla el
+  build, el fallo se detecta de inmediato y no hasta la demostración.
+- *CD (Entrega / Despliegue Continuo):* tomar ese artefacto y
+  *publicarlo* donde corresponde: nueva imagen Docker del front,
+  nuevo =apk= en un Release de GitHub, actualizar el servidor web,
+  etc.
+
+En el contexto académico suele bastar CI más la descarga y prueba
+del artefacto. Un CD completo (tiendas, firmas de producción,
+servidores reales) sigue el mismo esquema con controles adicionales.
+
+*** Qué construye cada destino
+
+| Destino | Comando típico | Artefacto | Cómo «actualiza» el usuario |
+|---------|----------------|-----------|-----------------------------|
+| Web (archivos) | =flutter build web --release= | =build/web/= | Redespliegan el contenedor / el nginx |
+| Web (contenedor) | =docker build= sobre ese =build/web= | Imagen Docker | =compose pull && up= o similar |
+| Android | =flutter build apk --release= | =.apk= | Instalan de nuevo (=adb install -r=) o tienda |
+| Android (tienda) | =flutter build appbundle --release= | =.aab= | Play Store (cuenta + revisión) |
+| iOS | =flutter build ipa --release= | =.ipa= | App Store / TestFlight (Mac + cuenta) |
+| Escritorio Linux | =flutter build linux --release= | Binario / carpeta | Copiar release o instalador |
+| Escritorio Windows | =flutter build windows --release= | =.exe= + DLLs | Copiar carpeta Release o instalador |
+| Escritorio macOS | =flutter build macos --release= | =.app= | Copiar / firmar / notarizar |
+
+Backend y gateway siguen su propio camino (=docker compose build=,
+imagen de Django, etc.). Este apartado se centra en el *cliente*
+Flutter y en cómo la tubería habla con contenedores.
+
+*** La idea en un dibujo
+
+#+begin_example
+  push a main / tag v1.2.0
+           │
+           ▼
+     ┌─────────────┐
+     │  CI runner  │  (GitHub Actions, GitLab CI, …)
+     │  contenedor │
+     └──────┬──────┘
+            │
+   flutter pub get
+   (tests opcionales)
+            │
+     ┌──────┴──────────────────────────┐
+     ▼                ▼                ▼
+ build web        build apk      build linux/…
+     │                │                │
+ imagen Docker     Release         Release
+ (front:nginx)     (.apk)         (zip del binario)
+     │                │                │
+ redesplegar      instalar/        copiar o
+ contenedor       tienda           instalador
+#+end_example
+
+Misma base de código; distintos *jobs* de la tubería.
+
+*** Paso 1 — Lo que ya deben tener antes de automatizar
+
+1. El proyecto compila en local (=flutter build web= y, si aplica,
+   =apk=).
+2. Repo en Git con =.gitignore= que *no* sube =build/=.
+3. =Dockerfile= del front (el de este mismo capítulo) o, al menos,
+   claridad de cómo copiar =build/web= a nginx.
+4. Versión en =pubspec.yaml= (=1.0.0+1=) cuando vayan a publicar
+   instalables.
+5. Secretos *fuera* del repo: tokens del registro Docker, keystore
+   de Android, etc. En GitHub van en *Settings → Secrets*.
+
+Si el build manual falla, la tubería solo fallará más rápido. Arreglen
+local primero.
+
+*** Paso 2 — CI del front web con contenedores (ejemplo GitHub Actions)
+
+Creen =.github/workflows/front-web.yml= en el repo Flutter (o en el
+monorepo del Proyecto 3, ajustando rutas):
+
+#+begin_src yaml
+name: Front web (build + imagen)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  IMAGE: ghcr.io/SU_ORG/entregas-front
+
+jobs:
+  build-web-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir imagen Docker del front
+        run: |
+          docker build -t $IMAGE:${{ github.sha }} \
+                       -t $IMAGE:latest \
+                       ./entregas_app
+
+      # Solo en push a main: publicar (CD suave)
+      - name: Login a GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push de la imagen
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          docker push $IMAGE:${{ github.sha }}
+          docker push $IMAGE:latest
+#+end_src
+
+Interpretación de la tubería:
+
+1. El runner es ya una máquina limpia (casi un «laboratorio
+   remoto»).
+2. =docker build= usa el =Dockerfile= multi-etapa: dentro de la
+   imagen de build corre =flutter build web=; la etapa final solo
+   tiene nginx + estáticos.
+3. Si el =push= fue a =main=, publican la imagen. Actualizar el
+   servidor es tirar de esa etiqueta:
+
+#+begin_src shell
+docker pull ghcr.io/SU_ORG/entregas-front:latest
+# en el compose: imagen nueva y
+docker compose up -d front
+#+end_src
+
+Eso *es* actualizar la app web: los usuarios recargan el navegador y
+ven el front nuevo. No reinstalan nada en el teléfono.
+
+Variante sin registro de imágenes: el job solo hace =flutter build
+web=, sube =build/web= como *artifact* de Actions, y ustedes lo
+lo copian a nginx de forma manual. Es un CD parcial, útil en el curso.
+
+*** Paso 3 — CI que construye el =apk= (binario móvil)
+
+Android en CI pide un poco más (SDK, licencias). Un camino didáctico
+con la imagen de Flutter que ya conocen:
+
+#+begin_src yaml
+name: Android APK
+
+on:
+  push:
+    tags: [ 'v*' ]   # ej. v1.2.0
+  workflow_dispatch: # botón manual en Actions
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir APK dentro de contenedor Flutter
+        run: |
+          docker run --rm -v "$PWD/entregas_app:/app" -w /app \
+            ghcr.io/cirruslabs/flutter:stable \
+            bash -lc "flutter pub get && flutter build apk --release"
+
+      - name: Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: entregas_app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Adjuntar al Release de GitHub (si fue un tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: entregas_app/build/app/outputs/flutter-apk/app-release.apk
+#+end_src
+
+Flujo de actualización móvil en el curso:
+
+1. Suben un tag: =git tag v1.2.0 && git push origin v1.2.0=.
+2. Actions genera el =apk=.
+3. Lo bajan del *Release* o del artifact.
+4. =adb install -r app-release.apk= (o instalación manual del archivo).
+
+Eso conecta este apartado con
+[[*Actualizar la app con Git y volver a construir el móvil][Actualizar
+la app con Git…]]: allí el rebuild era local; aquí el rebuild lo hace
+la tubería y el equipo solo instala el archivo.
+
+*Firma:* el =apk= de clase puede salir con la firma de debug/release
+del proyecto. Un release de tienda necesita keystore en *secrets*
+(=KEYSTORE_BASE64=, contraseñas) y un paso que lo configure antes del
+=build=. No suban el =.jks= al repo.
+
+*** Paso 4 — Escritorio (Linux / Windows / macOS)
+
+Flutter también empaqueta escritorio. En local:
+
+#+begin_src shell
+# habilitar el destino una vez por máquina
+flutter config --enable-linux-desktop
+flutter config --enable-windows-desktop
+flutter config --enable-macos-desktop
+
+flutter devices   # deben aparecer linux / windows / macos
+
+flutter build linux --release
+flutter build windows --release
+flutter build macos --release
+#+end_src
+
+Dónde queda el binario (rutas habituales):
+
+- Linux: =build/linux/x64/release/bundle/=
+- Windows: =build/windows/x64/runner/Release/=
+- macOS: =build/macos/Build/Products/Release/=
+
+Actualizar escritorio en práctica de laboratorio: comprimir esa
+carpeta, subirla al Release del mismo tag =v1.2.0=, y que el
+compañero descargue y reemplace la versión anterior. Instaladores
+distribuidos (MSI, AppImage, =.dmg= firmado) constituyen un paso
+posterior; no son obligatorios para demostrar el concepto.
+
+En CI, Linux es el más simple en =ubuntu-latest= (hay que instalar
+dependencias GTK/clang según la doc de Flutter). Windows y macOS
+piden runners =windows-latest= / =macos-latest= (más minutos de
+cuota). En el semestre basta con demostrar *un* escritorio (Linux)
+además de web y =apk=.
+
+*** Paso 5 — Una tubería que hace los tres (mapa mental)
+
+No hace falta un solo YAML gigante el primer día. Pueden tener:
+
+- =front-web.yml= → imagen Docker,
+- =android.yml= → =apk= en tags,
+- =desktop-linux.yml= → zip del bundle.
+
+O un workflow con tres *jobs* en paralelo tras el =push=. Lo
+importante es que cada job produzca un artefacto *nombrado* y
+versionado (sha o tag), no únicamente una etiqueta =latest=
+sin trazabilidad.
+
+*** Paso 6 — Actualizar de verdad: checklist por plataforma
+
+*Web (contenedor)*
+
+1. Merge a =main= (o tag).
+2. CI publica =entregas-front:1.2.0= (o =:sha=).
+3. En el servidor: =docker compose pull && docker compose up -d=.
+4. Verifican la URL; fuerzan recarga del navegador si permanece
+   la versión anterior del JavaScript.
+
+*Móvil*
+
+1. Tag =v1.2.0= (y bump en =pubspec.yaml=).
+2. CI deja el =apk= en Releases.
+3. =adb install -r …= o «instalar app desconocida» desde el archivo.
+4. Comprueban folio/chat contra la API (URL correcta).
+
+*Escritorio*
+
+1. Mismo tag.
+2. Bajan el zip del bundle.
+3. Reemplazan la carpeta anterior; abren el ejecutable.
+4. Misma =API_BASE= que acordaron (archivo de config o
+   =--dart-define= al compilar).
+
+*Backend* (para no olvidarlo): si solo actualizan el front y cambian
+el contrato JSON, el móvil viejo se rompe. Versionen la API o
+mantengan compatibilidad hacia atrás un tiempo.
+
+*** Paso 7 — Contenedores en la tubería: dos roles distintos
+
+1. *Contenedor como fábrica:* la imagen =cirruslabs/flutter= (u otra)
+   solo sirve para *compilar* dentro del runner. Al terminar, el
+   contenedor se tira; queda el =apk= o el =build/web=.
+2. *Contenedor como producto:* la imagen =entregas-front= *sí* se
+   publica y se ejecuta en el servidor (nginx + estáticos).
+
+Confundirlos es habitual: «metí el =apk= dentro de Docker» no
+actualiza el teléfono. Docker actualiza el *servidor web*; el
+teléfono necesita el =apk= (o la tienda).
+
+*** Secretos y buenas prácticas mínimas
+
+- =GITHUB_TOKEN= / token del registry: en Secrets, nunca en el
+  =Dockerfile= ni en el YAML en claro.
+- Keystore Android: Secret + paso que lo decodifica en el job.
+- No publiquen =API_BASE= con claves; la base URL puede ir en
+  =--dart-define=, las claves se quedan en el backend.
+- Fijen versión de Flutter (etiqueta =stable= concreta o
+  =flutter-version=) para que el CI no «flote» entre semanas.
+- En pull requests: construir sí; publicar imagen o Release, no
+  (evitan publicar imágenes intermedias innecesarias).
+
+*** Cómo encaja con lo que ya tienen en los apuntes
+
+| Apartado | Qué aporta | Qué suma CI/CD |
+|----------|------------|----------------|
+| Contenedor Docker del front | =Dockerfile= multi-etapa | El =docker build= corre solo en cada =push= |
+| De Flutter web al celular | =flutter build apk= (manual) | El mismo comando en el runner + Release |
+| Actualizar con Git | =pull= + rebuild local | El rebuild es remoto; ustedes instalan el artefacto |
+| Proyecto 3 | Demo web + móvil | Pueden mostrar el badge verde de Actions y el =apk= del tag |
+
+*** Mini práctica sugerida (equipo)
+
+1. Workflow que solo construye =web= y sube artifact (sin push a
+   registry).
+2. Tag =v0.1.0= que construye =apk= y lo deja en Releases.
+3. En el informe: captura del workflow en verde, enlace al Release,
+   y tres líneas: cómo actualizan web, móvil y (si aplica)
+   escritorio.
+
+No se requiere publicación en Play Store ni App Store. Sí se espera que comprendan la
+cadena *commit → build → artefacto → actualizar el cliente*.
 
 
 ** Comparación rápida: dónde vive cada cosa
@@ -13467,13 +14331,15 @@ y se *actualiza* a partir del mismo código que la web.
 | Front web en Docker | Estáticos en nginx | =flutter build web= → imagen |
 | App Android | Paquete instalable | =flutter build apk= / =appbundle= |
 | App iOS | Paquete Apple | =flutter build ipa= |
+| Escritorio | Binario nativo | =flutter build linux/windows/macos= |
+| CI/CD | Tubería que construye y publica | Actions / GitLab CI + artifacts o imagen |
 | Backend | Django o microservicios | =runserver= / =compose= |
 | Gateway | Borde HTTP | nginx / API gateway |
 
 
-** Buenas prácticas (para no pelearse con el laboratorio)
+** Buenas prácticas de laboratorio
 
-1. *URL configurable.* No dejen la IP del salón clavada en el código.
+1. *URL configurable.* No dejen una dirección IP de laboratorio fija en el código.
    Usen un =--dart-define=API_BASE=...= o un archivo de entorno por
    modo (dev / prod).
 2. *Una base URL.* Web, emulador y celular solo cambian esa base; las
@@ -13512,12 +14378,19 @@ y se *actualiza* a partir del mismo código que la web.
    «para no depender del servidor». ¿Qué ganan y qué rompen
    (actualizaciones, tamaño, reglas de negocio, secretos)?
 
-4. En la WiFi del salón, el celular físico no alcanza =10.0.2.2=.
+4. En una red Wi‑Fi local, el dispositivo físico no alcanza =10.0.2.2=.
    ¿Qué URL usan y qué tiene que estar abierto en la PC del gateway?
 
 5. ¿En qué se parece contenerizar Flutter web a contenerizar el HTML
    de la práctica de microservicios? ¿En qué se diferencia del
    =apk=?
+
+6. Si el CI construye el =apk= y la imagen Docker del front desde el
+   mismo commit, ¿qué problema evitan frente a «cada quien compila en
+   su equipo y se intercambian el binario de manera informal»?
+
+7. ¿Por qué publicar una imagen =entregas-front:latest= no actualiza
+   sola la app ya instalada en el teléfono?
 
 
 * Entrenar un modelo chico para el asistente (mini LLM)
@@ -14419,7 +15292,7 @@ patrones alineado con el código.
 
 En este apartado van a pasar el proyecto por una IA que actúe como
 *segundo revisor*: que señale riesgos, acoplamientos y huecos. Lo
-importante no es el chat largo, sino lo que hacen después: abrir el
+importante no es la extensión del diálogo con la IA, sino lo que hacen después: abrir el
 código, la demo y el README, y decidir qué hallazgo es cierto, cuál
 está exagerado y cuál se inventó el modelo.
 
@@ -14435,7 +15308,7 @@ Tiene sentido pedirle que mire:
 - si los patrones del informe aparecen de verdad en archivos,
 - si el =apk= quedó con =localhost= o con IPs internas de Docker,
 - si hay secretos en el repo,
-- si el README alcanza para que alguien más levante el sistema,
+- si el README permite que otra persona levante el sistema,
 - si está documentado el =build web= y el =build apk=.
 
 No tiene sentido pedirle un «examen de hacker» ni que reescriba el
@@ -14447,7 +15320,8 @@ hecho.
 
 *** Herramientas libres o sin costo
 
-No hace falta pagar suscripción. Hay dos caminos cómodos en clase:
+No es necesario contratar una suscripción. Hay dos alternativas
+adecuadas para el laboratorio:
 
 1. *En su computadora:* Ollama (u otra interfaz local como LM
    Studio) con un modelo abierto (Llama, Mistral, Gemma, Qwen, un
@@ -14461,13 +15335,14 @@ No hace falta pagar suscripción. Hay dos caminos cómodos en clase:
 | Ollama + modelo abierto | Revisar en local | Gratis (usa RAM/disco) |
 | LM Studio | Igual, con interfaz visual | Gratis en uso habitual |
 | Continue (o similar) + Ollama | Preguntar cerca del editor | Gratis con modelo local |
-| Aider + modelo local | Cambios chicos con Git | Gratis si el modelo no cobra |
+| Aider + modelo local | Cambios acotados con Git | Gratis si el modelo no cobra |
 | HuggingChat | Segunda opinión en el navegador | Capa gratuita |
 | Gemini (AI Studio) / Groq | Cupo gratis sin GPU | Dentro del free tier |
 
-Documenten en el informe qué usaron. Si la máquina se ahoga, bajen
-a un modelo más chico (del orden de 7B u 8B) o usen un cupo gratis:
-el método importa más que el tamaño del modelo.
+Documenten en el informe qué herramientas utilizaron. Si el equipo
+no dispone de memoria suficiente, empleen un modelo de menor tamaño
+(del orden de 7B u 8B parámetros) o un cupo gratuito en la nube:
+el procedimiento de verificación importa más que el tamaño del modelo.
 
 *** Paso 1 — Armar un paquete de contexto (sin secretos)
 
@@ -14502,7 +15377,7 @@ ollama pull llama3.2
 ollama run llama3.2
 #+end_src
 
-Una pregunta corta basta para ver que está vivo. Si usan Continue u
+Una pregunta breve permite comprobar que el servicio responde. Si usan Continue u
 otro cliente, apunten a =http://localhost:11434= y al mismo modelo.
 
 *** Paso 3 — Prompt de auditoría (con evidencias)
@@ -14530,8 +15405,8 @@ Tareas:
 5. Cierra con las 5 comprobaciones manuales más útiles antes de la demo.
 #+end_quote
 
-Si inventa rutas que ustedes no tienen, córtenlo: «solo puedes citar
-lo que aparece arriba».
+Si inventa rutas inexistentes en el proyecto, indiquen de forma
+explícita: «solo puedes citar lo que aparece arriba».
 
 *** Paso 4 — Segunda opinión
 
@@ -14542,12 +15417,12 @@ chat con cupo gratis, etc.) y armen una tabla:
 |----------|------|------|-------------------------|-------------|
 | … | sí/no | sí/no | sí / no / parcial | … |
 
-Si solo una lo menciona y al abrir el archivo no está, es ruido. Si
-las dos coinciden y el código lo confirma, prioricen el arreglo.
+Si solo una lo menciona y al abrir el archivo no se confirma, descártenlo.
+Si ambas coinciden y el código lo confirma, prioricen la corrección.
 
 *** Paso 5 — Cómo analizar el resultado
 
-Lo que entregan no es el log del chat. Es un informe corto (una a
+Lo que entregan no es el registro completo del diálogo. Es un informe corto (una a
 tres páginas) donde se ve que *ustedes* pensaron:
 
 1. herramientas y modelos (nombre; local o nube);
@@ -14558,8 +15433,9 @@ tres páginas) donde se ve que *ustedes* pensaron:
 5. cambios hechos después (commits o PR);
 6. qué quedó pendiente y por qué.
 
-Sin esa verificación, cualquiera imprime alucinaciones. Por eso el
-informe importa más que el chat.
+Sin esa verificación, el informe podría limitarse a reproducir
+errores del modelo. Por ello el análisis documentado importa más
+que el historial del chat.
 
 *** Paso 6 — Cierre antes de la demo
 
@@ -14576,17 +15452,17 @@ confirmados») ayuda al equipo el día de la presentación.
 
 | Qué pasa | Qué hacer |
 |----------|-----------|
-| Inventa microservicios que no existen | Acotar el prompt; exigir citas |
-| Todo sale «crítico» | Calibrar severidad ustedes |
+| Inventa microservicios que no existen | Restringir el prompt; exigir citas |
+| Todo aparece como «crítico» | Ajustar la severidad de forma manual |
 | Pegaron un =.env= en un chat web | Rotar secretos; no repetirlo |
 | El informe de patrones lo escribió la IA | Ustedes firman el análisis |
-| El modelo local se queda sin memoria | Modelo más chico o cupo gratis |
+| El modelo local se queda sin memoria | Modelo de menor tamaño o cupo gratuito |
 
 
 ** Desarrollar el mismo proyecto con IA libre (sin costo)
 
 También pueden *construir* los proyectos 1 a 3 con ayuda de una IA
-sin pagar. El orden que sí funciona en clase es este:
+sin costo. El orden de trabajo recomendado es el siguiente:
 
 #+begin_example
 ustedes escriben el diseño
@@ -14595,8 +15471,9 @@ ustedes escriben el diseño
             → lo corren y lo corrigen
 #+end_example
 
-Si pegan el enunciado entero y entregan el volcado, no hay proyecto:
-hay pegamento. Siguen haciendo falta Django, SQLite o PostgreSQL,
+Si se entrega únicamente el resultado generado a partir del
+enunciado, sin comprensión ni adaptación, no se cumple el objetivo
+del proyecto. Siguen siendo necesarios Django, SQLite o PostgreSQL,
 Flutter, el =.joblib= y —en el asistente— datos y entrenamiento
 propios. La IA acelera lo repetitivo; no inventa el dominio de su
 matrícula.
@@ -14607,7 +15484,7 @@ Elijan una línea y déjenla dicha en el README:
 
 *En local.* Ollama con un modelo de código razonable para su RAM;
 editor con un cliente que hable con ese modelo; si quieren, un
-asistente de terminal ligado a Git para commits chicos.
+asistente de terminal ligado a Git para commits acotados.
 
 *Cupo gratis en la nube.* Gemini (AI Studio), Groq, HuggingChat u
 otro free tier: copian fragmentos, pegan la propuesta en el repo y
@@ -14616,7 +15493,7 @@ versionan con Git.
 *Híbrido.* Diseños o auditorías largas en la nube; el día a día con
 un modelo local pequeño para no agotar límites.
 
-No es obligatorio pagar Copilot ni un plan plus. Quien ya lo tenga
+No es obligatorio contratar Copilot ni un plan de pago. Quien ya lo tenga
 puede usarlo; las reglas de abajo igual aplican.
 
 *** Paso 1 — Diseñar antes de pedir código
@@ -14634,8 +15511,8 @@ repartos genéricos), la corrigen: manda la matrícula.
 
 *** Paso 2 — Pedir el sistema por rebanadas
 
-Un pedido «haz el Proyecto 3 completo» suele salir frágil. Avancen
-así:
+Una solicitud del tipo «haz el Proyecto 3 completo» suele producir
+una solución frágil. Avancen de este modo:
 
 1. modelos, admin y datos de prueba;
 2. listado del catálogo;
@@ -14685,8 +15562,8 @@ relevante [pegar]. No reescribas el proyecto. Dame 3 causas
 probables ordenadas y el cambio mínimo para la más probable.
 #+end_quote
 
-En todos: poco contexto, una tarea, y cómo lo probarían. Eviten
-«reescribe todo».
+En todos los casos: contexto acotado, una sola tarea y criterios
+de prueba. Eviten solicitudes del tipo «reescribe todo el proyecto».
 
 *** Paso 4 — Adaptar al dominio
 
@@ -14701,7 +15578,7 @@ Ustedes:
 Si el código sigue hablando de medios de transporte y su problema
 es óptica o tintorería, aún no está adaptado.
 
-*** Paso 5 — Probar de verdad (no solo leer el chat)
+*** Paso 5 — Verificar en ejecución (no solo revisar el texto generado)
 
 - crear un producto y verlo en Flutter,
 - una recomendación donde las reglas corrijan al modelo,
@@ -14720,9 +15597,10 @@ En el README o el informe anoten con naturalidad:
 - qué partes son datos y entrenamiento propios,
 - qué revisaron ustedes después.
 
-Usar IA está bien como acelerador. Entregar sin poder explicar
-*pregunta → API → joblib → JSON → pantalla* no cumple. En la demo o
-en el informe individual se nota.
+El uso de IA como acelerador está permitido. Entregar sin poder
+explicar el flujo *pregunta → API → joblib → JSON → pantalla* no
+cumple los criterios. La demostración y el informe individual
+permiten verificar esa comprensión.
 
 *** Rutina corta de equipo
 
@@ -14731,7 +15609,7 @@ git pull
   → releer DISENO.md
     → pedir a la IA solo la rebanada del día
       → adaptar al dominio
-        → probar a mano
+        → probar en ejecución
           → commit pequeño y push
             → (opcional) auditoría rápida con otro modelo
 #+end_example
@@ -14749,7 +15627,7 @@ El apartado
 [[*Actualizar la app con Git y volver a construir el móvil][Actualizar
 la app con Git…]] sigue mandando el cierre: la IA puede proponer un
 diff; Git guarda el historial; =flutter build apk= demuestra el
-móvil. Un chat sin repo no es entrega.
+móvil. Un historial de chat sin repositorio no constituye una entrega.
 
 
 ** Resumen del recorrido

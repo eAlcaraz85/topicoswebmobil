@@ -1,0 +1,129 @@
+name: Artefactos del cliente Flutter
+
+# Este workflow asume que *este directorio* es la raíz del repositorio
+# (microservicios-entregas como repo propio), o que se copia a
+# .github/workflows en la raíz del monorepo ajustando working-directory.
+
+on:
+  push:
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: cliente_flutter
+
+jobs:
+  web:
+    name: Build web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build web --release --dart-define=API_BASE=http://127.0.0.1:8080
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: cliente_flutter/build/web
+
+  linux:
+    name: Build Linux desktop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Dependencias nativas Linux
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+        working-directory: .
+      - run: flutter config --enable-linux-desktop
+      - run: flutter pub get
+      - run: flutter build linux --release --dart-define=API_BASE=http://127.0.0.1:8080
+      - name: Empaquetar bundle
+        run: |
+          cd build/linux/x64/release/bundle
+          tar -czf "$GITHUB_WORKSPACE/entregas-linux-x64.tar.gz" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-desktop
+          path: entregas-linux-x64.tar.gz
+
+  android:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Instalar Android SDK (línea de comandos)
+        uses: android-actions/setup-android@v3
+      - run: flutter pub get
+      - run: flutter build apk --release --dart-define=API_BASE=http://10.0.2.2:8080
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: cliente_flutter/build/app/outputs/flutter-apk/app-release.apk
+
+  windows:
+    name: Build Windows desktop
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter build windows --release --dart-define=API_BASE=http://127.0.0.1:8080
+      - name: Empaquetar Release
+        shell: pwsh
+        run: |
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath "$env:GITHUB_WORKSPACE\entregas-windows-x64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop
+          path: entregas-windows-x64.zip
+
+  release:
+    name: Adjuntar a GitHub Release
+    needs: [web, linux, android, windows]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Preparar archivos del release
+        run: |
+          mkdir -p out
+          cp -r dist/web out/web
+          cp dist/linux-desktop/entregas-linux-x64.tar.gz out/ || true
+          find dist -name '*.tar.gz' -exec cp {} out/ \;
+          find dist -name '*.zip' -exec cp {} out/ \;
+          find dist -name '*.apk' -exec cp {} out/entregas-app-release.apk \;
+          tar -czf out/entregas-web.tar.gz -C out/web .
+          ls -la out
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/entregas-web.tar.gz
+            out/entregas-linux-x64.tar.gz
+            out/entregas-windows-x64.zip
+            out/entregas-app-release.apk
